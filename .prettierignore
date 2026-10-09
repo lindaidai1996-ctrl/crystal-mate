@@ -1,0 +1,9 @@
+node_modules
+.next
+coverage
+playwright-report
+test-results
+public/uploads
+*.tsbuildinfo
+next-env.d.ts
+AGENTS.md

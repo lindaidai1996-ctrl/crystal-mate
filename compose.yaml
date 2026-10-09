@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: crystal
+      POSTGRES_PASSWORD: crystal
+      POSTGRES_DB: crystal_mate
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U crystal -d crystal_mate']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+volumes:
+  postgres_data:

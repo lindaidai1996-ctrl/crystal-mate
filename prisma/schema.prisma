@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+}
+
+model Product {
+  id          String         @id @default(cuid())
+  code        String         @unique
+  name        String
+  description String         @default("") @db.Text
+  categoryId  String
+  category    Category       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  priceCents  Int
+  currency    String         @default("CNY")
+  stock       Int            @default(1)
+  published   Boolean        @default(false)
+  images      ProductImage[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([categoryId])
+  @@index([published, stock])
+  @@index([createdAt])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  objectKey String
+  url       String
+  position  Int
+
+  @@unique([productId, position])
+}
+
+model UploadGrant {
+  id        String   @id @default(cuid())
+  objectKey String   @unique
+  url       String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  uploadedAt DateTime?
+  usedAt    DateTime?
+}
