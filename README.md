@@ -25,4 +25,6 @@ Next.js App Router、React、Ant Design、Prisma 和 PostgreSQL 构成的单项�
 
 ## 验证
 
-`npm run typecheck`、`npm run lint`、`npm test` 和 `npm run build` 验证静态质量。初始化本地管理员后，可用 `E2E_USERNAME`、`E2E_PASSWORD` 运行 `npx playwright test`，覆盖登录保护、分类、商品、图片顺序、搜索、售罄及语言切换。首次运行先执行 `npx playwright install chromium`；若本机已有 Chrome，可设置 `PLAYWRIGHT_CHROME_PATH` 为浏览器可执行文件路径。
+`npm run typecheck`、`npm run lint`、`npm test` 和 `npm run build` 验证静态质量。首次运行浏览器测试前执行 `npx playwright install chromium`；若本机已有 Chrome，可设置 `PLAYWRIGHT_CHROME_PATH` 为浏览器可执行文件路径。
+
+端到端测试使用独立数据库：先创建名称以 `_test` 结尾的 PostgreSQL 数据库，设置 `E2E_DATABASE_URL`、`E2E_USERNAME`、`E2E_PASSWORD`，再运行 `npm run test:e2e -- tests/e2e/materials.spec.ts`。命令会在测试库部署迁移、创建或更新测试管理员，再启动 Playwright；默认测试端口为 3100，可用 `E2E_PORT` 调整。测试服务使用 `.next-e2e`，能与日常开发服务同时运行；测试上传默认使用本地图片存储。脚本拒绝将项目正常数据库 URL 用作测试库。

@@ -1,11 +1,22 @@
 'use client';
 
-import { AppstoreOutlined, LogoutOutlined, MenuOutlined, TagsOutlined } from '@ant-design/icons';
-import { Button, Drawer, Layout, Menu, Select } from 'antd';
+import {
+  AppstoreOutlined,
+  DeploymentUnitOutlined,
+  FolderOutlined,
+  GoldOutlined,
+  LogoutOutlined,
+  MenuOutlined,
+  ExperimentOutlined,
+  TagsOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
+import { Button, Drawer, Layout, Menu, Select, Tooltip } from 'antd';
 import { signOut } from 'next-auth/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { useState } from 'react';
+import { catalogPath } from '@/lib/catalog-scopes';
 
 const { Header, Sider, Content } = Layout;
 
@@ -21,7 +32,21 @@ export function AdminShell({
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const selected = pathname.startsWith('/admin/categories') ? 'categories' : 'products';
+  const selected = pathname.startsWith('/admin/categories')
+    ? 'categories'
+    : pathname.startsWith('/admin/distributors')
+      ? 'distributors'
+      : pathname.startsWith('/admin/materials')
+        ? 'materials'
+        : pathname.startsWith('/admin/tags')
+          ? 'tags'
+          : pathname === catalogPath('cabochons') ||
+              pathname.startsWith(`${catalogPath('cabochons')}/`)
+            ? 'cabochons'
+            : pathname === catalogPath('finished-strands') ||
+                pathname.startsWith(`${catalogPath('finished-strands')}/`)
+              ? 'finishedStrands'
+              : 'products';
   const menu = (
     <Menu
       theme="dark"
@@ -37,11 +62,56 @@ export function AdminShell({
           },
         },
         {
+          key: 'cabochons',
+          icon: <GoldOutlined />,
+          label: t('cabochons'),
+          onClick: () => {
+            router.push(catalogPath('cabochons'));
+            setOpen(false);
+          },
+        },
+        {
+          key: 'finishedStrands',
+          icon: <DeploymentUnitOutlined />,
+          label: t('finishedStrands'),
+          onClick: () => {
+            router.push(catalogPath('finished-strands'));
+            setOpen(false);
+          },
+        },
+        {
+          key: 'materials',
+          icon: <ExperimentOutlined />,
+          label: t('materials'),
+          onClick: () => {
+            router.push('/admin/materials');
+            setOpen(false);
+          },
+        },
+        {
           key: 'categories',
-          icon: <TagsOutlined />,
+          icon: <FolderOutlined />,
           label: t('categories'),
           onClick: () => {
             router.push('/admin/categories');
+            setOpen(false);
+          },
+        },
+        {
+          key: 'tags',
+          icon: <TagsOutlined />,
+          label: t('tags'),
+          onClick: () => {
+            router.push('/admin/tags');
+            setOpen(false);
+          },
+        },
+        {
+          key: 'distributors',
+          icon: <TeamOutlined />,
+          label: t('distributors'),
+          onClick: () => {
+            router.push('/admin/distributors');
             setOpen(false);
           },
         },
@@ -75,9 +145,7 @@ export function AdminShell({
             aria-label="Menu"
             onClick={() => setOpen(true)}
           />
-          <div className="header-context">
-            {selected === 'products' ? t('products') : t('categories')}
-          </div>
+          <div className="header-context">{t(selected)}</div>
           <div className="header-actions">
             <Select
               aria-label={t('language')}
@@ -89,12 +157,13 @@ export function AdminShell({
               ]}
               className="language-select"
             />
-            <Button
-              icon={<LogoutOutlined />}
-              onClick={() => signOut({ callbackUrl: `/${locale}/login` })}
-              title={t('logout')}
-              aria-label={t('logout')}
-            />
+            <Tooltip title={t('logout')}>
+              <Button
+                icon={<LogoutOutlined />}
+                onClick={() => signOut({ callbackUrl: `/${locale}/login` })}
+                aria-label={t('logout')}
+              />
+            </Tooltip>
           </div>
         </Header>
         <Content className="admin-content">{children}</Content>

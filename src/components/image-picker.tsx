@@ -1,12 +1,13 @@
 'use client';
 
-import { DeleteOutlined, LeftOutlined, PlusOutlined, RightOutlined } from '@ant-design/icons';
-import { App, Button, Spin } from 'antd';
+import { HolderOutlined, PlusOutlined, ZoomInOutlined } from '@ant-design/icons';
+import { App, Image, Spin, Upload, type UploadFile, Tooltip } from 'antd';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
-import Image from 'next/image';
+import { useRef, useState } from 'react';
 import { apiFetch } from '@/lib/client-api';
 import type { ProductImage } from '@/lib/client-types';
+import { ImageUploadChoiceDialog } from './imageUpload/imageUploadChoiceDialog';
+import { MAX_UPLOAD_BYTES } from './imageUpload/prepareImages';
 
 type UploadGrant = {
   id: string;
@@ -26,11 +27,21 @@ export function ImagePicker({
   const t = useTranslations('editor');
   const { message } = App.useApp();
   const [uploading, setUploading] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[] | null>(null);
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+  const draggingKey = useRef<string | null>(null);
+  const fileList: UploadFile[] = images.map((image, index) => ({
+    uid: image.objectKey,
+    name: t('imageNumber', { number: index + 1 }),
+    status: 'done',
+    url: image.url,
+    thumbUrl: image.url,
+  }));
 
   async function uploadOne(file: File): Promise<ProductImage> {
     if (
       !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) ||
-      file.size > 8 * 1024 * 1024 ||
+      file.size > MAX_UPLOAD_BYTES ||
       file.size === 0
     )
       throw new Error('INVALID_IMAGE');
@@ -58,91 +69,144 @@ export function ImagePicker({
     return { objectKey: grant.key, url: grant.url, position: 0 };
   }
 
-  async function upload(files: FileList | null) {
-    if (!files?.length || uploading) return;
-    const selected = Array.from(files).slice(0, 12 - images.length);
+  function selectFiles(files: File[]) {
+    if (!files.length || uploading || pendingFiles) return;
+    const selected = files.slice(0, 12 - images.length);
     if (!selected.length) return;
     setUploading(true);
-    const added: ProductImage[] = [];
-    for (const file of selected) {
-      try {
-        added.push(await uploadOne(file));
-      } catch {
-        message.error(t('uploadFailed'));
-      }
-    }
-    if (added.length)
-      onChange([...images, ...added].map((image, position) => ({ ...image, position })));
-    setUploading(false);
+    setPendingFiles(selected);
   }
 
-  function move(index: number, direction: -1 | 1) {
+  async function upload(files: File[]) {
+    setPendingFiles(null);
+    const added: ProductImage[] = [];
+    try {
+      for (const file of files) {
+        try {
+          added.push(await uploadOne(file));
+        } catch {
+          message.error(t('uploadFailed'));
+        }
+      }
+      if (added.length)
+        onChange([...images, ...added].map((image, position) => ({ ...image, position })));
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function reorder(from: number, to: number) {
+    if (from === to || from < 0 || to < 0) return;
     const copy = [...images];
-    [copy[index], copy[index + direction]] = [copy[index + direction], copy[index]];
+    const [moved] = copy.splice(from, 1);
+    copy.splice(to, 0, moved);
     onChange(copy.map((image, position) => ({ ...image, position })));
   }
 
   return (
     <>
-      <div className="image-grid">
-        {images.map((image, index) => (
-          <div className="image-item" key={image.objectKey}>
-            <Image unoptimized src={image.url} width={200} height={200} alt="" />
-            <div className="image-controls">
-              <Button
-                type="text"
-                size="small"
-                icon={<LeftOutlined />}
-                disabled={index === 0}
-                onClick={() => move(index, -1)}
-                title={t('moveLeft')}
-                aria-label={t('moveLeft')}
-              />
-              <Button
-                type="text"
-                size="small"
-                icon={<RightOutlined />}
-                disabled={index === images.length - 1}
-                onClick={() => move(index, 1)}
-                title={t('moveRight')}
-                aria-label={t('moveRight')}
-              />
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() =>
-                  onChange(
-                    images
-                      .filter((_, i) => i !== index)
-                      .map((item, position) => ({ ...item, position })),
-                  )
+      <Upload
+        className="image-picker-upload"
+        listType="picture-card"
+        accept="image/jpeg,image/png,image/webp"
+        multiple
+        disabled={uploading || pendingFiles !== null || images.length >= 12}
+        fileList={fileList}
+        isImageUrl={() => true}
+        beforeUpload={(file, files) => {
+          if (file === files[0]) selectFiles(files);
+          return Upload.LIST_IGNORE;
+        }}
+        onPreview={(file) => {
+          const index = images.findIndex((image) => image.objectKey === file.uid);
+          if (index >= 0) setPreviewIndex(index);
+        }}
+        onRemove={(file) => {
+          onChange(
+            images
+              .filter((image) => image.objectKey !== file.uid)
+              .map((image, position) => ({ ...image, position })),
+          );
+          return false;
+        }}
+        showUploadList={{ previewIcon: <ZoomInOutlined /> }}
+        itemRender={(originNode, file) => (
+          <Tooltip title={t('reorderImages')}>
+            <div
+              className="image-picker-sortable"
+              data-image-key={file.uid}
+              tabIndex={0}
+              aria-label={`${file.name}，${t('reorderImages')}`}
+              onKeyDown={(event) => {
+                if (event.target !== event.currentTarget) return;
+                const index = images.findIndex((image) => image.objectKey === file.uid);
+                if (event.key === 'ArrowLeft' && index > 0) {
+                  event.preventDefault();
+                  reorder(index, index - 1);
+                } else if (event.key === 'ArrowRight' && index < images.length - 1) {
+                  event.preventDefault();
+                  reorder(index, index + 1);
                 }
-                title={t('removeImage')}
-                aria-label={t('removeImage')}
-              />
-            </div>
-          </div>
-        ))}
-        {images.length < 12 && (
-          <label className="upload-trigger">
-            {uploading ? <Spin size="small" /> : <PlusOutlined style={{ fontSize: 18 }} />}
-            <span>{uploading ? t('uploading') : t('upload')}</span>
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              multiple
-              disabled={uploading}
-              onChange={(event) => {
-                void upload(event.target.files);
-                event.target.value = '';
               }}
-            />
-          </label>
+            >
+              {originNode}
+              <span
+                className="image-picker-drag-handle"
+                onPointerDown={(event) => {
+                  draggingKey.current = file.uid;
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                }}
+                onPointerUp={(event) => {
+                  const target = document
+                    .elementFromPoint(event.clientX, event.clientY)
+                    ?.closest<HTMLElement>('.image-picker-sortable');
+                  const from = images.findIndex((image) => image.objectKey === draggingKey.current);
+                  const to = images.findIndex(
+                    (image) => image.objectKey === target?.dataset.imageKey,
+                  );
+                  reorder(from, to);
+                  draggingKey.current = null;
+                }}
+                onPointerCancel={() => {
+                  draggingKey.current = null;
+                }}
+              >
+                <HolderOutlined />
+              </span>
+            </div>
+          </Tooltip>
         )}
-      </div>
+      >
+        {images.length < 12 && (
+          <div className="image-picker-trigger">
+            {uploading ? <Spin size="small" /> : <PlusOutlined />}
+            <span>{uploading ? t('uploading') : t('upload')}</span>
+          </div>
+        )}
+      </Upload>
+      <Image.PreviewGroup
+        items={images.map((image) => image.url)}
+        preview={{
+          visible: previewIndex !== null,
+          current: previewIndex ?? 0,
+          onVisibleChange: (visible) => {
+            if (!visible) setPreviewIndex(null);
+          },
+          onChange: (current) => setPreviewIndex(current),
+        }}
+      />
       <div className="helper-text">{t('imageHelp')}</div>
+      {pendingFiles && (
+        <ImageUploadChoiceDialog
+          files={pendingFiles}
+          askCompression
+          onCancel={() => {
+            setPendingFiles(null);
+            setUploading(false);
+          }}
+          onConfirm={(files) => void upload(files)}
+        />
+      )}
     </>
   );
 }

@@ -1,18 +1,19 @@
 'use client';
 
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { App, Button, Empty, Form, Input, Modal, Popconfirm, Table } from 'antd';
+import { App, Button, Empty, Form, Input, Modal, Popconfirm, Table, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { Category } from '@/lib/client-types';
+import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
 
 export function CategoriesPage() {
   const t = useTranslations('categories');
   const common = useTranslations('common');
   const { message } = App.useApp();
-  const [form] = Form.useForm<{ name: string }>();
+  const [form] = Form.useForm<{ name: string; prefix?: string }>();
   const [items, setItems] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -42,7 +43,7 @@ export function CategoriesPage() {
 
   function open(item: Category | null) {
     setEditing(item);
-    form.setFieldsValue({ name: item?.name ?? '' });
+    form.setFieldsValue({ name: item?.name ?? '', prefix: item?.prefix ?? undefined });
   }
   async function save() {
     const values = await form.validateFields();
@@ -74,6 +75,13 @@ export function CategoriesPage() {
   const columns: ColumnsType<Category> = [
     { title: t('name'), dataIndex: 'name', key: 'name' },
     {
+      title: t('prefix'),
+      dataIndex: 'prefix',
+      key: 'prefix',
+      width: 120,
+      render: (prefix: string | null) => prefix || '—',
+    },
+    {
       title: t('productCount'),
       key: 'count',
       width: 150,
@@ -85,26 +93,23 @@ export function CategoriesPage() {
       width: 110,
       render: (_, item) => (
         <span className="row-actions">
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            title={common('edit')}
-            aria-label={common('edit')}
-            onClick={() => open(item)}
-          />
+          <Tooltip title={common('edit')}>
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              aria-label={common('edit')}
+              onClick={() => open(item)}
+            />
+          </Tooltip>
           <Popconfirm
             title={t('deleteConfirm')}
             okText={common('delete')}
             cancelText={common('cancel')}
             onConfirm={() => remove(item.id)}
           >
-            <Button
-              type="text"
-              danger
-              icon={<DeleteOutlined />}
-              title={common('delete')}
-              aria-label={common('delete')}
-            />
+            <Tooltip title={common('delete')}>
+              <Button type="text" danger icon={<DeleteOutlined />} aria-label={common('delete')} />
+            </Tooltip>
           </Popconfirm>
         </span>
       ),
@@ -124,7 +129,7 @@ export function CategoriesPage() {
           dataSource={items}
           columns={columns}
           loading={loading}
-          pagination={false}
+          pagination={CLIENT_TABLE_PAGINATION}
           locale={{ emptyText: <Empty description={t('empty')} /> }}
         />
       </div>
@@ -146,6 +151,16 @@ export function CategoriesPage() {
           >
             <Input maxLength={60} autoFocus />
           </Form.Item>
+          {editing && (
+            <Form.Item
+              name="prefix"
+              label={t('prefix')}
+              extra={t('prefixHelp')}
+              rules={[{ required: true, whitespace: true, pattern: /^[A-Za-z]+$/, max: 20 }]}
+            >
+              <Input maxLength={20} style={{ textTransform: 'uppercase' }} />
+            </Form.Item>
+          )}
         </Form>
       </Modal>
     </>

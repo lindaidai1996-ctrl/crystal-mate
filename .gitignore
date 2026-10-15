@@ -1,6 +1,8 @@
 node_modules
 .DS_Store
 .next
+.next-e2e
+.next-e2e-product-sources
 .env
 .env.local
 .env.*.local

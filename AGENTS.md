@@ -13,3 +13,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Format every created or modified source file with Prettier before finishing a change.
 - Run `npm run format:check` after edits. Use `npm run format` only when intentionally formatting the whole repository.
 - Keep manual edits readable when Prettier cannot wrap a long expression or string.
+
+## Testing
+
+- 尽量不要新增或运行 E2E 测试，仅在改动较为复杂、确实需要验证完整流程时使用。简单的局部改动优先采用必要的格式、类型和 lint 检查。

@@ -31,7 +31,16 @@ export function apiError(error: unknown) {
   if (error instanceof ZodError)
     return NextResponse.json({ error: 'INVALID_INPUT', issues: error.issues }, { status: 400 });
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    if (error.code === 'P2002') return NextResponse.json({ error: 'DUPLICATE' }, { status: 409 });
+    if (error.code === 'P2002') {
+      const model = error.meta?.modelName;
+      const code =
+        model === 'MaterialBatch'
+          ? 'MATERIAL_BATCH_NAME_EXISTS'
+          : model === 'MaterialBatchEntry'
+            ? 'MATERIAL_ALREADY_IN_BATCH'
+            : 'DUPLICATE';
+      return NextResponse.json({ error: code }, { status: 409 });
+    }
     if (error.code === 'P2003') return NextResponse.json({ error: 'IN_USE' }, { status: 409 });
     if (error.code === 'P2025') return NextResponse.json({ error: 'NOT_FOUND' }, { status: 404 });
   }

@@ -19,29 +19,235 @@ model Admin {
 model Category {
   id        String    @id @default(cuid())
   name      String    @unique
+  prefix    String?   @unique
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   products  Product[]
 }
 
+model Tag {
+  id        String        @id @default(cuid())
+  name      String        @unique
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  products  ProductTag[]
+  materials MaterialTag[]
+}
+
+model DistributorArea {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Distributor {
+  id                     String                  @id @default(cuid())
+  name                   String
+  area                   String
+  address                String                  @default("")
+  wechat                 String                  @default("")
+  phone                  String                  @default("")
+  notes                  String                  @default("") @db.Text
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  materialBatchEntries   MaterialBatchEntry[]
+  productPurchaseEntries ProductPurchaseEntry[]
+  attachments            DistributorAttachment[]
+
+  @@index([area])
+  @@index([createdAt])
+}
+
+model DistributorAttachment {
+  id            String      @id @default(cuid())
+  distributorId String
+  distributor   Distributor @relation(fields: [distributorId], references: [id], onDelete: Cascade)
+  objectKey     String      @unique
+  url           String
+  fileName      String
+  notes         String      @default("") @db.Text
+  position      Int
+  createdAt     DateTime    @default(now())
+
+  @@unique([distributorId, position])
+}
+
 model Product {
-  id          String         @id @default(cuid())
-  code        String         @unique
-  name        String
-  description String         @default("") @db.Text
-  categoryId  String
-  category    Category       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  priceCents  Int
-  currency    String         @default("CNY")
-  stock       Int            @default(1)
-  published   Boolean        @default(false)
-  images      ProductImage[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id               String                   @id @default(cuid())
+  code             String                   @unique
+  name             String
+  description      String                   @default("") @db.Text
+  categoryId       String
+  category         Category                 @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  priceCents       Int
+  saleRule         ProductSaleRule          @default(PERCENT_50)
+  saleRuleValue    Decimal?                 @db.Decimal(12, 2)
+  saleManual       Boolean                  @default(true)
+  currency         String                   @default("CNY")
+  stock            Int                      @default(1)
+  origin           ProductOrigin?
+  published        Boolean                  @default(false)
+  images           ProductImage[]
+  tags             ProductTag[]
+  marketing        ProductMarketing?
+  measurement      CabochonMeasurement?
+  cost             CabochonCost?
+  purchaseEntries  ProductPurchaseEntry[]
+  diyRuns          ProductDiyRun[]
+  diyInputs        ProductDiyCabochon[]     @relation("DiyCabochonInput")
+  stockAdjustments ProductStockAdjustment[]
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
 
   @@index([categoryId])
   @@index([published, stock])
   @@index([createdAt])
+}
+
+enum ProductOrigin {
+  PURCHASED
+  DIY
+}
+
+enum ProductSaleRule {
+  COST
+  PERCENT_30
+  PERCENT_50
+  PERCENT_100
+  PERCENT_200
+  FIXED_AMOUNT
+  CUSTOM_PERCENT
+}
+
+enum DiyUsageUnit {
+  STRAND
+  BEAD
+  GRAM
+}
+
+model ProductPurchaseEntry {
+  id            String        @id @default(cuid())
+  productId     String
+  product       Product       @relation(fields: [productId], references: [id], onDelete: Restrict)
+  batchId       String
+  batch         MaterialBatch @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  distributorId String
+  distributor   Distributor   @relation(fields: [distributorId], references: [id], onDelete: Restrict)
+  quantity      Int
+  unitCost      Decimal       @db.Decimal(12, 2)
+  notes         String        @default("") @db.Text
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([productId, createdAt])
+  @@index([batchId])
+  @@index([distributorId])
+}
+
+model ProductDiyRun {
+  id             String               @id @default(cuid())
+  productId      String
+  product        Product              @relation(fields: [productId], references: [id], onDelete: Restrict)
+  quantity       Int
+  perUnitCost    Decimal              @db.Decimal(12, 2)
+  totalCost      Decimal?             @db.Decimal(22, 2)
+  perUnitQuote   Decimal?             @db.Decimal(22, 2)
+  totalQuote     Decimal?             @db.Decimal(22, 2)
+  craftDesignFee Json                 @default("{\"unitAmount\":\"0\",\"accumulateByQuantity\":false,\"totalAmount\":null}")
+  extraCosts     Json                 @default("[]")
+  notes          String               @default("") @db.Text
+  materialLines  ProductDiyMaterial[]
+  cabochonLines  ProductDiyCabochon[]
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@index([productId, createdAt])
+}
+
+model ProductDiyMaterial {
+  id                   String             @id @default(cuid())
+  runId                String
+  run                  ProductDiyRun      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  materialBatchEntryId String
+  materialBatchEntry   MaterialBatchEntry @relation(fields: [materialBatchEntryId], references: [id], onDelete: Restrict)
+  usageUnit            DiyUsageUnit
+  quantity             Decimal            @db.Decimal(12, 2)
+  unitCost             Decimal            @db.Decimal(12, 2)
+  lineCost             Decimal            @db.Decimal(12, 2)
+  quoteUnitPrice       Decimal?           @db.Decimal(12, 2)
+  quoteLineTotal       Decimal?           @db.Decimal(22, 2)
+  quoteSnapshot        Json?
+  position             Int
+
+  @@unique([runId, position])
+  @@index([materialBatchEntryId])
+}
+
+model ProductDiyCabochon {
+  id             String        @id @default(cuid())
+  runId          String
+  run            ProductDiyRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  productId      String
+  product        Product       @relation("DiyCabochonInput", fields: [productId], references: [id], onDelete: Restrict)
+  quantity       Int
+  unitCost       Decimal       @db.Decimal(12, 2)
+  lineCost       Decimal       @db.Decimal(12, 2)
+  quoteUnitPrice Decimal?      @db.Decimal(12, 2)
+  quoteLineTotal Decimal?      @db.Decimal(22, 2)
+  quoteSnapshot  Json?
+  position       Int
+
+  @@unique([runId, position])
+  @@index([productId])
+}
+
+model ProductStockAdjustment {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  delta     Int
+  reason    String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([productId, createdAt])
+}
+
+model ProductMarketing {
+  productId                 String  @id
+  product                   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  videoShot                 Boolean @default(false)
+  xiaohongshuVideoPublished Boolean @default(false)
+  xiaohongshuListed         Boolean @default(false)
+  douyinVideoPublished      Boolean @default(false)
+  douyinListed              Boolean @default(false)
+}
+
+model CabochonMeasurement {
+  productId String   @id
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  lengthMm  Decimal? @db.Decimal(10, 2)
+  widthMm   Decimal? @db.Decimal(10, 2)
+  heightMm  Decimal? @db.Decimal(10, 2)
+}
+
+model CabochonCost {
+  productId      String   @id
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  roughStoneCost Decimal? @db.Decimal(12, 2)
+  settingCost    Decimal? @db.Decimal(12, 2)
+  otherCosts     Json     @default("[]")
+  totalCost      Decimal  @db.Decimal(12, 2)
+  totalManual    Boolean  @default(false)
+}
+
+model ProductTag {
+  productId String
+  tagId     String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Restrict)
+
+  @@id([productId, tagId])
+  @@index([tagId])
 }
 
 model ProductImage {
@@ -56,11 +262,191 @@ model ProductImage {
 }
 
 model UploadGrant {
-  id        String   @id @default(cuid())
-  objectKey String   @unique
-  url       String
-  createdAt DateTime @default(now())
-  expiresAt DateTime
+  id         String    @id @default(cuid())
+  objectKey  String    @unique
+  url        String
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime
   uploadedAt DateTime?
-  usedAt    DateTime?
+  usedAt     DateTime?
+}
+
+enum MaterialUnit {
+  STRAND
+  BEAD
+}
+
+enum MaterialPriceSource {
+  COUNT
+  WEIGHT
+  CUSTOM
+}
+
+enum MaterialSaleRule {
+  COST
+  PERCENT_10
+  PERCENT_20
+  PERCENT_30
+  PERCENT_50
+  FIXED_AMOUNT
+  CUSTOM_PERCENT
+}
+
+model MaterialCategory {
+  id        String             @id @default(cuid())
+  name      String
+  aliases   String[]           @default([])
+  parentId  String?
+  parent    MaterialCategory?  @relation("MaterialCategoryTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children  MaterialCategory[] @relation("MaterialCategoryTree")
+  materials Material[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@index([parentId])
+}
+
+model Material {
+  id                 String               @id @default(cuid())
+  name               String
+  categoryId         String
+  category           MaterialCategory     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  unit               MaterialUnit         @default(STRAND)
+  purchaseUnitPrice  Decimal?             @db.Decimal(12, 2)
+  weightGrams        Decimal?             @db.Decimal(12, 2)
+  purchaseGramPrice  Decimal?             @db.Decimal(12, 2)
+  purchaseGramManual Boolean              @default(false)
+  lengthMm           Decimal?             @db.Decimal(12, 2)
+  widthMm            Decimal?             @db.Decimal(12, 2)
+  heightMm           Decimal?             @db.Decimal(12, 2)
+  childCount         Int?
+  childWeightGrams   Decimal?             @db.Decimal(12, 2)
+  childUnitPrice     Decimal?             @db.Decimal(12, 2)
+  childPriceSource   MaterialPriceSource?
+  saleRule           MaterialSaleRule     @default(COST)
+  saleRuleValue      Decimal?             @db.Decimal(12, 2)
+  saleUnitPrice      Decimal?             @db.Decimal(12, 2)
+  saleGramPrice      Decimal?             @db.Decimal(12, 2)
+  saleChildUnitPrice Decimal?             @db.Decimal(12, 2)
+  saleUnitManual     Boolean              @default(false)
+  saleGramManual     Boolean              @default(false)
+  saleChildManual    Boolean              @default(false)
+  notes              String               @default("") @db.Text
+  images             MaterialImage[]
+  tags               MaterialTag[]
+  batchEntries       MaterialBatchEntry[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  @@index([categoryId])
+  @@index([createdAt])
+}
+
+model MaterialTag {
+  materialId String
+  tagId      String
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Restrict)
+
+  @@id([materialId, tagId])
+  @@index([tagId])
+}
+
+model MaterialBatch {
+  id             String                    @id @default(cuid())
+  name           String                    @unique
+  receivedAt     DateTime                  @db.Date
+  notes          String                    @default("") @db.Text
+  entries        MaterialBatchEntry[]
+  productEntries ProductPurchaseEntry[]
+  attachments    MaterialBatchAttachment[]
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+
+  @@index([receivedAt])
+}
+
+model MaterialBatchEntry {
+  id                       String               @id @default(cuid())
+  materialId               String
+  material                 Material             @relation(fields: [materialId], references: [id], onDelete: Restrict)
+  batchId                  String
+  batch                    MaterialBatch        @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  distributorId            String
+  distributor              Distributor          @relation(fields: [distributorId], references: [id], onDelete: Restrict)
+  receivedQty              Int?
+  remainingQty             Int?
+  purchaseInputMode        String               @default("UNIT")
+  purchaseTotalWeightGrams Decimal?             @db.Decimal(12, 2)
+  purchaseTotalAmount      Decimal?             @db.Decimal(12, 2)
+  purchaseQuotedGramPrice  Decimal?             @db.Decimal(12, 2)
+  purchaseAutoField        String?
+  sampleWeightGrams        Decimal?             @db.Decimal(12, 2)
+  manualPurchaseUnitPrice  Decimal?             @db.Decimal(12, 2)
+  purchaseUnitInputs       Json?
+  unitPriceSource          String               @default("UNIT")
+  purchaseUnitPrice        Decimal?             @db.Decimal(12, 2)
+  weightGrams              Decimal?             @db.Decimal(12, 2)
+  purchaseGramPrice        Decimal?             @db.Decimal(12, 2)
+  purchaseGramManual       Boolean              @default(false)
+  lengthMm                 Decimal?             @db.Decimal(12, 2)
+  widthMm                  Decimal?             @db.Decimal(12, 2)
+  heightMm                 Decimal?             @db.Decimal(12, 2)
+  childCount               Int?
+  childWeightGrams         Decimal?             @db.Decimal(12, 2)
+  childUnitPrice           Decimal?             @db.Decimal(12, 2)
+  childPriceSource         MaterialPriceSource?
+  saleRule                 MaterialSaleRule     @default(COST)
+  saleRuleValue            Decimal?             @db.Decimal(12, 2)
+  saleUnitPrice            Decimal?             @db.Decimal(12, 2)
+  saleGramPrice            Decimal?             @db.Decimal(12, 2)
+  saleChildUnitPrice       Decimal?             @db.Decimal(12, 2)
+  saleUnitManual           Boolean              @default(false)
+  saleGramManual           Boolean              @default(false)
+  saleChildManual          Boolean              @default(false)
+  images                   MaterialBatchImage[]
+  diyLines                 ProductDiyMaterial[]
+  createdAt                DateTime             @default(now())
+  updatedAt                DateTime             @updatedAt
+
+  @@unique([materialId, batchId])
+  @@index([materialId, createdAt])
+  @@index([batchId])
+  @@index([distributorId])
+}
+
+model MaterialBatchAttachment {
+  id        String        @id @default(cuid())
+  batchId   String
+  batch     MaterialBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  objectKey String        @unique
+  url       String
+  fileName  String
+  notes     String        @default("") @db.Text
+  position  Int
+  createdAt DateTime      @default(now())
+
+  @@unique([batchId, position])
+}
+
+model MaterialBatchImage {
+  id        String             @id @default(cuid())
+  entryId   String
+  entry     MaterialBatchEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  objectKey String
+  url       String
+  position  Int
+
+  @@unique([entryId, position])
+}
+
+model MaterialImage {
+  id         String   @id @default(cuid())
+  materialId String
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  objectKey  String
+  url        String
+  position   Int
+
+  @@unique([materialId, position])
 }

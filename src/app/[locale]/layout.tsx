@@ -5,6 +5,8 @@ import { AppProviders } from '@/components/app-providers';
 import { routing } from '@/i18n/routing';
 
 export function generateStaticParams() {
+  // Next 16.4 dev can corrupt its prerender manifest when routes compile concurrently.
+  if (process.env.NODE_ENV === 'development') return [];
   return routing.locales.map((locale) => ({ locale }));
 }
 

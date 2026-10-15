@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { apiError, requireAdmin } from '@/lib/api';
 import { listSchema, productSchema } from '@/lib/validation';
-import { saveProduct } from '@/lib/products';
+import { productInclude, saveProduct, serializeProduct } from '@/lib/products';
 import { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
@@ -19,20 +19,29 @@ export async function GET(request: NextRequest) {
           }
         : {}),
       ...(filters.categoryId ? { categoryId: filters.categoryId } : {}),
+      ...(filters.excludeCategoryName
+        ? { category: { name: { not: filters.excludeCategoryName } } }
+        : {}),
+      ...(filters.tagId ? { tags: { some: { tagId: filters.tagId } } } : {}),
       ...(filters.published ? { published: filters.published === 'true' } : {}),
-      ...(filters.stock ? { stock: Number(filters.stock) } : {}),
+      ...(filters.stock ? { stock: filters.stock === '1' ? { gt: 0 } : 0 } : {}),
     };
     const [items, total] = await db.$transaction([
       db.product.findMany({
         where,
-        include: { category: true, images: { orderBy: { position: 'asc' } } },
+        include: productInclude,
         orderBy: { createdAt: 'desc' },
         skip: (filters.page - 1) * filters.pageSize,
         take: filters.pageSize,
       }),
       db.product.count({ where }),
     ]);
-    return NextResponse.json({ items, total, page: filters.page, pageSize: filters.pageSize });
+    return NextResponse.json({
+      items: items.map(serializeProduct),
+      total,
+      page: filters.page,
+      pageSize: filters.pageSize,
+    });
   } catch (error) {
     return apiError(error);
   }
