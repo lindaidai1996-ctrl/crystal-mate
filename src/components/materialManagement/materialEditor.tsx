@@ -17,7 +17,7 @@ import {
   Tooltip,
 } from 'antd';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type {
@@ -34,16 +34,24 @@ import type {
   Tag,
 } from '@/lib/client-types';
 import {
+  adoptSaleUnitPriceFromBeads,
   editMaterial,
   purchaseCandidates,
   recalculateMaterial,
   recognizeMaterialCategory,
 } from '@/lib/material-calculations';
 import { ImagePicker } from '@/components/image-picker';
+import { DistributorSelect } from '@/components/distributorSelect/distributorSelect';
 import { categoryPath, categoryTree } from './categoryTree';
 import { BatchSelector } from './batchSelector';
 import { MaterialAmountInput as AmountInput, PurchaseFields } from './purchaseFields';
-import { calculatePurchase, emptyPurchase, type MaterialPurchase } from '@/lib/material-purchase';
+import { MaterialSaleFields } from './materialSaleFields';
+import {
+  calculatePurchase,
+  emptyPurchase,
+  resolvePurchase,
+  type MaterialPurchase,
+} from '@/lib/material-purchase';
 
 function emptyMaterial(): MaterialValues {
   return {
@@ -86,26 +94,41 @@ type NewMaterialDraft = {
   quantityUnknown?: boolean;
 };
 
-function readNewMaterialDraft(): NewMaterialDraft | null {
+function readNewMaterialDraft(storageKey: string): NewMaterialDraft | null {
   if (typeof window === 'undefined') return null;
   try {
-    return JSON.parse(
-      sessionStorage.getItem(newMaterialDraftKey) ?? 'null',
-    ) as NewMaterialDraft | null;
+    return JSON.parse(sessionStorage.getItem(storageKey) ?? 'null') as NewMaterialDraft | null;
   } catch {
     return null;
   }
 }
 
-export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }) {
+export function MaterialEditor({
+  id,
+  entryId,
+  initialBatchId,
+  initialDistributorId,
+}: {
+  id: string;
+  entryId?: string;
+  initialBatchId?: string;
+  initialDistributorId?: string;
+}) {
   const t = useTranslations('materialEditor');
   const tagText = useTranslations('tags');
   const batchText = useTranslations('materialBatches');
   const common = useTranslations('common');
-  const { message, modal } = App.useApp();
+  const { message } = App.useApp();
   const router = useRouter();
   const [tagForm] = Form.useForm<{ name: string }>();
-  const [savedDraft] = useState(() => (id === 'new' ? readNewMaterialDraft() : null));
+  const nameBeforeFocus = useRef('');
+  const draftStorageKey =
+    initialBatchId || initialDistributorId
+      ? `${newMaterialDraftKey}:${JSON.stringify([initialBatchId, initialDistributorId])}`
+      : newMaterialDraftKey;
+  const [savedDraft] = useState(() =>
+    id === 'new' ? readNewMaterialDraft(draftStorageKey) : null,
+  );
   const [inputDraft, setDraft] = useState<MaterialValues>(
     () => savedDraft?.values ?? emptyMaterial(),
   );
@@ -118,27 +141,47 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
   const [batches, setBatches] = useState<MaterialBatch[]>([]);
   const [distributors, setDistributors] = useState<DistributorPage['items']>([]);
   const [selection, setSelection] = useState<MaterialBatchSelection | null>(
-    savedDraft?.selection ?? null,
+    savedDraft?.selection ?? (id === 'new' && initialBatchId ? { batchId: initialBatchId } : null),
   );
-  const [distributorId, setDistributorId] = useState<string | undefined>(savedDraft?.distributorId);
+  const [distributorId, setDistributorId] = useState<string | undefined>(
+    savedDraft?.distributorId ?? (id === 'new' ? initialDistributorId : undefined),
+  );
   const [receivedQty, setReceivedQty] = useState<number | null>(savedDraft?.receivedQty ?? null);
   const [purchase, setPurchase] = useState<MaterialPurchase>(
     () => savedDraft?.purchase ?? emptyPurchase(),
   );
   const [quantityUnknown, setQuantityUnknown] = useState(savedDraft?.quantityUnknown ?? false);
-  const effectiveQuantity = quantityUnknown && purchase.mode === 'BATCH' ? null : receivedQty;
+  const effectiveQuantity =
+    inputDraft.unit === 'GRAM'
+      ? resolvePurchase(purchase).totalWeightGrams === null
+        ? null
+        : Number(resolvePurchase(purchase).totalWeightGrams)
+      : quantityUnknown && purchase.mode === 'BATCH'
+        ? null
+        : receivedQty;
   const purchaseResult = calculatePurchase(inputDraft, purchase, effectiveQuantity);
   const draft = purchaseResult.values;
-  const [originalUnit, setOriginalUnit] = useState<MaterialValues['unit']>();
-  const [hasChildDetails, setHasChildDetails] = useState(false);
   const [linkedEntries, setLinkedEntries] = useState<MaterialBatchEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [revision, setRevision] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [createdMaterial, setCreatedMaterial] = useState<Material | null>(null);
   const isNew = id === 'new';
+  const returnBatchId = isNew ? initialBatchId : undefined;
+  const returnDistributorId = isNew ? initialDistributorId : undefined;
+  const returnPath = returnBatchId
+    ? `/admin/materials/batches/${encodeURIComponent(returnBatchId)}`
+    : returnDistributorId
+      ? `/admin/distributors/${encodeURIComponent(returnDistributorId)}`
+      : '/admin/materials';
+  const returnLabel = returnBatchId
+    ? common('backToBatch')
+    : returnDistributorId
+      ? common('backToDistributor')
+      : t('back');
   const isMasterEdit = !isNew && !entryId;
   const isAddingEntry = entryId === 'new';
   const candidates = purchaseCandidates(draft);
@@ -147,7 +190,7 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
     if (!isNew || createdMaterial) return;
     try {
       sessionStorage.setItem(
-        newMaterialDraftKey,
+        draftStorageKey,
         JSON.stringify({
           values: inputDraft,
           tagIds,
@@ -163,6 +206,7 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
       // Private browsing or disabled storage should not block editing.
     }
   }, [
+    draftStorageKey,
     isNew,
     createdMaterial,
     inputDraft,
@@ -192,18 +236,6 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
         setDistributors(distributorPage.items);
         if (material) {
           setTagIds(material.tags.map((tag) => tag.id));
-          setOriginalUnit(material.unit);
-          setHasChildDetails(
-            [material, ...material.batchEntries].some(
-              (item) =>
-                item.childCount !== null ||
-                item.childWeightGrams !== null ||
-                item.childUnitPrice !== null ||
-                item.childPriceSource !== null ||
-                item.saleChildUnitPrice !== null ||
-                item.saleChildManual,
-            ),
-          );
           setLinkedEntries(material.batchEntries);
           const entry =
             entryId && !isAddingEntry
@@ -222,6 +254,8 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
             ]),
           ) as MaterialValues;
           setDraft(values);
+          if (material.unit === 'GRAM' && isAddingEntry)
+            setPurchase({ ...emptyPurchase(), mode: 'BATCH' });
           setImages(source.images);
           if (entry && !isAddingEntry) {
             setSelection({ batchId: entry.batchId });
@@ -244,6 +278,30 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
   }, [id, entryId, isNew, isAddingEntry, revision]);
 
   function change(field: keyof MaterialValues, value: string | number | null) {
+    if (
+      field === 'unit' &&
+      value !== inputDraft.unit &&
+      (value === 'GRAM' || inputDraft.unit === 'GRAM')
+    ) {
+      setPurchase({ ...emptyPurchase(), mode: value === 'GRAM' ? 'BATCH' : 'UNIT' });
+      setReceivedQty(null);
+      setQuantityUnknown(false);
+      setDraft((current) =>
+        recalculateMaterial({
+          ...current,
+          unit: value as MaterialValues['unit'],
+          purchaseUnitPrice: null,
+          weightGrams: null,
+          purchaseGramPrice: null,
+          purchaseGramManual: false,
+          saleUnitPrice: null,
+          saleGramPrice: null,
+          saleUnitManual: false,
+          saleGramManual: false,
+        }),
+      );
+      return;
+    }
     setDraft((current) =>
       editMaterial(calculatePurchase(current, purchase, effectiveQuantity).values, field, value),
     );
@@ -291,6 +349,23 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
     );
   }
 
+  function recognizeName(name: string) {
+    if (isAddingEntry || name === nameBeforeFocus.current) return;
+    const category = recognizeMaterialCategory(name, categories);
+    if (category) setDraft((current) => ({ ...current, categoryId: category.id }));
+
+    const input = name.normalize('NFKC').trim().toLowerCase();
+    const matchedTagIds = tags
+      .filter((tag) => {
+        const term = tag.name.normalize('NFKC').trim().toLowerCase();
+        return term.length > 0 && input.includes(term);
+      })
+      .map((tag) => tag.id);
+    if (matchedTagIds.length) {
+      setTagIds((current) => [...new Set([...current, ...matchedTagIds])]);
+    }
+  }
+
   function recognize() {
     const category = recognizeMaterialCategory(draft.name, categories);
     if (!category) {
@@ -323,6 +398,7 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
   }
 
   async function save() {
+    if (saving || uploadingImages) return;
     setSubmitted(true);
     if (!draft.name.trim() || !draft.categoryId) {
       message.error(t('required'));
@@ -348,7 +424,7 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
     if (
       !isMasterEdit &&
       !(purchase.mode === 'BATCH' && quantityUnknown) &&
-      (!receivedQty || receivedQty < 1)
+      (effectiveQuantity === null || effectiveQuantity < (draft.unit === 'GRAM' ? 0.01 : 1))
     ) {
       message.error(t('quantityRequired'));
       return;
@@ -356,15 +432,6 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
     if (!isMasterEdit && purchase.mode === 'BATCH' && !purchaseResult.valid) {
       message.error(t('batchValuesRequired'));
       return;
-    }
-    if (originalUnit === 'STRAND' && draft.unit === 'BEAD' && hasChildDetails && !isAddingEntry) {
-      const confirmed = await modal.confirm({
-        title: t('unitChangeTitle'),
-        content: t('unitChangeWarning'),
-        okText: common('save'),
-        cancelText: common('cancel'),
-      });
-      if (!confirmed) return;
     }
     setSaving(true);
     try {
@@ -402,11 +469,12 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
           current.some((item) => item.id === batch.id) ? current : [batch, ...current],
         );
         try {
-          sessionStorage.removeItem(newMaterialDraftKey);
+          sessionStorage.removeItem(draftStorageKey);
         } catch {
           // Storage can be unavailable even after the form was opened.
         }
         setCreatedMaterial(created);
+        router.refresh();
         window.scrollTo(0, 0);
         return;
       } else if (isAddingEntry) {
@@ -460,7 +528,7 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
   function addAnother(reuseBatchAndDistributor: boolean) {
     const entry = createdMaterial?.batchEntries[0];
     try {
-      sessionStorage.removeItem(newMaterialDraftKey);
+      sessionStorage.removeItem(draftStorageKey);
     } catch {
       // The form remains usable without storage.
     }
@@ -478,12 +546,19 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
   }
 
   function amount(field: keyof MaterialValues, suffix: string, positive = false) {
+    const labelKey =
+      field === 'saleRuleValue'
+        ? draft.saleRule === 'FIXED_AMOUNT'
+          ? 'fixedAmount'
+          : 'customPercent'
+        : field;
+
     return (
       <AmountInput
         value={draft[field] as MaterialAmount}
         onChange={(value) => change(field, value)}
         suffix={suffix}
-        label={t(field as never)}
+        label={t(labelKey as never)}
         positive={positive}
       />
     );
@@ -516,7 +591,14 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
         title={common('saved')}
         extra={
           <Space wrap>
-            <Button onClick={() => router.push('/admin/materials')}>{t('back')}</Button>
+            <Button
+              onClick={() => {
+                router.replace(returnPath);
+                router.refresh();
+              }}
+            >
+              {returnLabel}
+            </Button>
             <Button onClick={() => addAnother(false)}>{t('addAnother')}</Button>
             <Button type="primary" onClick={() => addAnother(true)}>
               {t('addAnotherWithBatchAndDistributor')}
@@ -530,8 +612,8 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
     <>
       <div className="page-heading editor-heading">
         <div>
-          <Link href="/admin/materials" className="back-link">
-            <ArrowLeftOutlined /> {t('back')}
+          <Link href={returnPath} replace className="back-link">
+            <ArrowLeftOutlined /> {returnLabel}
           </Link>
           <h1>
             {isNew
@@ -560,7 +642,11 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
                   aria-label={t('name')}
                   disabled={isAddingEntry}
                   maxLength={120}
+                  onFocus={(event) => {
+                    nameBeforeFocus.current = event.target.value;
+                  }}
                   onChange={(event) => change('name', event.target.value)}
+                  onBlur={(event) => recognizeName(event.target.value)}
                 />
               </Form.Item>
               <Form.Item
@@ -624,15 +710,20 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
                   </Tooltip>
                 )}
               </div>
-              <Form.Item label={t('unit')} className="material-full-width">
+              <Form.Item
+                label={t('unit')}
+                className="material-full-width"
+                extra={!isNew && linkedEntries.length ? t('unitLocked') : undefined}
+              >
                 <Radio.Group
                   value={draft.unit}
                   aria-label={t('unit')}
-                  disabled={isAddingEntry}
+                  disabled={isAddingEntry || (!isNew && linkedEntries.length > 0)}
                   onChange={(event) => change('unit', event.target.value)}
                   options={[
                     { label: t('STRAND'), value: 'STRAND' },
                     { label: t('BEAD'), value: 'BEAD' },
+                    { label: t('GRAM'), value: 'GRAM' },
                   ]}
                 />
               </Form.Item>
@@ -661,16 +752,11 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
             <section className="editor-block">
               <h2>{batchText('source')}</h2>
               <Form.Item label={batchText('source')} required>
-                <Select
-                  showSearch
-                  optionFilterProp="label"
+                <DistributorSelect
                   value={distributorId}
                   aria-label={batchText('source')}
                   placeholder={batchText('source')}
-                  options={distributors.map((item) => ({
-                    value: item.id,
-                    label: `${item.name} · ${item.area}`,
-                  }))}
+                  distributors={distributors}
                   onChange={setDistributorId}
                 />
                 {!distributors.length && (
@@ -695,7 +781,12 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
           {!isMasterEdit && (
             <section className="editor-block">
               <h2>{t('images')}</h2>
-              <ImagePicker images={images} onChange={setImages} />
+              <ImagePicker
+                images={images}
+                onChange={setImages}
+                onUploadingChange={setUploadingImages}
+                disabled={saving}
+              />
             </section>
           )}
           {!isMasterEdit && draft.unit === 'STRAND' && (
@@ -772,48 +863,18 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
             </section>
           )}
           {!isMasterEdit && (
-            <section className="editor-block">
-              <h2>{t('saleDetails')}</h2>
-              <Form.Item label={t('saleRule')}>
-                <Radio.Group
-                  className="material-rule-options"
-                  value={draft.saleRule}
-                  aria-label={t('saleRule')}
-                  onChange={(event) => changeRule(event.target.value)}
-                  options={(
-                    [
-                      'COST',
-                      'PERCENT_10',
-                      'PERCENT_20',
-                      'PERCENT_30',
-                      'PERCENT_50',
-                      'FIXED_AMOUNT',
-                      'CUSTOM_PERCENT',
-                    ] as const
-                  ).map((rule) => ({ label: t(`rule_${rule}`), value: rule }))}
-                />
-              </Form.Item>
-              {(draft.saleRule === 'FIXED_AMOUNT' || draft.saleRule === 'CUSTOM_PERCENT') && (
-                <Form.Item
-                  label={t(draft.saleRule === 'FIXED_AMOUNT' ? 'fixedAmount' : 'customPercent')}
-                >
-                  {amount('saleRuleValue', draft.saleRule === 'FIXED_AMOUNT' ? t('yuan') : '%')}
-                </Form.Item>
-              )}
-              <div className="material-field-grid material-three-columns">
-                <Form.Item label={t('saleUnitPrice')}>
-                  {amount('saleUnitPrice', t('yuan'))}
-                </Form.Item>
-                <Form.Item label={t('saleGramPrice')}>
-                  {amount('saleGramPrice', t('yuanPerGram'))}
-                </Form.Item>
-                {draft.unit === 'STRAND' && (
-                  <Form.Item label={t('saleChildUnitPrice')}>
-                    {amount('saleChildUnitPrice', t('yuanPerBead'))}
-                  </Form.Item>
-                )}
-              </div>
-            </section>
+            <MaterialSaleFields
+              values={draft}
+              onChange={change}
+              onRuleChange={changeRule}
+              onAdopt={() =>
+                setDraft((current) =>
+                  adoptSaleUnitPriceFromBeads(
+                    calculatePurchase(current, purchase, effectiveQuantity).values,
+                  ),
+                )
+              }
+            />
           )}
           {!entryId && (
             <section className="editor-block">
@@ -829,10 +890,16 @@ export function MaterialEditor({ id, entryId }: { id: string; entryId?: string }
             </section>
           )}
           <div className="editor-actions">
-            <Link href="/admin/materials">
+            <Link href={returnPath} replace>
               <Button>{common('cancel')}</Button>
             </Link>
-            <Button type="primary" icon={<SaveOutlined />} htmlType="submit" loading={saving}>
+            <Button
+              type="primary"
+              icon={<SaveOutlined />}
+              htmlType="submit"
+              loading={saving}
+              disabled={uploadingImages}
+            >
               {common('save')}
             </Button>
           </div>

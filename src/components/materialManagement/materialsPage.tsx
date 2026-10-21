@@ -17,13 +17,16 @@ import {
   Popconfirm,
   Popover,
   Skeleton,
-  Table,
   Tooltip,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
-import { useCallback, useDeferredValue, useEffect, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useState, type ReactElement } from 'react';
 import { Link } from '@/i18n/navigation';
+import { PaginatedTable, useTablePagination } from '@/components/paginated-table';
+import { TextTag } from '@/components/text-tag';
+import { MaterialStockButton } from '@/components/inventory/materialStockButton';
+import { MaterialStockSummary } from '@/components/inventory/materialStockSummary';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type {
   MaterialBatchEntry,
@@ -37,15 +40,34 @@ import { ImageHoverPreview } from './imageHoverPreview';
 
 function BatchPrices({ item }: { item: Material }) {
   const t = useTranslations('materialBatches');
+  const editor = useTranslations('materialEditor');
   const entries = item.batchEntries;
   const priceText = (
-    value: Pick<Material, 'purchaseUnitPrice' | 'purchaseGramPrice' | 'saleUnitPrice'> &
+    value: Pick<
+      Material,
+      | 'purchaseUnitPrice'
+      | 'purchaseGramPrice'
+      | 'saleUnitPrice'
+      | 'saleChildUnitPrice'
+      | 'childCount'
+      | 'childUnitPrice'
+    > &
       Partial<Pick<MaterialBatchEntry, 'unitPriceSource'>>,
   ) =>
     [
-      `${t('purchaseUnitPrice')}: ${value.purchaseUnitPrice ?? '—'}${value.unitPriceSource === 'ESTIMATED' || value.unitPriceSource === 'MANUAL' ? ` (${t(`priceSource_${value.unitPriceSource}`)})` : ''}`,
-      `${t('gramPrice')}: ${value.purchaseGramPrice ?? '—'}`,
-      `${t('salePrice')}: ${value.saleUnitPrice ?? '—'}`,
+      ...(item.unit === 'GRAM'
+        ? []
+        : [
+            `${t('purchaseUnitPrice')}: ${value.purchaseUnitPrice ?? '—'}${value.unitPriceSource === 'ESTIMATED' || value.unitPriceSource === 'MANUAL' ? ` (${t(`priceSource_${value.unitPriceSource}`)})` : ''}`,
+          ]),
+      `${t('gramPrice')}: ${value.purchaseGramPrice ?? '—'}${item.unit === 'GRAM' ? ` ${editor('yuanPerGram')}` : ''}`,
+      `${t('salePrice')}: ${value.saleUnitPrice ?? '—'}${item.unit === 'GRAM' ? ` ${editor('yuanPerGram')}` : ''}`,
+      ...(item.unit === 'STRAND' && (value.childCount ?? 0) > 0 && value.childUnitPrice !== null
+        ? [`${t('purchaseBeadPrice')}: ${value.childUnitPrice} ${editor('yuanPerBead')}`]
+        : []),
+      ...(item.unit === 'STRAND' && value.saleChildUnitPrice !== null
+        ? [`${t('saleBeadPrice')}: ${value.saleChildUnitPrice} ${editor('yuanPerBead')}`]
+        : []),
     ].join(' · ');
   if (!entries.length)
     return (
@@ -55,10 +77,8 @@ function BatchPrices({ item }: { item: Material }) {
     );
   const samePrice = entries.every(
     (entry) =>
-      entry.purchaseUnitPrice === entries[0].purchaseUnitPrice &&
-      entry.purchaseGramPrice === entries[0].purchaseGramPrice &&
-      entry.saleUnitPrice === entries[0].saleUnitPrice &&
-      entry.unitPriceSource === entries[0].unitPriceSource,
+      entry.unitPriceSource === entries[0].unitPriceSource &&
+      priceText(entry) === priceText(entries[0]),
   );
   const links = entries.map((entry) => (
     <Link
@@ -111,14 +131,63 @@ function MaterialIdentity({ item }: { item: Material }) {
   return (
     <div className="product-cell">
       <ImageHoverPreview images={images} name={item.name} />
-      <Link className="product-name" href={`/admin/materials/${item.id}`}>
-        {item.name}
-      </Link>
+      <div>
+        <MaterialEditLink item={item} />
+        {!!item.tags.length && (
+          <div className="product-tags">
+            {item.tags.map((tag) => (
+              <TextTag key={tag.id} text={tag.name} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-function MaterialActions({ item, onRemove }: { item: Material; onRemove: (id: string) => void }) {
+function MaterialEditLink({ item, children }: { item: Material; children?: ReactElement }) {
+  const t = useTranslations('materials');
+  if (item.batchEntries.length > 1)
+    return (
+      <Popover
+        title={t('chooseEditBatch')}
+        content={
+          <div className="material-edit-batch-options">
+            {item.batchEntries.map((entry) => (
+              <Link key={entry.id} href={`/admin/materials/${item.id}/batches/${entry.id}`}>
+                {entry.batch.name}
+              </Link>
+            ))}
+          </div>
+        }
+        trigger="click"
+      >
+        {children ?? (
+          <button type="button" className="product-name material-edit-name">
+            {item.name}
+          </button>
+        )}
+      </Popover>
+    );
+  return (
+    <Link
+      className={children ? undefined : 'product-name'}
+      href={`/admin/materials/${item.id}/batches/${item.batchEntries[0]?.id ?? 'new'}`}
+    >
+      {children ?? item.name}
+    </Link>
+  );
+}
+
+function MaterialActions({
+  item,
+  onRemove,
+  onSaved,
+}: {
+  item: Material;
+  onRemove: (id: string) => void;
+  onSaved: () => void;
+}) {
   const t = useTranslations('materials');
   const common = useTranslations('common');
   const editButton = (
@@ -128,27 +197,15 @@ function MaterialActions({ item, onRemove }: { item: Material; onRemove: (id: st
   );
   return (
     <span className="row-actions">
-      {item.batchEntries.length > 1 ? (
-        <Popover
-          title={t('chooseEditBatch')}
-          content={
-            <div className="material-edit-batch-options">
-              {item.batchEntries.map((entry) => (
-                <Link key={entry.id} href={`/admin/materials/${item.id}/batches/${entry.id}`}>
-                  {entry.batch.name}
-                </Link>
-              ))}
-            </div>
-          }
-          trigger="click"
-        >
-          {editButton}
-        </Popover>
-      ) : (
-        <Link href={`/admin/materials/${item.id}/batches/${item.batchEntries[0]?.id ?? 'new'}`}>
-          {editButton}
-        </Link>
-      )}
+      <MaterialStockButton
+        allowDecimals={item.unit === 'GRAM'}
+        materialId={item.id}
+        name={item.name}
+        unit={t(item.unit)}
+        entries={item.batchEntries}
+        onSaved={onSaved}
+      />
+      <MaterialEditLink item={item}>{editButton}</MaterialEditLink>
       <Link href={`/admin/materials/${item.id}/batches/new`}>
         <Tooltip title={t('addBatch')}>
           <Button type="text" icon={<PlusOutlined />} aria-label={t('addBatch')} />
@@ -170,7 +227,9 @@ function MaterialActions({ item, onRemove }: { item: Material; onRemove: (id: st
 
 export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) {
   const t = useTranslations('materials');
+  const inventory = useTranslations('inventory');
   const common = useTranslations('common');
+  const pagination = useTablePagination();
   const { message } = App.useApp();
   const [categories, setCategories] = useState<MaterialCategory[]>([]);
   const [query, setQuery] = useState(initialQuery);
@@ -231,21 +290,34 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
     }
   }
 
+  const refreshStock = () => {
+    setRevision((value) => value + 1);
+  };
   const columns: ColumnsType<Material> = [
     {
       title: t('name'),
       key: 'name',
+      width: 260,
+      minWidth: 260,
       render: (_, item) => <MaterialIdentity item={item} />,
     },
     {
       title: t('category'),
       key: 'category',
+      width: 180,
+      minWidth: 180,
       render: (_, item) =>
         categoryPath(item.categoryId, categories)
           .map((id) => categories.find((category) => category.id === id)?.name)
           .join(' / ') || item.category.name,
     },
     { title: t('unit'), key: 'unit', width: 90, render: (_, item) => t(item.unit) },
+    {
+      title: inventory('current'),
+      key: 'stock',
+      width: 110,
+      render: (_, item) => <MaterialStockSummary material={item} />,
+    },
     {
       title: t('batchPrices'),
       key: 'batchPrices',
@@ -261,8 +333,8 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
     {
       title: t('actions'),
       key: 'actions',
-      width: 150,
-      render: (_, item) => <MaterialActions item={item} onRemove={remove} />,
+      width: 250,
+      render: (_, item) => <MaterialActions item={item} onRemove={remove} onSaved={refreshStock} />,
     },
   ];
 
@@ -274,9 +346,6 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
           <p>{t('count', { count: data.total })}</p>
         </div>
         <div className="material-heading-actions">
-          <Link href="/admin/materials/batches">
-            <Button>{t('manageBatches')}</Button>
-          </Link>
           <Link href="/admin/materials/categories">
             <Button icon={<FolderOutlined />}>{t('manageCategories')}</Button>
           </Link>
@@ -317,12 +386,12 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
       </div>
       <div className="table-surface">
         <div className="material-desktop-table">
-          <Table
+          <PaginatedTable
             rowKey="id"
             columns={columns}
             dataSource={data.items}
             loading={loading}
-            scroll={{ x: 850 }}
+            scroll={{ x: 1410 }}
             pagination={{
               ...CLIENT_TABLE_PAGINATION,
               current: page,
@@ -349,25 +418,27 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
                     .join(' / ') || item.category.name}{' '}
                   · {t(item.unit)}
                 </div>
+                <div className="material-mobile-meta">
+                  <MaterialStockSummary material={item} />
+                </div>
                 <div className="material-mobile-batches">
                   <span>{t('batchPrices')}</span>
                   <BatchPrices item={item} />
                 </div>
                 <div className="material-mobile-actions">
-                  <MaterialActions item={item} onRemove={remove} />
+                  <MaterialActions item={item} onRemove={remove} onSaved={refreshStock} />
                 </div>
               </article>
             ))
           ) : (
             <Empty description={t('empty')} />
           )}
-          {!loading && data.total > 0 && (
+          {!loading && (
             <Pagination
+              {...pagination}
               current={page}
               pageSize={pageSize}
               total={data.total}
-              showSizeChanger
-              pageSizeOptions={CLIENT_TABLE_PAGINATION.pageSizeOptions}
               onChange={changePage}
             />
           )}

@@ -1,16 +1,9 @@
 'use client';
 
-import { Alert, Modal, Segmented, Spin, Tooltip } from 'antd';
-import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
-import {
-  formatImageBytes,
-  MAX_UPLOAD_BYTES,
-  prepareImage,
-  type PreparedImage,
-} from './prepareImages';
-
-type UploadMode = 'compressed' | 'original';
+import { useState } from 'react';
+import { ImageCropDialog } from './imageCropDialog';
+import { ImageCompressionDialog } from './imageCompressionDialog';
+import type { UploadImageSource } from './prepareImages';
 
 export function ImageUploadChoiceDialog({
   files,
@@ -23,99 +16,44 @@ export function ImageUploadChoiceDialog({
   onCancel: () => void;
   onConfirm: (files: File[]) => void;
 }) {
-  const t = useTranslations('imageUpload');
-  const [prepared, setPrepared] = useState<PreparedImage[] | null>(null);
-  const [mode, setMode] = useState<UploadMode>('compressed');
+  const [index, setIndex] = useState(0);
+  const [sources, setSources] = useState<UploadImageSource[]>([]);
 
-  useEffect(() => {
-    let cancelled = false;
-    async function prepare() {
-      const results: PreparedImage[] = [];
-      for (const file of files) {
-        if (cancelled) break;
-        results.push(await prepareImage(file));
-      }
-      if (!cancelled) setPrepared(results);
+  function advance(source?: UploadImageSource) {
+    const next = source ? [...sources, source] : sources;
+    if (index === files.length - 1 && !next.length) {
+      onCancel();
+      return;
     }
-    void prepare();
-    return () => {
-      cancelled = true;
-    };
-  }, [files]);
+    setSources(next);
+    setIndex(index + 1);
+  }
 
-  const canUploadOriginal =
-    prepared?.every(
-      ({ original }) =>
-        original.size > 0 &&
-        original.size <= MAX_UPLOAD_BYTES &&
-        ['image/jpeg', 'image/png', 'image/webp'].includes(original.type),
-    ) ?? false;
-  const canUploadCompressed = prepared?.every(({ compressed }) => compressed !== null) ?? false;
+  if (index < files.length) {
+    return (
+      <ImageCropDialog
+        key={index}
+        file={files[index]}
+        index={index}
+        total={files.length}
+        onCancel={onCancel}
+        onCrop={(file) => advance({ file, cropped: true })}
+        onKeep={() => advance({ file: files[index], cropped: false })}
+        onRemove={() => advance()}
+      />
+    );
+  }
 
   return (
-    <Modal
-      title={t(askCompression ? 'compressionQuestion' : 'title')}
-      open
-      width={560}
+    <ImageCompressionDialog
+      sources={sources}
+      askCompression={askCompression}
       onCancel={onCancel}
-      onOk={() => {
-        if (!prepared || !(mode === 'original' ? canUploadOriginal : canUploadCompressed)) return;
-        onConfirm(prepared.map((item) => (mode === 'original' ? item.original : item.compressed!)));
+      onConfirm={onConfirm}
+      onBack={() => {
+        setIndex(0);
+        setSources([]);
       }}
-      okText={t('upload')}
-      okButtonProps={{ disabled: !(mode === 'original' ? canUploadOriginal : canUploadCompressed) }}
-      cancelText={t('cancel')}
-    >
-      {!prepared ? (
-        <div className="image-upload-preparing">
-          <Spin />
-          <span>{t('preparing')}</span>
-        </div>
-      ) : (
-        <div className="image-upload-choice">
-          <Segmented<UploadMode>
-            block
-            value={mode}
-            onChange={setMode}
-            options={[
-              {
-                label: t(askCompression ? 'compressYes' : 'compressed'),
-                value: 'compressed',
-                disabled: !canUploadCompressed,
-              },
-              {
-                label: t(askCompression ? 'compressNo' : 'original'),
-                value: 'original',
-                disabled: !canUploadOriginal,
-              },
-            ]}
-          />
-          {!canUploadOriginal && canUploadCompressed && (
-            <Alert type="info" showIcon message={t('originalUnavailable')} />
-          )}
-          {!canUploadCompressed && !canUploadOriginal && (
-            <Alert type="error" showIcon message={t('noValidOption')} />
-          )}
-          <div className="image-upload-list">
-            {prepared.map((item, index) => (
-              <div className="image-upload-row" key={`${item.original.name}-${index}`}>
-                <Tooltip title={item.original.name}>
-                  <span className="image-upload-name">{item.original.name}</span>
-                </Tooltip>
-                <span className="image-upload-sizes">
-                  {t('originalSize', { size: formatImageBytes(item.original.size) })}
-                  {' · '}
-                  {item.error
-                    ? t(item.error)
-                    : item.unchanged
-                      ? t('unchanged')
-                      : t('compressedSize', { size: formatImageBytes(item.compressed!.size) })}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </Modal>
+    />
   );
 }

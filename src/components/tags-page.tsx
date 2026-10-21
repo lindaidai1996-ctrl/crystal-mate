@@ -1,10 +1,12 @@
 'use client';
 
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { App, Button, Empty, Form, Input, Modal, Popconfirm, Table, Tooltip } from 'antd';
+import { App, Button, Empty, Form, Input, Modal, Popconfirm, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { PaginatedTable } from '@/components/paginated-table';
+import { TextTag } from '@/components/text-tag';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { Tag } from '@/lib/client-types';
 import { CLIENT_TABLE_PAGINATION, DEFAULT_TABLE_PAGE_SIZE } from '@/lib/table-pagination';
@@ -86,6 +88,7 @@ export function TagsPage() {
       title: t('name'),
       dataIndex: 'name',
       key: 'name',
+      render: (name: string) => <TextTag text={name} />,
       width: '25%',
       sorter: (a, b) => a.name.localeCompare(b.name, 'zh-CN'),
       defaultSortOrder: 'ascend',
@@ -135,7 +138,10 @@ export function TagsPage() {
   return (
     <>
       <div className="page-heading">
-        <h1>{t('title')}</h1>
+        <div>
+          <h1>{t('title')}</h1>
+          <p>{t('count', { count: visibleItems.length })}</p>
+        </div>
         <Button type="primary" icon={<PlusOutlined />} onClick={() => open(null)}>
           {t('new')}
         </Button>
@@ -154,7 +160,7 @@ export function TagsPage() {
         />
       </div>
       <div className="table-surface">
-        <Table
+        <PaginatedTable
           rowKey="id"
           dataSource={visibleItems}
           columns={columns}

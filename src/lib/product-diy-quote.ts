@@ -1,5 +1,6 @@
 import type { ProductDiyRun, MaterialBatchEntry, MaterialUnit } from './client-types';
 import { craftDesignFeeTotal } from './product-diy-cost';
+import { silverCostTotals } from './silver-cost';
 
 export function suggestedMaterialQuote(
   option: {
@@ -48,6 +49,13 @@ export function customerDiyDetails(run: ProductDiyRun) {
       unitPrice: line.quoteUnitPrice,
       subtotalPerItem: line.quoteLineTotal,
     })),
+    silver: run.silverCost
+      ? {
+          weightGrams: run.silverCost.weightGrams,
+          quoteGramPrice: run.silverCost.quoteGramPrice,
+          subtotalPerItem: silverCostTotals(run.silverCost)?.quote ?? null,
+        }
+      : null,
     extraFees: run.extraCosts.map((line) => ({ name: line.name, amountPerItem: line.quoteAmount })),
     craftDesignFee: craftDesignFeeTotal(run.craftDesignFee, run.quantity),
   };

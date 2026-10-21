@@ -2,6 +2,7 @@
 
 import { Form, Input, Select } from 'antd';
 import { useTranslations } from 'next-intl';
+import { DateInput } from '@/components/date-input';
 import type { MaterialBatch, MaterialBatchSelection } from '@/lib/client-types';
 
 export function todayInChina() {
@@ -82,11 +83,10 @@ export function BatchSelector({
               />
             </Form.Item>
             <Form.Item label={t('date')} required>
-              <Input
-                type="date"
+              <DateInput
                 aria-label={t('date')}
                 value={newBatch.receivedAt}
-                onChange={(event) => changeNew('receivedAt', event.target.value)}
+                onChange={(date) => changeNew('receivedAt', date)}
               />
             </Form.Item>
             <Form.Item label={t('notes')} className="material-full-width">

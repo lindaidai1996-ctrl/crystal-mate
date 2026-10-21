@@ -47,6 +47,7 @@ test('distributor details and custom areas persist', async ({ page }) => {
         'base64',
       ),
     });
+    await page.getByRole('button', { name: '保留整图', exact: true }).click();
     const imageChoice = page.getByRole('dialog', { name: '选择上传图片版本' });
     await expect(imageChoice).toBeVisible();
     await imageChoice.getByText('原图', { exact: true }).click();

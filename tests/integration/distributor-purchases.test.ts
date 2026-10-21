@@ -11,6 +11,7 @@ vi.mock('@/lib/api', () => ({
 }));
 import { db } from '../../src/lib/db';
 import {
+  getDistributorItemCounts,
   getDistributorPurchaseEntries,
   getDistributorPurchaseSummary,
 } from '../../src/lib/distributor-purchases';
@@ -179,6 +180,9 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
         },
       });
       const first = await getDistributorPurchaseSummary(supplier.id, defaults);
+      const counts = await getDistributorItemCounts();
+      expect(counts.get(supplier.id)).toEqual({ total: 24, products: 22, materials: 2 });
+      expect(counts.get(other.id)).toEqual({ total: 1, products: 1, materials: 0 });
       const second = await getDistributorPurchaseSummary(supplier.id, { ...defaults, page: 2 });
       expect(first.total).toBe(24);
       expect(first.items).toHaveLength(20);

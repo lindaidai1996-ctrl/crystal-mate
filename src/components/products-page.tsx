@@ -5,7 +5,6 @@ import {
   EditOutlined,
   PlusOutlined,
   SearchOutlined,
-  PictureOutlined,
   FileTextOutlined,
   CopyOutlined,
 } from '@ant-design/icons';
@@ -19,21 +18,23 @@ import {
   Select,
   Skeleton,
   Switch,
-  Table,
   Tag,
   Tooltip,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState, useDeferredValue, useCallback } from 'react';
-import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
+import { PaginatedTable } from '@/components/paginated-table';
+import { StockAdjustmentDrawer } from '@/components/inventory/stockAdjustmentDrawer';
+import { TextTag } from '@/components/text-tag';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { Category, Product, ProductPage, Tag as CatalogTag } from '@/lib/client-types';
 import { catalogPath, type CatalogScope } from '@/lib/catalog-scopes';
 import { generateProductDetails } from '@/lib/generate-product-details';
 import { CLIENT_TABLE_PAGINATION, DEFAULT_TABLE_PAGE_SIZE } from '@/lib/table-pagination';
 import { MissingCategoryState } from './missing-category-state';
+import { ImageHoverPreview } from './materialManagement/imageHoverPreview';
 
 const cabochonDateTimeFormatter = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'Asia/Shanghai',
@@ -52,46 +53,11 @@ const cabochonMarketingFields = [
   { key: 'xiaohongshuListed', width: 160 },
 ] as const;
 
-const productTagColors = [
-  'magenta',
-  'red',
-  'volcano',
-  'orange',
-  'gold',
-  'lime',
-  'green',
-  'cyan',
-  'blue',
-  'geekblue',
-  'purple',
-] as const;
-
-const productTagColorRules = [
-  {
-    keywords: ['玫红', '桃红', '洋红', '品红', '粉色', '粉', 'magenta', 'fuchsia', 'pink'],
-    color: 'magenta',
-  },
-  { keywords: ['火山', '朱红', '橘红', '珊瑚', 'coral', 'vermilion', 'volcano'], color: 'volcano' },
-  { keywords: ['红色', '红', 'red', 'scarlet', 'crimson'], color: 'red' },
-  { keywords: ['橙色', '橙', '橘', '桔', 'orange', 'tangerine'], color: 'orange' },
-  { keywords: ['金色', '金', '黄色', '黄', 'gold', 'golden', 'amber', 'yellow'], color: 'gold' },
-  { keywords: ['青柠', '酸橙', 'lime', 'chartreuse'], color: 'lime' },
-  { keywords: ['绿色', '绿', 'green', 'emerald', 'jade', 'olive'], color: 'green' },
-  { keywords: ['青色', '青', 'cyan', 'turquoise', 'teal', 'aqua'], color: 'cyan' },
-  { keywords: ['靛蓝', '靛', 'indigo', 'geekblue'], color: 'geekblue' },
-  { keywords: ['蓝色', '蓝', 'blue', 'azure', 'navy', 'sapphire'], color: 'blue' },
-  { keywords: ['紫色', '紫', 'purple', 'violet', 'lavender'], color: 'purple' },
-  { keywords: ['棕色', '棕', '褐', '咖啡', 'brown', 'beige'], color: '#8b5e3c' },
-  { keywords: ['黑色', '黑', 'black'], color: '#262626' },
-  { keywords: ['白色', '白', 'white'], color: '#f5f5f5' },
-  { keywords: ['银色', '银', 'silver'], color: '#d9d9d9' },
-  { keywords: ['灰色', '灰', 'gray', 'grey'], color: '#595959' },
-] as const;
-
 type CabochonMarketingField = (typeof cabochonMarketingFields)[number]['key'];
 
 export function ProductsPage({ scope }: { scope?: CatalogScope }) {
   const t = useTranslations('products');
+  const inventory = useTranslations('inventory');
   const common = useTranslations('common');
   const catalog = useTranslations('catalog');
   const editor = useTranslations('editor');
@@ -112,6 +78,7 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_TABLE_PAGE_SIZE);
   const [revision, setRevision] = useState(0);
+  const [stockProduct, setStockProduct] = useState<Product | null>(null);
   const [data, setData] = useState<ProductPage>({
     items: [],
     total: 0,
@@ -256,20 +223,7 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
       key: 'name',
       render: (_, item) => (
         <div className="product-cell">
-          {item.images[0] ? (
-            <Image
-              unoptimized
-              width={44}
-              height={44}
-              className="product-thumb"
-              src={item.images[0].url}
-              alt=""
-            />
-          ) : (
-            <span className="product-thumb product-thumb-empty">
-              <PictureOutlined />
-            </span>
-          )}
+          <ImageHoverPreview images={item.images} name={item.name} />
           <div>
             <Link className="product-name" href={`${listPath}/${item.id}`}>
               {item.name}
@@ -289,9 +243,7 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
       render: (_, item) => (
         <div className="product-tags">
           {item.tags.map((tag) => (
-            <Tag key={tag.id} {...getProductTagProps(tag.name)}>
-              {tag.name}
-            </Tag>
+            <TextTag key={tag.id} text={tag.name} />
           ))}
         </div>
       ),
@@ -320,16 +272,11 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
         }).format(value / 100),
     },
     {
-      title: isCabochon ? t('stockQuantity') : t('inventory'),
+      title: t('stockQuantity'),
       dataIndex: 'stock',
       key: 'stock',
       width: 120,
-      render: (value: number) =>
-        isCabochon ? (
-          value
-        ) : (
-          <Tag color={value ? 'success' : 'warning'}>{value ? t('inStock') : t('soldOut')}</Tag>
-        ),
+      render: (value: number) => value,
     },
     ...(!isCabochon
       ? [
@@ -380,9 +327,12 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
     {
       title: t('actions'),
       key: 'actions',
-      width: scope?.key === 'cabochons' ? 400 : 100,
+      width: scope?.key === 'cabochons' ? 500 : 200,
       render: (_, item) => (
         <span className="row-actions">
+          <Button type="text" onClick={() => setStockProduct(item)}>
+            {inventory('adjust')}
+          </Button>
           {!isCabochon && (
             <Link href={`${listPath}/${item.id}`}>
               <Tooltip title={common('edit')}>
@@ -537,7 +487,7 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
         />
       </div>
       <div className="table-surface">
-        <Table
+        <PaginatedTable
           rowKey="id"
           dataSource={data.items}
           columns={columns}
@@ -556,6 +506,18 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
           }}
         />
       </div>
+      {stockProduct && (
+        <StockAdjustmentDrawer
+          key={stockProduct.id}
+          name={stockProduct.name}
+          resourceUrl={`/api/products/${stockProduct.id}`}
+          onClose={() => setStockProduct(null)}
+          onSaved={() => {
+            setLoading(true);
+            setRevision((value) => value + 1);
+          }}
+        />
+      )}
     </>
   );
 }
@@ -574,31 +536,4 @@ function formatCabochonUpdatedAt(value: string) {
       .map(({ type, value }) => [type, value]),
   );
   return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}:${parts.second}`;
-}
-
-function getProductTagProps(name: string) {
-  const normalizedName = name.trim().toLowerCase();
-  // Prefer specific color phrases, then the first color mentioned in the name.
-  const matches = productTagColorRules.flatMap(({ keywords, color }) =>
-    keywords.flatMap((keyword) => {
-      const index = /^[a-z]+$/.test(keyword)
-        ? normalizedName.search(new RegExp(`\\b${keyword}\\b`, 'u'))
-        : normalizedName.indexOf(keyword);
-      return index < 0 ? [] : [{ color, index, length: keyword.length }];
-    }),
-  );
-  matches.sort((a, b) => b.length - a.length || a.index - b.index);
-  const color = matches[0]?.color ?? getFallbackProductTagColor(normalizedName);
-  if (color === '#f5f5f5' || color === '#d9d9d9') {
-    return { color, style: { color: '#595959', borderColor: '#d9d9d9' } };
-  }
-  return { color: color.startsWith('#') ? color : `${color}-inverse` };
-}
-
-function getFallbackProductTagColor(name: string) {
-  const hash = [...name].reduce(
-    (total, character) => (Math.imul(total, 31) + character.charCodeAt(0)) >>> 0,
-    0,
-  );
-  return productTagColors[hash % productTagColors.length];
 }

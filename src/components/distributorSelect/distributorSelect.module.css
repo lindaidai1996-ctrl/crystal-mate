@@ -1,0 +1,56 @@
+.option {
+  padding-block: 2px;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  overflow: hidden;
+  line-height: 22px;
+}
+
+.area {
+  flex: none;
+  max-width: 6em;
+  padding-inline: 6px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--ant-color-primary-bg, #e6f4ff);
+  color: var(--ant-color-primary-text, #1668dc);
+  font-size: 12px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.name {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 55%;
+  overflow: hidden;
+  color: var(--ant-color-text, #213047);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notes {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline-start: 10px;
+  overflow: hidden;
+  border-inline-start: 1px solid var(--ant-color-border-secondary, #e3e9f1);
+  color: var(--ant-color-text-secondary, #66758b);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fullNotes {
+  max-height: 50vh;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}

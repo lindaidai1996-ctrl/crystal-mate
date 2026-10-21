@@ -5,6 +5,13 @@ const TARGET_BYTES = 1024 * 1024;
 const MAX_EDGES = [1920, 1600, 1280, 1024];
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
+export type UploadImageSource = { file: File; cropped: boolean };
+
+export function validateImageSource(file: File): 'invalid' | 'tooLarge' | undefined {
+  if (!IMAGE_TYPES.includes(file.type) || file.size < 1) return 'invalid';
+  if (file.size > MAX_SOURCE_BYTES) return 'tooLarge';
+}
+
 export type PreparedImage = {
   original: File;
   compressed: File | null;
@@ -26,10 +33,16 @@ function encodeWebp(canvas: HTMLCanvasElement, quality: number): Promise<Blob> {
   });
 }
 
-export async function prepareImage(original: File): Promise<PreparedImage> {
+export async function prepareImage(
+  original: File,
+  { cropped = false }: { cropped?: boolean } = {},
+): Promise<PreparedImage> {
   if (!IMAGE_TYPES.includes(original.type) || original.size < 1)
     return { original, compressed: null, error: 'invalid' };
-  if (original.size > MAX_SOURCE_BYTES) return { original, compressed: null, error: 'tooLarge' };
+  // The 32 MB selection limit was already checked before cropping. A lossless PNG
+  // can grow beyond that limit; it must still be eligible for compression to 8 MB.
+  if (!cropped && original.size > MAX_SOURCE_BYTES)
+    return { original, compressed: null, error: 'tooLarge' };
 
   try {
     const bitmap = await createImageBitmap(original);

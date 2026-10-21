@@ -128,6 +128,8 @@ test('admin catalog workflow and language switch', async ({ page, request }) => 
     { name: 'front.png', mimeType: 'image/png', buffer: png },
     { name: 'back.png', mimeType: 'image/png', buffer: png },
   ]);
+  await page.getByRole('button', { name: '保留整图', exact: true }).click();
+  await page.getByRole('button', { name: '保留整图', exact: true }).click();
   const imageChoice = page.getByRole('dialog', { name: '是否压缩图片？' });
   await expect(imageChoice).toBeVisible();
   await expect(page.locator('.image-picker-sortable')).toHaveCount(0);

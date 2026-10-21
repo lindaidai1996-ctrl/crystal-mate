@@ -10,6 +10,7 @@ import {
   formatCategoryPrefix,
   formatProductCode,
   getNextCategoryPrefix,
+  parseProductCode,
 } from '../../src/lib/product-code';
 
 const validProduct = {
@@ -41,6 +42,26 @@ describe('catalog validation', () => {
     }
     expect(productSchema.safeParse({ ...validProduct, priceCents: -1 }).success).toBe(false);
     expect(productSchema.safeParse({ ...validProduct, priceCents: 12.5 }).success).toBe(false);
+  });
+
+  it('requires a valid stock snapshot for an inline adjustment and limits its reason', () => {
+    expect(
+      productSchema.parse({
+        ...validProduct,
+        stock: 0,
+        stockAdjustment: { expectedQuantity: 1 },
+      }).stockAdjustment,
+    ).toEqual({ expectedQuantity: 1, reason: '' });
+    for (const stockAdjustment of [
+      { reason: '盘点' },
+      { expectedQuantity: null },
+      { expectedQuantity: -1 },
+      { expectedQuantity: 1.5 },
+      { expectedQuantity: 2147483648 },
+      { expectedQuantity: 1, reason: 'a'.repeat(501) },
+    ]) {
+      expect(productSchema.safeParse({ ...validProduct, stockAdjustment }).success).toBe(false);
+    }
   });
 
   it('rejects duplicate or untrusted image keys', () => {
@@ -98,5 +119,12 @@ describe('product code generation', () => {
     expect(formatProductCode('B', 0)).toBe('B0001');
     expect(formatProductCode('C', 0)).toBe('C0001');
     expect(formatProductCode('AA', 9)).toBe('AA0010');
+  });
+
+  it('reads complete uppercase prefixes and four-digit sequences without misreading custom codes', () => {
+    expect(parseProductCode('AA0012')).toEqual({ prefix: 'AA', sequence: 12 });
+    for (const code of ['CUSTOM-0012', 'A10000', 'a0012', 'A12']) {
+      expect(parseProductCode(code)).toEqual({ prefix: null, sequence: null });
+    }
   });
 });

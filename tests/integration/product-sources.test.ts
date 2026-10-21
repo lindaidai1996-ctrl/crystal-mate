@@ -12,6 +12,7 @@ vi.mock('@/lib/api', () => ({
 }));
 import { db } from '../../src/lib/db';
 import { saveProduct } from '../../src/lib/products';
+import { reserveProductCode } from '../../src/lib/product-code-store';
 import { diyQuotePricing } from '../../src/lib/product-pricing';
 import {
   addProductSource,
@@ -364,7 +365,9 @@ describe.skipIf(!enabled)('product source transactions', () => {
         ],
       });
       expect(
-        (await db.materialBatchEntry.findUniqueOrThrow({ where: { id: entry.id } })).remainingQty,
+        (
+          await db.materialBatchEntry.findUniqueOrThrow({ where: { id: entry.id } })
+        ).remainingQty?.toNumber(),
       ).toBe(2);
       expect((await db.product.findUniqueOrThrow({ where: { id: egg.id } })).stock).toBe(1);
       await db.materialBatchEntry.update({
@@ -623,6 +626,8 @@ describe.skipIf(!enabled)('product source transactions', () => {
         diy.id,
       );
       expect(fixed).toMatchObject({ priceCents: 8625, saleRuleValue: '20.25' });
+      await db.category.update({ where: { id: category.id }, data: { prefix: 'PRICE' } });
+      const switchedCode = await reserveProductCode(category.id);
       const switched = await saveProduct(
         {
           ...base,
@@ -630,7 +635,8 @@ describe.skipIf(!enabled)('product source transactions', () => {
           saleManual: true,
           priceCents: 9999,
           name: egg.name,
-          code: egg.code,
+          code: switchedCode.code,
+          codeReservationToken: switchedCode.reservationToken,
           cost: null,
           measurement: null,
         },

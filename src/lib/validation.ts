@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { amountToCents, calculateCostTotal } from './cabochon-cost';
 import { productSaleRules } from './product-pricing';
 import { calculatePurchase, emptyPurchase } from './material-purchase';
+import { validMaterialQuantity } from './inventory';
 import { calculateDiyCost } from './product-diy-cost';
 
 export const categorySchema = z.object({
@@ -70,6 +71,13 @@ export const measurementSchema = z.object({
 
 const costAmount = z.string().regex(/^\d{1,10}(?:\.\d{1,2})?$/);
 
+export const silverPricingSchema = z.strictObject({
+  costGramPrice: costAmount,
+  quoteGramPrice: costAmount,
+});
+
+export const silverCostSchema = silverPricingSchema.extend({ weightGrams: costAmount });
+
 export const cabochonCostSchema = z
   .strictObject({
     roughStoneCost: costAmount.nullable(),
@@ -93,7 +101,29 @@ export const cabochonCostSchema = z
     }
   });
 
+const stockQuantity = z.number().int().min(0).max(2147483647);
+export const stockCountSchema = z.strictObject({
+  quantity: stockQuantity,
+  expectedQuantity: stockQuantity.nullable(),
+  reason: z.string().trim().max(500).default(''),
+});
+
+export const materialStockCountSchema = stockCountSchema.extend({
+  quantity: z
+    .number()
+    .min(0)
+    .max(2147483647)
+    .refine((value) => validMaterialQuantity(value, 'GRAM')),
+  expectedQuantity: z
+    .number()
+    .min(0)
+    .max(2147483647)
+    .refine((value) => validMaterialQuantity(value, 'GRAM'))
+    .nullable(),
+});
+
 const baseProductSchema = z.object({
+  codeReservationToken: z.uuid().optional(),
   code: z
     .string()
     .trim()
@@ -112,7 +142,11 @@ const baseProductSchema = z.object({
     .optional(),
   saleManual: z.boolean().optional(),
   currency: z.literal('CNY'),
-  stock: z.number().int().min(0).max(2147483647),
+  stock: stockQuantity,
+  stockAdjustment: stockCountSchema
+    .pick({ expectedQuantity: true, reason: true })
+    .extend({ expectedQuantity: stockQuantity })
+    .optional(),
   published: z.boolean(),
   imageKeys: z
     .array(z.string().min(1))
@@ -157,7 +191,7 @@ export const materialSchema = z
   .strictObject({
     name: z.string().trim().min(1).max(120),
     categoryId: z.string().cuid(),
-    unit: z.enum(['STRAND', 'BEAD']),
+    unit: z.enum(['STRAND', 'BEAD', 'GRAM']),
     purchaseUnitPrice: nullableAmount,
     weightGrams: positiveAmount,
     purchaseGramPrice: nullableAmount,
@@ -177,6 +211,7 @@ export const materialSchema = z
       'PERCENT_50',
       'FIXED_AMOUNT',
       'CUSTOM_PERCENT',
+      'CUSTOM_AMOUNT',
     ]),
     saleRuleValue: nullableAmount,
     saleUnitPrice: nullableAmount,
@@ -199,7 +234,7 @@ export const materialSchema = z
       context.addIssue({ code: 'custom', path: ['saleRuleValue'], message: 'Invalid rule value' });
     }
     if (
-      data.unit === 'BEAD' &&
+      data.unit !== 'STRAND' &&
       (data.childCount !== null ||
         data.childWeightGrams !== null ||
         data.childUnitPrice !== null ||
@@ -207,7 +242,11 @@ export const materialSchema = z
         data.saleChildUnitPrice !== null ||
         data.saleChildManual)
     ) {
-      context.addIssue({ code: 'custom', path: ['unit'], message: 'Beads cannot have child data' });
+      context.addIssue({
+        code: 'custom',
+        path: ['unit'],
+        message: 'Only strands can have child data',
+      });
     }
   });
 
@@ -225,7 +264,7 @@ export const materialMasterSchema = z.strictObject({
     .array(z.string().cuid())
     .refine((ids) => new Set(ids).size === ids.length)
     .optional(),
-  unit: z.enum(['STRAND', 'BEAD']),
+  unit: z.enum(['STRAND', 'BEAD', 'GRAM']),
   notes: z.string().trim().max(10000),
 });
 
@@ -259,6 +298,7 @@ export const productPurchaseSchema = z.strictObject({
 export const productDiySchema = z
   .strictObject({
     origin: z.literal('DIY'),
+    silverCost: silverCostSchema.optional(),
     quantity,
     notes: z.string().trim().max(10000).default(''),
     materials: z
@@ -363,7 +403,7 @@ export const productSchema = baseProductSchema
     }
   });
 
-export const productStockAdjustmentSchema = z.strictObject({
+const legacyProductStockAdjustmentSchema = z.strictObject({
   delta: z
     .number()
     .int()
@@ -372,6 +412,11 @@ export const productStockAdjustmentSchema = z.strictObject({
     .refine((value) => value !== 0),
   reason: z.string().trim().min(1).max(500),
 });
+
+export const productStockAdjustmentSchema = z.union([
+  stockCountSchema.extend({ expectedQuantity: stockQuantity }),
+  legacyProductStockAdjustmentSchema,
+]);
 
 export const materialPurchaseSchema = z
   .strictObject({
@@ -405,6 +450,29 @@ function validateMaterialPurchase(
   },
   context: z.RefinementCtx,
 ) {
+  if (data.receivedQty !== null && !validMaterialQuantity(data.receivedQty, data.values.unit)) {
+    context.addIssue({
+      code: 'custom',
+      path: ['receivedQty'],
+      message: 'Whole units required for strands and beads',
+    });
+  }
+  if (data.values.unit === 'GRAM') {
+    const calculated = calculatePurchase(data.values, data.purchase, data.receivedQty);
+    if (
+      data.purchase.mode !== 'BATCH' ||
+      !calculated.valid ||
+      data.receivedQty === null ||
+      data.receivedQty !== Number(calculated.purchase.totalWeightGrams)
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['purchase'],
+        message:
+          'Gram inventory requires a total weight matching the received quantity and a valid total amount',
+      });
+    }
+  }
   if (data.purchase.mode === 'UNIT' && data.receivedQty === null) {
     context.addIssue({
       code: 'custom',
@@ -419,7 +487,7 @@ function validateMaterialPurchase(
     context.addIssue({
       code: 'custom',
       path: ['purchase'],
-      message: 'Enter valid batch weight and amount, or two values to calculate them',
+      message: 'Enter a valid total amount, or a gram price and total weight to calculate it',
     });
   }
 }
@@ -432,7 +500,12 @@ const materialCreateObject = z.strictObject({
     .default([]),
   selection: materialBatchSelectionSchema,
   distributorId: z.string().cuid(),
-  receivedQty: z.number().int().positive().max(2147483647).nullable(),
+  receivedQty: z
+    .number()
+    .positive()
+    .max(2147483647)
+    .refine((value) => validMaterialQuantity(value, 'GRAM'))
+    .nullable(),
   purchase: materialPurchaseSchema,
 });
 
@@ -445,7 +518,12 @@ export const materialBatchEntryUpdateSchema = z
     values: materialSchema,
     tagIds: materialMasterSchema.shape.tagIds,
     distributorId: z.string().cuid(),
-    receivedQty: z.number().int().positive().max(2147483647).nullable(),
+    receivedQty: z
+      .number()
+      .positive()
+      .max(2147483647)
+      .refine((value) => validMaterialQuantity(value, 'GRAM'))
+      .nullable(),
     purchase: materialPurchaseSchema,
   })
   .superRefine(validateMaterialPurchase);

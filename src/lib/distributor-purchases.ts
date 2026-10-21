@@ -2,7 +2,36 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { ApiError } from '@/lib/api';
 import { db } from '@/lib/db';
-import type { DistributorPurchaseEntry, DistributorPurchaseSummary } from '@/lib/client-types';
+import type {
+  DistributorItemCounts,
+  DistributorPurchaseEntry,
+  DistributorPurchaseSummary,
+} from '@/lib/client-types';
+
+export async function getDistributorItemCounts() {
+  // Count catalog identities, not purchase rows or quantities, just like the detail page.
+  const rows = await db.$queryRaw<
+    { distributorId: string; products: number; materials: number }[]
+  >(Prisma.sql`
+    SELECT "distributorId",
+      (COUNT(DISTINCT "itemId") FILTER (WHERE type = 'PRODUCT'))::int AS products,
+      (COUNT(DISTINCT "itemId") FILTER (WHERE type = 'MATERIAL'))::int AS materials
+    FROM (
+      SELECT "distributorId", "productId" AS "itemId", 'PRODUCT' AS type
+      FROM "ProductPurchaseEntry"
+      UNION ALL
+      SELECT "distributorId", "materialId", 'MATERIAL'
+      FROM "MaterialBatchEntry"
+    ) purchases
+    GROUP BY "distributorId"
+  `);
+  return new Map<string, DistributorItemCounts>(
+    rows.map(({ distributorId, products, materials }) => [
+      distributorId,
+      { products, materials, total: products + materials },
+    ]),
+  );
+}
 
 export const distributorIdSchema = z.string().cuid();
 const paginationFields = {
@@ -160,7 +189,7 @@ export async function getDistributorPurchaseEntries(
       batchId: entry.batch.id,
       batchName: entry.batch.name,
       receivedAt: entry.batch.receivedAt.toISOString(),
-      quantity: entry.receivedQty,
+      quantity: entry.receivedQty?.toNumber() ?? null,
       unit: entry.material.unit,
       unitPrice: entry.purchaseUnitPrice?.toFixed(2) ?? null,
       amount:

@@ -3,6 +3,7 @@
 import { App, Button, Drawer, Form, Input } from 'antd';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { DateInput } from '@/components/date-input';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { MaterialBatch, MaterialBatchAttachment } from '@/lib/client-types';
 import { todayInChina } from './batchSelector';
@@ -74,11 +75,16 @@ export function BatchEditorDrawer({
     <Drawer
       title={batch ? t('editBatch') : t('newBatch')}
       open
-      onClose={onClose}
+      onClose={() => !uploading && !saving && onClose()}
+      closable={!uploading && !saving}
+      maskClosable={!uploading && !saving}
+      keyboard={!uploading && !saving}
       width="min(560px, 100vw)"
       footer={
         <div className="batch-drawer-actions">
-          <Button onClick={onClose}>{common('cancel')}</Button>
+          <Button disabled={uploading || saving} onClick={onClose}>
+            {common('cancel')}
+          </Button>
           <Button type="primary" loading={saving} disabled={uploading} onClick={() => void save()}>
             {common('save')}
           </Button>
@@ -105,13 +111,10 @@ export function BatchEditorDrawer({
           validateStatus={submitted && !draft.receivedAt ? 'error' : undefined}
           help={submitted && !draft.receivedAt ? t('required') : undefined}
         >
-          <Input
+          <DateInput
             aria-label={t('date')}
-            type="date"
             value={draft.receivedAt}
-            onChange={(event) =>
-              setDraft((current) => ({ ...current, receivedAt: event.target.value }))
-            }
+            onChange={(date) => setDraft((current) => ({ ...current, receivedAt: date }))}
           />
         </Form.Item>
         <Form.Item label={t('notes')}>

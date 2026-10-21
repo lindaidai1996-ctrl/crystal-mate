@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { MaterialCategory, MaterialValues } from '../../src/lib/client-types';
 import {
+  adoptSaleUnitPriceFromBeads,
   editMaterial,
   purchaseCandidates,
   recalculateMaterial,
   recognizeMaterialCategory,
+  saleUnitPriceFromBeads,
 } from '../../src/lib/material-calculations';
 import {
   categoryDescendants,
@@ -120,6 +122,99 @@ describe('material pricing', () => {
       childPriceSource: null,
       saleChildUnitPrice: null,
     });
+  });
+
+  it('adopts the bead sale price as a custom strand price and preserves it on later edits', () => {
+    const input = recalculateMaterial({
+      ...values(),
+      purchaseUnitPrice: '19.90',
+      childCount: 65,
+      childPriceSource: 'COUNT',
+    });
+    const entered = editMaterial(input, 'saleChildUnitPrice', '3.00');
+    expect(entered.childUnitPrice).toBe('0.31');
+    expect(saleUnitPriceFromBeads(entered)).toBe('195.00');
+    const adopted = adoptSaleUnitPriceFromBeads(entered);
+    expect(adopted).toMatchObject({
+      saleRule: 'CUSTOM_AMOUNT',
+      saleRuleValue: null,
+      saleUnitPrice: '195.00',
+      saleChildUnitPrice: '3.00',
+      saleUnitManual: true,
+      saleChildManual: true,
+    });
+    const changed = editMaterial(
+      editMaterial(adopted, 'childCount', 60),
+      'saleChildUnitPrice',
+      '4.00',
+    );
+    expect(changed.saleUnitPrice).toBe('195.00');
+    expect(saleUnitPriceFromBeads(changed)).toBe('240.00');
+    expect(adoptSaleUnitPriceFromBeads(changed).saleUnitPrice).toBe('240.00');
+  });
+
+  it('retains custom sale prices through cost recalculation, including empty and zero prices', () => {
+    const custom = recalculateMaterial(
+      {
+        ...values(),
+        saleRule: 'CUSTOM_AMOUNT',
+        saleUnitPrice: '195.00',
+        saleGramPrice: '0.00',
+        saleChildUnitPrice: null,
+      },
+      true,
+    );
+    expect(editMaterial(custom, 'purchaseUnitPrice', '200.00')).toMatchObject({
+      saleUnitPrice: '195.00',
+      saleGramPrice: '0.00',
+      saleChildUnitPrice: null,
+      saleUnitManual: true,
+      saleGramManual: true,
+      saleChildManual: false,
+    });
+    expect(editMaterial(custom, 'saleUnitPrice', null).saleUnitPrice).toBeNull();
+  });
+
+  it('resets manual prices when switching from custom pricing to a cost rule', () => {
+    const custom = adoptSaleUnitPriceFromBeads({
+      ...values(),
+      childPriceSource: 'COUNT',
+      saleChildUnitPrice: '3.00',
+    });
+    const automatic = editMaterial(custom, 'saleRule', 'PERCENT_20');
+    expect(automatic).toMatchObject({
+      saleUnitPrice: '120.00',
+      saleGramPrice: '6.00',
+      saleChildUnitPrice: '12.00',
+      saleUnitManual: false,
+      saleGramManual: false,
+      saleChildManual: false,
+    });
+    const fixed = editMaterial({ ...custom, saleRuleValue: '20.00' }, 'saleRule', 'FIXED_AMOUNT');
+    expect(fixed.saleUnitPrice).toBe('120.00');
+  });
+
+  it('handles exact cents and only suggests valid, supported strand amounts', () => {
+    const input = { ...values(), saleChildUnitPrice: '0.29', childCount: 3 };
+    expect(saleUnitPriceFromBeads(input)).toBe('0.87');
+    expect(saleUnitPriceFromBeads({ ...input, saleChildUnitPrice: '0.00' })).toBe('0.00');
+    for (const invalid of [
+      { ...input, childCount: null },
+      { ...input, childCount: 0 },
+      { ...input, childCount: 1.5 },
+      { ...input, saleChildUnitPrice: null },
+      { ...input, unit: 'BEAD' as const },
+      { ...input, saleChildUnitPrice: '9999999999.99', childCount: 2 },
+    ]) {
+      expect(saleUnitPriceFromBeads(invalid)).toBeNull();
+      expect(adoptSaleUnitPriceFromBeads(invalid)).toBe(invalid);
+    }
+  });
+
+  it('validates custom amounts without a markup parameter', () => {
+    const input = { ...values(), imageKeys: [], saleRule: 'CUSTOM_AMOUNT' };
+    expect(materialSchema.safeParse(input).success).toBe(true);
+    expect(materialSchema.safeParse({ ...input, saleRuleValue: '10.00' }).success).toBe(false);
   });
 });
 

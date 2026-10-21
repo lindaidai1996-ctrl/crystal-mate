@@ -1,11 +1,12 @@
 'use client';
 
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { App, Button, Empty, Input, Popconfirm, Table, Tooltip } from 'antd';
+import { App, Button, Empty, Input, Popconfirm, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from '@/i18n/navigation';
+import { PaginatedTable } from '@/components/paginated-table';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { MaterialBatch } from '@/lib/client-types';
 import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
@@ -148,7 +149,7 @@ export function MaterialBatchesPage() {
         />
       </div>
       <div className="table-surface">
-        <Table
+        <PaginatedTable
           rowKey="id"
           columns={columns}
           dataSource={visible}

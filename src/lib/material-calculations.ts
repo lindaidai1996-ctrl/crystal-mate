@@ -38,7 +38,34 @@ export function purchaseCandidates(values: MaterialValues) {
   };
 }
 
+export function saleUnitPriceFromBeads(values: MaterialValues): MaterialAmount {
+  const price = minor(values.saleChildUnitPrice);
+  const count = values.childCount;
+  if (
+    values.unit !== 'STRAND' ||
+    price === null ||
+    count === null ||
+    !Number.isInteger(count) ||
+    count <= 0
+  )
+    return null;
+  const total = price * BigInt(count);
+  return total <= BigInt('999999999999') ? fixed(total) : null;
+}
+
+export function adoptSaleUnitPriceFromBeads(values: MaterialValues): MaterialValues {
+  const price = saleUnitPriceFromBeads(values);
+  if (price === null) return values;
+  return recalculateMaterial({
+    ...values,
+    saleRule: 'CUSTOM_AMOUNT',
+    saleRuleValue: null,
+    saleUnitPrice: price,
+  });
+}
+
 function salePrice(cost: MaterialAmount, values: MaterialValues, isUnit = false): string | null {
+  if (values.saleRule === 'CUSTOM_AMOUNT') return null;
   const amount = minor(cost);
   if (amount === null) return null;
   const percentages = {
@@ -64,7 +91,7 @@ function salePrice(cost: MaterialAmount, values: MaterialValues, isUnit = false)
 
 export function recalculateMaterial(values: MaterialValues, resetSales = false): MaterialValues {
   const next = { ...values };
-  if (next.unit === 'BEAD') {
+  if (next.unit !== 'STRAND') {
     next.childCount = null;
     next.childWeightGrams = null;
     next.childUnitPrice = null;
@@ -72,10 +99,24 @@ export function recalculateMaterial(values: MaterialValues, resetSales = false):
     next.saleChildUnitPrice = null;
     next.saleChildManual = false;
   }
+  if (next.unit === 'GRAM') {
+    next.weightGrams = '1.00';
+    next.purchaseUnitPrice = next.purchaseGramPrice;
+    next.purchaseGramManual = true;
+    next.saleUnitPrice = next.saleGramPrice;
+    next.saleUnitManual = next.saleGramManual;
+  }
   const candidates = purchaseCandidates(next);
   if (!next.purchaseGramManual) next.purchaseGramPrice = candidates.gram;
   if (next.childPriceSource === 'COUNT') next.childUnitPrice = candidates.count;
   if (next.childPriceSource === 'WEIGHT') next.childUnitPrice = candidates.weight;
+  if (next.saleRule === 'CUSTOM_AMOUNT') {
+    next.saleRuleValue = null;
+    next.saleUnitManual = next.saleUnitPrice !== null;
+    next.saleGramManual = next.saleGramPrice !== null;
+    next.saleChildManual = next.saleChildUnitPrice !== null;
+    return next;
+  }
   if (resetSales || !next.saleUnitManual)
     next.saleUnitPrice = salePrice(next.purchaseUnitPrice, next, true);
   if (resetSales || !next.saleGramManual)
@@ -86,6 +127,10 @@ export function recalculateMaterial(values: MaterialValues, resetSales = false):
     next.saleUnitManual = false;
     next.saleGramManual = false;
     next.saleChildManual = false;
+  }
+  if (next.unit === 'GRAM') {
+    next.saleUnitPrice = next.saleGramPrice;
+    next.saleUnitManual = next.saleGramManual;
   }
   return next;
 }

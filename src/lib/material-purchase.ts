@@ -82,7 +82,11 @@ export function calculatePurchase(
   input: MaterialPurchase,
   quantity: number | null,
 ) {
-  const purchase = resolvePurchase(input);
+  const purchase = resolvePurchase(
+    values.unit === 'GRAM'
+      ? { ...input, sampleWeightGrams: null, manualUnitPrice: null, unitInputs: null }
+      : input,
+  );
   let source: 'UNIT' | 'AVERAGE' | 'ESTIMATED' | 'MANUAL' | 'UNKNOWN' = 'UNIT';
   let belowPrecision = false;
   let difference: MaterialAmount = null;
@@ -93,10 +97,10 @@ export function calculatePurchase(
     const amount = minor(purchase.totalAmount);
     let quote = minor(purchase.quotedGramPrice);
     valid =
-      weight !== null &&
-      weight > BigInt(0) &&
       amount !== null &&
+      (purchase.totalWeightGrams === null || (weight !== null && weight > BigInt(0))) &&
       totalFields.every((field) => purchase[field] === null || minor(purchase[field]) !== null);
+    if (purchase.autoField === 'totalWeightGrams' && quote === BigInt(0)) valid = false;
     if (
       purchase.autoField === 'totalWeightGrams' &&
       amount !== null &&
@@ -129,19 +133,31 @@ export function calculatePurchase(
       quote = null;
       belowPrecision = true;
     }
-    let gram = valid ? divide(amount! * BigInt(100), weight!) : null;
+    let gram =
+      valid && amount !== null && weight !== null ? divide(amount * BigInt(100), weight) : null;
     const sample = minor(purchase.sampleWeightGrams);
-    const knownQuantity = quantity !== null && Number.isInteger(quantity) && quantity > 0;
-    let unitWeight =
-      valid && knownQuantity ? divide(weight!, BigInt(quantity!)) : purchase.sampleWeightGrams;
+    const gramUnit = values.unit === 'GRAM';
+    if (gramUnit && (weight === null || weight <= BigInt(0))) valid = false;
+    const knownQuantity =
+      !gramUnit && quantity !== null && Number.isInteger(quantity) && quantity > 0;
+    let unitWeight = knownQuantity
+      ? valid && weight !== null
+        ? divide(weight, BigInt(quantity!))
+        : null
+      : purchase.sampleWeightGrams;
     let unitPrice =
-      valid && knownQuantity
-        ? divide(amount!, BigInt(quantity!))
-        : valid && sample !== null && sample > BigInt(0)
-          ? divide(amount! * sample, weight!)
+      valid && amount !== null && knownQuantity
+        ? divide(amount, BigInt(quantity!))
+        : valid && amount !== null && weight !== null && sample !== null && sample > BigInt(0)
+          ? divide(amount * sample, weight)
           : null;
     source = knownQuantity ? 'AVERAGE' : unitPrice !== null ? 'ESTIMATED' : 'UNKNOWN';
-    if (purchase.manualUnitPrice !== null) {
+    if (gramUnit) {
+      unitWeight = '1.00';
+      unitPrice = gram;
+      source = 'AVERAGE';
+    }
+    if (!gramUnit && purchase.manualUnitPrice !== null) {
       unitPrice =
         minor(purchase.manualUnitPrice) !== null ? fixed(minor(purchase.manualUnitPrice)!) : null;
       source = 'MANUAL';
@@ -149,13 +165,14 @@ export function calculatePurchase(
     if (unitWeight !== null && minor(unitWeight) !== null) unitWeight = fixed(minor(unitWeight)!);
     if (
       unitWeight !== null &&
-      (minor(unitWeight) === BigInt(0) || (valid && knownQuantity && weight! < BigInt(quantity!)))
+      (minor(unitWeight) === BigInt(0) ||
+        (valid && knownQuantity && weight !== null && weight < BigInt(quantity!)))
     ) {
       unitWeight = null;
       belowPrecision = true;
     }
-    if (valid && amount! > BigInt(0)) {
-      if (amount! * BigInt(100) < weight!) {
+    if (valid && amount !== null && amount > BigInt(0)) {
+      if (weight !== null && amount * BigInt(100) < weight) {
         gram = null;
         belowPrecision = true;
       }
@@ -163,26 +180,27 @@ export function calculatePurchase(
         unitPrice !== null &&
         purchase.manualUnitPrice === null &&
         (knownQuantity
-          ? amount! < BigInt(quantity!)
-          : sample !== null && amount! * sample < weight!)
+          ? amount < BigInt(quantity!)
+          : sample !== null && weight !== null && amount * sample < weight)
       ) {
         unitPrice = null;
         belowPrecision = true;
       }
     }
-    if (valid && quote !== null) {
-      const expected = (quote * weight! + BigInt(50)) / BigInt(100);
-      const delta = amount! - expected;
+    if (valid && quote !== null && weight !== null && amount !== null) {
+      const expected = (quote * weight + BigInt(50)) / BigInt(100);
+      const delta = amount - expected;
       difference = `${delta < BigInt(0) ? '-' : ''}${fixed(delta < BigInt(0) ? -delta : delta)}`;
     }
     next = {
       ...values,
       purchaseUnitPrice: unitPrice,
-      weightGrams: unitWeight,
+      weightGrams: gramUnit ? '1.00' : unitWeight,
       purchaseGramPrice: gram,
       purchaseGramManual: true,
     };
   }
+  if (values.unit === 'GRAM' && purchase.mode !== 'BATCH') valid = false;
   const calculated = recalculateMaterial(next);
   if (
     purchase.mode === 'BATCH' &&

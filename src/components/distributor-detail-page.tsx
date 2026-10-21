@@ -1,11 +1,13 @@
 'use client';
 
 import { ArrowLeftOutlined, EditOutlined } from '@ant-design/icons';
-import { App, Button, Descriptions, Empty, Input, Result, Skeleton, Table, Tabs, Tag } from 'antd';
+import { App, Button, Descriptions, Empty, Input, Result, Segmented, Skeleton, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from '@/i18n/navigation';
+import { PaginatedTable } from '@/components/paginated-table';
+import { CreatePurchaseButton } from '@/components/purchaseCreation/createPurchaseButton';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type {
   Distributor,
@@ -204,7 +206,7 @@ export function DistributorDetailPage({ id }: { id: string }) {
         : []),
     ];
     return (
-      <Table
+      <PaginatedTable
         rowKey="id"
         size="small"
         loading={entryLoading[key]}
@@ -229,7 +231,8 @@ export function DistributorDetailPage({ id }: { id: string }) {
   }
 
   function unitLabel(unit: string | null) {
-    if (unit === 'STRAND' || unit === 'BEAD') return distributorT(`unit_${unit}`);
+    if (unit === 'STRAND' || unit === 'BEAD' || unit === 'GRAM')
+      return distributorT(`unit_${unit}`);
     return distributorT('unit_piece');
   }
 
@@ -323,18 +326,26 @@ export function DistributorDetailPage({ id }: { id: string }) {
 
   return (
     <>
-      <div className="page-heading editor-heading">
+      <div className="page-heading editor-heading distributor-detail-heading">
         <div>
           <Link href="/admin/distributors" className="back-link">
             <ArrowLeftOutlined /> {t('back')}
           </Link>
           <h1>{distributor.name}</h1>
+          <p>{t('count', { count: purchasePage?.total ?? 0 })}</p>
         </div>
-        <Button icon={<EditOutlined />} onClick={() => setEditing(true)}>
-          {common('edit')}
-        </Button>
+        <div className="page-heading-actions">
+          <CreatePurchaseButton distributorId={distributor.id} />
+          <Button icon={<EditOutlined />} onClick={() => setEditing(true)}>
+            {common('edit')}
+          </Button>
+        </div>
       </div>
-      <Descriptions className="material-batch-summary" column={{ xs: 1, sm: 2, md: 3 }}>
+      <Descriptions
+        className="material-batch-summary distributor-detail-summary"
+        size="small"
+        column={{ xs: 1, sm: 2, md: 3 }}
+      >
         <Descriptions.Item label={distributorT('area')}>
           {distributor.area === '东海'
             ? distributorT('donghai')
@@ -357,7 +368,7 @@ export function DistributorDetailPage({ id }: { id: string }) {
           {distributor.notes || '—'}
         </Descriptions.Item>
       </Descriptions>
-      <div className="filter-bar">
+      <div className="filter-bar distributor-detail-filter">
         <Input.Search
           className="filter-search"
           aria-label={t('search')}
@@ -373,16 +384,18 @@ export function DistributorDetailPage({ id }: { id: string }) {
           allowClear
         />
       </div>
-      <Tabs
-        activeKey={type}
-        onChange={(key) => resetList(key as PurchaseType)}
-        size="large"
-        items={[
-          { key: 'all', label: t('all') },
-          { key: 'product', label: t('productsOnly') },
-          { key: 'material', label: t('materialsOnly') },
-        ]}
-      />
+      <div className="distributor-detail-type-filter">
+        <Segmented<PurchaseType>
+          value={type}
+          onChange={(value) => resetList(value)}
+          style={{ background: 'var(--ant-color-fill-tertiary)' }}
+          options={[
+            { value: 'all', label: t('all') },
+            { value: 'product', label: t('productsOnly') },
+            { value: 'material', label: t('materialsOnly') },
+          ]}
+        />
+      </div>
       <div className="table-surface">
         {purchaseFailed ? (
           <Result
@@ -401,7 +414,7 @@ export function DistributorDetailPage({ id }: { id: string }) {
             }
           />
         ) : (
-          <Table
+          <PaginatedTable
             rowKey={(row) => `${row.type}:${row.itemId}`}
             dataSource={purchasePage?.items ?? []}
             columns={columns}

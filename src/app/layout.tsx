@@ -12,7 +12,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="zh-CN">
       <body className="crystal-mate">
-        <AntdRegistry>{children}</AntdRegistry>
+        <AntdRegistry layer>{children}</AntdRegistry>
       </body>
     </html>
   );

@@ -2,6 +2,12 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { ApiError } from '@/lib/api';
+import {
+  materialStockSummary,
+  correctedRemainingQuantity,
+  MAX_STOCK,
+  validMaterialQuantity,
+} from '@/lib/inventory';
 import { calculatePurchase, emptyPurchase, type MaterialPurchase } from '@/lib/material-purchase';
 import type { MaterialValues } from '@/lib/client-types';
 import {
@@ -29,6 +35,7 @@ const emptyChildDetails = {
 
 export const entryInclude = {
   batch: true,
+  stockAdjustments: { orderBy: { createdAt: 'desc' } },
   distributor: true,
   images: { orderBy: { position: 'asc' } },
 } satisfies Prisma.MaterialBatchEntryInclude;
@@ -76,7 +83,19 @@ export function serializeEntry(entry: EntryWithRelations) {
     manualUnitPrice: entry.manualPurchaseUnitPrice?.toFixed(2) ?? null,
     unitInputs: entry.purchaseUnitInputs as MaterialPurchase['unitInputs'],
   };
-  return { ...entry, ...amounts(entry), purchase };
+  return {
+    ...entry,
+    ...amounts(entry),
+    purchase,
+    receivedQty: entry.receivedQty?.toNumber() ?? null,
+    remainingQty: entry.remainingQty?.toNumber() ?? null,
+    stockAdjustments: entry.stockAdjustments.map((record) => ({
+      ...record,
+      beforeQty: record.beforeQty?.toNumber() ?? null,
+      afterQty: record.afterQty.toNumber(),
+      delta: record.delta?.toNumber() ?? null,
+    })),
+  };
 }
 
 export function serializeMaterial(material: MaterialWithRelations) {
@@ -89,7 +108,13 @@ export function serializeMaterial(material: MaterialWithRelations) {
         b.createdAt.getTime() - a.createdAt.getTime() ||
         b.id.localeCompare(a.id),
     );
-  return { ...fields, tags: tags.map(({ tag }) => tag), ...amounts(material), batchEntries };
+  return {
+    ...fields,
+    tags: tags.map(({ tag }) => tag),
+    ...amounts(material),
+    batchEntries,
+    ...materialStockSummary(batchEntries),
+  };
 }
 
 async function validateTags(tx: Tx, tagIds: string[]) {
@@ -116,6 +141,14 @@ function detailValues(
     purchaseInput,
     receivedQty,
   );
+  if (receivedQty !== null && !validMaterialQuantity(receivedQty, master.unit))
+    throw new ApiError(400, 'INVALID_INPUT');
+  if (input.unit !== master.unit) throw new ApiError(409, 'MATERIAL_UNIT_LOCKED');
+  if (
+    master.unit === 'GRAM' &&
+    (receivedQty === null || receivedQty !== Number(calculated.purchase.totalWeightGrams))
+  )
+    throw new ApiError(400, 'INVALID_INPUT');
   if (!calculated.valid) throw new ApiError(400, 'INVALID_INPUT');
   const {
     name: _name,
@@ -269,14 +302,19 @@ export async function createMaterial(input: CreateInput) {
 
 async function writeMaterialMaster(
   tx: Tx,
-  material: { id: string; unit: 'STRAND' | 'BEAD' },
+  material: { id: string; unit: MaterialValues['unit'] },
   input: MasterInput,
 ) {
+  if (
+    material.unit !== input.unit &&
+    (await tx.materialBatchEntry.count({ where: { materialId: material.id } }))
+  )
+    throw new ApiError(409, 'MATERIAL_UNIT_LOCKED');
   const { tagIds, ...fields } = input;
   if (!(await tx.materialCategory.findUnique({ where: { id: input.categoryId } })))
     throw new ApiError(400, 'MATERIAL_CATEGORY_NOT_FOUND');
   if (tagIds) await validateTags(tx, tagIds);
-  const clearChildDetails = material.unit === 'STRAND' && input.unit === 'BEAD';
+  const clearChildDetails = material.unit === 'STRAND' && input.unit !== 'STRAND';
   await tx.material.update({
     where: { id: material.id },
     data: { ...fields, ...(clearChildDetails ? emptyChildDetails : {}) },
@@ -374,6 +412,15 @@ export async function updateMaterialEntry(
       ]);
       if (!material || !current || current.materialId !== materialId)
         throw new ApiError(404, 'NOT_FOUND');
+      const remainingQty = correctedRemainingQuantity(
+        {
+          receivedQty: current.receivedQty?.toNumber() ?? null,
+          remainingQty: current.remainingQty?.toNumber() ?? null,
+        },
+        input.receivedQty,
+      );
+      if (remainingQty !== null && (remainingQty < 0 || remainingQty > MAX_STOCK))
+        throw new ApiError(409, 'MATERIAL_STOCK_OUT_OF_RANGE');
       if (!(await tx.distributor.findUnique({ where: { id: input.distributorId } })))
         throw new ApiError(400, 'DISTRIBUTOR_NOT_FOUND');
       const master = {
@@ -397,7 +444,7 @@ export async function updateMaterialEntry(
           ...detail,
           distributorId: input.distributorId,
           receivedQty: input.receivedQty,
-          remainingQty: input.receivedQty,
+          remainingQty,
         },
       });
       await replaceEntryImages(tx, entryId, imageKeys, known);

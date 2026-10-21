@@ -80,4 +80,15 @@ describe('image preparation', () => {
     const result = await prepareImage(new File(['x'], 'broken.png', { type: 'image/png' }));
     expect(result).toMatchObject({ compressed: null, error: 'compressionFailed' });
   });
+
+  it('compresses a validated crop even if lossless export grew beyond the source selection limit', async () => {
+    mockCanvas(new Blob([new Uint8Array(40)], { type: 'image/webp' }));
+    const cropped = new File([new Uint8Array(MAX_SOURCE_BYTES + 1)], 'crop.png', {
+      type: 'image/png',
+    });
+    expect((await prepareImage(cropped)).error).toBe('tooLarge');
+    const result = await prepareImage(cropped, { cropped: true });
+    expect(result.compressed).toMatchObject({ type: 'image/webp', size: 40 });
+    expect(result.error).toBeUndefined();
+  });
 });

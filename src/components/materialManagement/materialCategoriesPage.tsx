@@ -11,13 +11,13 @@ import {
   Modal,
   Popconfirm,
   Select,
-  Table,
   Tooltip,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { Link } from '@/i18n/navigation';
+import { PaginatedTable } from '@/components/paginated-table';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { MaterialCategory } from '@/lib/client-types';
 import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
@@ -173,6 +173,9 @@ export function MaterialCategoriesPage() {
     items,
     editing ? categoryDescendants(editing.id, items) : new Set<string>(),
   );
+  const expandableKeys = items.filter((item) => item._count?.children).map((item) => item.id);
+  const allExpanded =
+    expandableKeys.length > 0 && expandableKeys.every((key) => expandedKeys.includes(key));
 
   return (
     <>
@@ -183,12 +186,20 @@ export function MaterialCategoriesPage() {
           </Link>
           <h1>{t('title')}</h1>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => open(null)}>
-          {t('new')}
-        </Button>
+        <div className="page-heading-actions">
+          <Button
+            disabled={loading || expandableKeys.length === 0}
+            onClick={() => setExpandedKeys(allExpanded ? [] : expandableKeys)}
+          >
+            {t(allExpanded ? 'collapseAll' : 'expandAll')}
+          </Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => open(null)}>
+            {t('new')}
+          </Button>
+        </div>
       </div>
       <div className="table-surface">
-        <Table
+        <PaginatedTable
           rowKey="id"
           dataSource={rows(null)}
           columns={columns}

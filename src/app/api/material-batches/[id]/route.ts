@@ -16,7 +16,18 @@ export async function GET(request: NextRequest, { params }: Context) {
         attachments: { orderBy: { position: 'asc' } },
         entries: { include: { ...entryInclude, material: true }, orderBy: { createdAt: 'desc' } },
         productEntries: {
-          include: { product: { select: { id: true, code: true, name: true } }, distributor: true },
+          include: {
+            product: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+                priceCents: true,
+                images: { orderBy: { position: 'asc' } },
+              },
+            },
+            distributor: true,
+          },
           orderBy: { createdAt: 'desc' },
         },
       },

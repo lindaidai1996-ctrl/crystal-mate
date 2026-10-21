@@ -1,6 +1,7 @@
 import type { MaterialPurchase } from './material-purchase';
 import type { ProductSaleRule } from './product-pricing';
 import type { CraftDesignFee } from './product-diy-cost';
+import type { SilverCost } from './silver-cost';
 
 export type Category = {
   id: string;
@@ -28,8 +29,10 @@ export type DistributorValues = Pick<
   'name' | 'area' | 'address' | 'wechat' | 'phone' | 'notes'
 >;
 export type DistributorArea = { id: string; name: string; distributorCount: number };
+export type DistributorItemCounts = { total: number; products: number; materials: number };
+export type DistributorListItem = Distributor & { itemCounts: DistributorItemCounts };
 export type DistributorPage = {
-  items: Distributor[];
+  items: DistributorListItem[];
   areas: string[];
   areaItems: DistributorArea[];
 };
@@ -173,14 +176,25 @@ export type ProductDiyRun = {
   perUnitQuote: string | null;
   totalQuote: string | null;
   craftDesignFee: CraftDesignFee;
+  silverCost: SilverCost;
   extraCosts: { name: string; amount: string; quoteAmount?: string | null }[];
   notes: string;
   materialLines: ProductDiyMaterial[];
   cabochonLines: ProductDiyCabochon[];
   createdAt: string;
 };
+export type StockAdjustment = {
+  id: string;
+  beforeQty: number | null;
+  afterQty: number;
+  delta: number | null;
+  reason: string;
+  createdAt: string;
+};
 export type ProductStockAdjustment = {
   id: string;
+  beforeQty: number | null;
+  afterQty: number | null;
   delta: number;
   reason: string;
   createdAt: string;
@@ -196,6 +210,8 @@ export type ProductSourceInput =
     }
   | {
       origin: 'DIY';
+      // null marks a new form waiting for its database defaults; it cannot be saved.
+      silverCost?: SilverCost | null;
       quantity: number;
       notes: string;
       materials: {
@@ -223,7 +239,7 @@ export type MaterialCategory = {
   parentId: string | null;
   _count?: { children: number; materials: number };
 };
-export type MaterialUnit = 'STRAND' | 'BEAD';
+export type MaterialUnit = 'STRAND' | 'BEAD' | 'GRAM';
 export type MaterialPriceSource = 'COUNT' | 'WEIGHT' | 'CUSTOM' | null;
 export type MaterialSaleRule =
   | 'COST'
@@ -232,7 +248,8 @@ export type MaterialSaleRule =
   | 'PERCENT_30'
   | 'PERCENT_50'
   | 'FIXED_AMOUNT'
-  | 'CUSTOM_PERCENT';
+  | 'CUSTOM_PERCENT'
+  | 'CUSTOM_AMOUNT';
 export type MaterialAmount = string | null;
 export type MaterialValues = {
   name: string;
@@ -260,6 +277,8 @@ export type MaterialValues = {
   notes: string;
 };
 export type Material = MaterialValues & {
+  knownStock: number;
+  unknownStockBatchCount: number;
   id: string;
   category: MaterialCategory;
   tags: Tag[];
@@ -302,9 +321,16 @@ export type MaterialBatchEntry = Omit<MaterialValues, 'name' | 'categoryId' | 'u
   distributor: Distributor;
   receivedQty: number | null;
   remainingQty: number | null;
+  stockAdjustments: StockAdjustment[];
   purchase: MaterialPurchase;
   unitPriceSource: 'UNIT' | 'AVERAGE' | 'ESTIMATED' | 'MANUAL' | 'UNKNOWN';
   images: ProductImage[];
   createdAt: string;
   updatedAt: string;
+};
+export type MaterialBatchDetail = MaterialBatch & {
+  entries: (MaterialBatchEntry & { material: { id: string; name: string; unit: MaterialUnit } })[];
+  productEntries: (ProductPurchaseEntry & {
+    product: Pick<Product, 'id' | 'code' | 'name' | 'priceCents' | 'images'>;
+  })[];
 };

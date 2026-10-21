@@ -2,6 +2,7 @@
 
 import {
   AppstoreOutlined,
+  ContainerOutlined,
   DeploymentUnitOutlined,
   FolderOutlined,
   GoldOutlined,
@@ -36,17 +37,19 @@ export function AdminShell({
     ? 'categories'
     : pathname.startsWith('/admin/distributors')
       ? 'distributors'
-      : pathname.startsWith('/admin/materials')
-        ? 'materials'
-        : pathname.startsWith('/admin/tags')
-          ? 'tags'
-          : pathname === catalogPath('cabochons') ||
-              pathname.startsWith(`${catalogPath('cabochons')}/`)
-            ? 'cabochons'
-            : pathname === catalogPath('finished-strands') ||
-                pathname.startsWith(`${catalogPath('finished-strands')}/`)
-              ? 'finishedStrands'
-              : 'products';
+      : pathname === '/admin/materials/batches' || pathname.startsWith('/admin/materials/batches/')
+        ? 'materialBatches'
+        : pathname.startsWith('/admin/materials')
+          ? 'materials'
+          : pathname.startsWith('/admin/tags')
+            ? 'tags'
+            : pathname === catalogPath('cabochons') ||
+                pathname.startsWith(`${catalogPath('cabochons')}/`)
+              ? 'cabochons'
+              : pathname === catalogPath('finished-strands') ||
+                  pathname.startsWith(`${catalogPath('finished-strands')}/`)
+                ? 'finishedStrands'
+                : 'products';
   const menu = (
     <Menu
       theme="dark"
@@ -89,6 +92,24 @@ export function AdminShell({
           },
         },
         {
+          key: 'distributors',
+          icon: <TeamOutlined />,
+          label: t('distributors'),
+          onClick: () => {
+            router.push('/admin/distributors');
+            setOpen(false);
+          },
+        },
+        {
+          key: 'materialBatches',
+          icon: <ContainerOutlined />,
+          label: t('materialBatches'),
+          onClick: () => {
+            router.push('/admin/materials/batches');
+            setOpen(false);
+          },
+        },
+        {
           key: 'categories',
           icon: <FolderOutlined />,
           label: t('categories'),
@@ -103,15 +124,6 @@ export function AdminShell({
           label: t('tags'),
           onClick: () => {
             router.push('/admin/tags');
-            setOpen(false);
-          },
-        },
-        {
-          key: 'distributors',
-          icon: <TeamOutlined />,
-          label: t('distributors'),
-          onClick: () => {
-            router.push('/admin/distributors');
             setOpen(false);
           },
         },

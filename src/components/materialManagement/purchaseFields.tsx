@@ -79,6 +79,31 @@ export function PurchaseFields({
       )}
     </Form.Item>
   );
+  if (values.unit === 'GRAM') {
+    return (
+      <section className="editor-block">
+        <h2>{t('purchaseInformation')}</h2>
+        <p className="material-input-help">{t('gramPurchaseHelp')}</p>
+        <div className="material-field-grid material-three-columns">
+          {totalInput('totalWeightGrams', 'g', true)}
+          {totalInput('quotedGramPrice', t('yuanPerGram'))}
+          {totalInput('totalAmount', t('yuan'))}
+        </div>
+        <p>
+          {t('actualGramPrice')}: {result.values.purchaseGramPrice ?? '—'} {t('yuanPerGram')}
+        </p>
+        {result.difference !== null && result.difference !== '0.00' && (
+          <Alert
+            type="warning"
+            showIcon
+            message={t('purchaseDifference', { amount: result.difference })}
+          />
+        )}
+        {result.belowPrecision && <Alert type="warning" showIcon message={t('belowPrecision')} />}
+        {!result.valid && <div className="material-input-help">{t('gramValuesRequired')}</div>}
+      </section>
+    );
+  }
   return (
     <section className="editor-block">
       <h2>{t('purchaseInformation')}</h2>

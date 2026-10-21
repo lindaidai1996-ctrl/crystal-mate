@@ -2,6 +2,8 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { ApiError } from '@/lib/api';
 import { db } from '@/lib/db';
+import { stockTransaction } from '@/lib/stock-transaction';
+import { DEFAULT_SILVER_PRICING } from '@/lib/silver-cost';
 import { productSourceSchema, productStockAdjustmentSchema } from '@/lib/validation';
 import {
   calculateDiyCost,
@@ -43,28 +45,40 @@ export function serializeProductSources(product: ProductSources) {
       ...entry,
       unitCost: entry.unitCost.toFixed(2),
     })),
-    diyRuns: product.diyRuns.map((run) => ({
-      ...run,
-      perUnitCost: run.perUnitCost.toFixed(2),
-      totalCost: run.totalCost?.toFixed(2) ?? null,
-      perUnitQuote: run.perUnitQuote?.toFixed(2) ?? null,
-      totalQuote: run.totalQuote?.toFixed(2) ?? null,
-      materialLines: run.materialLines.map((line) => ({
-        ...line,
-        quantity: line.quantity.toFixed(2),
-        unitCost: line.unitCost.toFixed(2),
-        lineCost: line.lineCost.toFixed(2),
-        quoteUnitPrice: line.quoteUnitPrice?.toFixed(2) ?? null,
-        quoteLineTotal: line.quoteLineTotal?.toFixed(2) ?? null,
-      })),
-      cabochonLines: run.cabochonLines.map((line) => ({
-        ...line,
-        unitCost: line.unitCost.toFixed(2),
-        lineCost: line.lineCost.toFixed(2),
-        quoteUnitPrice: line.quoteUnitPrice?.toFixed(2) ?? null,
-        quoteLineTotal: line.quoteLineTotal?.toFixed(2) ?? null,
-      })),
-    })),
+    diyRuns: product.diyRuns.map(
+      ({ silverWeightGrams, silverCostGramPrice, silverQuoteGramPrice, ...run }) => ({
+        ...run,
+        silverCost: {
+          weightGrams: silverWeightGrams.toFixed(2),
+          costGramPrice: silverCostGramPrice.toFixed(2),
+          quoteGramPrice: silverQuoteGramPrice.toFixed(2),
+        },
+        perUnitCost: run.perUnitCost.toFixed(2),
+        totalCost: run.totalCost?.toFixed(2) ?? null,
+        perUnitQuote: run.perUnitQuote?.toFixed(2) ?? null,
+        totalQuote: run.totalQuote?.toFixed(2) ?? null,
+        materialLines: run.materialLines.map((line) => ({
+          ...line,
+          materialBatchEntry: {
+            ...line.materialBatchEntry,
+            receivedQty: line.materialBatchEntry.receivedQty?.toNumber() ?? null,
+            remainingQty: line.materialBatchEntry.remainingQty?.toNumber() ?? null,
+          },
+          quantity: line.quantity.toFixed(2),
+          unitCost: line.unitCost.toFixed(2),
+          lineCost: line.lineCost.toFixed(2),
+          quoteUnitPrice: line.quoteUnitPrice?.toFixed(2) ?? null,
+          quoteLineTotal: line.quoteLineTotal?.toFixed(2) ?? null,
+        })),
+        cabochonLines: run.cabochonLines.map((line) => ({
+          ...line,
+          unitCost: line.unitCost.toFixed(2),
+          lineCost: line.lineCost.toFixed(2),
+          quoteUnitPrice: line.quoteUnitPrice?.toFixed(2) ?? null,
+          quoteLineTotal: line.quoteLineTotal?.toFixed(2) ?? null,
+        })),
+      }),
+    ),
     stockAdjustments: product.stockAdjustments,
   };
 }
@@ -139,7 +153,7 @@ async function diyValues(
       where: { id: { in: materialIds } },
       select: {
         id: true,
-        material: { select: { name: true } },
+        material: { select: { name: true, unit: true } },
         lengthMm: true,
         widthMm: true,
         heightMm: true,
@@ -154,6 +168,12 @@ async function diyValues(
     throw new ApiError(400, 'MATERIAL_ENTRY_NOT_FOUND');
   if (cabochons.length !== new Set(cabochonIds).size || cabochonIds.includes(productId))
     throw new ApiError(400, 'CABOCHON_NOT_FOUND');
+
+  for (const line of input.materials) {
+    const material = materials.find((item) => item.id === line.materialBatchEntryId)!;
+    if (material.material.unit === 'GRAM' && line.usageUnit !== 'GRAM')
+      throw new ApiError(400, 'INVALID_INPUT');
+  }
 
   const materialLines = input.materials.map((line, position) => ({
     materialBatchEntryId: line.materialBatchEntryId,
@@ -209,6 +229,9 @@ async function diyValues(
     perUnitQuote: quote?.perUnitQuote ?? null,
     totalQuote: quote?.totalQuote ?? null,
     craftDesignFee: input.craftDesignFee ?? emptyCraftDesignFee(),
+    silverWeightGrams: input.silverCost?.weightGrams ?? '0',
+    silverCostGramPrice: input.silverCost?.costGramPrice ?? DEFAULT_SILVER_PRICING.costGramPrice,
+    silverQuoteGramPrice: input.silverCost?.quoteGramPrice ?? DEFAULT_SILVER_PRICING.quoteGramPrice,
     extraCosts: input.extraCosts,
     notes: input.notes,
     materialLines: { create: materialLines },
@@ -347,16 +370,33 @@ export async function correctProductOrigin(productId: string, input: SourceInput
   );
 }
 
-export async function adjustProductStock(productId: string, input: AdjustmentInput) {
-  return db.$transaction(
-    async (tx) => {
-      await changeProductStock(tx, productId, input.delta);
-      await tx.productStockAdjustment.create({ data: { productId, ...input } });
-      return tx.product.findUniqueOrThrow({
-        where: { id: productId },
-        include: productSourceInclude,
-      });
+export async function applyProductStockAdjustment(
+  tx: Tx,
+  productId: string,
+  input: AdjustmentInput,
+) {
+  const current = await tx.product.findUniqueOrThrow({ where: { id: productId } });
+  if ('quantity' in input && current.stock !== input.expectedQuantity)
+    throw new ApiError(409, 'STOCK_CHANGED');
+  const delta = 'quantity' in input ? input.quantity - current.stock : input.delta;
+  await changeProductStock(tx, productId, delta);
+  await tx.productStockAdjustment.create({
+    data: {
+      productId,
+      delta,
+      beforeQty: current.stock,
+      afterQty: current.stock + delta,
+      reason: input.reason.trim() || '手动盘点',
     },
-    { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-  );
+  });
+}
+
+export async function adjustProductStock(productId: string, input: AdjustmentInput) {
+  return stockTransaction(async (tx) => {
+    await applyProductStockAdjustment(tx, productId, input);
+    return tx.product.findUniqueOrThrow({
+      where: { id: productId },
+      include: productSourceInclude,
+    });
+  });
 }

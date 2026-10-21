@@ -38,6 +38,7 @@ test('image choice cancels without a grant and uploads an oversized source as We
   });
 
   await input.setInputFiles({ name: 'cancel.png', mimeType: 'image/png', buffer: png });
+  await page.getByRole('button', { name: '保留整图', exact: true }).click();
   let choice = page.getByRole('dialog', { name: '选择上传图片版本' });
   await expect(choice).toBeVisible();
   await choice.getByRole('button', { name: /取\s*消/ }).click();
@@ -49,6 +50,7 @@ test('image choice cancels without a grant and uploads an oversized source as We
     mimeType: 'image/png',
     buffer: Buffer.concat([png, Buffer.alloc(9 * 1024 * 1024)]),
   });
+  await page.getByRole('button', { name: '保留整图', exact: true }).click();
   choice = page.getByRole('dialog', { name: '选择上传图片版本' });
   await expect(choice.getByText(/压缩后/)).toBeVisible();
   await expect(choice.locator('.ant-segmented-item-disabled')).toContainText('原图');

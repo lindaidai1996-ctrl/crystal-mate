@@ -1,21 +1,13 @@
 'use client';
 
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { App, Button, Image, Input, Spin, Tooltip } from 'antd';
 import { useState } from 'react';
-import { apiFetch } from '@/lib/client-api';
 import type { MaterialBatchAttachment } from '@/lib/client-types';
 import { useTranslations } from 'next-intl';
 import { ImageUploadChoiceDialog } from '@/components/imageUpload/imageUploadChoiceDialog';
-import { MAX_UPLOAD_BYTES } from '@/components/imageUpload/prepareImages';
-
-type UploadGrant = {
-  id: string;
-  key: string;
-  url: string;
-  uploadUrl: string;
-  mode: 'local' | 'cos';
-};
+import { AttachmentImageEditor } from '@/components/imageUpload/attachmentImageEditor';
+import { uploadImage } from '@/components/imageUpload/uploadImage';
 
 export function BatchAttachmentPicker({
   attachments,
@@ -27,41 +19,44 @@ export function BatchAttachmentPicker({
   onUploadingChange: (uploading: boolean) => void;
 }) {
   const t = useTranslations('materialBatches');
-  const { message } = App.useApp();
+  const imageT = useTranslations('imageUpload');
+  const common = useTranslations('common');
+  const { message, modal } = App.useApp();
   const [uploading, setUploading] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[] | null>(null);
+  const [editing, setEditing] = useState<MaterialBatchAttachment | null>(null);
+
+  function finishEditing() {
+    setEditing(null);
+    setUploading(false);
+    onUploadingChange(false);
+  }
+
+  async function replaceImage(file: File) {
+    if (!editing) return;
+    const objectKey = editing.objectKey;
+    setEditing(null);
+    try {
+      const replacement = await uploadOne(file);
+      onChange(
+        attachments.map((attachment) =>
+          attachment.objectKey === objectKey
+            ? { ...replacement, notes: attachment.notes, position: attachment.position }
+            : attachment,
+        ),
+      );
+    } catch {
+      message.error(t('uploadFailed'));
+    } finally {
+      setUploading(false);
+      onUploadingChange(false);
+    }
+  }
 
   async function uploadOne(file: File): Promise<MaterialBatchAttachment> {
-    if (
-      !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) ||
-      file.size < 1 ||
-      file.size > MAX_UPLOAD_BYTES
-    )
-      throw new Error('INVALID_IMAGE');
-    const grant = await apiFetch<UploadGrant>('/api/uploads', {
-      method: 'POST',
-      body: JSON.stringify({ type: file.type, size: file.size }),
-    });
-    if (grant.mode === 'local') {
-      const body = new FormData();
-      body.append('id', grant.id);
-      body.append('file', file);
-      await apiFetch(grant.uploadUrl, { method: 'POST', body });
-    } else {
-      const response = await fetch(grant.uploadUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': file.type },
-        body: file,
-      });
-      if (!response.ok) throw new Error('UPLOAD_FAILED');
-      await apiFetch('/api/uploads/confirm', {
-        method: 'POST',
-        body: JSON.stringify({ id: grant.id }),
-      });
-    }
+    const image = await uploadImage(file);
     return {
-      objectKey: grant.key,
-      url: grant.url,
+      ...image,
       fileName: file.name.slice(0, 255),
       notes: '',
       position: 0,
@@ -100,6 +95,15 @@ export function BatchAttachmentPicker({
 
   return (
     <div className="batch-attachments">
+      {editing && (
+        <AttachmentImageEditor
+          key={editing.objectKey}
+          url={editing.url}
+          fileName={editing.fileName}
+          onCancel={finishEditing}
+          onConfirm={(file) => void replaceImage(file)}
+        />
+      )}
       {pendingFiles && (
         <ImageUploadChoiceDialog
           files={pendingFiles}
@@ -122,6 +126,7 @@ export function BatchAttachmentPicker({
               aria-label={`${attachment.fileName} ${t('attachmentNotes')}`}
               placeholder={t('attachmentNotes')}
               value={attachment.notes}
+              disabled={uploading}
               maxLength={1000}
               autoSize={{ minRows: 1, maxRows: 3 }}
               onChange={(event) =>
@@ -133,13 +138,42 @@ export function BatchAttachmentPicker({
               }
             />
           </div>
+          <Tooltip title={imageT('editImage')}>
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              disabled={uploading}
+              aria-label={`${imageT('editImage')} ${attachment.fileName}`}
+              onClick={() => {
+                setUploading(true);
+                onUploadingChange(true);
+                setEditing(attachment);
+              }}
+            />
+          </Tooltip>
           <Tooltip title={t('removeAttachment')}>
             <Button
               type="text"
               danger
+              disabled={uploading}
               icon={<DeleteOutlined />}
               aria-label={`${t('removeAttachment')} ${attachment.fileName}`}
-              onClick={() => onChange(attachments.filter((_, itemIndex) => itemIndex !== index))}
+              onClick={async () => {
+                const confirmed = await modal.confirm({
+                  title: imageT('deleteConfirm'),
+                  content: attachment.fileName,
+                  okText: common('delete'),
+                  cancelText: common('cancel'),
+                  okButtonProps: { danger: true },
+                  autoFocusButton: 'cancel',
+                });
+                if (!confirmed) return;
+                onChange(
+                  attachments
+                    .filter((item) => item.objectKey !== attachment.objectKey)
+                    .map((item, position) => ({ ...item, position })),
+                );
+              }}
             />
           </Tooltip>
         </div>

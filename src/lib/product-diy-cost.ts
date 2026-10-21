@@ -1,5 +1,6 @@
 import { amountToCents, centsToAmount } from './cabochon-cost';
 import type { ProductSourceInput } from './client-types';
+import { silverCostTotals } from './silver-cost';
 
 export type CraftDesignFee = {
   unitAmount: string;
@@ -32,7 +33,13 @@ export function calculateDiyCost(input: Extract<ProductSourceInput, { origin: 'D
   totalCost: string;
 } | null {
   if (!Number.isInteger(input.quantity) || input.quantity <= 0) return null;
+  if (input.silverCost === null) return null;
   let perUnit = BigInt(0);
+  if (input.silverCost) {
+    const silver = silverCostTotals(input.silverCost);
+    if (!silver) return null;
+    perUnit += runAmountToCents(silver.cost)!;
+  }
   for (const line of [...input.materials, ...input.cabochons]) {
     const quantity = amountToCents(String(line.quantity));
     const cost = amountToCents(line.unitCost);
@@ -60,7 +67,13 @@ export function diyQuoteLineTotal(quantity: string | number, unitPrice: string |
 
 export function calculateDiyQuote(input: Extract<ProductSourceInput, { origin: 'DIY' }>) {
   if (!Number.isInteger(input.quantity) || input.quantity <= 0) return null;
+  if (input.silverCost === null) return null;
   let perUnit = BigInt(0);
+  if (input.silverCost) {
+    const silver = silverCostTotals(input.silverCost);
+    if (!silver) return null;
+    perUnit += runAmountToCents(silver.quote)!;
+  }
   for (const line of [...input.materials, ...input.cabochons]) {
     const total = diyQuoteLineTotal(line.quantity, line.quoteUnitPrice);
     if (total === null) return null;

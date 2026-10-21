@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 vi.mock('@/lib/api', () => ({
   ApiError: class ApiError extends Error {
@@ -179,8 +180,12 @@ describe.skipIf(!enabled)('batch purchase persistence', () => {
           data: { receivedQty: null, remainingQty: null },
         }),
       ).rejects.toThrow();
+      // A physical count can be known even when the historical purchase count is unknown.
       await expect(
         db.materialBatchEntry.update({ where: { id: append.id }, data: { remainingQty: 1 } }),
+      ).resolves.toMatchObject({ receivedQty: null, remainingQty: new Prisma.Decimal(1) });
+      await expect(
+        db.materialBatchEntry.update({ where: { id: append.id }, data: { remainingQty: -1 } }),
       ).rejects.toThrow();
     } finally {
       if (materialId) {

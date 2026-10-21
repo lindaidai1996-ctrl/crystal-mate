@@ -147,7 +147,7 @@ test('catalog menus filter products and preserve allowed categories on save', as
 
   for (const [slug, category, menu] of [
     ['cabochons', categories[0], '蛋面管理'],
-    ['finished-strands', categories[1], '其他商品管理'],
+    ['finished-strands', categories[1], '成品管理'],
   ] as const) {
     await page.getByRole('menuitem', { name: menu }).click();
     await expect(page.getByRole('heading', { name: menu })).toBeVisible();
@@ -308,7 +308,7 @@ test('catalog menus filter products and preserve allowed categories on save', as
 
   availableCategories = categories.filter((item) => item.name !== '成品串');
   await page.goto('/zh/admin/catalog/finished-strands');
-  await expect(page.getByRole('heading', { name: '其他商品管理' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '成品管理' })).toBeVisible();
   await expect(page.getByRole('link', { name: '其他饰品测试商品' })).toBeVisible();
   await page.getByRole('button', { name: '新建商品' }).click();
   await expect(page.getByLabel('所属分类')).toBeEnabled();

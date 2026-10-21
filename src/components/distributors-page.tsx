@@ -1,13 +1,26 @@
 'use client';
 
-import { DeleteOutlined, EditOutlined, EnvironmentOutlined, PlusOutlined } from '@ant-design/icons';
-import { App, Button, Drawer, Empty, Form, Input, Modal, Popconfirm, Table, Tooltip } from 'antd';
+import {
+  CopyOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EnvironmentOutlined,
+  EyeOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
+import { App, Button, Drawer, Empty, Form, Input, Modal, Popconfirm, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from '@/i18n/navigation';
+import { PaginatedTable } from '@/components/paginated-table';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
-import type { Distributor, DistributorArea, DistributorPage } from '@/lib/client-types';
+import type {
+  Distributor,
+  DistributorArea,
+  DistributorListItem,
+  DistributorPage,
+} from '@/lib/client-types';
 import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
 import { DistributorEditorDrawer } from './distributor-editor-drawer';
 
@@ -16,7 +29,7 @@ export function DistributorsPage() {
   const common = useTranslations('common');
   const { message } = App.useApp();
   const [areaForm] = Form.useForm<{ name: string }>();
-  const [items, setItems] = useState<Distributor[]>([]);
+  const [items, setItems] = useState<DistributorListItem[]>([]);
   const [savedAreas, setSavedAreas] = useState<string[]>([]);
   const [areaItems, setAreaItems] = useState<DistributorArea[]>([]);
   const [query, setQuery] = useState('');
@@ -119,7 +132,16 @@ export function DistributorsPage() {
     }
   }
 
-  const columns: ColumnsType<Distributor> = [
+  async function copyContact(value: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      message.success(t('copied'));
+    } catch {
+      message.error(t('copyFailed'));
+    }
+  }
+
+  const columns: ColumnsType<DistributorListItem> = [
     {
       title: t('name'),
       dataIndex: 'name',
@@ -147,8 +169,58 @@ export function DistributorsPage() {
         </Tooltip>
       ),
     },
-    { title: t('wechat'), dataIndex: 'wechat', key: 'wechat', width: 150 },
-    { title: t('phone'), dataIndex: 'phone', key: 'phone', width: 150 },
+    {
+      title: t('contact'),
+      key: 'contact',
+      width: 240,
+      render: (_, item) => (
+        <div className="distributor-contacts">
+          {(['wechat', 'phone'] as const).map((field) => (
+            <div className="distributor-contact" key={field}>
+              <span className="distributor-contact-label">{t(field)}</span>
+              <span className="distributor-contact-value">{item[field] || '—'}</span>
+              {item[field] && (
+                <Tooltip title={t('copyContact', { field: t(field) })}>
+                  <Button
+                    className="distributor-contact-copy"
+                    type="text"
+                    size="small"
+                    icon={<CopyOutlined />}
+                    aria-label={t('copyContact', { field: t(field) })}
+                    onClick={() => void copyContact(item[field])}
+                  />
+                </Tooltip>
+              )}
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      title: (
+        <Tooltip title={t('itemCountsHint')}>
+          <span>{t('itemCounts')}</span>
+        </Tooltip>
+      ),
+      key: 'itemCounts',
+      width: 190,
+      render: (_, { itemCounts }) => (
+        <div className="distributor-item-counts">
+          <div className="distributor-item-total">
+            <span>{t('totalItems')}</span>
+            <strong>{itemCounts.total.toLocaleString()}</strong>
+          </div>
+          <div className="distributor-item-breakdown">
+            <span>
+              {t('products')} <strong>{itemCounts.products.toLocaleString()}</strong>
+            </span>
+            <span>
+              {t('materials')} <strong>{itemCounts.materials.toLocaleString()}</strong>
+            </span>
+          </div>
+        </div>
+      ),
+    },
     {
       title: (
         <Tooltip title={t('notes')}>
@@ -165,18 +237,16 @@ export function DistributorsPage() {
       ),
     },
     {
-      title: t('attachmentCount'),
-      key: 'attachmentCount',
-      dataIndex: ['_count', 'attachments'],
-      width: 90,
-      render: (count: number | undefined) => count ?? 0,
-    },
-    {
       title: t('actions'),
       key: 'actions',
-      width: 110,
+      width: 210,
       render: (_, item) => (
         <span className="row-actions">
+          <Link href={`/admin/distributors/${item.id}`}>
+            <Button type="text" icon={<EyeOutlined />}>
+              {t('viewDetails')}
+            </Button>
+          </Link>
           <Tooltip title={common('edit')}>
             <Button
               type="text"
@@ -239,7 +309,10 @@ export function DistributorsPage() {
   return (
     <>
       <div className="page-heading">
-        <h1>{t('title')}</h1>
+        <div>
+          <h1>{t('title')}</h1>
+          <p>{t('count', { count: visibleItems.length })}</p>
+        </div>
         <div className="page-heading-actions">
           <Button icon={<EnvironmentOutlined />} onClick={() => setManagingAreas(true)}>
             {t('manageAreas')}
@@ -260,12 +333,12 @@ export function DistributorsPage() {
         />
       </div>
       <div className="table-surface">
-        <Table
+        <PaginatedTable
           rowKey="id"
           dataSource={visibleItems}
           columns={columns}
           loading={loading}
-          scroll={{ x: 1060 }}
+          scroll={{ x: 1200 }}
           pagination={CLIENT_TABLE_PAGINATION}
           locale={{ emptyText: <Empty description={t('empty')} /> }}
         />
@@ -293,7 +366,7 @@ export function DistributorsPage() {
           </Button>
         }
       >
-        <Table
+        <PaginatedTable
           rowKey="id"
           dataSource={areaItems}
           columns={areaColumns}
@@ -303,27 +376,27 @@ export function DistributorsPage() {
           scroll={{ x: 400 }}
           locale={{ emptyText: <Empty description={t('emptyAreas')} /> }}
         />
+        <Modal
+          title={editingArea ? t('editArea') : t('newArea')}
+          open={editingArea !== undefined}
+          onCancel={() => setEditingArea(undefined)}
+          onOk={saveArea}
+          okText={common('save')}
+          cancelText={common('cancel')}
+          confirmLoading={savingArea}
+          forceRender
+        >
+          <Form form={areaForm} layout="vertical" onFinish={saveArea}>
+            <Form.Item
+              name="name"
+              label={t('area')}
+              rules={[{ required: true, whitespace: true, max: 60 }]}
+            >
+              <Input maxLength={60} autoFocus />
+            </Form.Item>
+          </Form>
+        </Modal>
       </Drawer>
-      <Modal
-        title={editingArea ? t('editArea') : t('newArea')}
-        open={editingArea !== undefined}
-        onCancel={() => setEditingArea(undefined)}
-        onOk={saveArea}
-        okText={common('save')}
-        cancelText={common('cancel')}
-        confirmLoading={savingArea}
-        forceRender
-      >
-        <Form form={areaForm} layout="vertical" onFinish={saveArea}>
-          <Form.Item
-            name="name"
-            label={t('area')}
-            rules={[{ required: true, whitespace: true, max: 60 }]}
-          >
-            <Input maxLength={60} autoFocus />
-          </Form.Item>
-        </Form>
-      </Modal>
     </>
   );
 }

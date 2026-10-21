@@ -18,7 +18,7 @@ import {
 } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useRouter, Link } from '@/i18n/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type {
   CabochonMeasurement,
@@ -30,6 +30,7 @@ import type {
 } from '@/lib/client-types';
 import { catalogPath, type CatalogScope } from '@/lib/catalog-scopes';
 import { parseMeasurement } from '@/lib/parse-measurement';
+import { recognizeProductName } from '@/lib/product-name-recognition';
 import { cabochonCostSchema } from '@/lib/validation';
 import { amountToCents, centsToAmount, type CabochonCostValues } from '@/lib/cabochon-cost';
 import {
@@ -47,6 +48,8 @@ import { MissingCategoryState } from './missing-category-state';
 import { initialSource, ProductSourceSection } from './product-source-section';
 import type { ProductSourceInput } from '@/lib/client-types';
 import { productSourceSchema } from '@/lib/validation';
+import { useProductCode } from './productEditor/useProductCode';
+import { StockFields } from './productEditor/stockFields';
 
 type Values = {
   code: string;
@@ -56,13 +59,24 @@ type Values = {
   tagIds: string[];
   pricing: ProductPricingValues;
   stock: number;
+  stockReason?: string;
   published: boolean;
   marketing: ProductMarketing;
   measurement: CabochonMeasurement;
   cost: CabochonCostValues | null;
 };
 
-export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope }) {
+export function ProductEditor({
+  id,
+  scope,
+  initialBatchId,
+  initialDistributorId,
+}: {
+  id: string;
+  scope?: CatalogScope;
+  initialBatchId?: string;
+  initialDistributorId?: string;
+}) {
   const t = useTranslations('editor');
   const common = useTranslations('common');
   const catalog = useTranslations('catalog');
@@ -77,19 +91,28 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
   const [images, setImages] = useState<ProductImage[]>([]);
   const [initialValues, setInitialValues] = useState<Partial<Values>>({});
   const [product, setProduct] = useState<Product | null>(null);
-  const [sourceDraft, setSourceDraft] = useState<ProductSourceInput>(initialSource);
+  const [sourceDraft, setSourceDraft] = useState<ProductSourceInput>(() => ({
+    ...initialSource('PURCHASED'),
+    selection: { batchId: id === 'new' ? (initialBatchId ?? '') : '' },
+    distributorId: id === 'new' ? (initialDistributorId ?? '') : '',
+  }));
   const [productCategoryId, setProductCategoryId] = useState<string>();
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [loadRevision, setLoadRevision] = useState(0);
   const [saving, setSaving] = useState(false);
-  const [generatingCode, setGeneratingCode] = useState(false);
+  const [stockConflict, setStockConflict] = useState(false);
+  const [refreshingStock, setRefreshingStock] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [createdProduct, setCreatedProduct] = useState<Product | null>(null);
   const [tagModalOpen, setTagModalOpen] = useState(false);
   const [creatingTag, setCreatingTag] = useState(false);
   const [recognitionInput, setRecognitionInput] = useState('');
-  const codeRequestId = useRef(0);
   const isNew = id === 'new';
+  const { generatingCode, generateCode, resetCode, getCodeReservationToken } = useProductCode(
+    form,
+    product,
+  );
   const scopedCategory =
     scope?.key === 'cabochons'
       ? categories.find((item) => item.name === scope.categoryName)
@@ -100,10 +123,25 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
       : categories;
   const selectedCategoryId =
     Form.useWatch('categoryId', form) ?? scopedCategory?.id ?? initialValues.categoryId;
+  const categoryChanged = !isNew && product !== null && selectedCategoryId !== product.categoryId;
   const isCabochon = categories.some(
     (item) => item.id === selectedCategoryId && item.name === '蛋面',
   );
   const listPath = scope ? catalogPath(scope.key) : '/admin/products';
+  const returnBatchId = isNew ? initialBatchId : undefined;
+  const returnDistributorId = isNew ? initialDistributorId : undefined;
+  const returnPath = returnBatchId
+    ? `/admin/materials/batches/${encodeURIComponent(returnBatchId)}`
+    : returnDistributorId
+      ? `/admin/distributors/${encodeURIComponent(returnDistributorId)}`
+      : listPath;
+  const returnLabel = returnBatchId
+    ? common('backToBatch')
+    : returnDistributorId
+      ? common('backToDistributor')
+      : scope
+        ? catalog('backToList')
+        : t('back');
   const watchedCost = Form.useWatch('cost', { form, preserve: true });
   const pricingCost = productPricingCost(
     isCabochon,
@@ -125,38 +163,6 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
       ? null
       : salePriceCents - pricingCostCents;
   const isLoss = profitCents !== null && profitCents < BigInt(0);
-
-  const generateCode = useCallback(
-    async (categoryId: string | undefined) => {
-      const requestId = ++codeRequestId.current;
-      if (!categoryId) {
-        form.setFieldsValue({ code: '' });
-        setGeneratingCode(false);
-        return;
-      }
-
-      form.setFieldsValue({ code: '' });
-      setGeneratingCode(true);
-      try {
-        const result = await apiFetch<{ code: string }>('/api/products/code', {
-          method: 'POST',
-          body: JSON.stringify({ categoryId }),
-        });
-        if (requestId === codeRequestId.current) form.setFieldsValue({ code: result.code });
-      } catch (error) {
-        if (requestId === codeRequestId.current) {
-          message.error(
-            error instanceof ClientApiError
-              ? common(`errors.${error.code}` as never)
-              : t('codeGenerationFailed'),
-          );
-        }
-      } finally {
-        if (requestId === codeRequestId.current) setGeneratingCode(false);
-      }
-    },
-    [common, form, message, t],
-  );
 
   useEffect(() => {
     let active = true;
@@ -223,14 +229,12 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
     return () => window.clearTimeout(timer);
   }, [generateCode, isNew, scope, scopedCategory?.id]);
 
-  useEffect(
-    () => () => {
-      codeRequestId.current += 1;
-    },
-    [],
-  );
-
   async function save(values: Values) {
+    if (generatingCode || saving || uploadingImages || refreshingStock) return;
+    if (stockConflict) {
+      message.error(common('errors.STOCK_CHANGED'));
+      return;
+    }
     if (isNew && !productSourceSchema.safeParse(sourceDraft).success) {
       message.error(sourceText('invalid'));
       return;
@@ -241,6 +245,7 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
         method: isNew ? 'POST' : 'PUT',
         body: JSON.stringify({
           code: values.code.trim(),
+          codeReservationToken: getCodeReservationToken(values.code.trim()),
           name: values.name.trim(),
           description: (values.description ?? '').trim(),
           categoryId: scopedCategory?.id ?? values.categoryId,
@@ -251,6 +256,14 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
           saleManual: values.pricing.saleManual,
           currency: 'CNY',
           stock: values.stock,
+          ...(!isNew && product && values.stock !== product.stock
+            ? {
+                stockAdjustment: {
+                  expectedQuantity: product.stock,
+                  reason: values.stockReason ?? '',
+                },
+              }
+            : {}),
           ...(isNew ? { source: sourceDraft } : {}),
           published: values.published,
           marketing: values.marketing,
@@ -261,6 +274,7 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
       });
       if (isNew) {
         setCreatedProduct(saved);
+        router.refresh();
         window.scrollTo(0, 0);
         return;
       }
@@ -268,9 +282,16 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
       router.push(listPath);
       router.refresh();
     } catch (error) {
+      if (error instanceof ClientApiError && error.code === 'STOCK_CHANGED') {
+        setStockConflict(true);
+      }
       message.error(
         common(`errors.${error instanceof ClientApiError ? error.code : 'SERVER_ERROR'}` as never),
       );
+      if (error instanceof ClientApiError && error.code === 'PRODUCT_CODE_REGENERATE') {
+        resetCode();
+        void generateCode(values.categoryId);
+      }
       if (scope && error instanceof ClientApiError && error.code === 'CATEGORY_NOT_FOUND') {
         try {
           setCategories(await apiFetch<Category[]>('/api/categories'));
@@ -283,12 +304,54 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
     }
   }
 
-  function addAnother(reuseCategory: boolean) {
-    const categoryId = reuseCategory
-      ? createdProduct?.categoryId
-      : scope?.key === 'cabochons'
-        ? scopedCategory?.id
-        : undefined;
+  async function refreshStock() {
+    setRefreshingStock(true);
+    try {
+      const updated = await apiFetch<Product>(`/api/products/${id}`);
+      setProduct(updated);
+      form.setFieldsValue({ stock: updated.stock, stockReason: '' });
+      setStockConflict(false);
+    } catch (error) {
+      message.error(
+        common(`errors.${error instanceof ClientApiError ? error.code : 'SERVER_ERROR'}` as never),
+      );
+    } finally {
+      setRefreshingStock(false);
+    }
+  }
+
+  function addAnother(reuseSourceAndPricing: boolean) {
+    const categoryId = scope?.key === 'cabochons' ? scopedCategory?.id : undefined;
+    const currentPricing = form.getFieldValue('pricing') as ProductPricingValues | undefined;
+    const purchase = createdProduct?.purchaseEntries.at(-1);
+    const batchId =
+      purchase?.batchId ??
+      (sourceDraft.origin === 'PURCHASED' ? sourceDraft.selection.batchId : undefined) ??
+      '';
+    const source =
+      reuseSourceAndPricing && sourceDraft.origin === 'PURCHASED'
+        ? {
+            ...initialSource('PURCHASED'),
+            selection: { batchId },
+            distributorId: purchase?.distributorId ?? sourceDraft.distributorId,
+          }
+        : reuseSourceAndPricing
+          ? initialSource(sourceDraft.origin)
+          : initialSource();
+    const pricing =
+      reuseSourceAndPricing && currentPricing
+        ? {
+            saleRule: currentPricing.saleRule,
+            saleRuleValue: currentPricing.saleRuleValue,
+            saleManual: false,
+            price: null,
+          }
+        : {
+            saleRule: 'PERCENT_50' as const,
+            saleRuleValue: null,
+            saleManual: false,
+            price: null,
+          };
     const marketing = {
       videoShot: true,
       xiaohongshuVideoPublished: true,
@@ -301,8 +364,9 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
     setProductCategoryId(undefined);
     setInitialValues({});
     setImages([]);
-    setSourceDraft(initialSource());
+    setSourceDraft(source);
     setRecognitionInput('');
+    resetCode();
     form.resetFields();
     form.setFieldsValue({
       code: '',
@@ -315,10 +379,9 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
       marketing,
       measurement: { lengthMm: null, widthMm: null, heightMm: null },
       cost: null,
-      pricing: { saleRule: 'PERCENT_50', saleRuleValue: null, saleManual: false, price: null },
+      pricing,
     });
     if (categoryId) void generateCode(categoryId);
-    else codeRequestId.current += 1;
     window.scrollTo(0, 0);
   }
 
@@ -341,6 +404,23 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
       );
     } finally {
       setCreatingTag(false);
+    }
+  }
+
+  function recognizeName(name: string) {
+    if (!isNew) return;
+    const matched = recognizeProductName(
+      name,
+      scope?.key === 'cabochons' ? [] : availableCategories,
+      tags,
+    );
+    if (matched.tagIds.length) {
+      const selected: string[] = form.getFieldValue('tagIds') ?? [];
+      form.setFieldsValue({ tagIds: [...new Set([...selected, ...matched.tagIds])] });
+    }
+    if (matched.categoryId && matched.categoryId !== form.getFieldValue('categoryId')) {
+      form.setFieldsValue({ categoryId: matched.categoryId });
+      void generateCode(matched.categoryId);
     }
   }
 
@@ -401,12 +481,17 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
         title={common('saved')}
         extra={
           <Space wrap>
-            <Button onClick={() => router.push(listPath)}>
-              {scope ? catalog('backToList') : t('back')}
+            <Button
+              onClick={() => {
+                router.replace(returnPath);
+                router.refresh();
+              }}
+            >
+              {returnLabel}
             </Button>
             <Button onClick={() => addAnother(false)}>{t('addAnother')}</Button>
             <Button type="primary" onClick={() => addAnother(true)}>
-              {t('addAnotherWithCategory')}
+              {t('addAnotherWithSourceAndPricing')}
             </Button>
           </Space>
         }
@@ -417,8 +502,8 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
     <>
       <div className="page-heading editor-heading">
         <div>
-          <Link href={listPath} className="back-link">
-            <ArrowLeftOutlined /> {scope ? catalog('backToList') : t('back')}
+          <Link href={returnPath} replace className="back-link">
+            <ArrowLeftOutlined /> {returnLabel}
           </Link>
           <h1>{isNew ? t('newTitle') : t('editTitle')}</h1>
         </div>
@@ -456,7 +541,7 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
                 label={t('name')}
                 rules={[{ required: true, whitespace: true, message: t('required') }, { max: 120 }]}
               >
-                <Input maxLength={120} />
+                <Input maxLength={120} onBlur={(event) => recognizeName(event.target.value)} />
               </Form.Item>
               <Form.Item
                 className="editor-field-category"
@@ -468,7 +553,7 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
                   disabled={scope?.key === 'cabochons'}
                   placeholder={t('selectCategory')}
                   onChange={(categoryId: string) => {
-                    if (isNew) void generateCode(categoryId);
+                    void generateCode(categoryId);
                   }}
                   options={(scope?.key === 'cabochons'
                     ? [scopedCategory!]
@@ -483,7 +568,22 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
                 className="editor-field-code"
                 name="code"
                 label={t('code')}
-                extra={t('codeHelp')}
+                extra={
+                  categoryChanged ? (
+                    <>
+                      {t('codeCategoryChangedHelp', { code: product.code })}
+                      <Button
+                        type="link"
+                        size="small"
+                        onClick={() => void generateCode(selectedCategoryId)}
+                      >
+                        {t('retryCodeGeneration')}
+                      </Button>
+                    </>
+                  ) : (
+                    t('codeHelp')
+                  )
+                }
                 rules={[
                   { required: true, message: t('required') },
                   { pattern: /^[A-Za-z0-9_-]+$/ },
@@ -492,7 +592,7 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
               >
                 <Input
                   maxLength={64}
-                  readOnly={generatingCode}
+                  readOnly={generatingCode || categoryChanged}
                   aria-busy={generatingCode}
                   suffix={
                     <span style={{ display: 'inline-flex', width: 14, height: 14 }}>
@@ -503,31 +603,13 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
                   }
                 />
               </Form.Item>
-              <Form.Item
-                className="editor-field-stock"
-                name="stock"
-                label={t('stock')}
-                hidden={isNew}
-                rules={[
-                  { required: true, message: t('required') },
-                  { type: 'number', min: 0, max: 2147483647, message: t('stockInvalid') },
-                  {
-                    validator: (_, value) =>
-                      value == null || Number.isInteger(value)
-                        ? Promise.resolve()
-                        : Promise.reject(new Error(t('stockInvalid'))),
-                  },
-                ]}
-              >
-                <InputNumber
-                  disabled
-                  min={0}
-                  max={2147483647}
-                  precision={0}
-                  step={1}
-                  style={{ width: '100%' }}
-                />
-              </Form.Item>
+              <StockFields
+                isNew={isNew}
+                currentStock={product?.stock}
+                conflict={stockConflict}
+                refreshing={refreshingStock}
+                onRefresh={() => void refreshStock()}
+              />
               <div className="editor-field-tags">
                 <Form.Item name="tagIds" label={t('tags')}>
                   <Select
@@ -572,7 +654,12 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
           </section>
           <section className="editor-block">
             <h2>{t('images')}</h2>
-            <ImagePicker images={images} onChange={setImages} />
+            <ImagePicker
+              images={images}
+              onChange={setImages}
+              onUploadingChange={setUploadingImages}
+              disabled={saving}
+            />
           </section>
           {isCabochon && (
             <section className="editor-block">
@@ -657,8 +744,12 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
             }}
             categories={categories}
             onProductChanged={(updated) => {
+              const stock = form.getFieldValue('stock') as number;
+              if (stock === product?.stock) {
+                form.setFieldsValue({ stock: updated.stock });
+              }
               setProduct(updated);
-              form.setFieldsValue({ stock: updated.stock });
+              setStockConflict(false);
             }}
           />
           <section className="editor-block">
@@ -749,7 +840,7 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
             </div>
           </section>
           <div className="editor-actions">
-            <Link href={listPath}>
+            <Link href={returnPath} replace>
               <Button>{common('cancel')}</Button>
             </Link>
             <Button
@@ -759,6 +850,7 @@ export function ProductEditor({ id, scope }: { id: string; scope?: CatalogScope 
               loading={saving}
               disabled={
                 generatingCode ||
+                uploadingImages ||
                 !availableCategories.length ||
                 (scope?.key === 'cabochons' && !scopedCategory)
               }

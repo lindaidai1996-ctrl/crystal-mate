@@ -35,6 +35,7 @@ test('batch management saves private image attachments and notes', async ({ page
         'base64',
       ),
     });
+    await page.getByRole('button', { name: '保留整图', exact: true }).click();
     const imageChoice = page.getByRole('dialog', { name: '选择上传图片版本' });
     await expect(imageChoice).toBeVisible();
     await imageChoice.getByText('原图', { exact: true }).click();

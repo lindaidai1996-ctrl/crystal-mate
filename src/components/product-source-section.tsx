@@ -12,12 +12,17 @@ import {
   Popconfirm,
   Radio,
   Select,
-  Table,
   Tag,
   Tooltip,
 } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { DateInput } from '@/components/date-input';
+import { PaginatedTable } from '@/components/paginated-table';
+import { StockAdjustmentDrawer } from '@/components/inventory/stockAdjustmentDrawer';
+import { StockHistory } from '@/components/inventory/stockHistory';
+import { DistributorSelect } from '@/components/distributorSelect/distributorSelect';
+import { SilverCostFields } from '@/components/productEditor/silverCostFields';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type {
   Category,
@@ -32,6 +37,7 @@ import type {
 import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
 import { productSourceSchema } from '@/lib/validation';
 import { suggestedMaterialQuote } from '@/lib/product-diy-quote';
+import { DEFAULT_SILVER_PRICING } from '@/lib/silver-cost';
 import {
   calculateDiyCost,
   calculateDiyQuote,
@@ -67,6 +73,7 @@ export function initialSource(
         quantity: 1,
         notes: '',
         materials: [],
+        silverCost: null,
         cabochons: [],
         extraCosts: [],
         craftDesignFee: { ...emptyCraftDesignFee(), unitAmount: '100' },
@@ -263,12 +270,11 @@ function SourceFields({
           </label>
           <label className="source-field">
             <span>{t('distributor')}</span>
-            <Select
-              showSearch
-              optionFilterProp="label"
+            <DistributorSelect
+              aria-label={t('distributor')}
               value={value.distributorId || undefined}
               onChange={(distributorId) => update({ distributorId })}
-              options={distributors.map((item) => ({ value: item.id, label: item.name }))}
+              distributors={distributors}
             />
           </label>
           {'newBatch' in value.selection && value.selection.newBatch && (
@@ -289,13 +295,13 @@ function SourceFields({
               </label>
               <label className="source-field">
                 <span>{t('receivedAt')}</span>
-                <Input
-                  type="date"
+                <DateInput
+                  aria-label={t('receivedAt')}
                   value={value.selection.newBatch.receivedAt}
-                  onChange={(event) =>
+                  onChange={(date) =>
                     update({
                       selection: {
-                        newBatch: { ...value.selection.newBatch!, receivedAt: event.target.value },
+                        newBatch: { ...value.selection.newBatch!, receivedAt: date },
                       },
                     })
                   }
@@ -361,13 +367,16 @@ function SourceFields({
                         preview={materialPreview}
                         onChange={(id) => {
                           const option = materials.find((item) => item.entry.id === id);
+                          const usageUnit =
+                            option?.material.unit === 'GRAM' ? 'GRAM' : line.usageUnit;
                           change({
+                            usageUnit,
                             materialBatchEntryId: id,
                             unitCost: option
-                              ? (suggestedMaterialCost(option, line.usageUnit) ?? '')
+                              ? (suggestedMaterialCost(option, usageUnit) ?? '')
                               : '',
                             quoteUnitPrice: option
-                              ? suggestedMaterialQuote(option, line.usageUnit)
+                              ? suggestedMaterialQuote(option, usageUnit)
                               : null,
                           });
                         }}
@@ -391,7 +400,10 @@ function SourceFields({
                               : null,
                           });
                         }}
-                        options={(['STRAND', 'BEAD', 'GRAM'] as const).map((unit) => ({
+                        options={(selected?.material.unit === 'GRAM'
+                          ? (['GRAM'] as const)
+                          : (['STRAND', 'BEAD', 'GRAM'] as const)
+                        ).map((unit) => ({
                           value: unit,
                           label: t(unit),
                         }))}
@@ -457,6 +469,10 @@ function SourceFields({
               </div>
             );
           })}
+          <SilverCostFields
+            value={value.silverCost ?? null}
+            onChange={(silverCost) => update({ silverCost })}
+          />
           <div className="product-source-subheading">
             <strong>{t('cabochons')}</strong>
             <Button
@@ -730,8 +746,6 @@ export function ProductSourceSection({
   const [draft, setDraft] = useState<ProductSourceInput>(initialSource());
   const [saving, setSaving] = useState(false);
   const [adjustOpen, setAdjustOpen] = useState(false);
-  const [delta, setDelta] = useState<number | null>(null);
-  const [reason, setReason] = useState('');
   const materialRequest = useRef(0);
   const cabochonRequest = useRef(0);
   const cabochonCategoryId = categories.find((category) => category.name === '蛋面')?.id;
@@ -841,6 +855,7 @@ export function ProductSourceSection({
             quoteUnitPrice: line.quoteUnitPrice,
           })),
           extraCosts: run.extraCosts,
+          silverCost: run.silverCost ?? { weightGrams: '0', ...DEFAULT_SILVER_PRICING },
           craftDesignFee: run.craftDesignFee ?? emptyCraftDesignFee(),
         });
         setMaterials((current) => [
@@ -928,33 +943,6 @@ export function ProductSourceSection({
     }
   }
 
-  async function adjust() {
-    if (!product || !Number.isInteger(delta) || !delta || !reason.trim()) {
-      message.error(t('invalid'));
-      return;
-    }
-    setSaving(true);
-    try {
-      await apiFetch(`/api/products/${product.id}/stock-adjustments`, {
-        method: 'POST',
-        body: JSON.stringify({ delta, reason: reason.trim() }),
-      });
-      await refreshProduct();
-      setAdjustOpen(false);
-      setDelta(null);
-      setReason('');
-      message.success(common('saved'));
-    } catch (error) {
-      message.error(
-        error instanceof ClientApiError && error.code === 'PRODUCT_STOCK_OUT_OF_RANGE'
-          ? t('stockError')
-          : t('invalid'),
-      );
-    } finally {
-      setSaving(false);
-    }
-  }
-
   const records = product
     ? [
         ...product.purchaseEntries.map((entry) => ({
@@ -1007,8 +995,6 @@ export function ProductSourceSection({
             </Button>
             <Button
               onClick={() => {
-                setDelta(null);
-                setReason('');
                 setAdjustOpen(true);
               }}
             >
@@ -1016,7 +1002,7 @@ export function ProductSourceSection({
             </Button>
             <Button onClick={() => open('correct')}>{t('correctOrigin')}</Button>
           </div>
-          <Table
+          <PaginatedTable
             rowKey="id"
             size="small"
             pagination={CLIENT_TABLE_PAGINATION}
@@ -1079,18 +1065,7 @@ export function ProductSourceSection({
               },
             ]}
           />
-          {product.stockAdjustments.length > 0 && (
-            <div className="product-source-adjustments">
-              <strong>{t('history')}</strong>
-              {product.stockAdjustments.map((item) => (
-                <div key={item.id}>
-                  <span>{item.createdAt.slice(0, 10)}</span>
-                  <span>{item.delta > 0 ? `+${item.delta}` : item.delta}</span>
-                  <span>{item.reason}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          <StockHistory records={product.stockAdjustments} />
         </>
       )}
       <Drawer
@@ -1133,40 +1108,14 @@ export function ProductSourceSection({
           allowOriginChange={mode === 'correct'}
         />
       </Drawer>
-      <Drawer
-        title={t('adjustStock')}
-        open={adjustOpen}
-        onClose={() => setAdjustOpen(false)}
-        width="min(420px, 100vw)"
-        extra={
-          <Button type="primary" loading={saving} onClick={() => void adjust()}>
-            {t('save')}
-          </Button>
-        }
-      >
-        <div className="product-source-fields">
-          <p>{t('currentStock', { count: product?.stock ?? 0 })}</p>
-          <label className="source-field">
-            <span>{t('delta')}</span>
-            <InputNumber
-              min={-2147483647}
-              max={2147483647}
-              precision={0}
-              value={delta}
-              onChange={setDelta}
-            />
-          </label>
-          <label className="source-field">
-            <span>{t('reason')}</span>
-            <Input.TextArea
-              rows={3}
-              maxLength={500}
-              value={reason}
-              onChange={(event) => setReason(event.target.value)}
-            />
-          </label>
-        </div>
-      </Drawer>
+      {adjustOpen && product && (
+        <StockAdjustmentDrawer
+          name={product.name}
+          resourceUrl={`/api/products/${product.id}`}
+          onClose={() => setAdjustOpen(false)}
+          onSaved={refreshProduct}
+        />
+      )}
       {materialPreview.viewer}
     </section>
   );

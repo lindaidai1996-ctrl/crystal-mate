@@ -1,0 +1,10 @@
+ALTER TYPE "MaterialUnit" ADD VALUE 'GRAM';
+
+ALTER TABLE "MaterialBatchEntry"
+  ALTER COLUMN "receivedQty" TYPE DECIMAL(12,2),
+  ALTER COLUMN "remainingQty" TYPE DECIMAL(12,2);
+
+ALTER TABLE "MaterialStockAdjustment"
+  ALTER COLUMN "beforeQty" TYPE DECIMAL(12,2),
+  ALTER COLUMN "afterQty" TYPE DECIMAL(12,2),
+  ALTER COLUMN "delta" TYPE DECIMAL(12,2);

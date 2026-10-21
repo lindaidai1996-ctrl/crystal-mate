@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { MaterialValues } from '../../src/lib/client-types';
+import { purchaseCandidates } from '../../src/lib/material-calculations';
 import {
   calculatePurchase,
   editPurchase,
@@ -54,6 +55,106 @@ const payload = () => ({
 });
 
 describe('batch purchase calculation', () => {
+  it('offers and adopts count pricing without weight, then recalculates after quantity changes', () => {
+    const purchase = { ...emptyPurchase(), mode: 'BATCH' as const, totalAmount: '244.00' };
+    const result = calculatePurchase(
+      {
+        ...purchaseTestValues(),
+        unit: 'STRAND',
+        childCount: 122,
+        childWeightGrams: '1.00',
+        purchaseUnitPrice: '999.00',
+        weightGrams: '999.00',
+        purchaseGramPrice: '999.00',
+      },
+      purchase,
+      1,
+    );
+    expect(result.values).toMatchObject({
+      purchaseUnitPrice: '244.00',
+      weightGrams: null,
+      purchaseGramPrice: null,
+      childUnitPrice: null,
+    });
+    const candidates = purchaseCandidates(result.values);
+    expect(candidates).toEqual({ count: '2.00', gram: null, weight: null });
+
+    const adopted = calculatePurchase(
+      { ...result.values, childPriceSource: 'COUNT', childUnitPrice: candidates.count },
+      purchase,
+      1,
+    );
+    expect(adopted.values.childUnitPrice).toBe('2.00');
+    expect(calculatePurchase(adopted.values, purchase, 2)).toMatchObject({
+      valid: true,
+      values: { purchaseUnitPrice: '122.00', childUnitPrice: '1.00' },
+    });
+    const manual = calculatePurchase(adopted.values, { ...purchase, manualUnitPrice: '366.00' }, 1);
+    expect(manual.values.childUnitPrice).toBe('3.00');
+    expect(calculatePurchase(manual.values, purchase, 1)).toMatchObject({
+      source: 'AVERAGE',
+      values: { purchaseUnitPrice: '244.00', childUnitPrice: '2.00' },
+    });
+  });
+  it.each([null, '68.00'])(
+    'calculates cost and sale prices without a total weight (manual price: %s)',
+    (manualUnitPrice) => {
+      const result = calculatePurchase(
+        {
+          ...purchaseTestValues(),
+          unit: 'STRAND',
+          childCount: 122,
+          childPriceSource: 'COUNT',
+          saleRule: 'FIXED_AMOUNT',
+          saleRuleValue: '298.00',
+        },
+        {
+          ...emptyPurchase(),
+          mode: 'BATCH',
+          totalAmount: '68.00',
+          manualUnitPrice,
+        },
+        1,
+      );
+      expect(result).toMatchObject({
+        valid: true,
+        source: manualUnitPrice === null ? 'AVERAGE' : 'MANUAL',
+        difference: null,
+        belowPrecision: false,
+        values: {
+          purchaseUnitPrice: '68.00',
+          weightGrams: null,
+          purchaseGramPrice: null,
+          childUnitPrice: '0.56',
+          saleUnitPrice: '366.00',
+          saleGramPrice: null,
+          saleChildUnitPrice: '3.01',
+        },
+      });
+    },
+  );
+  it('divides the amount by quantity without requiring a weight', () => {
+    expect(
+      calculatePurchase(
+        purchaseTestValues(),
+        { ...emptyPurchase(), mode: 'BATCH', totalAmount: '68.00' },
+        2,
+      ),
+    ).toMatchObject({ valid: true, values: { purchaseUnitPrice: '34.00', weightGrams: null } });
+  });
+  it('keeps cost unknown without a quantity or total weight, even with a sample weight', () => {
+    expect(
+      calculatePurchase(
+        purchaseTestValues(),
+        { ...emptyPurchase(), mode: 'BATCH', totalAmount: '68.00', sampleWeightGrams: '1.00' },
+        null,
+      ),
+    ).toMatchObject({
+      valid: true,
+      source: 'UNKNOWN',
+      values: { purchaseUnitPrice: null, weightGrams: '1.00', purchaseGramPrice: null },
+    });
+  });
   it.each(['BEAD', 'STRAND'] as const)(
     'calculates average %s values and sale suggestions',
     (unit) => {
@@ -196,7 +297,14 @@ describe('batch purchase calculation', () => {
       ).valid,
     ).toBe(false);
   });
-  it('accepts free purchases only with a positive weight and does not divide by zero', () => {
+  it('accepts free purchases and rejects zero weights or division by zero', () => {
+    expect(
+      calculatePurchase(
+        purchaseTestValues(),
+        { ...emptyPurchase(), mode: 'BATCH', totalAmount: '0.00' },
+        10,
+      ),
+    ).toMatchObject({ valid: true, values: { purchaseUnitPrice: '0.00', weightGrams: null } });
     expect(
       calculatePurchase(purchaseTestValues(), { ...batch(), totalAmount: '0.00' }, 10).values
         .purchaseUnitPrice,
@@ -238,6 +346,21 @@ describe('batch purchase calculation', () => {
 });
 
 describe('purchase request compatibility and validation', () => {
+  it.each([1, null])(
+    'accepts an amount without weight on create, append, and edit (quantity: %s)',
+    (receivedQty) => {
+      const input = {
+        ...payload(),
+        receivedQty,
+        purchase: { ...emptyPurchase(), mode: 'BATCH', totalAmount: '68.00' },
+      };
+      expect(materialCreateSchema.safeParse(input).success).toBe(true);
+      expect(materialBatchEntrySchema.safeParse(input).success).toBe(true);
+      const { selection: _selection, ...edit } = input;
+      void _selection;
+      expect(materialBatchEntryUpdateSchema.safeParse(edit).success).toBe(true);
+    },
+  );
   it('defaults old requests to unit mode with no invented batch totals', () => {
     const { purchase: _purchase, ...legacy } = payload();
     void _purchase;
