@@ -1,0 +1,1 @@
+ALTER TYPE "ProductSaleRule" ADD VALUE 'CUSTOM_AMOUNT';

@@ -54,15 +54,26 @@ async function requireDistributor(id: string) {
   if (!item) throw new ApiError(404, 'NOT_FOUND');
 }
 
+type PriceField = 'saleUnitPrice' | 'childUnitPrice' | 'saleChildUnitPrice';
 type SummaryRow = Omit<
   DistributorPurchaseSummary,
-  'latestReceivedAt' | 'totalAmount' | 'totalWeightGrams'
+  'latestReceivedAt' | 'totalAmount' | 'totalWeightGrams' | PriceField
 > & {
   latestReceivedAt: Date;
   totalAmount: Prisma.Decimal | null;
   totalWeightGrams: Prisma.Decimal | null;
   total: bigint;
+} & { [Field in `${PriceField}${'Min' | 'Max'}`]: Prisma.Decimal | null } & {
+  [Field in `${PriceField}HasUnknown`]: boolean;
 };
+
+function summaryPrice(row: Omit<SummaryRow, 'itemId'>, field: PriceField) {
+  return {
+    min: row[`${field}Min`]?.toFixed(2) ?? null,
+    max: row[`${field}Max`]?.toFixed(2) ?? null,
+    hasUnknown: row[`${field}HasUnknown`],
+  };
+}
 
 export async function getDistributorPurchaseSummary(
   distributorId: string,
@@ -78,25 +89,33 @@ export async function getDistributorPurchaseSummary(
       SELECT 'PRODUCT'::text AS type, p.id AS "itemId", p.name, p.code,
         'PIECE'::text AS unit, e."batchId", b."receivedAt",
         e.quantity::numeric AS quantity, e.quantity::numeric * e."unitCost" AS amount,
-        NULL::numeric AS weight
+        NULL::numeric AS weight, p."priceCents"::numeric / 100 AS "saleUnitPrice",
+        NULL::numeric AS "childUnitPrice", NULL::numeric AS "saleChildUnitPrice"
       FROM "ProductPurchaseEntry" e
       JOIN "Product" p ON p.id = e."productId"
       JOIN "MaterialBatch" b ON b.id = e."batchId"
       WHERE e."distributorId" = ${distributorId}
         AND ${options.type} IN ('all', 'product')
         AND (strpos(lower(p.name), lower(${options.q})) > 0
-          OR strpos(lower(p.code), lower(${options.q})) > 0)
+          OR strpos(lower(p.code), lower(${options.q})) > 0
+          OR EXISTS (SELECT 1 FROM unnest(p.aliases) AS alias
+            WHERE strpos(lower(alias), lower(${options.q})) > 0))
       UNION ALL
       SELECT 'MATERIAL', m.id, m.name, NULL::text, m.unit::text,
         e."batchId", b."receivedAt", e."receivedQty"::numeric,
         COALESCE(e."purchaseTotalAmount", e."receivedQty"::numeric * e."purchaseUnitPrice"),
-        COALESCE(e."purchaseTotalWeightGrams", e."receivedQty"::numeric * e."weightGrams")
+        COALESCE(e."purchaseTotalWeightGrams", e."receivedQty"::numeric * e."weightGrams"),
+        e."saleUnitPrice",
+        CASE m.unit WHEN 'STRAND' THEN e."childUnitPrice" WHEN 'BEAD' THEN e."purchaseUnitPrice" END,
+        CASE m.unit WHEN 'STRAND' THEN e."saleChildUnitPrice" WHEN 'BEAD' THEN e."saleUnitPrice" END
       FROM "MaterialBatchEntry" e
       JOIN "Material" m ON m.id = e."materialId"
       JOIN "MaterialBatch" b ON b.id = e."batchId"
       WHERE e."distributorId" = ${distributorId}
         AND ${options.type} IN ('all', 'material')
-        AND strpos(lower(m.name), lower(${options.q})) > 0
+        AND (strpos(lower(m.name), lower(${options.q})) > 0
+          OR EXISTS (SELECT 1 FROM unnest(m.aliases) AS alias
+            WHERE strpos(lower(alias), lower(${options.q})) > 0))
     ), grouped AS (
       SELECT type, "itemId", name, code, unit,
         COUNT(DISTINCT "batchId")::int AS "batchCount",
@@ -104,7 +123,13 @@ export async function getDistributorPurchaseSummary(
         SUM(quantity)::double precision AS "knownQuantity",
         bool_or(quantity IS NULL) AS "hasUnknownQuantity",
         SUM(amount) AS "totalAmount", bool_or(amount IS NULL) AS "hasUnknownAmount",
-        SUM(weight) AS "totalWeightGrams", bool_or(type = 'MATERIAL' AND weight IS NULL) AS "hasUnknownWeight"
+        SUM(weight) AS "totalWeightGrams", bool_or(type = 'MATERIAL' AND weight IS NULL) AS "hasUnknownWeight",
+        MIN("saleUnitPrice") AS "saleUnitPriceMin", MAX("saleUnitPrice") AS "saleUnitPriceMax",
+        bool_or("saleUnitPrice" IS NULL) AS "saleUnitPriceHasUnknown",
+        MIN("childUnitPrice") AS "childUnitPriceMin", MAX("childUnitPrice") AS "childUnitPriceMax",
+        bool_or("childUnitPrice" IS NULL) AS "childUnitPriceHasUnknown",
+        MIN("saleChildUnitPrice") AS "saleChildUnitPriceMin", MAX("saleChildUnitPrice") AS "saleChildUnitPriceMax",
+        bool_or("saleChildUnitPrice" IS NULL) AS "saleChildUnitPriceHasUnknown"
       FROM purchases GROUP BY type, "itemId", name, code, unit
     )
     SELECT paged.*, counted.total
@@ -133,6 +158,9 @@ export async function getDistributorPurchaseSummary(
         latestReceivedAt: row.latestReceivedAt.toISOString(),
         totalAmount: row.totalAmount?.toFixed(2) ?? null,
         totalWeightGrams: row.totalWeightGrams?.toFixed(2) ?? null,
+        saleUnitPrice: summaryPrice(row, 'saleUnitPrice'),
+        childUnitPrice: summaryPrice(row, 'childUnitPrice'),
+        saleChildUnitPrice: summaryPrice(row, 'saleChildUnitPrice'),
       })),
     total: Number(rows[0].total),
     page: options.page,
@@ -153,7 +181,12 @@ export async function getDistributorPurchaseEntries(
   if (options.type === 'product') {
     const where = { distributorId, productId: options.itemId };
     const [entries, count] = await db.$transaction([
-      db.productPurchaseEntry.findMany({ where, include: { batch }, orderBy, ...paging }),
+      db.productPurchaseEntry.findMany({
+        where,
+        include: { batch, product: { select: { priceCents: true } } },
+        orderBy,
+        ...paging,
+      }),
       db.productPurchaseEntry.count({ where }),
     ]);
     total = count;
@@ -166,6 +199,9 @@ export async function getDistributorPurchaseEntries(
       quantity: entry.quantity,
       unit: 'PIECE',
       unitPrice: entry.unitCost.toFixed(2),
+      saleUnitPrice: (entry.product.priceCents / 100).toFixed(2),
+      childUnitPrice: null,
+      saleChildUnitPrice: null,
       amount: entry.unitCost.mul(entry.quantity).toFixed(2),
       weightGrams: null,
       gramPrice: null,
@@ -192,6 +228,15 @@ export async function getDistributorPurchaseEntries(
       quantity: entry.receivedQty?.toNumber() ?? null,
       unit: entry.material.unit,
       unitPrice: entry.purchaseUnitPrice?.toFixed(2) ?? null,
+      saleUnitPrice: entry.saleUnitPrice?.toFixed(2) ?? null,
+      childUnitPrice:
+        (entry.material.unit === 'BEAD' ? entry.purchaseUnitPrice : entry.childUnitPrice)?.toFixed(
+          2,
+        ) ?? null,
+      saleChildUnitPrice:
+        (entry.material.unit === 'BEAD' ? entry.saleUnitPrice : entry.saleChildUnitPrice)?.toFixed(
+          2,
+        ) ?? null,
       amount:
         (
           entry.purchaseTotalAmount ??

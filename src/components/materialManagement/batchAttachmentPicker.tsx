@@ -1,28 +1,42 @@
 'use client';
 
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { App, Button, Image, Input, Spin, Tooltip } from 'antd';
+import { App, Button, Image, Input, Spin, Tag, Tooltip } from 'antd';
 import { useState } from 'react';
 import type { MaterialBatchAttachment } from '@/lib/client-types';
 import { useTranslations } from 'next-intl';
 import { ImageUploadChoiceDialog } from '@/components/imageUpload/imageUploadChoiceDialog';
 import { AttachmentImageEditor } from '@/components/imageUpload/attachmentImageEditor';
+import { AttachmentCandidateDialog } from '@/components/imageUpload/attachmentCandidateDialog';
+import { attachmentCoverKey, MAX_ATTACHMENTS, type AttachmentOwner } from '@/lib/attachments';
 import { uploadImage } from '@/components/imageUpload/uploadImage';
 
 export function BatchAttachmentPicker({
   attachments,
   onChange,
   onUploadingChange,
+  owner,
+  coverObjectKey,
+  onCoverChange,
+  disabled = false,
 }: {
+  owner?: AttachmentOwner;
+  coverObjectKey?: string | null;
+  onCoverChange: (key: string | null) => void;
+  disabled?: boolean;
   attachments: MaterialBatchAttachment[];
   onChange: (attachments: MaterialBatchAttachment[]) => void;
   onUploadingChange: (uploading: boolean) => void;
 }) {
   const t = useTranslations('materialBatches');
   const imageT = useTranslations('imageUpload');
+  const attachmentT = useTranslations('attachments');
   const common = useTranslations('common');
   const { message, modal } = App.useApp();
   const [uploading, setUploading] = useState(false);
+  const [choosing, setChoosing] = useState(false);
+  const busy = uploading || disabled || choosing;
+  const effectiveCover = attachmentCoverKey(attachments, coverObjectKey);
   const [pendingFiles, setPendingFiles] = useState<File[] | null>(null);
   const [editing, setEditing] = useState<MaterialBatchAttachment | null>(null);
 
@@ -38,6 +52,7 @@ export function BatchAttachmentPicker({
     setEditing(null);
     try {
       const replacement = await uploadOne(file);
+      if (effectiveCover === objectKey) onCoverChange(replacement.objectKey);
       onChange(
         attachments.map((attachment) =>
           attachment.objectKey === objectKey
@@ -64,8 +79,12 @@ export function BatchAttachmentPicker({
   }
 
   function selectFiles(files: FileList | null) {
-    if (!files?.length || uploading) return;
-    const selected = Array.from(files).slice(0, 12 - attachments.length);
+    if (!files?.length || busy) return;
+    const selected = Array.from(files);
+    if (selected.length + attachments.length > MAX_ATTACHMENTS) {
+      message.warning(attachmentT('limitExceeded', { limit: MAX_ATTACHMENTS }));
+      return;
+    }
     if (!selected.length) return;
     setUploading(true);
     onUploadingChange(true);
@@ -95,6 +114,39 @@ export function BatchAttachmentPicker({
 
   return (
     <div className="batch-attachments">
+      {choosing && owner && (
+        <AttachmentCandidateDialog
+          owner={owner}
+          attachments={attachments}
+          onClose={() => {
+            setChoosing(false);
+            onUploadingChange(false);
+          }}
+          onAdd={(items) => {
+            const keys = new Set(attachments.map((item) => item.objectKey));
+            const added = items.filter((item) => !keys.has(item.objectKey));
+            if (attachments.length + added.length > MAX_ATTACHMENTS) {
+              message.warning(attachmentT('limitExceeded', { limit: MAX_ATTACHMENTS }));
+              return;
+            }
+            onChange(
+              [
+                ...attachments,
+                ...added.map((item) => ({
+                  objectKey: item.objectKey,
+                  url: item.url,
+                  fileName: item.fileName,
+                  source: item.source,
+                  notes: '',
+                  position: 0,
+                })),
+              ].map((item, position) => ({ ...item, position })),
+            );
+            setChoosing(false);
+            onUploadingChange(false);
+          }}
+        />
+      )}
       {editing && (
         <AttachmentImageEditor
           key={editing.objectKey}
@@ -122,11 +174,25 @@ export function BatchAttachmentPicker({
             <Tooltip title={attachment.fileName}>
               <span className="batch-attachment-name">{attachment.fileName}</span>
             </Tooltip>
+            <div>
+              {effectiveCover === attachment.objectKey ? (
+                <Tag color="blue">{attachmentT('cover')}</Tag>
+              ) : (
+                <Button
+                  size="small"
+                  type="link"
+                  disabled={busy}
+                  onClick={() => onCoverChange(attachment.objectKey)}
+                >
+                  {attachmentT('setCover')}
+                </Button>
+              )}
+            </div>
             <Input.TextArea
               aria-label={`${attachment.fileName} ${t('attachmentNotes')}`}
               placeholder={t('attachmentNotes')}
               value={attachment.notes}
-              disabled={uploading}
+              disabled={busy}
               maxLength={1000}
               autoSize={{ minRows: 1, maxRows: 3 }}
               onChange={(event) =>
@@ -142,7 +208,7 @@ export function BatchAttachmentPicker({
             <Button
               type="text"
               icon={<EditOutlined />}
-              disabled={uploading}
+              disabled={busy}
               aria-label={`${imageT('editImage')} ${attachment.fileName}`}
               onClick={() => {
                 setUploading(true);
@@ -155,7 +221,7 @@ export function BatchAttachmentPicker({
             <Button
               type="text"
               danger
-              disabled={uploading}
+              disabled={busy}
               icon={<DeleteOutlined />}
               aria-label={`${t('removeAttachment')} ${attachment.fileName}`}
               onClick={async () => {
@@ -168,17 +234,17 @@ export function BatchAttachmentPicker({
                   autoFocusButton: 'cancel',
                 });
                 if (!confirmed) return;
-                onChange(
-                  attachments
-                    .filter((item) => item.objectKey !== attachment.objectKey)
-                    .map((item, position) => ({ ...item, position })),
-                );
+                const remaining = attachments
+                  .filter((item) => item.objectKey !== attachment.objectKey)
+                  .map((item, position) => ({ ...item, position }));
+                onCoverChange(attachmentCoverKey(remaining, effectiveCover));
+                onChange(remaining);
               }}
             />
           </Tooltip>
         </div>
       ))}
-      {attachments.length < 12 && (
+      {attachments.length < MAX_ATTACHMENTS && (
         <label className="batch-attachment-upload">
           {uploading ? <Spin size="small" /> : <PlusOutlined />}
           <span>{uploading ? t('uploading') : t('uploadAttachment')}</span>
@@ -187,13 +253,24 @@ export function BatchAttachmentPicker({
             aria-label={t('uploadAttachment')}
             accept="image/jpeg,image/png,image/webp"
             multiple
-            disabled={uploading}
+            disabled={busy}
             onChange={(event) => {
               selectFiles(event.target.files);
               event.target.value = '';
             }}
           />
         </label>
+      )}
+      {owner && (
+        <Button
+          disabled={busy || attachments.length >= MAX_ATTACHMENTS}
+          onClick={() => {
+            setChoosing(true);
+            onUploadingChange(true);
+          }}
+        >
+          {attachmentT('chooseFromItems')}
+        </Button>
       )}
       <span className="batch-attachment-hint">{t('attachmentHelp')}</span>
     </div>

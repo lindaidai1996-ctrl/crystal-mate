@@ -41,6 +41,7 @@ export const entryInclude = {
 } satisfies Prisma.MaterialBatchEntryInclude;
 
 export const materialInclude = {
+  _count: { select: { imageImportItems: { where: { entryId: { not: null } } } } },
   category: true,
   tags: { include: { tag: true } },
   images: { orderBy: { position: 'asc' } },
@@ -99,7 +100,7 @@ export function serializeEntry(entry: EntryWithRelations) {
 }
 
 export function serializeMaterial(material: MaterialWithRelations) {
-  const { tags, ...fields } = material;
+  const { tags, _count, ...fields } = material;
   const batchEntries = material.batchEntries
     .map(serializeEntry)
     .sort(
@@ -110,6 +111,7 @@ export function serializeMaterial(material: MaterialWithRelations) {
     );
   return {
     ...fields,
+    imageImportCount: _count?.imageImportItems ?? 0,
     tags: tags.map(({ tag }) => tag),
     ...amounts(material),
     batchEntries,
@@ -152,12 +154,14 @@ function detailValues(
   if (!calculated.valid) throw new ApiError(400, 'INVALID_INPUT');
   const {
     name: _name,
+    aliases: _aliases,
     categoryId: _categoryId,
     unit: _unit,
     notes: _notes,
     ...detail
   } = calculated.values;
   void _name;
+  void _aliases;
   void _categoryId;
   void _unit;
   void _notes;
@@ -200,8 +204,13 @@ async function resolveBatch(tx: Tx, selection: Selection) {
   });
 }
 
-async function imageUrls(tx: Tx, materialId: string | null, imageKeys: string[]) {
-  const known = new Map<string, string>();
+async function imageUrls(
+  tx: Tx,
+  materialId: string | null,
+  imageKeys: string[],
+  heldImages?: ReadonlyMap<string, string>,
+) {
+  const known = new Map(heldImages);
   if (materialId) {
     const [legacy, batched] = await Promise.all([
       tx.materialImage.findMany({ where: { materialId, objectKey: { in: imageKeys } } }),
@@ -252,51 +261,57 @@ async function consumeGrants(tx: Tx, fresh: string[]) {
 }
 
 export async function createMaterial(input: CreateInput) {
-  return db.$transaction(
-    async (tx) => {
-      const { name, categoryId, unit, notes } = input.values;
-      if (!(await tx.materialCategory.findUnique({ where: { id: categoryId } })))
-        throw new ApiError(400, 'MATERIAL_CATEGORY_NOT_FOUND');
-      await validateTags(tx, input.tagIds);
-      if (!(await tx.distributor.findUnique({ where: { id: input.distributorId } })))
-        throw new ApiError(400, 'DISTRIBUTOR_NOT_FOUND');
-      const batch = await resolveBatch(tx, input.selection);
-      const { detail, imageKeys } = detailValues(
-        input.values,
-        { name, categoryId, unit, notes },
-        input.purchase,
-        input.receivedQty,
-      );
-      const { known, fresh } = await imageUrls(tx, null, imageKeys);
-      const material = await tx.material.create({
-        data: {
-          name,
-          categoryId,
-          unit,
-          notes,
-          tags: { create: input.tagIds.map((tagId) => ({ tag: { connect: { id: tagId } } })) },
-        },
-      });
-      const entry = await tx.materialBatchEntry.create({
-        data: {
-          ...detail,
-          materialId: material.id,
-          batchId: batch.id,
-          distributorId: input.distributorId,
-          receivedQty: input.receivedQty,
-          remainingQty: input.receivedQty,
-        },
-      });
-      await replaceEntryImages(tx, entry.id, imageKeys, known);
-      await consumeGrants(tx, fresh);
-      return serializeMaterial(
-        await tx.material.findUniqueOrThrow({
-          where: { id: material.id },
-          include: materialInclude,
-        }),
-      );
+  return db.$transaction((tx) => createMaterialInTransaction(tx, input), {
+    isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+  });
+}
+
+export async function createMaterialInTransaction(
+  tx: Tx,
+  input: CreateInput,
+  heldImages?: ReadonlyMap<string, string>,
+) {
+  const { name, aliases, categoryId, unit, notes } = input.values;
+  if (!(await tx.materialCategory.findUnique({ where: { id: categoryId } })))
+    throw new ApiError(400, 'MATERIAL_CATEGORY_NOT_FOUND');
+  await validateTags(tx, input.tagIds);
+  if (!(await tx.distributor.findUnique({ where: { id: input.distributorId } })))
+    throw new ApiError(400, 'DISTRIBUTOR_NOT_FOUND');
+  const batch = await resolveBatch(tx, input.selection);
+  const { detail, imageKeys } = detailValues(
+    input.values,
+    { name, categoryId, unit, notes },
+    input.purchase,
+    input.receivedQty,
+  );
+  const { known, fresh } = await imageUrls(tx, null, imageKeys, heldImages);
+  const material = await tx.material.create({
+    data: {
+      name,
+      aliases,
+      categoryId,
+      unit,
+      notes,
+      tags: { create: input.tagIds.map((tagId) => ({ tag: { connect: { id: tagId } } })) },
     },
-    { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+  });
+  const entry = await tx.materialBatchEntry.create({
+    data: {
+      ...detail,
+      materialId: material.id,
+      batchId: batch.id,
+      distributorId: input.distributorId,
+      receivedQty: input.receivedQty,
+      remainingQty: input.receivedQty,
+    },
+  });
+  await replaceEntryImages(tx, entry.id, imageKeys, known);
+  await consumeGrants(tx, fresh);
+  return serializeMaterial(
+    await tx.material.findUniqueOrThrow({
+      where: { id: material.id },
+      include: materialInclude,
+    }),
   );
 }
 
@@ -356,46 +371,52 @@ export async function updateMaterialMaster(id: string, input: MasterInput) {
 }
 
 export async function createMaterialEntry(materialId: string, input: EntryInput) {
-  return db.$transaction(
-    async (tx) => {
-      const material = await tx.material.findUnique({ where: { id: materialId } });
-      if (!material) throw new ApiError(404, 'NOT_FOUND');
-      if (!(await tx.distributor.findUnique({ where: { id: input.distributorId } })))
-        throw new ApiError(400, 'DISTRIBUTOR_NOT_FOUND');
-      const batch = await resolveBatch(tx, input.selection);
-      if (
-        await tx.materialBatchEntry.findUnique({
-          where: { materialId_batchId: { materialId, batchId: batch.id } },
-        })
-      )
-        throw new ApiError(409, 'MATERIAL_ALREADY_IN_BATCH');
-      const { detail, imageKeys } = detailValues(
-        input.values,
-        material,
-        input.purchase,
-        input.receivedQty,
-      );
-      const { known, fresh } = await imageUrls(tx, materialId, imageKeys);
-      const entry = await tx.materialBatchEntry.create({
-        data: {
-          ...detail,
-          materialId,
-          batchId: batch.id,
-          distributorId: input.distributorId,
-          receivedQty: input.receivedQty,
-          remainingQty: input.receivedQty,
-        },
-      });
-      await replaceEntryImages(tx, entry.id, imageKeys, known);
-      await consumeGrants(tx, fresh);
-      return serializeEntry(
-        await tx.materialBatchEntry.findUniqueOrThrow({
-          where: { id: entry.id },
-          include: entryInclude,
-        }),
-      );
+  return db.$transaction((tx) => createMaterialEntryInTransaction(tx, materialId, input), {
+    isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+  });
+}
+
+export async function createMaterialEntryInTransaction(
+  tx: Tx,
+  materialId: string,
+  input: EntryInput,
+  heldImages?: ReadonlyMap<string, string>,
+) {
+  const material = await tx.material.findUnique({ where: { id: materialId } });
+  if (!material) throw new ApiError(404, 'NOT_FOUND');
+  if (!(await tx.distributor.findUnique({ where: { id: input.distributorId } })))
+    throw new ApiError(400, 'DISTRIBUTOR_NOT_FOUND');
+  const batch = await resolveBatch(tx, input.selection);
+  if (
+    await tx.materialBatchEntry.findUnique({
+      where: { materialId_batchId: { materialId, batchId: batch.id } },
+    })
+  )
+    throw new ApiError(409, 'MATERIAL_ALREADY_IN_BATCH');
+  const { detail, imageKeys } = detailValues(
+    input.values,
+    material,
+    input.purchase,
+    input.receivedQty,
+  );
+  const { known, fresh } = await imageUrls(tx, materialId, imageKeys, heldImages);
+  const entry = await tx.materialBatchEntry.create({
+    data: {
+      ...detail,
+      materialId,
+      batchId: batch.id,
+      distributorId: input.distributorId,
+      receivedQty: input.receivedQty,
+      remainingQty: input.receivedQty,
     },
-    { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+  });
+  await replaceEntryImages(tx, entry.id, imageKeys, known);
+  await consumeGrants(tx, fresh);
+  return serializeEntry(
+    await tx.materialBatchEntry.findUniqueOrThrow({
+      where: { id: entry.id },
+      include: entryInclude,
+    }),
   );
 }
 
@@ -425,6 +446,7 @@ export async function updateMaterialEntry(
         throw new ApiError(400, 'DISTRIBUTOR_NOT_FOUND');
       const master = {
         name: input.values.name,
+        aliases: input.values.aliases,
         categoryId: input.values.categoryId,
         unit: input.values.unit,
         notes: material.notes,

@@ -8,7 +8,15 @@ import { useState } from 'react';
 
 type PreviewImage = { objectKey: string; url: string; fileName?: string };
 
-export function ImageHoverPreview({ images, name }: { images: PreviewImage[]; name: string }) {
+export function ImageHoverPreview({
+  images,
+  name,
+  coverObjectKey,
+}: {
+  images: PreviewImage[];
+  name: string;
+  coverObjectKey?: string | null;
+}) {
   const t = useTranslations('editor');
   const [current, setCurrent] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -20,6 +28,12 @@ export function ImageHoverPreview({ images, name }: { images: PreviewImage[]; na
         <PictureOutlined />
       </span>
     );
+
+  // A list cover stays fixed even while the user browses other images in the preview.
+  const thumbnail =
+    coverObjectKey === undefined
+      ? image
+      : (images.find((item) => item.objectKey === coverObjectKey) ?? images[0]);
 
   return (
     <Image.PreviewGroup
@@ -82,7 +96,7 @@ export function ImageHoverPreview({ images, name }: { images: PreviewImage[]; na
             width={44}
             height={44}
             className="product-thumb"
-            src={image.url}
+            src={thumbnail.url}
             alt=""
           />
         </button>

@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { AttachmentImageEditor } from '@/components/imageUpload/attachmentImageEditor';
 import { uploadImage } from '@/components/imageUpload/uploadImage';
+import { attachmentCoverKey } from '@/lib/attachments';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { MaterialBatch, MaterialBatchAttachment } from '@/lib/client-types';
 
@@ -43,6 +44,10 @@ export function BatchAttachmentGallery({
       const saved = await apiFetch<MaterialBatch>(`/api/material-batches/${batch.id}`, {
         method: 'PUT',
         body: JSON.stringify({
+          coverObjectKey:
+            attachmentCoverKey(current.attachments, current.coverObjectKey) === objectKey
+              ? replacement.objectKey
+              : current.coverObjectKey,
           name: current.name,
           receivedAt: current.receivedAt.slice(0, 10),
           notes: current.notes,

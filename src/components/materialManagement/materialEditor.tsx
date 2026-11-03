@@ -1,28 +1,14 @@
 'use client';
 
-import { ArrowLeftOutlined, PlusOutlined, ScanOutlined, SaveOutlined } from '@ant-design/icons';
-import {
-  App,
-  Button,
-  Cascader,
-  Form,
-  Input,
-  InputNumber,
-  Modal,
-  Radio,
-  Result,
-  Select,
-  Skeleton,
-  Space,
-  Tooltip,
-} from 'antd';
+import { ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons';
+import { App, Button, Form, Result, Skeleton, Space } from 'antd';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
+import { emptyMaterial } from '@/lib/material-defaults';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type {
   Material,
-  MaterialAmount,
   MaterialBatch,
   MaterialBatchEntry,
   MaterialBatchSelection,
@@ -33,53 +19,17 @@ import type {
   ProductImage,
   Tag,
 } from '@/lib/client-types';
-import {
-  adoptSaleUnitPriceFromBeads,
-  editMaterial,
-  purchaseCandidates,
-  recalculateMaterial,
-  recognizeMaterialCategory,
-} from '@/lib/material-calculations';
-import { ImagePicker } from '@/components/image-picker';
-import { DistributorSelect } from '@/components/distributorSelect/distributorSelect';
-import { categoryPath, categoryTree } from './categoryTree';
+import { editMaterial, recalculateMaterial } from '@/lib/material-calculations';
 import { BatchSelector } from './batchSelector';
-import { MaterialAmountInput as AmountInput, PurchaseFields } from './purchaseFields';
-import { MaterialSaleFields } from './materialSaleFields';
+import { DistributorSelect } from '@/components/distributorSelect/distributorSelect';
+import { MaterialBasicFields } from './materialBasicFields';
+import { MaterialDetailFields } from './materialDetailFields';
 import {
   calculatePurchase,
   emptyPurchase,
   resolvePurchase,
   type MaterialPurchase,
 } from '@/lib/material-purchase';
-
-function emptyMaterial(): MaterialValues {
-  return {
-    name: '',
-    categoryId: '',
-    unit: 'STRAND',
-    purchaseUnitPrice: null,
-    weightGrams: null,
-    purchaseGramPrice: null,
-    purchaseGramManual: false,
-    lengthMm: null,
-    widthMm: null,
-    heightMm: null,
-    childCount: null,
-    childWeightGrams: null,
-    childUnitPrice: null,
-    childPriceSource: null,
-    saleRule: 'COST',
-    saleRuleValue: null,
-    saleUnitPrice: null,
-    saleGramPrice: null,
-    saleChildUnitPrice: null,
-    saleUnitManual: false,
-    saleGramManual: false,
-    saleChildManual: false,
-    notes: '',
-  };
-}
 
 const newMaterialDraftKey = 'crystal-mate:new-material-draft';
 
@@ -115,13 +65,10 @@ export function MaterialEditor({
   initialDistributorId?: string;
 }) {
   const t = useTranslations('materialEditor');
-  const tagText = useTranslations('tags');
   const batchText = useTranslations('materialBatches');
   const common = useTranslations('common');
   const { message } = App.useApp();
   const router = useRouter();
-  const [tagForm] = Form.useForm<{ name: string }>();
-  const nameBeforeFocus = useRef('');
   const draftStorageKey =
     initialBatchId || initialDistributorId
       ? `${newMaterialDraftKey}:${JSON.stringify([initialBatchId, initialDistributorId])}`
@@ -129,14 +76,13 @@ export function MaterialEditor({
   const [savedDraft] = useState(() =>
     id === 'new' ? readNewMaterialDraft(draftStorageKey) : null,
   );
-  const [inputDraft, setDraft] = useState<MaterialValues>(
-    () => savedDraft?.values ?? emptyMaterial(),
-  );
+  const [inputDraft, setDraft] = useState<MaterialValues>(() => ({
+    ...emptyMaterial(),
+    ...savedDraft?.values,
+  }));
   const [categories, setCategories] = useState<MaterialCategory[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [tagIds, setTagIds] = useState<string[]>(savedDraft?.tagIds ?? []);
-  const [tagModalOpen, setTagModalOpen] = useState(false);
-  const [creatingTag, setCreatingTag] = useState(false);
   const [images, setImages] = useState<ProductImage[]>(savedDraft?.images ?? []);
   const [batches, setBatches] = useState<MaterialBatch[]>([]);
   const [distributors, setDistributors] = useState<DistributorPage['items']>([]);
@@ -184,7 +130,6 @@ export function MaterialEditor({
       : t('back');
   const isMasterEdit = !isNew && !entryId;
   const isAddingEntry = entryId === 'new';
-  const candidates = purchaseCandidates(draft);
 
   useEffect(() => {
     if (!isNew || createdMaterial) return;
@@ -248,7 +193,11 @@ export function MaterialEditor({
           const values = Object.fromEntries(
             Object.keys(emptyMaterial()).map((field) => [
               field,
-              field === 'name' || field === 'categoryId' || field === 'unit' || field === 'notes'
+              field === 'name' ||
+              field === 'aliases' ||
+              field === 'categoryId' ||
+              field === 'unit' ||
+              field === 'notes'
                 ? material[field as keyof MaterialValues]
                 : (source as Partial<MaterialValues>)[field as keyof MaterialValues],
             ]),
@@ -349,54 +298,6 @@ export function MaterialEditor({
     );
   }
 
-  function recognizeName(name: string) {
-    if (isAddingEntry || name === nameBeforeFocus.current) return;
-    const category = recognizeMaterialCategory(name, categories);
-    if (category) setDraft((current) => ({ ...current, categoryId: category.id }));
-
-    const input = name.normalize('NFKC').trim().toLowerCase();
-    const matchedTagIds = tags
-      .filter((tag) => {
-        const term = tag.name.normalize('NFKC').trim().toLowerCase();
-        return term.length > 0 && input.includes(term);
-      })
-      .map((tag) => tag.id);
-    if (matchedTagIds.length) {
-      setTagIds((current) => [...new Set([...current, ...matchedTagIds])]);
-    }
-  }
-
-  function recognize() {
-    const category = recognizeMaterialCategory(draft.name, categories);
-    if (!category) {
-      message.warning(t('recognitionFailed'));
-      return;
-    }
-    setDraft((current) => ({ ...current, categoryId: category.id }));
-    message.success(t('recognized', { category: category.name }));
-  }
-
-  async function createTag({ name }: { name: string }) {
-    setCreatingTag(true);
-    try {
-      const tag = await apiFetch<Tag>('/api/tags', {
-        method: 'POST',
-        body: JSON.stringify({ name: name.trim() }),
-      });
-      setTags((items) => [...items, tag].sort((a, b) => a.name.localeCompare(b.name)));
-      setTagIds((current) => [...current, tag.id]);
-      message.success(common('saved'));
-      tagForm.resetFields();
-      setTagModalOpen(false);
-    } catch (error) {
-      message.error(
-        common(`errors.${error instanceof ClientApiError ? error.code : 'SERVER_ERROR'}` as never),
-      );
-    } finally {
-      setCreatingTag(false);
-    }
-  }
-
   async function save() {
     if (saving || uploadingImages) return;
     setSubmitted(true);
@@ -446,6 +347,7 @@ export function MaterialEditor({
           method: 'PUT',
           body: JSON.stringify({
             name: values.name,
+            aliases: values.aliases,
             categoryId: values.categoryId,
             tagIds,
             unit: values.unit,
@@ -545,25 +447,6 @@ export function MaterialEditor({
     window.scrollTo(0, 0);
   }
 
-  function amount(field: keyof MaterialValues, suffix: string, positive = false) {
-    const labelKey =
-      field === 'saleRuleValue'
-        ? draft.saleRule === 'FIXED_AMOUNT'
-          ? 'fixedAmount'
-          : 'customPercent'
-        : field;
-
-    return (
-      <AmountInput
-        value={draft[field] as MaterialAmount}
-        onChange={(value) => change(field, value)}
-        suffix={suffix}
-        label={t(labelKey as never)}
-        positive={positive}
-      />
-    );
-  }
-
   if (loading) return <Skeleton active paragraph={{ rows: 12 }} />;
   if (loadError)
     return (
@@ -628,117 +511,28 @@ export function MaterialEditor({
       </div>
       <Form layout="vertical" onFinish={save}>
         <div className="editor-surface material-editor">
-          <section className="editor-block">
-            <h2>{t('basics')}</h2>
-            <div className="material-field-grid">
-              <Form.Item
-                label={t('name')}
-                required
-                validateStatus={submitted && !draft.name.trim() ? 'error' : undefined}
-                help={submitted && !draft.name.trim() ? t('required') : undefined}
-              >
-                <Input
-                  value={draft.name}
-                  aria-label={t('name')}
-                  disabled={isAddingEntry}
-                  maxLength={120}
-                  onFocus={(event) => {
-                    nameBeforeFocus.current = event.target.value;
-                  }}
-                  onChange={(event) => change('name', event.target.value)}
-                  onBlur={(event) => recognizeName(event.target.value)}
-                />
-              </Form.Item>
-              <Form.Item
-                label={t('category')}
-                required
-                validateStatus={submitted && !draft.categoryId ? 'error' : undefined}
-                help={submitted && !draft.categoryId ? t('required') : undefined}
-              >
-                <div className="material-category-control">
-                  <Cascader
-                    options={categoryTree(categories)}
-                    disabled={isAddingEntry}
-                    value={draft.categoryId ? categoryPath(draft.categoryId, categories) : []}
-                    onChange={(path) => change('categoryId', (path?.at(-1) as string) ?? '')}
-                    placeholder={t('selectCategory')}
-                    aria-label={t('category')}
-                    showSearch
-                    changeOnSelect
-                    allowClear
-                  />
-                  {!isAddingEntry && (
-                    <Tooltip title={t('recognize')}>
-                      <Button
-                        icon={<ScanOutlined />}
-                        onClick={recognize}
-                        aria-label={t('recognize')}
-                      >
-                        {t('recognize')}
-                      </Button>
-                    </Tooltip>
-                  )}
-                </div>
-              </Form.Item>
-              {!categories.length && (
-                <Link href="/admin/materials/categories">{t('noCategories')}</Link>
-              )}
-              <div className="editor-field-tags material-full-width">
-                <Form.Item label={t('tags')}>
-                  <Select
-                    mode="multiple"
-                    showSearch
-                    optionFilterProp="label"
-                    value={tagIds}
-                    onChange={setTagIds}
-                    disabled={isAddingEntry}
-                    aria-label={t('tags')}
-                    placeholder={t('selectTags')}
-                    options={tags.map((item) => ({ value: item.id, label: item.name }))}
-                  />
-                </Form.Item>
-                {!isAddingEntry && (
-                  <Tooltip title={tagText('new')}>
-                    <Button
-                      icon={<PlusOutlined />}
-                      aria-label={tagText('new')}
-                      onClick={() => {
-                        tagForm.resetFields();
-                        setTagModalOpen(true);
-                      }}
-                    />
-                  </Tooltip>
-                )}
-              </div>
-              <Form.Item
-                label={t('unit')}
-                className="material-full-width"
-                extra={!isNew && linkedEntries.length ? t('unitLocked') : undefined}
-              >
-                <Radio.Group
-                  value={draft.unit}
-                  aria-label={t('unit')}
-                  disabled={isAddingEntry || (!isNew && linkedEntries.length > 0)}
-                  onChange={(event) => change('unit', event.target.value)}
-                  options={[
-                    { label: t('STRAND'), value: 'STRAND' },
-                    { label: t('BEAD'), value: 'BEAD' },
-                    { label: t('GRAM'), value: 'GRAM' },
-                  ]}
-                />
-              </Form.Item>
-            </div>
-            {!isMasterEdit && (
-              <>
-                <h3 className="material-subheading">{t('dimensions')}</h3>
-                <div className="material-field-grid material-three-columns">
-                  <Form.Item label={t('lengthMm')}>{amount('lengthMm', 'mm', true)}</Form.Item>
-                  <Form.Item label={t('widthMm')}>{amount('widthMm', 'mm', true)}</Form.Item>
-                  <Form.Item label={t('heightMm')}>{amount('heightMm', 'mm', true)}</Form.Item>
-                </div>
-              </>
-            )}
-          </section>
+          <MaterialBasicFields
+            values={draft}
+            categories={categories}
+            tags={tags}
+            tagIds={tagIds}
+            onTagsChange={setTagIds}
+            onTagCreated={(tag) =>
+              setTags((items) => [...items, tag].sort((a, b) => a.name.localeCompare(b.name)))
+            }
+            onCategoryCreated={(category) => {
+              setCategories((items) =>
+                [...items, category].sort((a, b) => a.name.localeCompare(b.name)),
+              );
+            }}
+            onChange={change}
+            onValuesChange={setDraft}
+            onAliasesChange={(aliases) => setDraft((current) => ({ ...current, aliases }))}
+            isAddingEntry={isAddingEntry}
+            isMasterEdit={isMasterEdit}
+            unitLocked={!isNew && linkedEntries.length > 0}
+            submitted={submitted}
+          />
           {!isMasterEdit && (!entryId || isAddingEntry) && (
             <BatchSelector selection={selection} onChange={setSelection} batches={batches} />
           )}
@@ -765,130 +559,25 @@ export function MaterialEditor({
               </Form.Item>
             </section>
           )}
-          {!isMasterEdit && (
-            <PurchaseFields
-              values={draft}
-              purchase={purchase}
-              quantity={receivedQty}
-              quantityUnknown={quantityUnknown}
-              onQuantityChange={setReceivedQty}
-              onUnknownChange={setQuantityUnknown}
-              onPurchaseChange={setPurchase}
-              onModeChange={changeMode}
-              onValueChange={change}
-            />
-          )}
-          {!isMasterEdit && (
-            <section className="editor-block">
-              <h2>{t('images')}</h2>
-              <ImagePicker
-                images={images}
-                onChange={setImages}
-                onUploadingChange={setUploadingImages}
-                disabled={saving}
-              />
-            </section>
-          )}
-          {!isMasterEdit && draft.unit === 'STRAND' && (
-            <section className="editor-block">
-              <h2>{t('purchaseDetails')}</h2>
-              <div className="material-field-grid material-three-columns">
-                <Form.Item label={t('childCount')}>
-                  <InputNumber<number>
-                    value={draft.childCount}
-                    aria-label={t('childCount')}
-                    onChange={(value) => change('childCount', value)}
-                    min={1}
-                    max={2147483647}
-                    precision={0}
-                    style={{ width: '100%' }}
-                  />
-                </Form.Item>
-                <Form.Item label={t('childWeightGrams')}>
-                  {amount('childWeightGrams', 'g', true)}
-                </Form.Item>
-                <Form.Item label={t('childUnitPrice')}>
-                  {amount('childUnitPrice', t('yuanPerBead'))}
-                  {draft.childPriceSource && draft.childPriceSource !== 'CUSTOM' && (
-                    <div className="material-source-label">
-                      {t(`source_${draft.childPriceSource}`)}
-                    </div>
-                  )}
-                  <div className="material-price-suggestions">
-                    <div>
-                      <span>
-                        {t('byCount')}: {candidates.count ?? '—'}
-                      </span>
-                      <Button
-                        type="link"
-                        size="small"
-                        disabled={candidates.count === null}
-                        onClick={() =>
-                          setDraft((current) =>
-                            recalculateMaterial({
-                              ...current,
-                              childUnitPrice: candidates.count,
-                              childPriceSource: 'COUNT',
-                            }),
-                          )
-                        }
-                      >
-                        {t('adopt')}
-                      </Button>
-                    </div>
-                    <div>
-                      <span>
-                        {t('byWeight')}: {candidates.weight ?? '—'}
-                      </span>
-                      <Button
-                        type="link"
-                        size="small"
-                        disabled={candidates.weight === null}
-                        onClick={() =>
-                          setDraft((current) =>
-                            recalculateMaterial({
-                              ...current,
-                              childUnitPrice: candidates.weight,
-                              childPriceSource: 'WEIGHT',
-                            }),
-                          )
-                        }
-                      >
-                        {t('adopt')}
-                      </Button>
-                    </div>
-                  </div>
-                </Form.Item>
-              </div>
-            </section>
-          )}
-          {!isMasterEdit && (
-            <MaterialSaleFields
-              values={draft}
-              onChange={change}
-              onRuleChange={changeRule}
-              onAdopt={() =>
-                setDraft((current) =>
-                  adoptSaleUnitPriceFromBeads(
-                    calculatePurchase(current, purchase, effectiveQuantity).values,
-                  ),
-                )
-              }
-            />
-          )}
-          {!entryId && (
-            <section className="editor-block">
-              <h2>{t('notes')}</h2>
-              <Input.TextArea
-                value={draft.notes}
-                aria-label={t('notes')}
-                onChange={(event) => change('notes', event.target.value)}
-                maxLength={10000}
-                rows={4}
-                showCount
-              />
-            </section>
-          )}
+          <MaterialDetailFields
+            values={draft}
+            purchase={purchase}
+            quantity={receivedQty}
+            quantityUnknown={quantityUnknown}
+            onQuantityChange={setReceivedQty}
+            onUnknownChange={setQuantityUnknown}
+            onPurchaseChange={setPurchase}
+            onModeChange={changeMode}
+            onChange={change}
+            onRuleChange={changeRule}
+            onValuesChange={setDraft}
+            images={images}
+            onImagesChange={setImages}
+            onUploadingChange={setUploadingImages}
+            disabled={saving}
+            showDetails={!isMasterEdit}
+            showNotes={!entryId}
+          />
           <div className="editor-actions">
             <Link href={returnPath} replace>
               <Button>{common('cancel')}</Button>
@@ -905,31 +594,6 @@ export function MaterialEditor({
           </div>
         </div>
       </Form>
-      <Modal
-        title={tagText('newTitle')}
-        open={tagModalOpen}
-        onCancel={() => {
-          if (!creatingTag) {
-            tagForm.resetFields();
-            setTagModalOpen(false);
-          }
-        }}
-        onOk={() => tagForm.submit()}
-        okText={common('save')}
-        cancelText={common('cancel')}
-        confirmLoading={creatingTag}
-        forceRender
-      >
-        <Form form={tagForm} layout="vertical" onFinish={createTag}>
-          <Form.Item
-            name="name"
-            label={tagText('name')}
-            rules={[{ required: true, whitespace: true, max: 60 }]}
-          >
-            <Input maxLength={60} autoFocus />
-          </Form.Item>
-        </Form>
-      </Modal>
     </>
   );
 }

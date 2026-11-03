@@ -22,7 +22,11 @@ import type {
   DistributorPage,
 } from '@/lib/client-types';
 import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
+import { coverFirstAttachments } from '@/lib/attachments';
+import { ImageHoverPreview } from './materialManagement/imageHoverPreview';
 import { DistributorEditorDrawer } from './distributor-editor-drawer';
+
+const pagination = { ...CLIENT_TABLE_PAGINATION, defaultPageSize: 20 };
 
 export function DistributorsPage() {
   const t = useTranslations('distributors');
@@ -148,9 +152,17 @@ export function DistributorsPage() {
       key: 'name',
       width: 180,
       render: (name: string, item: Distributor) => (
-        <Link className="product-name" href={`/admin/distributors/${item.id}`}>
-          {name}
-        </Link>
+        <div className="product-cell">
+          <ImageHoverPreview
+            key={item.coverObjectKey ?? item.attachments?.[0]?.objectKey ?? item.id}
+            images={coverFirstAttachments(item.attachments ?? [], item.coverObjectKey)}
+            coverObjectKey={item.coverObjectKey ?? null}
+            name={name}
+          />
+          <Link className="product-name" href={`/admin/distributors/${item.id}`}>
+            {name}
+          </Link>
+        </div>
       ),
     },
     { title: t('area'), dataIndex: 'area', key: 'area', width: 110, render: areaLabel },
@@ -339,7 +351,7 @@ export function DistributorsPage() {
           columns={columns}
           loading={loading}
           scroll={{ x: 1200 }}
-          pagination={CLIENT_TABLE_PAGINATION}
+          pagination={pagination}
           locale={{ emptyText: <Empty description={t('empty')} /> }}
         />
       </div>
@@ -371,7 +383,7 @@ export function DistributorsPage() {
           dataSource={areaItems}
           columns={areaColumns}
           loading={loading}
-          pagination={CLIENT_TABLE_PAGINATION}
+          pagination={pagination}
           size="small"
           scroll={{ x: 400 }}
           locale={{ emptyText: <Empty description={t('emptyAreas')} /> }}

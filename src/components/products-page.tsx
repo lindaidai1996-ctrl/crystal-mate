@@ -5,8 +5,10 @@ import {
   EditOutlined,
   PlusOutlined,
   SearchOutlined,
+  ScanOutlined,
   FileTextOutlined,
   CopyOutlined,
+  FileExcelOutlined,
 } from '@ant-design/icons';
 import {
   App,
@@ -16,8 +18,8 @@ import {
   Popconfirm,
   Result,
   Select,
+  Space,
   Skeleton,
-  Switch,
   Tag,
   Tooltip,
 } from 'antd';
@@ -26,13 +28,19 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState, useDeferredValue, useCallback } from 'react';
 import { Link } from '@/i18n/navigation';
 import { PaginatedTable } from '@/components/paginated-table';
+import { DateRangeFilter } from '@/components/date-range-filter';
+import type { DateRange } from '@/lib/date-range';
+import {
+  CabochonMarketingStatus,
+  type CabochonMarketingField,
+} from '@/components/catalog/cabochonMarketingStatus';
 import { StockAdjustmentDrawer } from '@/components/inventory/stockAdjustmentDrawer';
 import { TextTag } from '@/components/text-tag';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { Category, Product, ProductPage, Tag as CatalogTag } from '@/lib/client-types';
 import { catalogPath, type CatalogScope } from '@/lib/catalog-scopes';
 import { generateProductDetails } from '@/lib/generate-product-details';
-import { CLIENT_TABLE_PAGINATION, DEFAULT_TABLE_PAGE_SIZE } from '@/lib/table-pagination';
+import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
 import { MissingCategoryState } from './missing-category-state';
 import { ImageHoverPreview } from './materialManagement/imageHoverPreview';
 
@@ -47,16 +55,10 @@ const cabochonDateTimeFormatter = new Intl.DateTimeFormat('en-GB', {
   hourCycle: 'h23',
 });
 
-const cabochonMarketingFields = [
-  { key: 'videoShot', width: 160 },
-  { key: 'xiaohongshuVideoPublished', width: 210 },
-  { key: 'xiaohongshuListed', width: 160 },
-] as const;
-
-type CabochonMarketingField = (typeof cabochonMarketingFields)[number]['key'];
-
 export function ProductsPage({ scope }: { scope?: CatalogScope }) {
   const t = useTranslations('products');
+  const diyImport = useTranslations('diyImport');
+  const excelImport = useTranslations('cabochonExcel');
   const inventory = useTranslations('inventory');
   const common = useTranslations('common');
   const catalog = useTranslations('catalog');
@@ -75,15 +77,16 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
   const [tagId, setTagId] = useState<string>();
   const [published, setPublished] = useState<string>();
   const [stock, setStock] = useState<string>();
+  const [createdRange, setCreatedRange] = useState<DateRange>(null);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_TABLE_PAGE_SIZE);
+  const [pageSize, setPageSize] = useState(20);
   const [revision, setRevision] = useState(0);
   const [stockProduct, setStockProduct] = useState<Product | null>(null);
   const [data, setData] = useState<ProductPage>({
     items: [],
     total: 0,
     page: 1,
-    pageSize: DEFAULT_TABLE_PAGE_SIZE,
+    pageSize: 20,
   });
   const [loading, setLoading] = useState(true);
   const [pendingMarketing, setPendingMarketing] = useState<Record<string, boolean>>({});
@@ -141,6 +144,10 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
     if (tagId) params.set('tagId', tagId);
     if (published) params.set('published', published);
     if (stock) params.set('stock', stock);
+    if (createdRange) {
+      params.set('createdFrom', createdRange[0]);
+      params.set('createdTo', createdRange[1]);
+    }
     apiFetch<ProductPage>(`/api/products?${params}`, { signal: controller.signal })
       .then(setData)
       .catch((error) => {
@@ -158,6 +165,7 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
     tagId,
     published,
     stock,
+    createdRange,
     page,
     pageSize,
     revision,
@@ -176,9 +184,11 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
     }
   }
 
-  async function copyProductInfo(measurement: Product['measurement']) {
+  async function copyProductInfo(product: Product) {
     try {
-      await navigator.clipboard.writeText(generateProductDetails(measurement));
+      await navigator.clipboard.writeText(
+        generateProductDetails(product.measurement, product.extraInfo?.settingStyle?.magicBoxStyle),
+      );
       message.success(marketingConfig('copied'));
     } catch {
       message.error(marketingConfig('copyFailed'));
@@ -251,6 +261,13 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
     ...(isCabochon
       ? [
           {
+            title: t('setting'),
+            key: 'setting',
+            width: 160,
+            render: (_: unknown, item: Product) =>
+              item.extraInfo?.settingStyle?.magicBoxStyle || editor('unknownSettingStyle'),
+          },
+          {
             title: t('dimensions'),
             dataIndex: 'measurement',
             key: 'measurement',
@@ -294,23 +311,20 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
         ]
       : []),
     ...(isCabochon
-      ? cabochonMarketingFields.map(({ key, width }) => ({
-          title: editor(key),
-          key,
-          width,
-          render: (_: unknown, item: Product) => {
-            const pendingKey = `${item.id}:${key}`;
-            return (
-              <Switch
-                aria-label={`${item.name}：${editor(key)}`}
-                checked={item.marketing?.[key] ?? false}
-                loading={Boolean(pendingMarketing[pendingKey])}
-                disabled={Boolean(pendingMarketing[pendingKey])}
-                onChange={(checked) => void updateMarketing(item.id, key, checked)}
+      ? [
+          {
+            title: editor('marketing'),
+            key: 'marketing',
+            width: 240,
+            render: (_: unknown, item: Product) => (
+              <CabochonMarketingStatus
+                product={item}
+                pending={pendingMarketing}
+                onChange={updateMarketing}
               />
-            );
+            ),
           },
-        }))
+        ]
       : []),
     {
       title: t('updated'),
@@ -352,7 +366,7 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
               <Button
                 type="text"
                 icon={<CopyOutlined />}
-                onClick={() => void copyProductInfo(item.measurement)}
+                onClick={() => void copyProductInfo(item)}
               >
                 {t('copyProductInfo')}
               </Button>
@@ -406,11 +420,23 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
           <h1>{scope ? common(scope.titleKey) : t('title')}</h1>
           <p>{t('count', { count: data.total })}</p>
         </div>
-        <Link href={`${listPath}/new`}>
-          <Button type="primary" icon={<PlusOutlined />}>
-            {t('new')}
-          </Button>
-        </Link>
+        <Space wrap>
+          {isCabochon && (
+            <Link href={`${listPath}/excel-import`}>
+              <Button icon={<FileExcelOutlined />}>{excelImport('entry')}</Button>
+            </Link>
+          )}
+          {!isCabochon && (
+            <Link href="/admin/products/diy-image-import">
+              <Button icon={<ScanOutlined />}>{diyImport('entry')}</Button>
+            </Link>
+          )}
+          <Link href={`${listPath}/new`}>
+            <Button type="primary" icon={<PlusOutlined />}>
+              {t('new')}
+            </Button>
+          </Link>
+        </Space>
       </div>
       <div className="filter-bar">
         <Input
@@ -484,6 +510,15 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
             { value: '1', label: t('inStock') },
             { value: '0', label: t('soldOut') },
           ]}
+        />
+        <DateRangeFilter
+          kind="created"
+          value={createdRange}
+          onChange={(range) => {
+            setLoading(true);
+            setCreatedRange(range);
+            setPage(1);
+          }}
         />
       </div>
       <div className="table-surface">

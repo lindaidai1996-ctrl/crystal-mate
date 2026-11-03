@@ -1,4 +1,5 @@
 import { apiFetch } from '@/lib/client-api';
+import type { ImageUploadPurpose } from '@/lib/image-storage';
 import { MAX_UPLOAD_BYTES } from './prepareImages';
 
 type UploadGrant = {
@@ -9,7 +10,7 @@ type UploadGrant = {
   mode: 'local' | 'cos';
 };
 
-export async function uploadImage(file: File) {
+export async function uploadImage(file: File, purpose: ImageUploadPurpose = 'catalog') {
   if (
     !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) ||
     file.size < 1 ||
@@ -19,7 +20,7 @@ export async function uploadImage(file: File) {
 
   const grant = await apiFetch<UploadGrant>('/api/uploads', {
     method: 'POST',
-    body: JSON.stringify({ type: file.type, size: file.size }),
+    body: JSON.stringify({ type: file.type, size: file.size, purpose }),
   });
   if (grant.mode === 'local') {
     const body = new FormData();

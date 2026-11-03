@@ -11,6 +11,7 @@ import { App, Button, Image, Spin, Upload, type UploadFile, Tooltip } from 'antd
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import type { ProductImage } from '@/lib/client-types';
+import type { ImageUploadPurpose } from '@/lib/image-storage';
 import { ImageUploadChoiceDialog } from './imageUpload/imageUploadChoiceDialog';
 import { AttachmentImageEditor } from './imageUpload/attachmentImageEditor';
 import { uploadImage } from './imageUpload/uploadImage';
@@ -20,11 +21,15 @@ export function ImagePicker({
   onChange,
   onUploadingChange,
   disabled = false,
+  maxImages = 12,
+  purpose = 'catalog',
 }: {
   images: ProductImage[];
   onChange: (images: ProductImage[]) => void;
   onUploadingChange?: (uploading: boolean) => void;
   disabled?: boolean;
+  maxImages?: number;
+  purpose?: ImageUploadPurpose;
 }) {
   const t = useTranslations('editor');
   const imageT = useTranslations('imageUpload');
@@ -46,7 +51,7 @@ export function ImagePicker({
     const objectKey = editing.objectKey;
     setEditing(null);
     try {
-      const replacement = await uploadImage(file);
+      const replacement = await uploadImage(file, purpose);
       onChange(
         images.map((image) =>
           image.objectKey === objectKey ? { ...replacement, position: image.position } : image,
@@ -69,7 +74,7 @@ export function ImagePicker({
 
   function selectFiles(files: File[]) {
     if (!files.length || busy || pendingFiles) return;
-    const selected = files.slice(0, 12 - images.length);
+    const selected = files.slice(0, maxImages - images.length);
     if (!selected.length) return;
     changeUploading(true);
     setPendingFiles(selected);
@@ -81,7 +86,7 @@ export function ImagePicker({
     try {
       for (const file of files) {
         try {
-          added.push(await uploadImage(file));
+          added.push(await uploadImage(file, purpose));
         } catch {
           message.error(t('uploadFailed'));
         }
@@ -109,7 +114,7 @@ export function ImagePicker({
         accept="image/jpeg,image/png,image/webp"
         multiple
         disabled={busy}
-        openFileDialogOnClick={images.length < 12}
+        openFileDialogOnClick={images.length < maxImages}
         fileList={fileList}
         isImageUrl={() => true}
         beforeUpload={(file, files) => {
@@ -205,7 +210,7 @@ export function ImagePicker({
           </Tooltip>
         )}
       >
-        {images.length < 12 && (
+        {images.length < maxImages && (
           <div className="image-picker-trigger">
             {uploading ? <Spin size="small" /> : <PlusOutlined />}
             <span>{uploading ? t('uploading') : t('upload')}</span>

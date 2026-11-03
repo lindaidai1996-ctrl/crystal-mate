@@ -4,6 +4,15 @@ import { productSaleRules } from './product-pricing';
 import { calculatePurchase, emptyPurchase } from './material-purchase';
 import { validMaterialQuantity } from './inventory';
 import { calculateDiyCost } from './product-diy-cost';
+import { imageObjectKeyPattern } from './image-storage';
+import { MAX_ATTACHMENTS } from './attachments';
+import { normalizeAliases } from './catalog-aliases';
+import { createdTimeFilterFields, validCreatedTimeRange } from './date-range';
+
+export const catalogAliasesSchema = z
+  .array(z.string().trim().max(120))
+  .max(20)
+  .transform(normalizeAliases);
 
 export const categorySchema = z.object({
   name: z.string().trim().min(1).max(60),
@@ -24,8 +33,20 @@ export const tagSchema = z.object({
   name: z.string().trim().min(1).max(60),
 });
 
+export const settingStyleSchema = z.strictObject({
+  magicBoxStyle: z.string().trim().min(1).max(60),
+});
+
+const coverObjectKeySchema = z.string().regex(imageObjectKeyPattern).nullable().optional();
+
 const imageAttachmentSchema = z.strictObject({
-  objectKey: z.string().regex(/^images\/[0-9a-f-]+\.(?:jpg|png|webp)$/),
+  source: z
+    .strictObject({
+      kind: z.enum(['MATERIAL_BATCH_IMAGE', 'MATERIAL_IMAGE', 'PRODUCT_IMAGE']),
+      id: z.string().cuid(),
+    })
+    .optional(),
+  objectKey: z.string().regex(imageObjectKeyPattern),
   fileName: z.string().trim().min(1).max(255),
   notes: z.string().trim().max(1000),
 });
@@ -37,7 +58,8 @@ export const distributorSchema = z.strictObject({
   wechat: z.string().trim().max(100),
   phone: z.string().trim().max(50),
   notes: z.string().trim().max(10000),
-  attachments: z.array(imageAttachmentSchema).max(12).optional(),
+  attachments: z.array(imageAttachmentSchema).max(MAX_ATTACHMENTS).optional(),
+  coverObjectKey: coverObjectKeySchema,
 });
 
 export const distributorAreaSchema = z.strictObject({
@@ -131,6 +153,7 @@ const baseProductSchema = z.object({
     .max(64)
     .regex(/^[A-Za-z0-9_-]+$/),
   name: z.string().trim().min(1).max(120),
+  aliases: catalogAliasesSchema.optional(),
   description: z.string().trim().max(10000),
   categoryId: z.string().cuid(),
   priceCents: z.number().int().min(0).max(2147483647),
@@ -159,18 +182,25 @@ const baseProductSchema = z.object({
   marketing: marketingSchema.optional(),
   measurement: measurementSchema.nullable().optional(),
   cost: cabochonCostSchema.nullable().optional(),
+  extraInfo: z.strictObject({ settingStyleId: z.string().cuid().nullable() }).nullable().optional(),
 });
 
-export const listSchema = z.object({
-  q: z.string().trim().max(120).optional(),
-  categoryId: z.string().optional(),
-  excludeCategoryName: z.literal('蛋面').optional(),
-  tagId: z.string().cuid().optional(),
-  published: z.enum(['true', 'false']).optional(),
-  stock: z.enum(['0', '1']).optional(),
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(50).default(10),
-});
+export const listSchema = z
+  .object({
+    ...createdTimeFilterFields,
+    q: z.string().trim().max(120).optional(),
+    categoryId: z.string().optional(),
+    excludeCategoryName: z.literal('蛋面').optional(),
+    tagId: z.string().cuid().optional(),
+    published: z.enum(['true', 'false']).optional(),
+    stock: z.enum(['0', '1']).optional(),
+    page: z.coerce.number().int().min(1).default(1),
+    pageSize: z.coerce.number().int().min(1).max(50).default(20),
+  })
+  .refine(validCreatedTimeRange, {
+    path: ['createdTo'],
+    message: 'End time must not precede start time',
+  });
 
 const materialDecimal = z.string().regex(/^\d{1,10}(?:\.\d{1,2})?$/);
 const nullableAmount = materialDecimal.nullable();
@@ -190,6 +220,7 @@ export const materialCategorySchema = z.strictObject({
 export const materialSchema = z
   .strictObject({
     name: z.string().trim().min(1).max(120),
+    aliases: catalogAliasesSchema.default([]),
     categoryId: z.string().cuid(),
     unit: z.enum(['STRAND', 'BEAD', 'GRAM']),
     purchaseUnitPrice: nullableAmount,
@@ -209,6 +240,7 @@ export const materialSchema = z
       'PERCENT_20',
       'PERCENT_30',
       'PERCENT_50',
+      'PERCENT_60',
       'FIXED_AMOUNT',
       'CUSTOM_PERCENT',
       'CUSTOM_AMOUNT',
@@ -250,15 +282,24 @@ export const materialSchema = z
     }
   });
 
-export const materialListSchema = z.object({
-  q: z.string().trim().max(120).optional(),
-  categoryId: z.string().cuid().optional(),
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(50).default(10),
-});
+export const materialListSchema = z
+  .object({
+    ...createdTimeFilterFields,
+    q: z.string().trim().max(120).optional(),
+    categoryId: z.string().cuid().optional(),
+    categoryGroup: z.enum(['silver', 'hetian']).optional(),
+    source: z.enum(['IMAGE_IMPORT', 'OTHER']).optional(),
+    page: z.coerce.number().int().min(1).default(1),
+    pageSize: z.coerce.number().int().min(1).max(50).default(20),
+  })
+  .refine(validCreatedTimeRange, {
+    path: ['createdTo'],
+    message: 'End time must not precede start time',
+  });
 
 export const materialMasterSchema = z.strictObject({
   name: z.string().trim().min(1).max(120),
+  aliases: catalogAliasesSchema.optional(),
   categoryId: z.string().cuid(),
   tagIds: z
     .array(z.string().cuid())
@@ -276,7 +317,8 @@ const batchHeaderSchema = z.strictObject({
 
 export const materialBatchHeaderSchema = batchHeaderSchema;
 export const materialBatchWriteSchema = batchHeaderSchema.extend({
-  attachments: z.array(imageAttachmentSchema).max(12).default([]),
+  attachments: z.array(imageAttachmentSchema).max(MAX_ATTACHMENTS).default([]),
+  coverObjectKey: coverObjectKeySchema,
 });
 export const materialBatchSelectionSchema = z.union([
   z.strictObject({ batchId: z.string().cuid() }),
@@ -372,6 +414,20 @@ export const productSchema = baseProductSchema
       input.saleRule !== undefined ||
       input.saleRuleValue !== undefined ||
       input.saleManual !== undefined;
+    if (input.saleRule === 'CUSTOM_AMOUNT') {
+      if (input.saleManual !== true)
+        context.addIssue({
+          code: 'custom',
+          path: ['saleManual'],
+          message: 'Custom amount requires manual pricing',
+        });
+      if (input.saleRuleValue != null)
+        context.addIssue({
+          code: 'custom',
+          path: ['saleRuleValue'],
+          message: 'Custom amount does not use a markup parameter',
+        });
+    }
     if (input.saleRule !== 'FIXED_AMOUNT' && input.saleRuleValue?.startsWith('-'))
       context.addIssue({
         code: 'custom',

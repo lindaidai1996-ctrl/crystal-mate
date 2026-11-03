@@ -18,6 +18,7 @@ import type {
   DistributorPurchaseSummary,
 } from '@/lib/client-types';
 import { DistributorEditorDrawer } from './distributor-editor-drawer';
+import { distributorPurchasePriceColumns } from './distributorPurchasePriceColumns';
 
 type PurchaseType = 'all' | 'product' | 'material';
 
@@ -179,6 +180,7 @@ export function DistributorDetailPage({ id }: { id: string }) {
         dataIndex: 'unitPrice',
         render: (value: string | null) => value ?? '—',
       },
+      ...distributorPurchasePriceColumns<DistributorPurchaseEntry>(t),
       {
         title: t('amount'),
         dataIndex: 'amount',
@@ -225,7 +227,7 @@ export function DistributorDetailPage({ id }: { id: string }) {
             : false
         }
         locale={{ emptyText: <Empty description={t('emptyEntries')} /> }}
-        scroll={{ x: 900 }}
+        scroll={{ x: 1320 }}
       />
     );
   }
@@ -261,6 +263,7 @@ export function DistributorDetailPage({ id }: { id: string }) {
         </Link>
       ),
     },
+    ...distributorPurchasePriceColumns<DistributorPurchaseSummary>(t),
     { title: t('batchCount'), dataIndex: 'batchCount', key: 'batchCount', width: 90 },
     {
       title: t('latestReceivedAt'),
@@ -447,7 +450,7 @@ export function DistributorDetailPage({ id }: { id: string }) {
                 : false
             }
             locale={{ emptyText: <Empty description={t('empty')} /> }}
-            scroll={{ x: 1050 }}
+            scroll={{ x: 1470 }}
           />
         )}
       </div>

@@ -2,25 +2,29 @@ import { Readable } from 'node:stream';
 import { NextRequest } from 'next/server';
 import { ApiError, apiError, requireAdmin } from '@/lib/api';
 import { cosConfig, MAX_IMAGE_BYTES, storageMode } from '@/lib/media';
+import { imageObjectKeyPattern } from '@/lib/image-storage';
 
-const imageName =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.(jpg|png|webp)$/;
 const contentTypes: Record<string, string> = {
   jpg: 'image/jpeg',
   png: 'image/png',
   webp: 'image/webp',
 };
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ name: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ path: string[] }> },
+) {
   try {
     await requireAdmin(request);
     if (storageMode() !== 'cos') throw new ApiError(404, 'NOT_FOUND');
-    const { name } = await params;
-    const match = imageName.exec(name);
-    if (!match) throw new ApiError(404, 'NOT_FOUND');
+    const { path } = await params;
+    if ((path.length !== 1 && path.length !== 3) || path.some((part) => part.includes('/')))
+      throw new ApiError(404, 'NOT_FOUND');
+    const key = path.length === 1 ? `images/${path[0]}` : path.join('/');
+    if (!imageObjectKeyPattern.test(key)) throw new ApiError(404, 'NOT_FOUND');
 
     const { client, bucket, region } = cosConfig();
-    const object = { Bucket: bucket, Region: region, Key: `images/${name}` };
+    const object = { Bucket: bucket, Region: region, Key: key };
     let metadata;
     try {
       metadata = await client.headObject(object);
@@ -36,7 +40,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const stream = client.getObjectStream(object) as Readable;
     return new Response(Readable.toWeb(stream) as ReadableStream<Uint8Array>, {
       headers: {
-        'Content-Type': contentTypes[match[1]],
+        'Content-Type': contentTypes[key.slice(key.lastIndexOf('.') + 1)],
         'Content-Length': String(size),
         'Cache-Control': 'private, max-age=3600',
         'X-Content-Type-Options': 'nosniff',

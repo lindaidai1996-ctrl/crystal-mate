@@ -11,7 +11,10 @@ import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { MaterialBatch } from '@/lib/client-types';
 import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
 import { BatchEditorDrawer } from './batchEditorDrawer';
+import { coverFirstAttachments } from '@/lib/attachments';
 import { ImageHoverPreview } from './imageHoverPreview';
+import { DateRangeFilter } from '@/components/date-range-filter';
+import { inDateRange, type DateRange } from '@/lib/date-range';
 
 export function MaterialBatchesPage() {
   const t = useTranslations('materialBatches');
@@ -19,12 +22,19 @@ export function MaterialBatchesPage() {
   const { message } = App.useApp();
   const [items, setItems] = useState<MaterialBatch[]>([]);
   const [query, setQuery] = useState('');
+  const [receivedRange, setReceivedRange] = useState<DateRange>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<MaterialBatch | null | undefined>(undefined);
   const visible = useMemo(() => {
     const term = query.trim().toLocaleLowerCase();
-    return term ? items.filter((item) => item.name.toLocaleLowerCase().includes(term)) : items;
-  }, [items, query]);
+    return items.filter(
+      (item) =>
+        (!term || item.name.toLocaleLowerCase().includes(term)) &&
+        inDateRange(item.receivedAt, receivedRange),
+    );
+  }, [items, query, receivedRange]);
 
   function showError(error: unknown) {
     message.error(
@@ -45,6 +55,9 @@ export function MaterialBatchesPage() {
     try {
       await apiFetch(`/api/material-batches/${id}`, { method: 'DELETE' });
       setItems((current) => current.filter((item) => item.id !== id));
+      setPage((current) =>
+        Math.min(current, Math.max(1, Math.ceil((visible.length - 1) / pageSize))),
+      );
       message.success(common('deleted'));
     } catch (error) {
       showError(error);
@@ -57,7 +70,12 @@ export function MaterialBatchesPage() {
       key: 'name',
       render: (_, item) => (
         <div className="product-cell">
-          <ImageHoverPreview images={item.attachments ?? []} name={item.name} />
+          <ImageHoverPreview
+            key={item.coverObjectKey ?? item.attachments?.[0]?.objectKey ?? item.id}
+            images={coverFirstAttachments(item.attachments ?? [], item.coverObjectKey)}
+            coverObjectKey={item.coverObjectKey ?? null}
+            name={item.name}
+          />
           <Link className="product-name" href={`/admin/materials/batches/${item.id}`}>
             {item.name}
           </Link>
@@ -142,10 +160,21 @@ export function MaterialBatchesPage() {
         <Input.Search
           className="filter-search"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setPage(1);
+          }}
           placeholder={t('search')}
           aria-label={t('search')}
           allowClear
+        />
+        <DateRangeFilter
+          kind="received"
+          value={receivedRange}
+          onChange={(range) => {
+            setReceivedRange(range);
+            setPage(1);
+          }}
         />
       </div>
       <div className="table-surface">
@@ -155,7 +184,15 @@ export function MaterialBatchesPage() {
           dataSource={visible}
           loading={loading}
           scroll={{ x: 760 }}
-          pagination={CLIENT_TABLE_PAGINATION}
+          pagination={{
+            ...CLIENT_TABLE_PAGINATION,
+            current: page,
+            pageSize,
+            onChange: (nextPage, nextPageSize) => {
+              setPage(nextPageSize === pageSize ? nextPage : 1);
+              setPageSize(nextPageSize);
+            },
+          }}
           locale={{ emptyText: <Empty description={t('emptyBatches')} /> }}
         />
       </div>
@@ -163,13 +200,14 @@ export function MaterialBatchesPage() {
         <BatchEditorDrawer
           batch={editing}
           onClose={() => setEditing(undefined)}
-          onSaved={(batch) =>
+          onSaved={(batch) => {
+            setPage(1);
             setItems((current) =>
               current.some((item) => item.id === batch.id)
                 ? current.map((item) => (item.id === batch.id ? batch : item))
                 : [batch, ...current],
-            )
-          }
+            );
+          }}
         />
       )}
     </>

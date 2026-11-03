@@ -104,13 +104,26 @@ describe.skipIf(!enabled)('custom material sale prices', () => {
         saleChildUnitPrice: '3.00',
         childCount: 60,
       });
-      update.values = { ...update.values, ...editMaterial(changed, 'saleRule', 'PERCENT_20') };
+      update.values = { ...update.values, ...editMaterial(changed, 'saleRule', 'PERCENT_60') };
       expect(await updateMaterialEntry(materialId, entryId, update)).toMatchObject({
-        saleRule: 'PERCENT_20',
-        saleUnitPrice: '36.00',
-        saleChildUnitPrice: '0.60',
+        saleRule: 'PERCENT_60',
+        saleUnitPrice: '48.00',
+        saleGramPrice: '3.00',
+        saleChildUnitPrice: '1.00',
         saleUnitManual: false,
         saleChildManual: false,
+      });
+      const rounded = serializeMaterial(
+        await db.material.findUniqueOrThrow({
+          where: { id: materialId },
+          include: materialInclude,
+        }),
+      );
+      expect(rounded.batchEntries[0]).toMatchObject({
+        saleRule: 'PERCENT_60',
+        saleUnitPrice: '48.00',
+        saleGramPrice: '3.00',
+        saleChildUnitPrice: '1.00',
       });
     } finally {
       if (materialId) {

@@ -14,6 +14,8 @@ const dimensionFields = ['lengthMm', 'widthMm', 'heightMm'] as const;
 export function ProductMarketingConfig({ id }: { id: string }) {
   const t = useTranslations('marketingConfig');
   const catalog = useTranslations('catalog');
+  const products = useTranslations('products');
+  const editor = useTranslations('editor');
   const { message } = App.useApp();
   const [product, setProduct] = useState<Product | null>(null);
   const [content, setContent] = useState('');
@@ -103,6 +105,12 @@ export function ProductMarketingConfig({ id }: { id: string }) {
               <span>{formatDimension(product.measurement, field, t('missingDimension'))}</span>
             </div>
           ))}
+          <div className="marketing-config-setting">
+            <span className="marketing-config-label">{products('setting')}</span>
+            <span>
+              {product.extraInfo?.settingStyle?.magicBoxStyle || editor('unknownSettingStyle')}
+            </span>
+          </div>
         </div>
       </section>
       <section className="editor-section marketing-config-section">
@@ -118,7 +126,14 @@ export function ProductMarketingConfig({ id }: { id: string }) {
             <Button
               type="primary"
               icon={<FileTextOutlined />}
-              onClick={() => setContent(generateProductDetails(product.measurement))}
+              onClick={() =>
+                setContent(
+                  generateProductDetails(
+                    product.measurement,
+                    product.extraInfo?.settingStyle?.magicBoxStyle,
+                  ),
+                )
+              }
             >
               {t('generate')}
             </Button>

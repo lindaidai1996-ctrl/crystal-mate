@@ -120,11 +120,13 @@ export function ProductPricingFields({
       </div>
       <p className="product-pricing-help">
         {t(
-          value.saleManual
-            ? 'manualPriceHelp'
-            : quote !== undefined
-              ? 'diyAutoPriceHelp'
-              : 'autoPriceHelp',
+          value.saleRule === 'CUSTOM_AMOUNT'
+            ? 'customAmountHelp'
+            : value.saleManual
+              ? 'manualPriceHelp'
+              : quote !== undefined
+                ? 'diyAutoPriceHelp'
+                : 'autoPriceHelp',
         )}
       </p>
     </div>

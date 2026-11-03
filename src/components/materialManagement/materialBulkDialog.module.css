@@ -1,0 +1,56 @@
+.content,
+.section,
+.material {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+}
+.section {
+  padding: 20px 0;
+  border-top: 1px solid var(--ant-color-border-secondary);
+}
+.heading,
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer {
+  justify-content: flex-end;
+}
+.input {
+  width: 100%;
+}
+.hint {
+  color: var(--ant-color-text-secondary);
+  margin: 0;
+}
+.targets {
+  max-height: 320px;
+  overflow: auto;
+}
+.material {
+  padding: 12px 0;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.grid :global(.ant-form-item) {
+  margin-bottom: 0;
+}
+.issues {
+  padding-left: 20px;
+  margin-bottom: 0;
+  overflow-wrap: anywhere;
+}

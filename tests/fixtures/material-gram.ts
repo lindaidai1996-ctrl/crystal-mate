@@ -3,6 +3,7 @@ import { emptyPurchase } from '../../src/lib/material-purchase';
 
 export const gramValues = (): MaterialValues => ({
   name: '银料',
+  aliases: [],
   categoryId: 'clx1234567890123456789012',
   unit: 'GRAM',
   purchaseUnitPrice: null,

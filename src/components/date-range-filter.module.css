@@ -1,0 +1,16 @@
+.dateTime {
+  width: 420px;
+  max-width: 100%;
+}
+
+.date {
+  width: 290px;
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .dateTime,
+  .date {
+    width: 100%;
+  }
+}

@@ -52,6 +52,7 @@ model Distributor {
   updatedAt              DateTime                @updatedAt
   materialBatchEntries   MaterialBatchEntry[]
   productPurchaseEntries ProductPurchaseEntry[]
+  coverObjectKey         String?
   attachments            DistributorAttachment[]
 
   @@index([area])
@@ -62,7 +63,7 @@ model DistributorAttachment {
   id            String      @id @default(cuid())
   distributorId String
   distributor   Distributor @relation(fields: [distributorId], references: [id], onDelete: Cascade)
-  objectKey     String      @unique
+  objectKey     String
   url           String
   fileName      String
   notes         String      @default("") @db.Text
@@ -70,12 +71,14 @@ model DistributorAttachment {
   createdAt     DateTime    @default(now())
 
   @@unique([distributorId, position])
+  @@unique([distributorId, objectKey])
 }
 
 model Product {
   id               String                   @id @default(cuid())
   code             String                   @unique
   name             String
+  aliases          String[]                 @default([])
   description      String                   @default("") @db.Text
   categoryId       String
   category         Category                 @relation(fields: [categoryId], references: [id], onDelete: Restrict)
@@ -92,7 +95,9 @@ model Product {
   marketing        ProductMarketing?
   measurement      CabochonMeasurement?
   cost             CabochonCost?
+  extraInfo        CabochonExtraInfo?
   purchaseEntries  ProductPurchaseEntry[]
+  diyImageImports  DiyImageImport[]
   diyRuns          ProductDiyRun[]
   diyInputs        ProductDiyCabochon[]     @relation("DiyCabochonInput")
   stockAdjustments ProductStockAdjustment[]
@@ -117,6 +122,21 @@ model ProductCode {
   @@index([prefix, sequence(sort: Desc)])
 }
 
+/// Reviewed spreadsheet drafts and durable per-row receipts for historical cabochons.
+model CabochonExcelImport {
+  id        String   @id @db.Uuid
+  fileHash  String
+  fileName  String
+  sheetName String
+  rows      Json
+  version   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([fileHash, sheetName])
+  @@index([updatedAt])
+}
+
 enum ProductOrigin {
   PURCHASED
   DIY
@@ -130,6 +150,7 @@ enum ProductSaleRule {
   PERCENT_200
   FIXED_AMOUNT
   CUSTOM_PERCENT
+  CUSTOM_AMOUNT
 }
 
 enum DiyUsageUnit {
@@ -158,6 +179,7 @@ model ProductPurchaseEntry {
 }
 
 model ProductDiyRun {
+  imageImport          DiyImageImport?
   id                   String               @id @default(cuid())
   productId            String
   product              Product              @relation(fields: [productId], references: [id], onDelete: Restrict)
@@ -265,6 +287,23 @@ model CabochonCost {
   totalManual    Boolean  @default(false)
 }
 
+model SettingStyle {
+  id            String              @id @default(cuid())
+  magicBoxStyle String              @unique
+  cabochons     CabochonExtraInfo[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+}
+
+model CabochonExtraInfo {
+  productId      String        @id
+  product        Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  settingStyleId String?
+  settingStyle   SettingStyle? @relation(fields: [settingStyleId], references: [id], onDelete: Restrict)
+
+  @@index([settingStyleId])
+}
+
 model ProductTag {
   productId String
   tagId     String
@@ -296,6 +335,48 @@ model UploadGrant {
   usedAt     DateTime?
 }
 
+/// Recognition drafts are kept separate from stock until explicitly committed.
+model MaterialImageImport {
+  id            String                    @id @default(cuid())
+  sourceKey     String                    @unique
+  sourceUrl     String
+  fileName      String
+  width         Int
+  height        Int
+  provider      String
+  model         String
+  promptVersion String
+  status        String                    @default("DRAFT")
+  version       Int                       @default(0)
+  settings      Json
+  warnings      Json
+  errorCode     String?
+  runToken      String?
+  leaseUntil    DateTime?
+  archivedAt    DateTime?
+  items         MaterialImageImportItem[]
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+
+  @@index([createdAt])
+}
+
+model MaterialImageImportItem {
+  id         String              @id @default(uuid())
+  importId   String
+  import     MaterialImageImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+  position   Int
+  data       Json
+  materialId String?
+  material   Material?           @relation(fields: [materialId], references: [id], onDelete: SetNull)
+  entryId    String?             @unique
+  entry      MaterialBatchEntry? @relation(fields: [entryId], references: [id], onDelete: SetNull)
+  createdAt  DateTime            @default(now())
+
+  @@unique([importId, position])
+  @@index([materialId])
+}
+
 enum MaterialUnit {
   STRAND
   BEAD
@@ -314,6 +395,7 @@ enum MaterialSaleRule {
   PERCENT_20
   PERCENT_30
   PERCENT_50
+  PERCENT_60
   FIXED_AMOUNT
   CUSTOM_PERCENT
   CUSTOM_AMOUNT
@@ -336,6 +418,7 @@ model MaterialCategory {
 model Material {
   id                 String               @id @default(cuid())
   name               String
+  aliases            String[]             @default([])
   categoryId         String
   category           MaterialCategory     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   unit               MaterialUnit         @default(STRAND)
@@ -362,6 +445,7 @@ model Material {
   images             MaterialImage[]
   tags               MaterialTag[]
   batchEntries       MaterialBatchEntry[]
+  imageImportItems   MaterialImageImportItem[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 
@@ -386,6 +470,7 @@ model MaterialBatch {
   notes          String                    @default("") @db.Text
   entries        MaterialBatchEntry[]
   productEntries ProductPurchaseEntry[]
+  coverObjectKey String?
   attachments    MaterialBatchAttachment[]
   createdAt      DateTime                  @default(now())
   updatedAt      DateTime                  @updatedAt
@@ -434,6 +519,7 @@ model MaterialBatchEntry {
   saleChildManual          Boolean                   @default(false)
   images                   MaterialBatchImage[]
   diyLines                 ProductDiyMaterial[]
+  imageImportItem          MaterialImageImportItem?
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime                  @updatedAt
 
@@ -460,7 +546,7 @@ model MaterialBatchAttachment {
   id        String        @id @default(cuid())
   batchId   String
   batch     MaterialBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
-  objectKey String        @unique
+  objectKey String
   url       String
   fileName  String
   notes     String        @default("") @db.Text
@@ -468,6 +554,7 @@ model MaterialBatchAttachment {
   createdAt DateTime      @default(now())
 
   @@unique([batchId, position])
+  @@unique([batchId, objectKey])
 }
 
 model MaterialBatchImage {
@@ -490,4 +577,29 @@ model MaterialImage {
   position   Int
 
   @@unique([materialId, position])
+}
+
+/// Multi-view DIY recognition stays outside product stock until reviewed and committed.
+model DiyImageImport {
+  id            String         @id @default(uuid())
+  images        Json
+  data          Json
+  status        String         @default("DRAFT")
+  version       Int            @default(0)
+  provider      String         @default("")
+  model         String         @default("")
+  promptVersion String         @default("")
+  warnings      Json           @default("[]")
+  errorCode     String?
+  runToken      String?
+  leaseUntil    DateTime?
+  productId     String?
+  product       Product?       @relation(fields: [productId], references: [id], onDelete: Restrict)
+  runId         String?        @unique
+  run           ProductDiyRun? @relation(fields: [runId], references: [id], onDelete: Restrict)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([createdAt])
+  @@index([productId])
 }

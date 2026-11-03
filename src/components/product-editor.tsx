@@ -18,7 +18,7 @@ import {
 } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useRouter, Link } from '@/i18n/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type {
   CabochonMeasurement,
@@ -26,6 +26,7 @@ import type {
   Product,
   ProductImage,
   ProductMarketing,
+  SettingStyle,
   Tag,
 } from '@/lib/client-types';
 import { catalogPath, type CatalogScope } from '@/lib/catalog-scopes';
@@ -50,10 +51,14 @@ import type { ProductSourceInput } from '@/lib/client-types';
 import { productSourceSchema } from '@/lib/validation';
 import { useProductCode } from './productEditor/useProductCode';
 import { StockFields } from './productEditor/stockFields';
+import { AliasInput } from './catalog/aliasInput';
+import { useNameTagRecognition } from './productEditor/useNameTagRecognition';
+import { NameTagControls } from './productEditor/nameTagControls';
 
 type Values = {
   code: string;
   name: string;
+  aliases: string[];
   description: string;
   categoryId: string;
   tagIds: string[];
@@ -61,6 +66,7 @@ type Values = {
   stock: number;
   stockReason?: string;
   published: boolean;
+  settingStyleId: string | null;
   marketing: ProductMarketing;
   measurement: CabochonMeasurement;
   cost: CabochonCostValues | null;
@@ -81,13 +87,18 @@ export function ProductEditor({
   const common = useTranslations('common');
   const catalog = useTranslations('catalog');
   const tagText = useTranslations('tags');
+  const settingStyleText = useTranslations('settingStyles');
   const sourceText = useTranslations('productSources');
+  const diyImport = useTranslations('diyImport');
   const router = useRouter();
   const { message } = App.useApp();
   const [form] = Form.useForm<Values>();
+  const lengthMm = Form.useWatch(['measurement', 'lengthMm'], form);
   const [tagForm] = Form.useForm<{ name: string }>();
+  const [settingStyleForm] = Form.useForm<{ magicBoxStyle: string }>();
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [settingStyles, setSettingStyles] = useState<SettingStyle[]>([]);
   const [images, setImages] = useState<ProductImage[]>([]);
   const [initialValues, setInitialValues] = useState<Partial<Values>>({});
   const [product, setProduct] = useState<Product | null>(null);
@@ -107,7 +118,15 @@ export function ProductEditor({
   const [createdProduct, setCreatedProduct] = useState<Product | null>(null);
   const [tagModalOpen, setTagModalOpen] = useState(false);
   const [creatingTag, setCreatingTag] = useState(false);
+  const [settingStyleModalOpen, setSettingStyleModalOpen] = useState(false);
+  const [creatingSettingStyle, setCreatingSettingStyle] = useState(false);
   const [recognitionInput, setRecognitionInput] = useState('');
+  const nameBeforeFocus = useRef('');
+  const nameTags = useNameTagRecognition({
+    readName: () => form.getFieldValue('name') ?? '',
+    readTags: () => form.getFieldValue('tagIds') ?? [],
+    writeTags: (tagIds) => form.setFieldsValue({ tagIds }),
+  });
   const isNew = id === 'new';
   const { generatingCode, generateCode, resetCode, getCodeReservationToken } = useProductCode(
     form,
@@ -170,20 +189,23 @@ export function ProductEditor({
       setLoading(true);
       setLoadError(false);
       try {
-        const [list, tagList, product] = await Promise.all([
+        const [list, tagList, styleList, product] = await Promise.all([
           apiFetch<Category[]>('/api/categories'),
           apiFetch<Tag[]>('/api/tags'),
+          apiFetch<SettingStyle[]>('/api/setting-styles'),
           isNew ? Promise.resolve(null) : apiFetch<Product>(`/api/products/${id}`),
         ]);
         if (!active) return;
         setCategories(list);
         setTags(tagList);
+        setSettingStyles(styleList);
         if (product) {
           setProduct(product);
           setProductCategoryId(product.categoryId);
           setInitialValues({
             code: product.code,
             name: product.name,
+            aliases: product.aliases ?? [],
             description: product.description,
             categoryId: product.categoryId,
             tagIds: product.tags.map((tag) => tag.id),
@@ -195,6 +217,7 @@ export function ProductEditor({
             },
             stock: product.stock,
             published: product.published,
+            settingStyleId: product.extraInfo?.settingStyleId ?? null,
             marketing: product.marketing ?? {
               videoShot: false,
               xiaohongshuVideoPublished: false,
@@ -230,7 +253,8 @@ export function ProductEditor({
   }, [generateCode, isNew, scope, scopedCategory?.id]);
 
   async function save(values: Values) {
-    if (generatingCode || saving || uploadingImages || refreshingStock) return;
+    if (generatingCode || saving || uploadingImages || refreshingStock || nameTags.isMatching())
+      return;
     if (stockConflict) {
       message.error(common('errors.STOCK_CHANGED'));
       return;
@@ -247,6 +271,7 @@ export function ProductEditor({
           code: values.code.trim(),
           codeReservationToken: getCodeReservationToken(values.code.trim()),
           name: values.name.trim(),
+          aliases: values.aliases ?? [],
           description: (values.description ?? '').trim(),
           categoryId: scopedCategory?.id ?? values.categoryId,
           tagIds: values.tagIds ?? [],
@@ -269,6 +294,7 @@ export function ProductEditor({
           marketing: values.marketing,
           measurement: isCabochon ? values.measurement : null,
           cost: isCabochon ? values.cost : null,
+          extraInfo: isCabochon ? { settingStyleId: values.settingStyleId ?? null } : null,
           imageKeys: images.map((image) => image.objectKey),
         }),
       });
@@ -343,7 +369,7 @@ export function ProductEditor({
         ? {
             saleRule: currentPricing.saleRule,
             saleRuleValue: currentPricing.saleRuleValue,
-            saleManual: false,
+            saleManual: currentPricing.saleRule === 'CUSTOM_AMOUNT',
             price: null,
           }
         : {
@@ -366,16 +392,19 @@ export function ProductEditor({
     setImages([]);
     setSourceDraft(source);
     setRecognitionInput('');
+    nameTags.reset();
     resetCode();
     form.resetFields();
     form.setFieldsValue({
       code: '',
       name: '',
+      aliases: [],
       description: '',
       categoryId,
       tagIds: [],
       stock: 0,
       published: false,
+      settingStyleId: null,
       marketing,
       measurement: { lengthMm: null, widthMm: null, heightMm: null },
       cost: null,
@@ -394,6 +423,7 @@ export function ProductEditor({
       });
       setTags((items) => [...items, tag].sort((a, b) => a.name.localeCompare(b.name)));
       const selected = form.getFieldValue('tagIds') ?? [];
+      nameTags.manualChange([...selected, tag.id]);
       form.setFieldsValue({ tagIds: [...selected, tag.id] });
       message.success(common('saved'));
       tagForm.resetFields();
@@ -407,17 +437,37 @@ export function ProductEditor({
     }
   }
 
+  async function createSettingStyle({ magicBoxStyle }: { magicBoxStyle: string }) {
+    if (creatingSettingStyle) return;
+    setCreatingSettingStyle(true);
+    try {
+      const style = await apiFetch<SettingStyle>('/api/setting-styles', {
+        method: 'POST',
+        body: JSON.stringify({ magicBoxStyle: magicBoxStyle.trim() }),
+      });
+      setSettingStyles((items) =>
+        [...items, style].sort((a, b) => a.magicBoxStyle.localeCompare(b.magicBoxStyle)),
+      );
+      form.setFieldsValue({ settingStyleId: style.id });
+      setSettingStyleModalOpen(false);
+      message.success(common('saved'));
+    } catch (error) {
+      message.error(
+        common(`errors.${error instanceof ClientApiError ? error.code : 'SERVER_ERROR'}` as never),
+      );
+    } finally {
+      setCreatingSettingStyle(false);
+    }
+  }
+
   function recognizeName(name: string) {
+    void nameTags.recognize();
     if (!isNew) return;
     const matched = recognizeProductName(
       name,
       scope?.key === 'cabochons' ? [] : availableCategories,
-      tags,
+      [],
     );
-    if (matched.tagIds.length) {
-      const selected: string[] = form.getFieldValue('tagIds') ?? [];
-      form.setFieldsValue({ tagIds: [...new Set([...selected, ...matched.tagIds])] });
-    }
     if (matched.categoryId && matched.categoryId !== form.getFieldValue('categoryId')) {
       form.setFieldsValue({ categoryId: matched.categoryId });
       void generateCode(matched.categoryId);
@@ -507,16 +557,29 @@ export function ProductEditor({
           </Link>
           <h1>{isNew ? t('newTitle') : t('editTitle')}</h1>
         </div>
+        {!isCabochon && (isNew || product?.origin === 'DIY' || product?.origin == null) && (
+          <Link
+            href={
+              isNew
+                ? '/admin/products/diy-image-import'
+                : `/admin/products/diy-image-import?product=${id}`
+            }
+          >
+            <Button icon={<ScanOutlined />}>{diyImport('entry')}</Button>
+          </Link>
+        )}
       </div>
       <Form
         form={form}
         layout="vertical"
         initialValues={{
+          aliases: [],
           description: '',
           categoryId: scopedCategory?.id,
           tagIds: [],
           stock: 0,
           published: false,
+          settingStyleId: null,
           marketing: {
             videoShot: true,
             xiaohongshuVideoPublished: true,
@@ -541,7 +604,25 @@ export function ProductEditor({
                 label={t('name')}
                 rules={[{ required: true, whitespace: true, message: t('required') }, { max: 120 }]}
               >
-                <Input maxLength={120} onBlur={(event) => recognizeName(event.target.value)} />
+                <Input
+                  maxLength={120}
+                  onFocus={(event) => {
+                    nameBeforeFocus.current = event.target.value;
+                  }}
+                  onChange={() => nameTags.invalidate()}
+                  onBlur={(event) => {
+                    if (event.target.value !== nameBeforeFocus.current)
+                      recognizeName(event.target.value);
+                  }}
+                />
+              </Form.Item>
+              <Form.Item
+                className="editor-field-name"
+                name="aliases"
+                label={common('aliases')}
+                extra={common('aliasesHelp')}
+              >
+                <AliasInput />
               </Form.Item>
               <Form.Item
                 className="editor-field-category"
@@ -611,13 +692,24 @@ export function ProductEditor({
                 onRefresh={() => void refreshStock()}
               />
               <div className="editor-field-tags">
-                <Form.Item name="tagIds" label={t('tags')}>
+                <Form.Item
+                  name="tagIds"
+                  label={t('tags')}
+                  extra={
+                    <NameTagControls
+                      {...nameTags}
+                      disabled={saving}
+                      onRecognize={() => void nameTags.recognize(true)}
+                    />
+                  }
+                >
                   <Select
                     mode="multiple"
                     showSearch
                     optionFilterProp="label"
                     placeholder={t('selectTags')}
                     options={tags.map((item) => ({ value: item.id, label: item.name }))}
+                    onChange={(ids: string[]) => nameTags.manualChange(ids)}
                   />
                 </Form.Item>
                 <Tooltip title={tagText('new')}>
@@ -631,6 +723,29 @@ export function ProductEditor({
                   />
                 </Tooltip>
               </div>
+              {isCabochon && (
+                <div className="editor-field-setting-style">
+                  <Form.Item name="settingStyleId" label={t('magicBoxStyle')}>
+                    <Select
+                      showSearch
+                      allowClear
+                      optionFilterProp="label"
+                      placeholder={t('unknownSettingStyle')}
+                      options={settingStyles.map((item) => ({
+                        value: item.id,
+                        label: item.magicBoxStyle,
+                      }))}
+                    />
+                  </Form.Item>
+                  <Tooltip title={settingStyleText('new')}>
+                    <Button
+                      icon={<PlusOutlined />}
+                      aria-label={settingStyleText('new')}
+                      onClick={() => setSettingStyleModalOpen(true)}
+                    />
+                  </Tooltip>
+                </div>
+              )}
               <Form.Item
                 className="editor-field-publication editor-switch-field"
                 name="published"
@@ -655,6 +770,7 @@ export function ProductEditor({
           <section className="editor-block">
             <h2>{t('images')}</h2>
             <ImagePicker
+              purpose={isCabochon ? 'cabochon' : 'catalog'}
               images={images}
               onChange={setImages}
               onUploadingChange={setUploadingImages}
@@ -669,7 +785,33 @@ export function ProductEditor({
                   <Form.Item
                     key={field}
                     name={['measurement', field]}
-                    label={t(field)}
+                    label={
+                      field === 'lengthMm' ? (
+                        <Space size={8}>
+                          {t(field)}
+                          <Button
+                            type="link"
+                            size="small"
+                            htmlType="button"
+                            disabled={
+                              saving ||
+                              lengthMm == null ||
+                              !Number.isFinite(lengthMm) ||
+                              lengthMm <= 0
+                            }
+                            onClick={() =>
+                              form.setFieldsValue({
+                                measurement: { widthMm: lengthMm, heightMm: lengthMm },
+                              })
+                            }
+                          >
+                            {common('applyToWidthHeight')}
+                          </Button>
+                        </Space>
+                      ) : (
+                        t(field)
+                      )
+                    }
                     rules={[{ type: 'number', min: 0.01, max: 99999999.99 }]}
                   >
                     <InputNumber
@@ -849,6 +991,7 @@ export function ProductEditor({
               htmlType="submit"
               loading={saving}
               disabled={
+                nameTags.matching ||
                 generatingCode ||
                 uploadingImages ||
                 !availableCategories.length ||
@@ -882,6 +1025,28 @@ export function ProductEditor({
             rules={[{ required: true, whitespace: true, max: 60 }]}
           >
             <Input maxLength={60} autoFocus />
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Modal
+        title={settingStyleText('new')}
+        open={settingStyleModalOpen}
+        onCancel={() => {
+          if (!creatingSettingStyle) setSettingStyleModalOpen(false);
+        }}
+        onOk={() => settingStyleForm.submit()}
+        okText={common('save')}
+        cancelText={common('cancel')}
+        confirmLoading={creatingSettingStyle}
+        afterClose={() => settingStyleForm.resetFields()}
+      >
+        <Form form={settingStyleForm} layout="vertical" onFinish={createSettingStyle}>
+          <Form.Item
+            name="magicBoxStyle"
+            label={settingStyleText('magicBoxStyle')}
+            rules={[{ required: true, whitespace: true, max: 60 }]}
+          >
+            <Input maxLength={60} autoFocus disabled={creatingSettingStyle} />
           </Form.Item>
         </Form>
       </Modal>

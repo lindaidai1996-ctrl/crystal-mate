@@ -12,6 +12,7 @@ export function ImageCropDialog({
   file,
   index,
   total,
+  helpText,
   onCancel,
   onCrop,
   onKeep,
@@ -20,6 +21,7 @@ export function ImageCropDialog({
   file: File;
   index: number;
   total: number;
+  helpText?: string;
   onCancel: () => void;
   onCrop: (file: File) => void;
   onKeep: () => void;
@@ -101,7 +103,7 @@ export function ImageCropDialog({
       }
     >
       <p className="image-upload-name">{file.name}</p>
-      <p className="helper-text">{t('cropHelp')}</p>
+      <p className="helper-text">{helpText ?? t('cropHelp')}</p>
       {sourceError || failed ? (
         <Alert type="error" showIcon message={t(sourceError ?? 'decodeFailed')} />
       ) : (

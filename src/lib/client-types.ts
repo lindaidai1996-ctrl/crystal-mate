@@ -1,3 +1,4 @@
+import type { AttachmentSource } from './attachments';
 import type { MaterialPurchase } from './material-purchase';
 import type { ProductSaleRule } from './product-pricing';
 import type { CraftDesignFee } from './product-diy-cost';
@@ -10,6 +11,11 @@ export type Category = {
   _count?: { products: number };
 };
 export type Tag = { id: string; name: string; _count?: { products: number; materials: number } };
+export type SettingStyle = { id: string; magicBoxStyle: string; productCount: number };
+export type CabochonExtraInfo = {
+  settingStyleId: string | null;
+  settingStyle: { id: string; magicBoxStyle: string } | null;
+};
 export type Distributor = {
   id: string;
   name: string;
@@ -19,6 +25,7 @@ export type Distributor = {
   phone: string;
   notes: string;
   attachments: DistributorAttachment[];
+  coverObjectKey?: string | null;
   _count?: { attachments: number };
   createdAt: string;
   updatedAt: string;
@@ -37,6 +44,11 @@ export type DistributorPage = {
   areaItems: DistributorArea[];
 };
 export type DistributorDetailResponse = { item: Distributor; areas: string[] };
+export type DistributorPriceRange = {
+  min: string | null;
+  max: string | null;
+  hasUnknown: boolean;
+};
 export type DistributorPurchaseSummary = {
   type: 'PRODUCT' | 'MATERIAL';
   itemId: string;
@@ -51,6 +63,9 @@ export type DistributorPurchaseSummary = {
   hasUnknownAmount: boolean;
   totalWeightGrams: string | null;
   hasUnknownWeight: boolean;
+  saleUnitPrice: DistributorPriceRange;
+  childUnitPrice: DistributorPriceRange;
+  saleChildUnitPrice: DistributorPriceRange;
 };
 export type DistributorPurchaseEntry = {
   id: string;
@@ -61,6 +76,9 @@ export type DistributorPurchaseEntry = {
   quantity: number | null;
   unit: string;
   unitPrice: string | null;
+  saleUnitPrice: string | null;
+  childUnitPrice: string | null;
+  saleChildUnitPrice: string | null;
   amount: string | null;
   weightGrams: string | null;
   gramPrice: string | null;
@@ -102,6 +120,7 @@ export type Product = {
   id: string;
   code: string;
   name: string;
+  aliases: string[];
   description: string;
   categoryId: string;
   category: Category;
@@ -117,6 +136,7 @@ export type Product = {
   marketing: ProductMarketing;
   measurement: CabochonMeasurement | null;
   cost: CabochonCost | null;
+  extraInfo?: CabochonExtraInfo | null;
   purchaseEntries: ProductPurchaseEntry[];
   diyRuns: ProductDiyRun[];
   stockAdjustments: ProductStockAdjustment[];
@@ -247,12 +267,14 @@ export type MaterialSaleRule =
   | 'PERCENT_20'
   | 'PERCENT_30'
   | 'PERCENT_50'
+  | 'PERCENT_60'
   | 'FIXED_AMOUNT'
   | 'CUSTOM_PERCENT'
   | 'CUSTOM_AMOUNT';
 export type MaterialAmount = string | null;
 export type MaterialValues = {
   name: string;
+  aliases: string[];
   categoryId: string;
   unit: MaterialUnit;
   purchaseUnitPrice: MaterialAmount;
@@ -277,6 +299,7 @@ export type MaterialValues = {
   notes: string;
 };
 export type Material = MaterialValues & {
+  imageImportCount?: number;
   knownStock: number;
   unknownStockBatchCount: number;
   id: string;
@@ -289,16 +312,31 @@ export type Material = MaterialValues & {
 };
 export type MaterialPage = { items: Material[]; total: number; page: number; pageSize: number };
 
+export type MaterialImageImportSource = {
+  itemId: string;
+  importId: string;
+  fileName: string;
+  sourceUrl: string;
+  importedAt: string;
+  archivedAt: string | null;
+  entryId: string;
+  receivedAt: string;
+  batch: { id: string; name: string };
+  distributor: { id: string; name: string };
+};
+
 export type MaterialBatch = {
   id: string;
   name: string;
   receivedAt: string;
   notes: string;
   attachments?: MaterialBatchAttachment[];
+  coverObjectKey?: string | null;
   createdAt: string;
   _count?: { entries: number; productEntries: number; attachments: number };
 };
 export type MaterialBatchAttachment = {
+  source?: AttachmentSource;
   id?: string;
   objectKey: string;
   url: string;
@@ -312,7 +350,10 @@ export type MaterialBatchSelection =
       batchId?: never;
       newBatch: { name: string; receivedAt: string; notes: string };
     };
-export type MaterialBatchEntry = Omit<MaterialValues, 'name' | 'categoryId' | 'unit' | 'notes'> & {
+export type MaterialBatchEntry = Omit<
+  MaterialValues,
+  'name' | 'aliases' | 'categoryId' | 'unit' | 'notes'
+> & {
   id: string;
   materialId: string;
   batchId: string;

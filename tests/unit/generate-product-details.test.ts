@@ -17,6 +17,32 @@ describe('product details copy', () => {
 
   it('keeps the dimension positions when values are missing', () => {
     expect(generateProductDetails({ lengthMm: 11, heightMm: 5 })).toContain('11x待补充x5(厚度)');
-    expect(generateProductDetails(null)).toContain('待补充x待补充x待补充(厚度)');
+  });
+
+  it.each([null, undefined, {}, { lengthMm: null, widthMm: null, heightMm: null }])(
+    'omits the size section when all dimensions are missing: %j',
+    (measurement) => {
+      const content = generateProductDetails(measurement);
+      expect(content.startsWith('关于定价：')).toBe(true);
+      expect(content).not.toContain('关于尺寸');
+      expect(content).not.toContain('配上925银托后尺寸为');
+      expect(content).not.toContain('待补充');
+    },
+  );
+
+  it('inserts the setting section immediately after the dimensions', () => {
+    expect(generateProductDetails({ lengthMm: 11, heightMm: 5 }, '花朵魔盒')).toContain(
+      '配上925银托后尺寸为：11x待补充x5(厚度)\n关于镶嵌：\n- 镶嵌花朵魔盒\n关于定价：',
+    );
+  });
+
+  it('includes the setting even without dimensions', () => {
+    expect(generateProductDetails(null, ' 花朵魔盒 ')).toBe(
+      `关于镶嵌：\n- 镶嵌花朵魔盒\n${generateProductDetails(null)}`,
+    );
+  });
+
+  it.each([null, undefined, '', '   '])('omits an empty setting: %j', (setting) => {
+    expect(generateProductDetails({ widthMm: 8 }, setting)).not.toContain('关于镶嵌');
   });
 });

@@ -4,8 +4,10 @@ import {
   adoptSaleUnitPriceFromBeads,
   editMaterial,
   purchaseCandidates,
+  percentageSalePrice,
   recalculateMaterial,
   recognizeMaterialCategory,
+  saleGramPriceFromUnit,
   saleUnitPriceFromBeads,
 } from '../../src/lib/material-calculations';
 import {
@@ -24,6 +26,7 @@ import {
 function values(): MaterialValues {
   return {
     name: '紫发晶串',
+    aliases: [],
     categoryId: 'clx1234567890123456789012',
     unit: 'STRAND',
     purchaseUnitPrice: '100.00',
@@ -56,6 +59,104 @@ const categories: MaterialCategory[] = [
 ];
 
 describe('material pricing', () => {
+  it('recommends a gram sale price from the current unit sale price and weight', () => {
+    const bead = recalculateMaterial({
+      ...values(),
+      unit: 'BEAD',
+      weightGrams: '0.55',
+      saleRule: 'CUSTOM_AMOUNT',
+      saleUnitPrice: '4.00',
+      saleGramPrice: '2.00',
+    });
+    expect(saleGramPriceFromUnit(bead)).toBe('7.27');
+    const changed = editMaterial(bead, 'saleUnitPrice', '5.00');
+    expect(saleGramPriceFromUnit(changed)).toBe('9.09');
+    expect(changed.saleGramPrice).toBe('2.00');
+    const adopted = editMaterial(changed, 'saleGramPrice', saleGramPriceFromUnit(changed));
+    expect(adopted).toMatchObject({ saleGramPrice: '9.09', saleGramManual: true });
+    expect(editMaterial(adopted, 'purchaseUnitPrice', '2.00').saleGramPrice).toBe('9.09');
+    expect(saleGramPriceFromUnit({ ...bead, weightGrams: '0.32' })).toBe('12.50');
+    expect(
+      saleGramPriceFromUnit({ ...values(), saleUnitPrice: '195.00', weightGrams: '20.00' }),
+    ).toBe('9.75');
+  });
+
+  it('only recommends valid gram prices and preserves exact cent rounding', () => {
+    const input = { ...values(), saleUnitPrice: '0.29', weightGrams: '2.00' };
+    expect(saleGramPriceFromUnit(input)).toBe('0.15');
+    expect(saleGramPriceFromUnit({ ...input, saleUnitPrice: '0.00' })).toBe('0.00');
+    expect(
+      saleGramPriceFromUnit({ ...input, saleUnitPrice: '9999999999.99', weightGrams: '1.00' }),
+    ).toBe('9999999999.99');
+    for (const invalid of [
+      { ...input, saleUnitPrice: null },
+      { ...input, saleUnitPrice: '1.234' },
+      { ...input, weightGrams: null },
+      { ...input, weightGrams: '0.00' },
+      { ...input, weightGrams: '-2.00' },
+      { ...input, unit: 'GRAM' as const },
+      { ...input, saleUnitPrice: '9999999999.99', weightGrams: '0.01' },
+    ]) {
+      expect(saleGramPriceFromUnit(invalid)).toBeNull();
+    }
+  });
+
+  it.each([
+    ['PERCENT_30', null, '13.93', '18.109', '19.00'],
+    ['PERCENT_50', null, '12.10', '18.15', '19.00'],
+    ['PERCENT_60', null, '11.75', '18.80', '19.00'],
+    ['PERCENT_30', null, '10.00', '13.00', '13.00'],
+    ['PERCENT_60', null, '0.00', '0.00', '0.00'],
+    ['CUSTOM_PERCENT', '0.01', '18.00', '18.0018', '19.00'],
+    ['CUSTOM_PERCENT', '81.00', '10.00', '18.10', '19.00'],
+    ['CUSTOM_PERCENT', '88.00', '10.00', '18.80', '19.00'],
+  ] as const)(
+    'ceilings %s pricing without rounding away fractional yuan',
+    (saleRule, saleRuleValue, cost, originalPrice, price) => {
+      const input = {
+        ...values(),
+        saleRule,
+        saleRuleValue,
+        purchaseUnitPrice: cost,
+        purchaseGramPrice: cost,
+        purchaseGramManual: true,
+        childUnitPrice: cost,
+      };
+      expect(percentageSalePrice(cost, input)).toEqual({
+        price,
+        originalPrice,
+        roundedUp: originalPrice !== price,
+      });
+      expect(recalculateMaterial(input)).toMatchObject({
+        saleUnitPrice: price,
+        saleGramPrice: price,
+        saleChildUnitPrice: price,
+      });
+      expect(materialSchema.safeParse({ ...input, imageKeys: [] }).success).toBe(true);
+    },
+  );
+
+  it('preserves fractional cost and manual prices and handles missing percentages', () => {
+    const input = { ...values(), purchaseUnitPrice: '18.10' };
+    expect(recalculateMaterial(input).saleUnitPrice).toBe('18.10');
+    const automatic = recalculateMaterial({ ...input, saleRule: 'PERCENT_60' });
+    const manual = editMaterial(automatic, 'saleUnitPrice', '18.80');
+    expect(editMaterial(manual, 'purchaseUnitPrice', '100.00').saleUnitPrice).toBe('18.80');
+    expect(percentageSalePrice(null, automatic)).toBeNull();
+    expect(percentageSalePrice('18.10', { ...input, saleRule: 'CUSTOM_PERCENT' })).toBeNull();
+    expect(percentageSalePrice('18.10', input)).toBeNull();
+  });
+
+  it.each([
+    ['PERCENT_10', '10.00'],
+    ['PERCENT_20', '20.00'],
+  ] as const)('keeps legacy %s markups as custom percentages', (saleRule, saleRuleValue) => {
+    expect(recalculateMaterial({ ...values(), saleRule })).toMatchObject({
+      saleRule: 'CUSTOM_PERCENT',
+      saleRuleValue,
+    });
+  });
+
   it('rounds count and weight estimates to two decimal places', () => {
     const input = { ...values(), childCount: 3, childWeightGrams: '1.50' };
     expect(purchaseCandidates(input)).toEqual({
@@ -78,7 +179,7 @@ describe('material pricing', () => {
     expect(adopted.saleChildUnitPrice).toBe('11.00');
     const updated = editMaterial(adopted, 'purchaseUnitPrice', '120.00');
     expect(updated.childUnitPrice).toBe('12.00');
-    expect(updated.saleChildUnitPrice).toBe('13.20');
+    expect(updated.saleChildUnitPrice).toBe('14.00');
     expect(editMaterial(updated, 'childUnitPrice', '14.00').childPriceSource).toBe('CUSTOM');
     expect(editMaterial(updated, 'childUnitPrice', '12').childPriceSource).toBe('COUNT');
   });

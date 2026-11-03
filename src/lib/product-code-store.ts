@@ -23,35 +23,40 @@ export async function withProductTransaction<T>(
   }
 }
 
-export async function reserveProductCode(categoryId: string) {
-  return withProductTransaction(async (tx) => {
-    const category = await tx.category.findUnique({
-      where: { id: categoryId },
-      select: { prefix: true },
-    });
-    if (!category) throw new ApiError(400, 'CATEGORY_NOT_FOUND');
-    if (!category.prefix) throw new ApiError(400, 'CATEGORY_PREFIX_MISSING');
+export async function reserveProductCodeInTransaction(
+  tx: Prisma.TransactionClient,
+  categoryId: string,
+) {
+  const category = await tx.category.findUnique({
+    where: { id: categoryId },
+    select: { prefix: true },
+  });
+  if (!category) throw new ApiError(400, 'CATEGORY_NOT_FOUND');
+  if (!category.prefix) throw new ApiError(400, 'CATEGORY_PREFIX_MISSING');
 
-    const latest = await tx.productCode.findFirst({
-      where: { prefix: category.prefix },
-      orderBy: { sequence: 'desc' },
-      select: { sequence: true },
+  const latest = await tx.productCode.findFirst({
+    where: { prefix: category.prefix },
+    orderBy: { sequence: 'desc' },
+    select: { sequence: true },
+  });
+  let sequence = latest?.sequence ?? 0;
+  while (sequence < 9999) {
+    const code = formatProductCode(category.prefix, sequence);
+    sequence += 1;
+    // Also tolerate products imported directly without a history record.
+    const existing = await tx.product.findUnique({ where: { code }, select: { id: true } });
+    if (existing) continue;
+    const reservationToken = randomUUID();
+    await tx.productCode.create({
+      data: { code, prefix: category.prefix, sequence, categoryId, reservationToken },
     });
-    let sequence = latest?.sequence ?? 0;
-    while (sequence < 9999) {
-      const code = formatProductCode(category.prefix, sequence);
-      sequence += 1;
-      // Also tolerate products imported directly without a history record.
-      const existing = await tx.product.findUnique({ where: { code }, select: { id: true } });
-      if (existing) continue;
-      const reservationToken = randomUUID();
-      await tx.productCode.create({
-        data: { code, prefix: category.prefix, sequence, categoryId, reservationToken },
-      });
-      return { code, reservationToken };
-    }
-    throw new ApiError(409, 'CODE_EXHAUSTED');
-  }, true);
+    return { code, reservationToken };
+  }
+  throw new ApiError(409, 'CODE_EXHAUSTED');
+}
+
+export async function reserveProductCode(categoryId: string) {
+  return withProductTransaction((tx) => reserveProductCodeInTransaction(tx, categoryId), true);
 }
 
 type CurrentProduct = { id: string; code: string; categoryId: string };

@@ -3,8 +3,13 @@
 import { Button, Form, Radio } from 'antd';
 import { useTranslations } from 'next-intl';
 import type { MaterialSaleRule, MaterialValues } from '@/lib/client-types';
-import { saleUnitPriceFromBeads } from '@/lib/material-calculations';
+import {
+  percentageSalePrice,
+  saleGramPriceFromUnit,
+  saleUnitPriceFromBeads,
+} from '@/lib/material-calculations';
 import { MaterialAmountInput } from './purchaseFields';
+import { MaterialSaleProfit } from './materialSaleProfit';
 
 export function MaterialSaleFields({
   values,
@@ -19,6 +24,7 @@ export function MaterialSaleFields({
 }) {
   const t = useTranslations('materialEditor');
   const strandPrice = saleUnitPriceFromBeads(values);
+  const recommendedGramPrice = saleGramPriceFromUnit(values);
   const gram = values.unit === 'GRAM';
   const unitSuffix = t(
     gram ? 'yuanPerGram' : values.unit === 'STRAND' ? 'yuanPerStrand' : 'yuanPerBead',
@@ -42,6 +48,24 @@ export function MaterialSaleFields({
       label={t(field === 'saleRuleValue' ? ruleValueLabel : field)}
     />
   );
+  const roundingNote = (
+    cost: string | null,
+    manual: boolean,
+    price: string | null,
+    suffix: string,
+  ) => {
+    if (manual) return null;
+    const result = percentageSalePrice(cost, values);
+    if (result === null || result.price !== price) return null;
+    return (
+      <div className="material-source-label">
+        {t(result.roundedUp ? 'saleRoundedUp' : 'saleAlreadyWhole', {
+          price: result.originalPrice,
+          unit: suffix,
+        })}
+      </div>
+    );
+  };
 
   return (
     <section className="editor-block">
@@ -58,10 +82,9 @@ export function MaterialSaleFields({
           options={(
             [
               'COST',
-              'PERCENT_10',
-              'PERCENT_20',
               'PERCENT_30',
               'PERCENT_50',
+              'PERCENT_60',
               'FIXED_AMOUNT',
               'CUSTOM_PERCENT',
               'CUSTOM_AMOUNT',
@@ -76,6 +99,12 @@ export function MaterialSaleFields({
         {values.unit !== 'GRAM' && (
           <Form.Item label={t('saleUnitPrice')}>
             {amount('saleUnitPrice', unitSuffix)}
+            {roundingNote(
+              values.purchaseUnitPrice,
+              values.saleUnitManual,
+              values.saleUnitPrice,
+              unitSuffix,
+            )}
             {values.saleUnitManual && (
               <div className="material-source-label">{t('manualSalePrice')}</div>
             )}
@@ -91,14 +120,58 @@ export function MaterialSaleFields({
                 </div>
               </div>
             )}
+            <MaterialSaleProfit
+              cost={values.purchaseUnitPrice}
+              salePrice={values.saleUnitPrice}
+              unit={values.unit}
+            />
           </Form.Item>
         )}
         <Form.Item label={t('saleGramPrice')}>
           {amount('saleGramPrice', t('yuanPerGram'))}
+          {roundingNote(
+            values.purchaseGramPrice,
+            values.saleGramManual,
+            values.saleGramPrice,
+            t('yuanPerGram'),
+          )}
+          {recommendedGramPrice !== null && (
+            <div className="material-price-suggestions">
+              <div>
+                <span>
+                  {t('saleGramFromUnit')}: {recommendedGramPrice} {t('yuanPerGram')}
+                </span>
+                <Button
+                  type="link"
+                  size="small"
+                  disabled={recommendedGramPrice === values.saleGramPrice}
+                  onClick={() => onChange('saleGramPrice', recommendedGramPrice)}
+                >
+                  {t('adopt')}
+                </Button>
+              </div>
+            </div>
+          )}
+          <MaterialSaleProfit
+            cost={values.purchaseGramPrice}
+            salePrice={values.saleGramPrice}
+            unit="GRAM"
+          />
         </Form.Item>
         {values.unit === 'STRAND' && (
           <Form.Item label={t('saleChildUnitPrice')}>
             {amount('saleChildUnitPrice', t('yuanPerBead'))}
+            {roundingNote(
+              values.childUnitPrice,
+              values.saleChildManual,
+              values.saleChildUnitPrice,
+              t('yuanPerBead'),
+            )}
+            <MaterialSaleProfit
+              cost={values.childUnitPrice}
+              salePrice={values.saleChildUnitPrice}
+              unit="BEAD"
+            />
           </Form.Item>
         )}
       </div>

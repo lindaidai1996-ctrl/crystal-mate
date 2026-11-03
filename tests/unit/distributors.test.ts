@@ -40,7 +40,7 @@ describe('distributor validation', () => {
     );
   });
 
-  it('accepts up to 12 image attachments with names and notes', () => {
+  it('accepts up to 50 image attachments with names and notes', () => {
     const attachment = {
       objectKey: 'images/123e4567-e89b-12d3-a456-426614174000.png',
       fileName: '采购凭证.png',
@@ -50,7 +50,7 @@ describe('distributor validation', () => {
       distributorSchema.parse({ ...validDistributor, attachments: [attachment] }).attachments,
     ).toEqual([attachment]);
     expect(
-      distributorSchema.safeParse({ ...validDistributor, attachments: Array(13).fill(attachment) })
+      distributorSchema.safeParse({ ...validDistributor, attachments: Array(51).fill(attachment) })
         .success,
     ).toBe(false);
     expect(

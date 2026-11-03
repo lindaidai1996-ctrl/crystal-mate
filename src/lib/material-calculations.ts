@@ -38,6 +38,22 @@ export function purchaseCandidates(values: MaterialValues) {
   };
 }
 
+export function childWeightFromStrand(values: MaterialValues): MaterialAmount {
+  const weight = minor(values.weightGrams);
+  const count = values.childCount;
+  if (
+    values.unit !== 'STRAND' ||
+    weight === null ||
+    weight <= BigInt(0) ||
+    count === null ||
+    !Number.isSafeInteger(count) ||
+    count <= 0
+  )
+    return null;
+  const suggestion = divide(weight, BigInt(count));
+  return suggestion !== '0.00' ? suggestion : null;
+}
+
 export function saleUnitPriceFromBeads(values: MaterialValues): MaterialAmount {
   const price = minor(values.saleChildUnitPrice);
   const count = values.childCount;
@@ -53,6 +69,15 @@ export function saleUnitPriceFromBeads(values: MaterialValues): MaterialAmount {
   return total <= BigInt('999999999999') ? fixed(total) : null;
 }
 
+export function saleGramPriceFromUnit(values: MaterialValues): MaterialAmount {
+  if (values.unit === 'GRAM') return null;
+  const price = minor(values.saleUnitPrice);
+  const weight = minor(values.weightGrams);
+  if (price === null || weight === null) return null;
+  const gramPrice = divide(price * BigInt(100), weight);
+  return gramPrice !== null && minor(gramPrice)! <= BigInt('999999999999') ? gramPrice : null;
+}
+
 export function adoptSaleUnitPriceFromBeads(values: MaterialValues): MaterialValues {
   const price = saleUnitPriceFromBeads(values);
   if (price === null) return values;
@@ -64,17 +89,44 @@ export function adoptSaleUnitPriceFromBeads(values: MaterialValues): MaterialVal
   });
 }
 
-function salePrice(cost: MaterialAmount, values: MaterialValues, isUnit = false): string | null {
-  if (values.saleRule === 'CUSTOM_AMOUNT') return null;
+export function percentageSalePrice(cost: MaterialAmount, values: MaterialValues) {
   const amount = minor(cost);
   if (amount === null) return null;
   const percentages = {
-    COST: BigInt(0),
     PERCENT_10: BigInt(1000),
     PERCENT_20: BigInt(2000),
     PERCENT_30: BigInt(3000),
     PERCENT_50: BigInt(5000),
+    PERCENT_60: BigInt(6000),
   } as const;
+  if (
+    values.saleRule === 'COST' ||
+    values.saleRule === 'FIXED_AMOUNT' ||
+    values.saleRule === 'CUSTOM_AMOUNT'
+  )
+    return null;
+  const percentage =
+    values.saleRule === 'CUSTOM_PERCENT'
+      ? minor(values.saleRuleValue)
+      : percentages[values.saleRule];
+  if (percentage === null) return null;
+
+  // Keep all six decimal places until ceiling, so even 18.000001 becomes 19.
+  const numerator = amount * (BigInt(10000) + percentage);
+  const scale = BigInt(1000000);
+  const fraction = (numerator % scale).toString().padStart(6, '0').replace(/0+$/, '');
+  return {
+    price: fixed(((numerator + scale - BigInt(1)) / scale) * BigInt(100)),
+    originalPrice: `${numerator / scale}.${fraction.padEnd(2, '0')}`,
+    roundedUp: numerator % scale !== BigInt(0),
+  };
+}
+
+function salePrice(cost: MaterialAmount, values: MaterialValues, isUnit = false): string | null {
+  if (values.saleRule === 'CUSTOM_AMOUNT') return null;
+  const amount = minor(cost);
+  if (amount === null) return null;
+  if (values.saleRule === 'COST') return fixed(amount);
   if (values.saleRule === 'FIXED_AMOUNT') {
     const addition = minor(values.saleRuleValue);
     const unitCost = minor(values.purchaseUnitPrice);
@@ -82,15 +134,15 @@ function salePrice(cost: MaterialAmount, values: MaterialValues, isUnit = false)
     if (isUnit) return fixed(amount + addition);
     return unitCost > BigInt(0) ? divide(amount * (unitCost + addition), unitCost) : null;
   }
-  const percentage =
-    values.saleRule === 'CUSTOM_PERCENT'
-      ? minor(values.saleRuleValue)
-      : percentages[values.saleRule];
-  return percentage !== null ? divide(amount * (BigInt(10000) + percentage), BigInt(10000)) : null;
+  return percentageSalePrice(cost, values)?.price ?? null;
 }
 
 export function recalculateMaterial(values: MaterialValues, resetSales = false): MaterialValues {
   const next = { ...values };
+  if (next.saleRule === 'PERCENT_10' || next.saleRule === 'PERCENT_20') {
+    next.saleRuleValue = next.saleRule === 'PERCENT_10' ? '10.00' : '20.00';
+    next.saleRule = 'CUSTOM_PERCENT';
+  }
   if (next.unit !== 'STRAND') {
     next.childCount = null;
     next.childWeightGrams = null;

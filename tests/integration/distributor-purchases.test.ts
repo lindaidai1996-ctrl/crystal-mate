@@ -109,6 +109,7 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
                 receivedQty: 2,
                 remainingQty: 2,
                 purchaseUnitPrice: '0.10',
+                saleUnitPrice: '0.20',
                 weightGrams: '0.15',
               },
               {
@@ -120,6 +121,7 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
                 purchaseTotalAmount: '1.01',
                 purchaseTotalWeightGrams: '0.25',
                 purchaseUnitPrice: '999.99',
+                saleUnitPrice: '0.30',
                 weightGrams: '999.99',
                 unitPriceSource: 'ESTIMATED',
               },
@@ -140,14 +142,29 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
           categoryId: materialCategory.id,
           unit: 'STRAND',
           batchEntries: {
-            create: {
-              batchId: batches[0].id,
-              distributorId: supplier.id,
-              receivedQty: null,
-              remainingQty: null,
-              purchaseTotalAmount: '0',
-              purchaseInputMode: 'BATCH',
-            },
+            create: [
+              {
+                batchId: batches[0].id,
+                distributorId: supplier.id,
+                receivedQty: null,
+                remainingQty: null,
+                purchaseTotalAmount: '0',
+                purchaseInputMode: 'BATCH',
+                saleUnitPrice: '99.99',
+                childUnitPrice: '1.23',
+                saleChildUnitPrice: '2.34',
+              },
+              {
+                batchId: batches[1].id,
+                distributorId: supplier.id,
+                receivedQty: null,
+                remainingQty: null,
+                purchaseTotalAmount: '0',
+                purchaseInputMode: 'BATCH',
+                saleUnitPrice: '199.99',
+                childUnitPrice: '2.34',
+              },
+            ],
           },
         },
       });
@@ -203,6 +220,8 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
         knownQuantity: 11,
         totalAmount: '1.80',
         hasUnknownQuantity: false,
+        saleUnitPrice: { min: '0.00', max: '0.00', hasUnknown: false },
+        childUnitPrice: { min: null, max: null, hasUnknown: true },
       });
       expect(all.find((row) => row.itemId === material.id)).toMatchObject({
         batchCount: 3,
@@ -212,12 +231,18 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
         hasUnknownAmount: true,
         totalWeightGrams: '0.55',
         hasUnknownWeight: true,
+        saleUnitPrice: { min: '0.20', max: '0.30', hasUnknown: true },
+        childUnitPrice: { min: '0.10', max: '999.99', hasUnknown: true },
+        saleChildUnitPrice: { min: '0.20', max: '0.30', hasUnknown: true },
       });
       expect(all.find((row) => row.itemId === unknownMaterial.id)).toMatchObject({
         knownQuantity: null,
         hasUnknownQuantity: true,
         totalAmount: '0.00',
         hasUnknownAmount: false,
+        saleUnitPrice: { min: '99.99', max: '199.99', hasUnknown: false },
+        childUnitPrice: { min: '1.23', max: '2.34', hasUnknown: false },
+        saleChildUnitPrice: { min: '2.34', max: '2.34', hasUnknown: true },
       });
       expect(
         (await getDistributorPurchaseSummary(supplier.id, { ...defaults, type: 'product' })).total,
@@ -247,17 +272,38 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
         pageSize: 20,
       });
       expect(materialDetails.items[0].quantity).toBeNull();
+      expect(materialDetails.items[0]).toMatchObject({
+        saleUnitPrice: null,
+        childUnitPrice: null,
+        saleChildUnitPrice: null,
+      });
       expect(materialDetails.items[1]).toMatchObject({
         quantity: null,
         amount: '1.01',
         weightGrams: '0.25',
         priceSource: 'ESTIMATED',
+        saleUnitPrice: '0.30',
+        childUnitPrice: '999.99',
+        saleChildUnitPrice: '0.30',
       });
       expect(materialDetails.items[2]).toMatchObject({
         quantity: 2,
         amount: '0.20',
         weightGrams: '0.30',
+        saleUnitPrice: '0.20',
+        childUnitPrice: '0.10',
+        saleChildUnitPrice: '0.20',
       });
+      const strandDetails = await getDistributorPurchaseEntries(supplier.id, {
+        type: 'material',
+        itemId: unknownMaterial.id,
+        page: 1,
+        pageSize: 20,
+      });
+      expect(strandDetails.items).toMatchObject([
+        { saleUnitPrice: '199.99', childUnitPrice: '2.34', saleChildUnitPrice: null },
+        { saleUnitPrice: '99.99', childUnitPrice: '1.23', saleChildUnitPrice: '2.34' },
+      ]);
       const productDetails = await getDistributorPurchaseEntries(supplier.id, {
         type: 'product',
         itemId: products[0].id,
@@ -267,6 +313,11 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
       expect(productDetails.total).toBe(3);
       expect(productDetails.items).toHaveLength(1);
       expect(productDetails.items[0].batchId).toBe(batches[0].id);
+      expect(productDetails.items[0]).toMatchObject({
+        saleUnitPrice: '0.00',
+        childUnitPrice: null,
+        saleChildUnitPrice: null,
+      });
       expect(
         (
           await getDistributorPurchaseEntries(other.id, {

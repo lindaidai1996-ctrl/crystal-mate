@@ -319,7 +319,8 @@ body {
   min-width: 0;
   margin-bottom: 18px;
 }
-.editor-field-tags {
+.editor-field-tags,
+.editor-field-setting-style {
   display: flex;
   align-self: start;
   align-items: flex-end;
@@ -327,12 +328,14 @@ body {
   min-width: 0;
   margin-bottom: 18px;
 }
-.editor-field-tags > .ant-form-item {
+.editor-field-tags > .ant-form-item,
+.editor-field-setting-style > .ant-form-item {
   flex: 1;
   min-width: 0;
   margin-bottom: 0;
 }
-.editor-field-tags > .ant-btn {
+.editor-field-tags > .ant-btn,
+.editor-field-setting-style > .ant-btn {
   flex: none;
 }
 .editor-field-tags {
@@ -344,6 +347,9 @@ body {
 .editor-field-stock,
 .editor-field-publication {
   grid-column: span 4;
+}
+.editor-field-setting-style {
+  grid-column: 1 / span 8;
 }
 .editor-field-description {
   grid-column: 1 / -1;
@@ -835,6 +841,20 @@ body {
 }
 .marketing-config-section {
   max-width: 1000px;
+}
+.product-marketing-status {
+  display: grid;
+  gap: 8px;
+}
+.product-marketing-status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.marketing-config-setting {
+  grid-column: 1 / -1;
+  overflow-wrap: anywhere;
 }
 .marketing-config-details {
   display: grid;
@@ -1446,6 +1466,9 @@ body {
   .editor-field-publication {
     grid-column: span 6;
   }
+  .editor-field-setting-style {
+    grid-column: 1 / span 6;
+  }
   .marketing-config-compose {
     grid-template-columns: 1fr;
   }
@@ -1461,7 +1484,8 @@ body {
   .editor-fields > .ant-form-item {
     grid-column: 1 / -1;
   }
-  .editor-field-tags {
+  .editor-field-tags,
+  .editor-field-setting-style {
     grid-column: 1 / -1;
   }
   .editor-marketing-grid {

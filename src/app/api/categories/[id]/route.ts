@@ -35,6 +35,10 @@ export async function PUT(request: NextRequest, { params }: Context) {
             where: { product: { categoryId: id } },
           });
           if (costCount) throw new ApiError(409, 'CABOCHON_COSTS_IN_USE');
+          const extraInfoCount = await tx.cabochonExtraInfo.count({
+            where: { product: { categoryId: id } },
+          });
+          if (extraInfoCount) throw new ApiError(409, 'CABOCHON_EXTRA_INFO_IN_USE');
         }
         return tx.category.update({ where: { id }, data });
       },

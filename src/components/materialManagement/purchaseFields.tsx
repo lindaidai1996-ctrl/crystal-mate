@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Checkbox, Form, InputNumber, Radio } from 'antd';
+import { Alert, Checkbox, ConfigProvider, Form, InputNumber, Radio } from 'antd';
 import { useTranslations } from 'next-intl';
 import type { MaterialAmount, MaterialValues } from '@/lib/client-types';
 import {
@@ -62,6 +62,7 @@ export function PurchaseFields({
 }) {
   const t = useTranslations('materialEditor');
   const batchText = useTranslations('materialBatches');
+  const { componentDisabled } = ConfigProvider.useConfig();
   const unit = t(values.unit);
   const batch = purchase.mode === 'BATCH';
   const result = calculatePurchase(values, purchase, quantityUnknown ? null : quantity);
@@ -122,7 +123,7 @@ export function PurchaseFields({
           <InputNumber<number>
             value={batch && quantityUnknown ? null : quantity}
             onChange={onQuantityChange}
-            disabled={batch && quantityUnknown}
+            disabled={componentDisabled || (batch && quantityUnknown)}
             min={1}
             max={2147483647}
             precision={0}

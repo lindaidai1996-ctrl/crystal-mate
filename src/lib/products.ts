@@ -27,6 +27,7 @@ export const productInclude = {
   marketing: true,
   measurement: true,
   cost: true,
+  extraInfo: { include: { settingStyle: true } },
   ...productSourceInclude,
 } satisfies Prisma.ProductInclude;
 
@@ -67,8 +68,15 @@ export function serializeProduct(product: ProductWithRelations) {
   };
 }
 
-export async function saveProduct(input: ProductInput, id?: string) {
-  return withProductTransaction(async (tx) => {
+type ProductWriteContext = {
+  tx: Prisma.TransactionClient;
+  heldImages: ReadonlyMap<string, string>;
+  historicalStock?: { quantity: number; reason: string };
+};
+
+export async function saveProduct(input: ProductInput, id?: string, context?: ProductWriteContext) {
+  const heldImages = context?.heldImages ?? new Map<string, string>();
+  const operation = async (tx: Prisma.TransactionClient) => {
     const category = await tx.category.findUnique({
       where: { id: input.categoryId },
       select: { id: true, name: true, prefix: true },
@@ -77,11 +85,21 @@ export async function saveProduct(input: ProductInput, id?: string) {
     if (category.name !== '蛋面' && input.measurement != null)
       throw new ApiError(400, 'INVALID_INPUT');
     if (category.name !== '蛋面' && input.cost != null) throw new ApiError(400, 'INVALID_INPUT');
+    if (category.name !== '蛋面' && input.extraInfo != null)
+      throw new ApiError(400, 'INVALID_INPUT');
+    if (input.extraInfo?.settingStyleId) {
+      const style = await tx.settingStyle.findUnique({
+        where: { id: input.extraInfo.settingStyleId },
+        select: { id: true },
+      });
+      if (!style) throw new ApiError(400, 'SETTING_STYLE_NOT_FOUND');
+    }
     const current = id
       ? await tx.product.findUnique({ where: { id }, include: { images: true } })
       : null;
     if (id && !current) throw new ApiError(404, 'NOT_FOUND');
-    if (!id && !input.source) throw new ApiError(400, 'PRODUCT_SOURCE_REQUIRED');
+    if (!id && !input.source && !context?.historicalStock)
+      throw new ApiError(400, 'PRODUCT_SOURCE_REQUIRED');
     if (id && input.source) throw new ApiError(400, 'INVALID_INPUT');
     if (input.stockAdjustment) {
       if (!current) throw new ApiError(400, 'INVALID_INPUT');
@@ -103,7 +121,7 @@ export async function saveProduct(input: ProductInput, id?: string) {
     }
 
     const oldImages = new Map(current?.images.map((image) => [image.objectKey, image]) ?? []);
-    const newKeys = input.imageKeys.filter((key) => !oldImages.has(key));
+    const newKeys = input.imageKeys.filter((key) => !oldImages.has(key) && !heldImages.has(key));
     const grants = await tx.uploadGrant.findMany({
       where: {
         objectKey: { in: newKeys },
@@ -118,6 +136,7 @@ export async function saveProduct(input: ProductInput, id?: string) {
     const data = {
       code: input.code,
       name: input.name,
+      aliases: input.aliases,
       description: input.description,
       categoryId: input.categoryId,
       priceCents: input.priceCents,
@@ -132,6 +151,16 @@ export async function saveProduct(input: ProductInput, id?: string) {
       ? await tx.product.update({ where: { id }, data })
       : await tx.product.create({ data });
     await claimProductCode(tx, input, product.id, current);
+    if (category.name !== '蛋面') {
+      await tx.cabochonExtraInfo.deleteMany({ where: { productId: product.id } });
+    } else if (input.extraInfo !== undefined || !id) {
+      const settingStyleId = input.extraInfo?.settingStyleId ?? null;
+      await tx.cabochonExtraInfo.upsert({
+        where: { productId: product.id },
+        create: { productId: product.id, settingStyleId },
+        update: { settingStyleId },
+      });
+    }
     if (input.marketing || !id) {
       await tx.productMarketing.upsert({
         where: { productId: product.id },
@@ -193,7 +222,7 @@ export async function saveProduct(input: ProductInput, id?: string) {
         data: input.imageKeys.map((key, position) => ({
           productId: product.id,
           objectKey: key,
-          url: oldImages.get(key)?.url ?? grantByKey.get(key)!.url,
+          url: oldImages.get(key)?.url ?? heldImages.get(key) ?? grantByKey.get(key)!.url,
           position,
         })),
       });
@@ -204,6 +233,13 @@ export async function saveProduct(input: ProductInput, id?: string) {
         data: { usedAt: new Date() },
       });
     if (!id && input.source) await createSource(tx, product.id, input.source);
+    if (!id && context?.historicalStock && context.historicalStock.quantity > 0) {
+      await applyProductStockAdjustment(tx, product.id, {
+        quantity: context.historicalStock.quantity,
+        expectedQuantity: 0,
+        reason: context.historicalStock.reason,
+      });
+    }
     const saved = await tx.product.findUniqueOrThrow({
       where: { id: product.id },
       include: productInclude,
@@ -221,5 +257,16 @@ export async function saveProduct(input: ProductInput, id?: string) {
       saved.updatedAt = updated.updatedAt;
     }
     return serializeProduct(saved);
-  });
+  };
+  return context ? operation(context.tx) : withProductTransaction(operation);
+}
+
+// Commit a reviewed draft and its product in the same transaction.
+export function saveProductInTransaction(
+  tx: Prisma.TransactionClient,
+  input: ProductInput,
+  id?: string,
+  heldImages: ReadonlyMap<string, string> = new Map(),
+) {
+  return saveProduct(input, id, { tx, heldImages });
 }

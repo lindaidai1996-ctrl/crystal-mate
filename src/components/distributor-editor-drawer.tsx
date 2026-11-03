@@ -3,6 +3,7 @@
 import { App, AutoComplete, Button, Drawer, Form, Input, Space } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { attachmentCoverKey } from '@/lib/attachments';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { Distributor, DistributorValues } from '@/lib/client-types';
 import { BatchAttachmentPicker } from './materialManagement/batchAttachmentPicker';
@@ -26,6 +27,9 @@ export function DistributorEditorDrawer({
     distributor?.attachments ?? [],
   );
   const [uploading, setUploading] = useState(false);
+  const [coverObjectKey, setCoverObjectKey] = useState<string | null>(
+    distributor?.coverObjectKey ?? null,
+  );
   const [saving, setSaving] = useState(false);
 
   function areaLabel(area: string) {
@@ -46,7 +50,9 @@ export function DistributorEditorDrawer({
           method: distributor ? 'PUT' : 'POST',
           body: JSON.stringify({
             ...values,
-            attachments: attachments.map(({ objectKey, fileName, notes }) => ({
+            coverObjectKey: attachmentCoverKey(attachments, coverObjectKey),
+            attachments: attachments.map(({ objectKey, fileName, notes, source }) => ({
+              source,
               objectKey,
               fileName,
               notes,
@@ -138,6 +144,10 @@ export function DistributorEditorDrawer({
         </Form.Item>
         <Form.Item label={t('attachments')}>
           <BatchAttachmentPicker
+            owner={distributor ? { type: 'distributor', id: distributor.id } : undefined}
+            coverObjectKey={coverObjectKey}
+            onCoverChange={setCoverObjectKey}
+            disabled={saving}
             attachments={attachments}
             onChange={setAttachments}
             onUploadingChange={setUploading}

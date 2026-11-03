@@ -1,20 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { findAliasIds } from '@/lib/catalog-search';
 import { apiError, requireAdmin } from '@/lib/api';
 import { listSchema, productSchema } from '@/lib/validation';
 import { productInclude, saveProduct, serializeProduct } from '@/lib/products';
 import { Prisma } from '@prisma/client';
+import { createdTimeWhere } from '@/lib/date-range';
 
 export async function GET(request: NextRequest) {
   try {
     await requireAdmin(request);
     const filters = listSchema.parse(Object.fromEntries(request.nextUrl.searchParams));
+    const aliasIds = await findAliasIds('product', filters.q ?? '');
     const where: Prisma.ProductWhereInput = {
+      ...createdTimeWhere(filters),
       ...(filters.q
         ? {
             OR: [
               { name: { contains: filters.q, mode: 'insensitive' } },
               { code: { contains: filters.q, mode: 'insensitive' } },
+              { id: { in: aliasIds } },
             ],
           }
         : {}),

@@ -6,22 +6,32 @@ import {
   FolderOutlined,
   PlusOutlined,
   SearchOutlined,
+  ScanOutlined,
 } from '@ant-design/icons';
 import {
   App,
   Button,
-  Cascader,
+  Checkbox,
   Empty,
   Input,
   Pagination,
   Popconfirm,
   Popover,
+  Segmented,
+  Select,
   Skeleton,
   Tooltip,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
-import { useCallback, useDeferredValue, useEffect, useState, type ReactElement } from 'react';
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactElement,
+} from 'react';
 import { Link } from '@/i18n/navigation';
 import { PaginatedTable, useTablePagination } from '@/components/paginated-table';
 import { TextTag } from '@/components/text-tag';
@@ -34,9 +44,35 @@ import type {
   MaterialCategory,
   MaterialPage,
 } from '@/lib/client-types';
-import { CLIENT_TABLE_PAGINATION, DEFAULT_TABLE_PAGE_SIZE } from '@/lib/table-pagination';
-import { categoryPath, categoryTree } from './categoryTree';
+import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
+import {
+  materialGroupCategories,
+  type MaterialCategoryGroup,
+} from '@/lib/material-category-groups';
+import { categoryPath } from './categoryTree';
+import { MaterialCategoryFilter } from './materialCategoryFilter';
 import { ImageHoverPreview } from './imageHoverPreview';
+import { MaterialImportSources } from './materialImportSources';
+import { MaterialBulkDialog } from './materialBulkDialog';
+import { togglePageSelection } from '@/lib/material-bulk';
+import bulkStyles from './materialBulkDialog.module.css';
+import { DateRangeFilter } from '@/components/date-range-filter';
+import type { DateRange } from '@/lib/date-range';
+
+const MATERIAL_PAGE_SIZE = 20;
+type MaterialTab = 'all' | MaterialCategoryGroup;
+type MaterialFilters = {
+  query: string;
+  categoryId?: string;
+  source?: 'IMAGE_IMPORT' | 'OTHER';
+  createdRange: DateRange;
+  page: number;
+  pageSize: number;
+};
+
+function initialFilters(query = ''): MaterialFilters {
+  return { query, createdRange: null, page: 1, pageSize: MATERIAL_PAGE_SIZE };
+}
 
 function BatchPrices({ item }: { item: Material }) {
   const t = useTranslations('materialBatches');
@@ -133,6 +169,7 @@ function MaterialIdentity({ item }: { item: Material }) {
       <ImageHoverPreview images={images} name={item.name} />
       <div>
         <MaterialEditLink item={item} />
+        <MaterialImportSources material={item} />
         {!!item.tags.length && (
           <div className="product-tags">
             {item.tags.map((tag) => (
@@ -227,23 +264,37 @@ function MaterialActions({
 
 export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) {
   const t = useTranslations('materials');
+  const bulk = useTranslations('materialBulk');
   const inventory = useTranslations('inventory');
   const common = useTranslations('common');
   const pagination = useTablePagination();
   const { message } = App.useApp();
   const [categories, setCategories] = useState<MaterialCategory[]>([]);
-  const [query, setQuery] = useState(initialQuery);
-  const search = useDeferredValue(query);
-  const [categoryId, setCategoryId] = useState<string>();
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_TABLE_PAGE_SIZE);
+  const [activeTab, setActiveTab] = useState<MaterialTab>('all');
+  const [tabFilters, setTabFilters] = useState<Record<MaterialTab, MaterialFilters>>(() => ({
+    all: initialFilters(initialQuery),
+    silver: initialFilters(),
+    hetian: initialFilters(),
+  }));
+  const { query, categoryId, source, createdRange, page, pageSize } = tabFilters[activeTab];
+  const deferredFilters = useDeferredValue(tabFilters);
+  const requestFilters = deferredFilters[activeTab];
+  const categoryGroup = activeTab === 'all' ? undefined : activeTab;
+  const filterCategories = useMemo(
+    () => materialGroupCategories(categories, categoryGroup),
+    [categories, categoryGroup],
+  );
+
   const [revision, setRevision] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [bulkMode, setBulkMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkAction, setBulkAction] = useState<{ intent: 'edit' | 'delete'; ids: string[] }>();
   const [data, setData] = useState<MaterialPage>({
     items: [],
     total: 0,
     page: 1,
-    pageSize: DEFAULT_TABLE_PAGE_SIZE,
+    pageSize: MATERIAL_PAGE_SIZE,
   });
   const errorText = useCallback(
     (error: unknown) =>
@@ -258,11 +309,20 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
   }, [errorText, message]);
   useEffect(() => {
     const controller = new AbortController();
+    const { query: search, page, pageSize, categoryId, source, createdRange } = requestFilters;
     const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+    if (categoryGroup) params.set('categoryGroup', categoryGroup);
     if (search) params.set('q', search);
     if (categoryId) params.set('categoryId', categoryId);
+    if (source) params.set('source', source);
+    if (createdRange) {
+      params.set('createdFrom', createdRange[0]);
+      params.set('createdTo', createdRange[1]);
+    }
     apiFetch<MaterialPage>(`/api/materials?${params}`, { signal: controller.signal })
-      .then(setData)
+      .then((result) => {
+        if (!controller.signal.aborted) setData(result);
+      })
       .catch((error) => {
         if (!controller.signal.aborted) message.error(errorText(error));
       })
@@ -270,20 +330,33 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [page, pageSize, search, categoryId, revision, errorText, message]);
+  }, [requestFilters, categoryGroup, revision, errorText, message]);
+
+  function updateFilters(patch: Partial<MaterialFilters>) {
+    setTabFilters((current) => ({
+      ...current,
+      [activeTab]: { ...current[activeTab], ...patch },
+    }));
+  }
+
+  function changeFilters(patch: Partial<MaterialFilters>) {
+    setSelectedIds([]);
+    setLoading(true);
+    updateFilters({ ...patch, page: 1 });
+  }
 
   function changePage(nextPage: number, nextPageSize: number) {
     setLoading(true);
-    setPage(nextPageSize === pageSize ? nextPage : 1);
-    setPageSize(nextPageSize);
+    updateFilters({ page: nextPageSize === pageSize ? nextPage : 1, pageSize: nextPageSize });
   }
 
   async function remove(id: string) {
     try {
       await apiFetch(`/api/materials/${id}`, { method: 'DELETE' });
+      setSelectedIds((ids) => ids.filter((selectedId) => selectedId !== id));
       message.success(common('deleted'));
       setLoading(true);
-      setPage(1);
+      updateFilters({ page: 1 });
       setRevision((value) => value + 1);
     } catch (error) {
       message.error(errorText(error));
@@ -346,6 +419,9 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
           <p>{t('count', { count: data.total })}</p>
         </div>
         <div className="material-heading-actions">
+          <Link href="/admin/materials/image-import">
+            <Button icon={<ScanOutlined />}>{t('imageImport')}</Button>
+          </Link>
           <Link href="/admin/materials/categories">
             <Button icon={<FolderOutlined />}>{t('manageCategories')}</Button>
           </Link>
@@ -356,42 +432,139 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
           </Link>
         </div>
       </div>
+      <Segmented<MaterialTab>
+        value={activeTab}
+        style={{ background: 'var(--ant-color-fill-tertiary)' }}
+        options={[
+          { value: 'all', label: t('tabAll') },
+          { value: 'silver', label: t('tabSilver') },
+          { value: 'hetian', label: t('tabHetian') },
+        ]}
+        onChange={(key) => {
+          setSelectedIds([]);
+          setBulkAction(undefined);
+          setLoading(true);
+          setData({
+            items: [],
+            total: 0,
+            page: tabFilters[key].page,
+            pageSize: tabFilters[key].pageSize,
+          });
+          setActiveTab(key);
+        }}
+      />
       <div className="filter-bar">
         <Input
           className="filter-search"
           prefix={<SearchOutlined />}
           value={query}
-          onChange={(event) => {
-            setLoading(true);
-            setQuery(event.target.value);
-            setPage(1);
-          }}
+          onChange={(event) => changeFilters({ query: event.target.value })}
           placeholder={t('search')}
           allowClear
         />
-        <Cascader
+        <Select
           className="filter-select"
-          options={categoryTree(categories)}
-          value={categoryId ? categoryPath(categoryId, categories) : []}
-          onChange={(path) => {
-            setLoading(true);
-            setCategoryId(path?.at(-1) as string | undefined);
-            setPage(1);
-          }}
-          placeholder={t('category')}
-          showSearch
-          changeOnSelect
+          aria-label={t('source')}
+          placeholder={t('allSources')}
+          value={source}
           allowClear
+          options={[
+            { value: 'IMAGE_IMPORT', label: t('sourceImageImport') },
+            { value: 'OTHER', label: t('sourceOther') },
+          ]}
+          onChange={(value) => changeFilters({ source: value })}
         />
+        <DateRangeFilter
+          kind="created"
+          value={createdRange}
+          onChange={(range) => changeFilters({ createdRange: range })}
+        />
+      </div>
+      <MaterialCategoryFilter
+        key={activeTab}
+        categories={filterCategories}
+        value={categoryId}
+        onChange={(categoryId) => changeFilters({ categoryId })}
+      />
+      <div className={bulkStyles.toolbar}>
+        <Button
+          onClick={() => {
+            setBulkMode((value) => !value);
+            setSelectedIds([]);
+          }}
+        >
+          {bulkMode ? bulk('cancel') : bulk('start')}
+        </Button>
+        {bulkMode && (
+          <>
+            <span aria-live="polite">{bulk('selected', { count: selectedIds.length })}</span>
+            <Button
+              disabled={loading || !data.items.length}
+              onClick={() =>
+                setSelectedIds((ids) =>
+                  togglePageSelection(
+                    ids,
+                    data.items.map((item) => item.id),
+                    true,
+                  ),
+                )
+              }
+            >
+              {bulk('selectPage')}
+            </Button>
+            <Button
+              disabled={loading || !data.items.some((item) => selectedIds.includes(item.id))}
+              onClick={() =>
+                setSelectedIds((ids) =>
+                  togglePageSelection(
+                    ids,
+                    data.items.map((item) => item.id),
+                    false,
+                  ),
+                )
+              }
+            >
+              {bulk('deselectPage')}
+            </Button>
+            <Button disabled={!selectedIds.length} onClick={() => setSelectedIds([])}>
+              {bulk('clear')}
+            </Button>
+            <Button
+              icon={<EditOutlined />}
+              disabled={!selectedIds.length}
+              onClick={() => setBulkAction({ intent: 'edit', ids: [...selectedIds] })}
+            >
+              {common('edit')}
+            </Button>
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              disabled={!selectedIds.length}
+              onClick={() => setBulkAction({ intent: 'delete', ids: [...selectedIds] })}
+            >
+              {common('delete')}
+            </Button>
+          </>
+        )}
       </div>
       <div className="table-surface">
         <div className="material-desktop-table">
           <PaginatedTable
             rowKey="id"
+            rowSelection={
+              bulkMode
+                ? {
+                    selectedRowKeys: selectedIds,
+                    preserveSelectedRowKeys: true,
+                    onChange: (keys) => setSelectedIds(keys.map(String)),
+                    getCheckboxProps: () => ({ disabled: loading }),
+                  }
+                : undefined
+            }
             columns={columns}
             dataSource={data.items}
             loading={loading}
-            scroll={{ x: 1410 }}
+            scroll={{ x: bulkMode ? 1458 : 1410 }}
             pagination={{
               ...CLIENT_TABLE_PAGINATION,
               current: page,
@@ -408,6 +581,18 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
           ) : data.items.length ? (
             data.items.map((item) => (
               <article className="material-mobile-item" key={item.id}>
+                {bulkMode && (
+                  <Checkbox
+                    checked={selectedIds.includes(item.id)}
+                    onChange={(event) =>
+                      setSelectedIds((ids) =>
+                        togglePageSelection(ids, [item.id], event.target.checked),
+                      )
+                    }
+                  >
+                    {bulk('selectMaterial', { name: item.name })}
+                  </Checkbox>
+                )}
                 <MaterialIdentity item={item} />
                 <div className="material-mobile-meta">
                   {categoryPath(item.categoryId, categories)
@@ -444,6 +629,24 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
           )}
         </div>
       </div>
+      {bulkAction && (
+        <MaterialBulkDialog
+          intent={bulkAction.intent}
+          materialIds={bulkAction.ids}
+          categories={categories}
+          onClose={() => setBulkAction(undefined)}
+          onSaved={() => {
+            message.success(bulkAction.intent === 'delete' ? common('deleted') : common('saved'));
+            if (bulkAction.intent === 'delete') {
+              setSelectedIds([]);
+              updateFilters({ page: 1 });
+            }
+            setBulkAction(undefined);
+            setLoading(true);
+            setRevision((value) => value + 1);
+          }}
+        />
+      )}
     </>
   );
 }

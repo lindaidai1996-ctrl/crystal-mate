@@ -16,6 +16,7 @@ import {
 export function purchaseTestValues(): MaterialValues {
   return {
     name: '测试物料',
+    aliases: [],
     categoryId: 'clx1234567890123456789012',
     unit: 'BEAD',
     purchaseUnitPrice: null,
@@ -173,7 +174,7 @@ describe('batch purchase calculation', () => {
         weightGrams: '25.00',
         purchaseGramPrice: '8.00',
         saleUnitPrice: '220.00',
-        saleGramPrice: '8.80',
+        saleGramPrice: '9.00',
       });
       expect(result.source).toBe('AVERAGE');
       if (unit === 'STRAND') expect(result.values.childUnitPrice).toBe('20.00');

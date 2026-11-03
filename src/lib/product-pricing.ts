@@ -15,6 +15,7 @@ export const productSaleRules = [
   'PERCENT_200',
   'FIXED_AMOUNT',
   'CUSTOM_PERCENT',
+  'CUSTOM_AMOUNT',
 ] as const;
 
 export type ProductSaleRule = (typeof productSaleRules)[number];
@@ -54,6 +55,7 @@ export function calculateProductPrice(
   rule: ProductSaleRule,
   ruleValue: string | null,
 ): string | null {
+  if (rule === 'CUSTOM_AMOUNT') return null;
   const cents = cost === null ? null : amountToCents(cost);
   if (cents === null) return null;
   let result: bigint;
@@ -93,7 +95,8 @@ export function editProductPricing(
   change: Partial<Pick<ProductPricingValues, 'saleRule' | 'saleRuleValue' | 'price'>>,
 ): ProductPricingValues {
   const next = { ...current, ...change };
-  next.saleManual = 'price' in change ? change.price !== null : false;
+  next.saleManual =
+    next.saleRule === 'CUSTOM_AMOUNT' || ('price' in change ? change.price !== null : false);
   if ('saleRule' in change && change.saleRule !== current.saleRule) next.saleRuleValue = null;
   return recalculateProductPricing(next, cost);
 }

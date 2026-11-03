@@ -153,6 +153,39 @@ describe('product pricing', () => {
     expect(recalculateProductPricing(calculated, null).price).toBeNull();
   });
 
+  it('retains custom amounts across cost changes and keeps cleared prices empty', () => {
+    const calculated = recalculateProductPricing(automatic, '100');
+    const custom = editProductPricing(calculated, '100', { saleRule: 'CUSTOM_AMOUNT' });
+    expect(custom).toEqual({
+      saleRule: 'CUSTOM_AMOUNT',
+      saleRuleValue: null,
+      saleManual: true,
+      price: '150.00',
+    });
+    const entered = editProductPricing(custom, null, { price: '88.88' });
+    expect(recalculateProductPricing(entered, '200').price).toBe('88.88');
+    expect(recalculateProductPricing(entered, null).price).toBe('88.88');
+    expect(editProductPricing(entered, '200', { price: null })).toMatchObject({
+      saleManual: true,
+      price: null,
+    });
+    expect(editProductPricing(entered, '200', { saleRule: 'PERCENT_50' })).toMatchObject({
+      saleManual: false,
+      price: '300.00',
+    });
+    expect(calculateProductPrice('100', 'CUSTOM_AMOUNT', null)).toBeNull();
+  });
+
+  it('allows custom pricing without a cost and clears the previous markup parameter', () => {
+    const fixed = { ...automatic, saleRule: 'FIXED_AMOUNT' as const, saleRuleValue: '20' };
+    const custom = editProductPricing(fixed, null, { saleRule: 'CUSTOM_AMOUNT' });
+    expect(custom).toMatchObject({ saleRuleValue: null, saleManual: true, price: null });
+    expect(editProductPricing(custom, null, { price: '0' })).toMatchObject({
+      saleManual: true,
+      price: '0',
+    });
+  });
+
   it('accepts legacy requests but requires complete new pricing fields', () => {
     const base = {
       code: 'A1',
@@ -166,6 +199,16 @@ describe('product pricing', () => {
       imageKeys: [],
     };
     expect(productSchema.safeParse(base).success).toBe(true);
+    const custom = {
+      ...base,
+      saleRule: 'CUSTOM_AMOUNT',
+      saleRuleValue: null,
+      saleManual: true,
+    };
+    expect(productSchema.safeParse(custom).success).toBe(true);
+    expect(productSchema.safeParse({ ...custom, priceCents: 0 }).success).toBe(true);
+    expect(productSchema.safeParse({ ...custom, saleManual: false }).success).toBe(false);
+    expect(productSchema.safeParse({ ...custom, saleRuleValue: '10' }).success).toBe(false);
     expect(
       productSchema.safeParse({
         ...base,

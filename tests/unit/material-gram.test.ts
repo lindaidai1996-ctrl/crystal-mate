@@ -15,6 +15,22 @@ import { materialCreateSchema, materialBatchEntryUpdateSchema } from '../../src/
 import { calculateDiyCost, calculateDiyQuote } from '../../src/lib/product-diy-cost';
 
 describe('gram materials', () => {
+  it('ceilings percentage prices per gram and synchronizes the stock unit price', () => {
+    const result = calculatePurchase(
+      { ...values(), saleRule: 'PERCENT_60', saleRuleValue: null },
+      { ...purchase(), totalWeightGrams: '2.00', totalAmount: '23.50' },
+      2,
+    );
+    expect(result).toMatchObject({
+      valid: true,
+      values: {
+        purchaseGramPrice: '11.75',
+        saleGramPrice: '19.00',
+        saleUnitPrice: '19.00',
+      },
+    });
+  });
+
   it('calculates costs and sale prices per gram for fractional stock', () => {
     const result = calculatePurchase(
       values(),

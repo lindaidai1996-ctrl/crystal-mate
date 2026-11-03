@@ -1,0 +1,1 @@
+ALTER TYPE "MaterialSaleRule" ADD VALUE 'PERCENT_60';

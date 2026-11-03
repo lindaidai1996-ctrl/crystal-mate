@@ -28,7 +28,25 @@ describe('shared image upload', () => {
     const body = fetch.mock.calls[1][1].body as FormData;
     expect(body.get('id')).toBe(grant.id);
     expect((body.get('file') as File).name).toBe(file.name);
+    expect(JSON.parse(fetch.mock.calls[0][1].body).purpose).toBe('catalog');
   });
+
+  it.each(['import-source', 'import-crop', 'cabochon'] as const)(
+    'passes the %s storage purpose when requesting an upload grant',
+    async (purpose) => {
+      const fetch = vi
+        .fn()
+        .mockResolvedValueOnce(Response.json(grant))
+        .mockResolvedValueOnce(new Response(null, { status: 204 }));
+      vi.stubGlobal('fetch', fetch);
+      await uploadImage(file, purpose);
+      expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({
+        type: file.type,
+        size: file.size,
+        purpose,
+      });
+    },
+  );
 
   it('confirms the grant only after COS accepted the uploaded image', async () => {
     const fetch = vi

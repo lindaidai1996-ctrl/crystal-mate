@@ -54,6 +54,7 @@ function transaction() {
     uploadGrant: { findMany: vi.fn().mockResolvedValue([]) },
     cabochonMeasurement: { deleteMany: vi.fn() },
     cabochonCost: { deleteMany: vi.fn() },
+    cabochonExtraInfo: { deleteMany: vi.fn() },
     productImage: { deleteMany: vi.fn() },
     productStockAdjustment: {
       create: vi.fn().mockImplementation(async ({ data }) => {

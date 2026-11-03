@@ -4,6 +4,7 @@ import { App, Button, Drawer, Form, Input } from 'antd';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DateInput } from '@/components/date-input';
+import { attachmentCoverKey } from '@/lib/attachments';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { MaterialBatch, MaterialBatchAttachment } from '@/lib/client-types';
 import { todayInChina } from './batchSelector';
@@ -34,6 +35,9 @@ export function BatchEditorDrawer({
     notes: batch?.notes ?? '',
     attachments: batch?.attachments ?? [],
   }));
+  const [coverObjectKey, setCoverObjectKey] = useState<string | null>(
+    batch?.coverObjectKey ?? null,
+  );
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -51,7 +55,9 @@ export function BatchEditorDrawer({
             name: draft.name,
             receivedAt: draft.receivedAt,
             notes: draft.notes,
-            attachments: draft.attachments.map(({ objectKey, fileName, notes }) => ({
+            coverObjectKey: attachmentCoverKey(draft.attachments, coverObjectKey),
+            attachments: draft.attachments.map(({ objectKey, fileName, notes, source }) => ({
+              source,
               objectKey,
               fileName,
               notes,
@@ -91,7 +97,7 @@ export function BatchEditorDrawer({
         </div>
       }
     >
-      <Form layout="vertical">
+      <Form layout="vertical" disabled={saving}>
         <Form.Item
           label={t('name')}
           required
@@ -128,6 +134,10 @@ export function BatchEditorDrawer({
         </Form.Item>
         <Form.Item label={t('attachments')}>
           <BatchAttachmentPicker
+            owner={batch ? { type: 'batch', id: batch.id } : undefined}
+            coverObjectKey={coverObjectKey}
+            onCoverChange={setCoverObjectKey}
+            disabled={saving}
             attachments={draft.attachments}
             onChange={(attachments) => setDraft((current) => ({ ...current, attachments }))}
             onUploadingChange={setUploading}

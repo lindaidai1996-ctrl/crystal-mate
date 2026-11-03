@@ -1,5 +1,8 @@
 export class ClientApiError extends Error {
-  constructor(public code: string) {
+  constructor(
+    public code: string,
+    public issues?: { materialId: string; name: string; entryId?: string; code: string }[],
+  ) {
     super(code);
   }
 }
@@ -15,7 +18,7 @@ export async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
   });
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new ClientApiError(body.error ?? 'SERVER_ERROR');
+    throw new ClientApiError(body.error ?? 'SERVER_ERROR', body.issues);
   }
   if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
