@@ -171,6 +171,41 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
       const entry = await db.materialBatchEntry.findFirstOrThrow({
         where: { materialId: material.id },
       });
+      const latestImageEntry = await db.materialBatchEntry.findUniqueOrThrow({
+        where: { materialId_batchId: { materialId: material.id, batchId: batches[1].id } },
+      });
+      await db.productImage.create({
+        data: {
+          productId: products[0].id,
+          objectKey: `${suffix}/product.jpg`,
+          url: 'https://example.test/product.jpg',
+          position: 0,
+        },
+      });
+      await db.materialImage.createMany({
+        data: [
+          {
+            materialId: material.id,
+            objectKey: `${suffix}/material.jpg`,
+            url: 'https://example.test/material.jpg',
+            position: 0,
+          },
+          {
+            materialId: unknownMaterial.id,
+            objectKey: `${suffix}/fallback.jpg`,
+            url: 'https://example.test/fallback.jpg',
+            position: 0,
+          },
+        ],
+      });
+      await db.materialBatchImage.create({
+        data: {
+          entryId: latestImageEntry.id,
+          objectKey: `${suffix}/batch.jpg`,
+          url: 'https://example.test/batch.jpg',
+          position: 0,
+        },
+      });
       await db.product.create({
         data: {
           name: 'DIY排除',
@@ -216,6 +251,7 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
           .map((row) => `${row.latestReceivedAt}:${row.type}:${row.itemId}`),
       );
       expect(all.find((row) => row.itemId === products[0].id)).toMatchObject({
+        image: { objectKey: `${suffix}/product.jpg`, url: 'https://example.test/product.jpg' },
         batchCount: 2,
         knownQuantity: 11,
         totalAmount: '1.80',
@@ -224,6 +260,7 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
         childUnitPrice: { min: null, max: null, hasUnknown: true },
       });
       expect(all.find((row) => row.itemId === material.id)).toMatchObject({
+        image: { objectKey: `${suffix}/batch.jpg`, url: 'https://example.test/batch.jpg' },
         batchCount: 3,
         knownQuantity: 2,
         hasUnknownQuantity: true,
@@ -236,6 +273,7 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
         saleChildUnitPrice: { min: '0.20', max: '0.30', hasUnknown: true },
       });
       expect(all.find((row) => row.itemId === unknownMaterial.id)).toMatchObject({
+        image: { objectKey: `${suffix}/fallback.jpg`, url: 'https://example.test/fallback.jpg' },
         knownQuantity: null,
         hasUnknownQuantity: true,
         totalAmount: '0.00',

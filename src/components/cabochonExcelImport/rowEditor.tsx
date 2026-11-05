@@ -17,6 +17,7 @@ import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/client-api';
 import { excelFields, type ExcelRowInput } from '@/lib/cabochonExcelImport/contracts';
 import {
+  excelMeasurementValue,
   excelTagSource,
   normalizeExcelRow,
   type MatchItem,
@@ -50,7 +51,11 @@ export function ExcelRowEditor({
 }) {
   const t = useTranslations('cabochonExcel');
   const { message } = App.useApp();
-  const [draft, setDraft] = useState<ExcelRowInput>({ ...row, sourceStyle: sourceStyle(row) });
+  const [draft, setDraft] = useState<ExcelRowInput>(() => ({
+    ...row,
+    sourceStyle: sourceStyle(row),
+    values: { ...row.values, measurement: excelMeasurementValue(row) },
+  }));
   const [newTag, setNewTag] = useState(row.values.type.trim());
   const [creating, setCreating] = useState(false);
   const [applySameStyle, setApplySameStyle] = useState(false);
@@ -158,6 +163,7 @@ export function ExcelRowEditor({
                     onChange={(event) =>
                       setDraft({
                         ...draft,
+                        ...(field === 'measurement' ? { measurementEdited: true } : {}),
                         values: { ...draft.values, [field]: event.target.value },
                       })
                     }
@@ -233,6 +239,7 @@ export function ExcelRowEditor({
               }
               disabled={busy || creating || !excelTagSource(draft)}
               onRecognize={() => void nameTags.recognize(true)}
+              onCancel={nameTags.cancel}
             />
           </>
         )}

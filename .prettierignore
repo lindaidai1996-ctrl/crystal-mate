@@ -1,5 +1,7 @@
 node_modules
 .next
+.next-drafts
+.next-codex-preview
 .next-e2e-product-sources
 coverage
 playwright-report

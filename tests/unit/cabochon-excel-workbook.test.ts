@@ -1,6 +1,6 @@
 import { zipSync, strToU8 } from 'fflate';
 import { describe, expect, it } from 'vitest';
-import { parseWorkbook } from '@/lib/cabochonExcelImport/workbook';
+import { parseWorkbook, parseWorkbookAsync } from '@/lib/cabochonExcelImport/workbook';
 
 const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 13, 10, 26, 10]);
 const workbook =
@@ -28,6 +28,18 @@ function file(parts: Record<string, string | Uint8Array>) {
 }
 
 describe('embedded workbook images', () => {
+  it('parses embedded images through the asynchronous import path', async () => {
+    const source = file({
+      'xl/worksheets/sheet1.xml': worksheet(header, '<drawing r:id="draw1"/>'),
+      'xl/worksheets/_rels/sheet1.xml.rels': rels(relation('draw1', '../drawings/drawing1.xml')),
+      'xl/drawings/drawing1.xml':
+        '<xdr:wsDr xmlns:xdr="d" xmlns:a="a" xmlns:r="r"><xdr:oneCellAnchor><xdr:from><xdr:col>1</xdr:col><xdr:row>1</xdr:row></xdr:from><xdr:pic><a:blip r:embed="pic1"/></xdr:pic></xdr:oneCellAnchor></xdr:wsDr>',
+      'xl/drawings/_rels/drawing1.xml.rels': rels(relation('pic1', '../media/photo.png')),
+      'xl/media/photo.png': png,
+    });
+    const result = await parseWorkbookAsync(source);
+    expect(result.sheets[0].rows[1].images[0].bytes).toEqual(png);
+  });
   it('reads inline/shared rich text and cached numeric formulas without evaluating code', () => {
     const result = parseWorkbook(
       file({

@@ -17,6 +17,7 @@ import {
   Input,
   Popconfirm,
   Result,
+  Segmented,
   Select,
   Space,
   Skeleton,
@@ -34,15 +35,39 @@ import {
   CabochonMarketingStatus,
   type CabochonMarketingField,
 } from '@/components/catalog/cabochonMarketingStatus';
-import { StockAdjustmentDrawer } from '@/components/inventory/stockAdjustmentDrawer';
 import { TextTag } from '@/components/text-tag';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
-import type { Category, Product, ProductPage, Tag as CatalogTag } from '@/lib/client-types';
+import type {
+  Category,
+  Product,
+  ProductPage,
+  SettingStyle,
+  Tag as CatalogTag,
+} from '@/lib/client-types';
 import { catalogPath, type CatalogScope } from '@/lib/catalog-scopes';
 import { generateProductDetails } from '@/lib/generate-product-details';
 import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
 import { MissingCategoryState } from './missing-category-state';
 import { ImageHoverPreview } from './materialManagement/imageHoverPreview';
+import { EditorDraftBox } from './editorDraftBox';
+import { useSessionListState } from './useSessionListState';
+import { withAdminReturnTo } from '@/lib/admin-return-path';
+import { ProductInlineEdit, type ProductQuickEditChange } from './productInlineEdit';
+
+type MarketingFilterValue = '' | 'true' | 'false';
+type MarketingFilterField = CabochonMarketingField;
+type MarketingFilters = Record<MarketingFilterField, MarketingFilterValue>;
+
+const marketingFilterFields: MarketingFilterField[] = [
+  'videoShot',
+  'xiaohongshuVideoPublished',
+  'xiaohongshuListed',
+];
+const emptyMarketingFilters: MarketingFilters = {
+  videoShot: '',
+  xiaohongshuVideoPublished: '',
+  xiaohongshuListed: '',
+};
 
 const cabochonDateTimeFormatter = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'Asia/Shanghai',
@@ -55,33 +80,83 @@ const cabochonDateTimeFormatter = new Intl.DateTimeFormat('en-GB', {
   hourCycle: 'h23',
 });
 
-export function ProductsPage({ scope }: { scope?: CatalogScope }) {
+export function ProductsPage({
+  scope,
+  initialSettingStyleId,
+}: {
+  scope?: CatalogScope;
+  initialSettingStyleId?: string;
+}) {
   const t = useTranslations('products');
   const diyImport = useTranslations('diyImport');
   const excelImport = useTranslations('cabochonExcel');
-  const inventory = useTranslations('inventory');
   const common = useTranslations('common');
   const catalog = useTranslations('catalog');
   const editor = useTranslations('editor');
   const marketingConfig = useTranslations('marketingConfig');
+  const productSources = useTranslations('productSources');
   const locale = useLocale();
   const { message } = App.useApp();
   const isCabochon = scope?.key === 'cabochons';
+  const isFinishedStrands = scope?.key === 'finished-strands';
+  const cabochonActionWidth = locale === 'en' ? 360 : 320;
+  const listStateKey = `products:${scope?.key ?? 'all'}`;
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryStatus, setCategoryStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [categoryRevision, setCategoryRevision] = useState(0);
   const [tags, setTags] = useState<CatalogTag[]>([]);
-  const [query, setQuery] = useState('');
+  const [settingStyles, setSettingStyles] = useState<SettingStyle[]>([]);
+  const [query, setQuery] = useSessionListState(
+    `${listStateKey}:query`,
+    '',
+    !initialSettingStyleId,
+  );
   const search = useDeferredValue(query);
-  const [categoryId, setCategoryId] = useState<string>();
-  const [tagId, setTagId] = useState<string>();
-  const [published, setPublished] = useState<string>();
-  const [stock, setStock] = useState<string>();
-  const [createdRange, setCreatedRange] = useState<DateRange>(null);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [categoryId, setCategoryId] = useSessionListState<string | undefined>(
+    `${listStateKey}:categoryId`,
+    undefined,
+  );
+  const [tagId, setTagId] = useSessionListState<string | undefined>(
+    `${listStateKey}:tagId`,
+    undefined,
+    !initialSettingStyleId,
+  );
+  const [settingStyleId, setSettingStyleId] = useSessionListState<string | undefined>(
+    `${listStateKey}:settingStyleId`,
+    initialSettingStyleId,
+    !initialSettingStyleId,
+  );
+  const [published, setPublished] = useSessionListState<string | undefined>(
+    `${listStateKey}:published`,
+    undefined,
+  );
+  const [origin, setOrigin] = useSessionListState<'all' | 'PURCHASED' | 'DIY'>(
+    `${listStateKey}:origin`,
+    'all',
+  );
+  const [stock, setStock] = useSessionListState<string | undefined>(
+    `${listStateKey}:stock`,
+    undefined,
+    !initialSettingStyleId,
+  );
+  const [marketingFilters, setMarketingFilters] = useSessionListState<MarketingFilters>(
+    `${listStateKey}:marketingFilters`,
+    emptyMarketingFilters,
+    !initialSettingStyleId,
+  );
+  const [createdRange, setCreatedRange] = useSessionListState<DateRange>(
+    `${listStateKey}:createdRange`,
+    null,
+    !initialSettingStyleId,
+  );
+  const [page, setPage] = useSessionListState(`${listStateKey}:page`, 1, !initialSettingStyleId);
+  const [pageSize, setPageSize] = useSessionListState(`${listStateKey}:pageSize`, 20);
+  const [priceSort, setPriceSort] = useSessionListState<'ascend' | 'descend' | null>(
+    `${listStateKey}:priceSort`,
+    null,
+    !initialSettingStyleId,
+  );
   const [revision, setRevision] = useState(0);
-  const [stockProduct, setStockProduct] = useState<Product | null>(null);
   const [data, setData] = useState<ProductPage>({
     items: [],
     total: 0,
@@ -135,15 +210,29 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
       .catch((error) => message.error(errorMessage(error)));
   }, [message, errorMessage]);
   useEffect(() => {
+    if (!isCabochon) return;
+    apiFetch<SettingStyle[]>('/api/setting-styles')
+      .then(setSettingStyles)
+      .catch((error) => message.error(errorMessage(error)));
+  }, [isCabochon, message, errorMessage]);
+  useEffect(() => {
     if (!canLoadProducts) return;
     const controller = new AbortController();
     const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+    if (priceSort) params.set('sortPrice', priceSort === 'ascend' ? 'asc' : 'desc');
     if (search) params.set('q', search);
     if (effectiveCategoryId) params.set('categoryId', effectiveCategoryId);
     if (scope?.key === 'finished-strands') params.set('excludeCategoryName', '蛋面');
     if (tagId) params.set('tagId', tagId);
+    if (isCabochon && settingStyleId) params.set('settingStyleId', settingStyleId);
     if (published) params.set('published', published);
+    if (isFinishedStrands && origin !== 'all') params.set('origin', origin);
     if (stock) params.set('stock', stock);
+    if (isCabochon) {
+      for (const field of marketingFilterFields) {
+        if (marketingFilters[field]) params.set(field, marketingFilters[field]);
+      }
+    }
     if (createdRange) {
       params.set('createdFrom', createdRange[0]);
       params.set('createdTo', createdRange[1]);
@@ -163,11 +252,17 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
     canLoadProducts,
     scope,
     tagId,
+    isCabochon,
+    settingStyleId,
     published,
+    origin,
+    isFinishedStrands,
     stock,
+    marketingFilters,
     createdRange,
     page,
     pageSize,
+    priceSort,
     revision,
     message,
     errorMessage,
@@ -216,6 +311,10 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
         ),
       }));
       message.success(common('saved'));
+      if (marketingFilters[field]) {
+        setLoading(true);
+        setRevision((current) => current + 1);
+      }
     } catch (error) {
       message.error(errorMessage(error));
     } finally {
@@ -227,17 +326,67 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
     }
   }
 
+  async function saveQuickEdit(item: Product, change: ProductQuickEditChange) {
+    try {
+      if (change.field === 'stock') {
+        await apiFetch(`/api/products/${item.id}/stock-adjustments`, {
+          method: 'POST',
+          body: JSON.stringify({
+            quantity: change.value,
+            expectedQuantity: item.stock,
+            reason: '',
+          }),
+        });
+      } else {
+        await apiFetch(`/api/products/${item.id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(
+            change.field === 'price'
+              ? { field: 'price', priceCents: change.value }
+              : { field: 'measurement', measurement: change.value },
+          ),
+        });
+      }
+      message.success(common('saved'));
+      setLoading(true);
+      setRevision((value) => value + 1);
+    } catch (error) {
+      message.error(errorMessage(error));
+      if (error instanceof ClientApiError && error.code === 'STOCK_CHANGED') {
+        setLoading(true);
+        setRevision((value) => value + 1);
+      }
+      throw error;
+    }
+  }
+
   const columns: ColumnsType<Product> = [
     {
       title: t('name'),
       key: 'name',
+      width: isCabochon ? 300 : undefined,
+      fixed: isCabochon ? 'left' : undefined,
       render: (_, item) => (
         <div className="product-cell">
           <ImageHoverPreview images={item.images} name={item.name} />
           <div>
-            <Link className="product-name" href={`${listPath}/${item.id}`}>
-              {item.name}
-            </Link>
+            <div className="product-name-line">
+              <Link className="product-name" href={`${listPath}/${item.id}`}>
+                {item.name}
+              </Link>
+              {isFinishedStrands && item.origin === 'DIY' && (
+                <Tooltip title={productSources('DIY')}>
+                  <span
+                    className="product-diy-mark"
+                    role="img"
+                    aria-label={productSources('DIY')}
+                    tabIndex={0}
+                  >
+                    {t('diy')}
+                  </span>
+                </Tooltip>
+              )}
+            </div>
             <div className="product-code">{item.code}</div>
           </div>
         </div>
@@ -249,7 +398,7 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
     {
       title: t('tags'),
       key: 'tags',
-      width: 180,
+      width: isCabochon ? 220 : 180,
       render: (_, item) => (
         <div className="product-tags">
           {item.tags.map((tag) => (
@@ -263,7 +412,7 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
           {
             title: t('setting'),
             key: 'setting',
-            width: 160,
+            width: 180,
             render: (_: unknown, item: Product) =>
               item.extraInfo?.settingStyle?.magicBoxStyle || editor('unknownSettingStyle'),
           },
@@ -271,9 +420,16 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
             title: t('dimensions'),
             dataIndex: 'measurement',
             key: 'measurement',
-            width: 230,
-            render: (measurement: Product['measurement']) =>
-              formatCabochonMeasurement(measurement, marketingConfig('missingDimension')),
+            width: 260,
+            render: (_: Product['measurement'], item: Product) => (
+              <ProductInlineEdit
+                product={item}
+                field="measurement"
+                onSave={(change) => saveQuickEdit(item, change)}
+              >
+                {formatCabochonMeasurement(item.measurement, marketingConfig('missingDimension'))}
+              </ProductInlineEdit>
+            ),
           },
         ]
       : []),
@@ -281,19 +437,36 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
       title: t('price'),
       dataIndex: 'priceCents',
       key: 'price',
-      width: 130,
-      render: (value: number) =>
-        new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'zh-CN', {
-          style: 'currency',
-          currency: 'CNY',
-        }).format(value / 100),
+      sorter: true,
+      sortOrder: priceSort,
+      width: isCabochon ? 170 : 130,
+      render: (value: number, item) => (
+        <ProductInlineEdit
+          product={item}
+          field="price"
+          onSave={(change) => saveQuickEdit(item, change)}
+        >
+          {new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'zh-CN', {
+            style: 'currency',
+            currency: 'CNY',
+          }).format(value / 100)}
+        </ProductInlineEdit>
+      ),
     },
     {
       title: t('stockQuantity'),
       dataIndex: 'stock',
       key: 'stock',
-      width: 120,
-      render: (value: number) => value,
+      width: isCabochon ? 140 : 120,
+      render: (value: number, item) => (
+        <ProductInlineEdit
+          product={item}
+          field="stock"
+          onSave={(change) => saveQuickEdit(item, change)}
+        >
+          {value}
+        </ProductInlineEdit>
+      ),
     },
     ...(!isCabochon
       ? [
@@ -315,7 +488,7 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
           {
             title: editor('marketing'),
             key: 'marketing',
-            width: 240,
+            width: 320,
             render: (_: unknown, item: Product) => (
               <CabochonMarketingStatus
                 product={item}
@@ -330,7 +503,7 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
       title: t('updated'),
       dataIndex: 'updatedAt',
       key: 'updated',
-      width: isCabochon ? 180 : 150,
+      width: isCabochon ? 210 : 150,
       render: (value: string) =>
         isCabochon
           ? formatCabochonUpdatedAt(value)
@@ -341,12 +514,9 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
     {
       title: t('actions'),
       key: 'actions',
-      width: scope?.key === 'cabochons' ? 500 : 200,
+      width: isCabochon ? cabochonActionWidth : 100,
       render: (_, item) => (
-        <span className="row-actions">
-          <Button type="text" onClick={() => setStockProduct(item)}>
-            {inventory('adjust')}
-          </Button>
+        <span className={isCabochon ? 'row-actions cabochon-row-actions' : 'row-actions'}>
           {!isCabochon && (
             <Link href={`${listPath}/${item.id}`}>
               <Tooltip title={common('edit')}>
@@ -421,13 +591,14 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
           <p>{t('count', { count: data.total })}</p>
         </div>
         <Space wrap>
+          <EditorDraftBox kind="PRODUCT" returnTo={listPath} />
           {isCabochon && (
             <Link href={`${listPath}/excel-import`}>
               <Button icon={<FileExcelOutlined />}>{excelImport('entry')}</Button>
             </Link>
           )}
           {!isCabochon && (
-            <Link href="/admin/products/diy-image-import">
+            <Link href={withAdminReturnTo('/admin/products/diy-image-import', listPath)}>
               <Button icon={<ScanOutlined />}>{diyImport('entry')}</Button>
             </Link>
           )}
@@ -438,19 +609,41 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
           </Link>
         </Space>
       </div>
-      <div className="filter-bar">
-        <Input
-          className="filter-search"
-          value={query}
-          onChange={(event) => {
-            setLoading(true);
-            setQuery(event.target.value);
-            setPage(1);
-          }}
-          prefix={<SearchOutlined />}
-          placeholder={t('search')}
-          allowClear
-        />
+      <div className={isFinishedStrands ? 'filter-bar filter-bar--finished' : 'filter-bar'}>
+        <div className="product-filter-primary">
+          <Input
+            className="filter-search"
+            value={query}
+            onChange={(event) => {
+              setLoading(true);
+              setQuery(event.target.value);
+              setPage(1);
+            }}
+            prefix={<SearchOutlined />}
+            placeholder={t('search')}
+            allowClear
+          />
+          {isFinishedStrands && (
+            <div className="product-origin-filter">
+              <span className="product-origin-label">{t('originFilter')}</span>
+              <Segmented<'all' | 'PURCHASED' | 'DIY'>
+                size="small"
+                aria-label={t('originFilter')}
+                value={origin}
+                options={[
+                  { value: 'all', label: t('all') },
+                  { value: 'PURCHASED', label: t('purchased') },
+                  { value: 'DIY', label: t('diy') },
+                ]}
+                onChange={(value) => {
+                  setLoading(true);
+                  setOrigin(value);
+                  setPage(1);
+                }}
+              />
+            </div>
+          )}
+        </div>
         {!isCabochon && (
           <Select
             className="filter-select"
@@ -463,6 +656,26 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
             placeholder={t('category')}
             allowClear
             options={availableCategories.map((item) => ({ value: item.id, label: item.name }))}
+          />
+        )}
+        {isCabochon && (
+          <Select
+            className="filter-select"
+            value={settingStyleId}
+            onChange={(value) => {
+              setLoading(true);
+              setSettingStyleId(value);
+              setPage(1);
+            }}
+            placeholder={t('setting')}
+            aria-label={t('setting')}
+            allowClear
+            showSearch
+            optionFilterProp="label"
+            options={[
+              ...settingStyles.map((item) => ({ value: item.id, label: item.magicBoxStyle })),
+              { value: 'unset', label: t('unsetSetting') },
+            ]}
           />
         )}
         <Select
@@ -496,21 +709,23 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
             ]}
           />
         )}
-        <Select
-          className="filter-select"
-          value={stock}
-          onChange={(value) => {
-            setLoading(true);
-            setStock(value);
-            setPage(1);
-          }}
-          placeholder={isCabochon ? t('stockFilter') : t('inventory')}
-          allowClear
-          options={[
-            { value: '1', label: t('inStock') },
-            { value: '0', label: t('soldOut') },
-          ]}
-        />
+        {!isCabochon && (
+          <Select
+            className="filter-select"
+            value={stock}
+            onChange={(value) => {
+              setLoading(true);
+              setStock(value);
+              setPage(1);
+            }}
+            placeholder={t('inventory')}
+            allowClear
+            options={[
+              { value: '1', label: t('inStock') },
+              { value: '0', label: t('soldOut') },
+            ]}
+          />
+        )}
         <DateRangeFilter
           kind="created"
           value={createdRange}
@@ -521,12 +736,60 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
           }}
         />
       </div>
+      {isCabochon && (
+        <div className="cabochon-filter-row">
+          <div className="cabochon-filter-group">
+            <span className="cabochon-filter-label">{t('stockFilter')}</span>
+            <Segmented
+              aria-label={t('stockFilter')}
+              value={stock ?? ''}
+              options={[
+                { value: '', label: t('all') },
+                { value: '1', label: t('inStock') },
+                { value: '0', label: t('soldOut') },
+              ]}
+              onChange={(value) => {
+                setLoading(true);
+                setStock(value || undefined);
+                setPage(1);
+              }}
+            />
+          </div>
+          {marketingFilterFields.map((field) => (
+            <div className="cabochon-filter-group" key={field}>
+              <span className="cabochon-filter-label">{editor(field)}</span>
+              <Segmented<MarketingFilterValue>
+                aria-label={editor(field)}
+                value={marketingFilters[field]}
+                options={[
+                  { value: '', label: t('all') },
+                  { value: 'true', label: t('completed') },
+                  { value: 'false', label: t('incomplete') },
+                ]}
+                onChange={(value) => {
+                  setLoading(true);
+                  setMarketingFilters((current) => ({ ...current, [field]: value }));
+                  setPage(1);
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      )}
       <div className="table-surface">
         <PaginatedTable
           rowKey="id"
           dataSource={data.items}
           columns={columns}
+          scroll={isCabochon ? { x: 1800 + cabochonActionWidth } : undefined}
           loading={loading}
+          onChange={(_, __, sorter, extra) => {
+            if (extra.action !== 'sort') return;
+            const order = Array.isArray(sorter) ? sorter[0]?.order : sorter.order;
+            setPriceSort(order === 'ascend' || order === 'descend' ? order : null);
+            setPage(1);
+            setLoading(true);
+          }}
           locale={{ emptyText: <Empty description={t('empty')} /> }}
           pagination={{
             ...CLIENT_TABLE_PAGINATION,
@@ -541,18 +804,6 @@ export function ProductsPage({ scope }: { scope?: CatalogScope }) {
           }}
         />
       </div>
-      {stockProduct && (
-        <StockAdjustmentDrawer
-          key={stockProduct.id}
-          name={stockProduct.name}
-          resourceUrl={`/api/products/${stockProduct.id}`}
-          onClose={() => setStockProduct(null)}
-          onSaved={() => {
-            setLoading(true);
-            setRevision((value) => value + 1);
-          }}
-        />
-      )}
     </>
   );
 }

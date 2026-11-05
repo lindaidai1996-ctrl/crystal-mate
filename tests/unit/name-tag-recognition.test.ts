@@ -107,6 +107,16 @@ describe('shared name tag model adapter', () => {
     expect(init.body).not.toContain('text-secret');
     expect(JSON.parse(init.body).thinking).toBeUndefined();
   });
+  it('passes cancellation through to the model request', async () => {
+    const controller = new AbortController();
+    const fetchMock = vi.fn().mockResolvedValue(envelope([match(0, ['粉胶花'])]));
+    vi.stubGlobal('fetch', fetchMock);
+    await recognizeNameTags([names[0]], tags, controller.signal);
+    const signal = fetchMock.mock.calls[0][1].signal as AbortSignal;
+    expect(signal.aborted).toBe(false);
+    controller.abort();
+    expect(signal.aborted).toBe(true);
+  });
   it('handles rate limits, network failures, malformed JSON and truncated results', async () => {
     const fetchMock = vi
       .fn()

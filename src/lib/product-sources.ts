@@ -24,7 +24,15 @@ export const productSourceInclude = {
   diyRuns: {
     include: {
       materialLines: {
-        include: { materialBatchEntry: { include: { material: true, batch: true } } },
+        include: {
+          materialBatchEntry: {
+            include: {
+              material: { include: { images: { orderBy: { position: 'asc' } } } },
+              batch: true,
+              images: { orderBy: { position: 'asc' } },
+            },
+          },
+        },
         orderBy: { position: 'asc' },
       },
       cabochonLines: {

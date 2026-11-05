@@ -36,7 +36,13 @@ export async function GET(request: NextRequest) {
     const where: Prisma.MaterialWhereInput = {
       ...createdTimeWhere(filters),
       ...(filters.q
-        ? { OR: [{ name: { contains: filters.q, mode: 'insensitive' } }, { id: { in: aliasIds } }] }
+        ? {
+            OR: [
+              { name: { contains: filters.q, mode: 'insensitive' } },
+              { id: { in: aliasIds } },
+              { tags: { some: { tag: { name: { contains: filters.q, mode: 'insensitive' } } } } },
+            ],
+          }
         : {}),
       ...(categoryIds ? { categoryId: { in: categoryIds } } : {}),
       ...(filters.source

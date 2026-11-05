@@ -57,8 +57,10 @@ async function requireDistributor(id: string) {
 type PriceField = 'saleUnitPrice' | 'childUnitPrice' | 'saleChildUnitPrice';
 type SummaryRow = Omit<
   DistributorPurchaseSummary,
-  'latestReceivedAt' | 'totalAmount' | 'totalWeightGrams' | PriceField
+  'image' | 'latestReceivedAt' | 'totalAmount' | 'totalWeightGrams' | PriceField
 > & {
+  imageObjectKey: string | null;
+  imageUrl: string | null;
   latestReceivedAt: Date;
   totalAmount: Prisma.Decimal | null;
   totalWeightGrams: Prisma.Decimal | null;
@@ -132,13 +134,32 @@ export async function getDistributorPurchaseSummary(
         bool_or("saleChildUnitPrice" IS NULL) AS "saleChildUnitPriceHasUnknown"
       FROM purchases GROUP BY type, "itemId", name, code, unit
     )
-    SELECT paged.*, counted.total
+    SELECT paged.*, counted.total, cover."objectKey" AS "imageObjectKey", cover.url AS "imageUrl"
     FROM (SELECT COUNT(*) AS total FROM grouped) counted
     LEFT JOIN (
       SELECT * FROM grouped
       ORDER BY "latestReceivedAt" DESC, type COLLATE "C", "itemId" COLLATE "C"
       LIMIT ${options.pageSize} OFFSET ${(options.page - 1) * options.pageSize}
     ) paged ON true
+    LEFT JOIN LATERAL (
+      SELECT "objectKey", url FROM (
+        SELECT pi."objectKey", pi.url, 0 AS priority, NULL::timestamp AS "receivedAt", pi.position
+        FROM "ProductImage" pi
+        WHERE paged.type = 'PRODUCT' AND pi."productId" = paged."itemId"
+        UNION ALL
+        SELECT mbi."objectKey", mbi.url, 0, b."receivedAt", mbi.position
+        FROM "MaterialBatchImage" mbi
+        JOIN "MaterialBatchEntry" e ON e.id = mbi."entryId"
+        JOIN "MaterialBatch" b ON b.id = e."batchId"
+        WHERE paged.type = 'MATERIAL' AND e."materialId" = paged."itemId"
+        UNION ALL
+        SELECT mi."objectKey", mi.url, 1, NULL::timestamp, mi.position
+        FROM "MaterialImage" mi
+        WHERE paged.type = 'MATERIAL' AND mi."materialId" = paged."itemId"
+      ) images
+      ORDER BY priority, "receivedAt" DESC NULLS LAST, position, "objectKey"
+      LIMIT 1
+    ) cover ON true
     ORDER BY "latestReceivedAt" DESC, type COLLATE "C", "itemId" COLLATE "C"
   `);
   return {
@@ -149,6 +170,10 @@ export async function getDistributorPurchaseSummary(
         itemId: row.itemId!,
         name: row.name,
         code: row.code,
+        image:
+          row.imageObjectKey && row.imageUrl
+            ? { objectKey: row.imageObjectKey, url: row.imageUrl }
+            : null,
         unit: row.unit,
         batchCount: row.batchCount,
         knownQuantity: row.knownQuantity,

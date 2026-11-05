@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowLeftOutlined, EditOutlined } from '@ant-design/icons';
-import { App, Button, Descriptions, Empty, Result, Segmented, Skeleton } from 'antd';
+import { App, Button, Descriptions, Result, Segmented, Skeleton } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -11,8 +11,10 @@ import { CreatePurchaseButton } from '@/components/purchaseCreation/createPurcha
 import { BatchEditorDrawer } from './batchEditorDrawer';
 import { BatchAttachmentGallery } from './batchAttachmentGallery';
 import { BatchDetailEntriesTable, type BatchEntryType } from './batchDetailEntriesTable';
+import { useSessionListState } from '@/components/useSessionListState';
+import { withAdminReturnTo } from '@/lib/admin-return-path';
 
-export function MaterialBatchDetailPage({ id }: { id: string }) {
+export function MaterialBatchDetailPage({ id, returnTo }: { id: string; returnTo?: string }) {
   const t = useTranslations('materialBatches');
   const common = useTranslations('common');
   const { message } = App.useApp();
@@ -21,7 +23,13 @@ export function MaterialBatchDetailPage({ id }: { id: string }) {
   const [failed, setFailed] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editingImage, setEditingImage] = useState(false);
-  const [tab, setTab] = useState<BatchEntryType | 'attachments'>('all');
+  const [tab, setTab] = useSessionListState<BatchEntryType | 'attachments'>(
+    `material-batch-detail:${id}:tab`,
+    'all',
+  );
+  const detailPath = returnTo
+    ? withAdminReturnTo(`/admin/materials/batches/${id}`, returnTo)
+    : `/admin/materials/batches/${id}`;
 
   async function remove(entry: MaterialBatchDetail['entries'][number]) {
     try {
@@ -70,10 +78,10 @@ export function MaterialBatchDetailPage({ id }: { id: string }) {
     <>
       <div className="page-heading editor-heading">
         <div>
-          <Link href="/admin/materials/batches" className="back-link">
+          <Link href={returnTo ?? '/admin/materials/batches'} className="back-link">
             <ArrowLeftOutlined /> {t('back')}
           </Link>
-          <h1>{batch.name}</h1>
+          <h1 className="page-record-name">{batch.name}</h1>
         </div>
         <div className="page-heading-actions">
           <CreatePurchaseButton batchId={batch.id} />
@@ -102,22 +110,19 @@ export function MaterialBatchDetailPage({ id }: { id: string }) {
       </div>
       {tab === 'attachments' ? (
         <section aria-label={t('attachments')}>
-          {batch.attachments?.length ? (
-            <BatchAttachmentGallery
-              batch={batch}
-              onUploadingChange={setEditingImage}
-              onSaved={(saved) =>
-                setBatch((current) => (current ? { ...current, ...saved } : current))
-              }
-            />
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('noAttachments')} />
-          )}
+          <BatchAttachmentGallery
+            batch={batch}
+            onUploadingChange={setEditingImage}
+            onSaved={(saved) =>
+              setBatch((current) => (current ? { ...current, ...saved } : current))
+            }
+          />
         </section>
       ) : (
         <BatchDetailEntriesTable
           batch={batch}
           type={tab}
+          returnTo={detailPath}
           onRemove={remove}
           onStockSaved={async () => {
             setBatch(await apiFetch<MaterialBatchDetail>(`/api/material-batches/${id}`));

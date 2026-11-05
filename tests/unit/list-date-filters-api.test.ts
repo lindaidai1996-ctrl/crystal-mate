@@ -120,3 +120,100 @@ describe('list creation-time API filters', () => {
     },
   );
 });
+
+describe('product price sorting', () => {
+  it.each([
+    ['asc', 'asc'],
+    ['desc', 'desc'],
+  ] as const)('sorts the full result before paginating (%s)', async (param, order) => {
+    const response = await products(
+      new NextRequest(`http://localhost/api/products?sortPrice=${param}&page=2&pageSize=20`),
+    );
+    expect(response.status).toBe(200);
+    expect(mocks.products).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderBy: [{ priceCents: order }, { id: 'asc' }],
+        skip: 20,
+        take: 20,
+      }),
+    );
+  });
+
+  it('rejects unsupported sort values', async () => {
+    const response = await products(
+      new NextRequest('http://localhost/api/products?sortPrice=random'),
+    );
+    expect(response.status).toBe(400);
+    expect(mocks.products).not.toHaveBeenCalled();
+  });
+});
+
+describe('product origin filtering', () => {
+  it.each(['PURCHASED', 'DIY'] as const)('filters items and total by %s', async (origin) => {
+    const response = await products(
+      new NextRequest(`http://localhost/api/products?origin=${origin}&page=2`),
+    );
+    expect(response.status).toBe(200);
+    expect(mocks.products).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ origin }), skip: 20 }),
+    );
+    expect(mocks.productCount).toHaveBeenCalledWith({
+      where: mocks.products.mock.calls[0][0].where,
+    });
+  });
+
+  it('rejects unsupported origins', async () => {
+    const response = await products(new NextRequest('http://localhost/api/products?origin=OTHER'));
+    expect(response.status).toBe(400);
+    expect(mocks.products).not.toHaveBeenCalled();
+  });
+});
+
+describe('cabochon marketing filters', () => {
+  it('combines stock and marketing progress with the same conditions for rows and total', async () => {
+    const response = await products(
+      new NextRequest(
+        'http://localhost/api/products?stock=1&videoShot=true&xiaohongshuVideoPublished=false&xiaohongshuListed=true',
+      ),
+    );
+    expect(response.status).toBe(200);
+    const where = mocks.products.mock.calls[0][0].where;
+    expect(where).toMatchObject({
+      stock: { gt: 0 },
+      AND: [
+        { marketing: { is: { videoShot: true } } },
+        {
+          OR: [
+            { marketing: { is: null } },
+            { marketing: { is: { xiaohongshuVideoPublished: false } } },
+          ],
+        },
+        { marketing: { is: { xiaohongshuListed: true } } },
+      ],
+    });
+    expect(mocks.productCount).toHaveBeenCalledWith({ where });
+  });
+
+  it('retains the unset-setting filter alongside incomplete marketing progress', async () => {
+    const response = await products(
+      new NextRequest('http://localhost/api/products?settingStyleId=unset&videoShot=false'),
+    );
+    expect(response.status).toBe(200);
+    expect(mocks.products.mock.calls[0][0].where.AND).toEqual([
+      {
+        OR: [{ extraInfo: { is: null } }, { extraInfo: { is: { settingStyleId: null } } }],
+      },
+      {
+        OR: [{ marketing: { is: null } }, { marketing: { is: { videoShot: false } } }],
+      },
+    ]);
+  });
+
+  it('rejects invalid progress values before database reads', async () => {
+    const response = await products(
+      new NextRequest('http://localhost/api/products?xiaohongshuListed=pending'),
+    );
+    expect(response.status).toBe(400);
+    expect(mocks.products).not.toHaveBeenCalled();
+  });
+});

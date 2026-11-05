@@ -23,6 +23,7 @@ import {
 } from '@ant-design/icons';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { withAdminReturnTo } from '@/lib/admin-return-path';
 import {
   newDiyPart,
   patchDiyPart,
@@ -40,9 +41,11 @@ import styles from './diyImport.module.css';
 export function DiyImportPage({
   initialId,
   targetProductId,
+  returnTo,
 }: {
   initialId?: string;
   targetProductId?: string;
+  returnTo?: string;
 }) {
   const t = useTranslations('diyImport');
   const state = useDiyImport(initialId);
@@ -125,9 +128,10 @@ export function DiyImportPage({
         <div>
           <Link
             href={
-              job?.data.targetProductId
+              returnTo ??
+              (job?.data.targetProductId
                 ? `/admin/products/${job.data.targetProductId}`
-                : '/admin/products'
+                : '/admin/products')
             }
             className="back-link"
           >
@@ -250,7 +254,12 @@ export function DiyImportPage({
               title={t('commitSuccess')}
               subTitle={t('commitSuccessHint')}
               extra={
-                <Link href={`/admin/products/${job.productId}`}>
+                <Link
+                  href={withAdminReturnTo(
+                    `/admin/products/${job.productId}`,
+                    returnTo ?? '/admin/products',
+                  )}
+                >
                   <Button type="primary">{t('viewProduct')}</Button>
                 </Link>
               }

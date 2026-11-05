@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       select: { id: true, name: true },
       orderBy: { name: 'asc' },
     });
-    return NextResponse.json({ matches: await recognizeNameTags(names, tags) });
+    return NextResponse.json({ matches: await recognizeNameTags(names, tags, request.signal) });
   } catch (error) {
     return apiError(error);
   }

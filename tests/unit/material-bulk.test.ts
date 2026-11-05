@@ -4,6 +4,7 @@ import { MAX_STOCK } from '../../src/lib/inventory';
 import {
   bulkSaleValues,
   bulkStockQuantity,
+  bulkTagChanges,
   materialBulkUpdateSchema,
   togglePageSelection,
 } from '../../src/lib/material-bulk';
@@ -15,6 +16,54 @@ describe('bulk material selection', () => {
     expect(togglePageSelection(both, ['a', 'b'], false)).toEqual(['c', 'd']);
     expect(togglePageSelection(both, ['c'], false)).toEqual(['a', 'b', 'd']);
     expect(togglePageSelection(both, ['a'], true)).toHaveLength(4);
+  });
+});
+
+describe('bulk material tags', () => {
+  const id = 'clx1234567890123456789012';
+  const otherId = 'clx1234567890123456789013';
+  const base = {
+    snapshot: { materials: [{ id, updatedAt: new Date().toISOString() }], entries: [] },
+    entryIds: [],
+  };
+
+  it('adds only missing tags and keeps existing tags by default', () => {
+    expect(bulkTagChanges(['existing', 'shared'], ['shared', 'new'], false)).toEqual({
+      add: ['new'],
+      remove: [],
+    });
+    expect(
+      materialBulkUpdateSchema.parse({
+        ...base,
+        changes: { tags: { ids: [id], replace: false } },
+      }).changes.tags,
+    ).toEqual({ ids: [id], replace: false });
+  });
+
+  it('replaces old tags and allows clearing every tag', () => {
+    expect(bulkTagChanges(['existing', 'shared'], ['shared', 'new'], true)).toEqual({
+      add: ['new'],
+      remove: ['existing'],
+    });
+    expect(bulkTagChanges(['existing'], [], true)).toEqual({ add: [], remove: ['existing'] });
+    expect(
+      materialBulkUpdateSchema.safeParse({
+        ...base,
+        changes: { tags: { ids: [], replace: true } },
+      }).success,
+    ).toBe(true);
+  });
+
+  it('rejects empty additive and duplicate tag selections', () => {
+    for (const tags of [
+      { ids: [], replace: false },
+      { ids: [id, id], replace: false },
+      { ids: [id, otherId], replace: 'yes' },
+    ]) {
+      expect(materialBulkUpdateSchema.safeParse({ ...base, changes: { tags } }).success).toBe(
+        false,
+      );
+    }
   });
 });
 

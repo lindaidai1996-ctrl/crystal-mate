@@ -54,6 +54,7 @@ export type DistributorPurchaseSummary = {
   itemId: string;
   name: string;
   code: string | null;
+  image: Pick<ProductImage, 'objectKey' | 'url'> | null;
   unit: string | null;
   batchCount: number;
   latestReceivedAt: string;
@@ -160,7 +161,7 @@ export type ProductDiyMaterial = {
   id: string;
   materialBatchEntryId: string;
   materialBatchEntry: MaterialBatchEntry & {
-    material: { id: string; name: string; unit: MaterialUnit };
+    material: Pick<Material, 'id' | 'name' | 'unit' | 'images'>;
   };
   usageUnit: 'STRAND' | 'BEAD' | 'GRAM';
   quantity: string;

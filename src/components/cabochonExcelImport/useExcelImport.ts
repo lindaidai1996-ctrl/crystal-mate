@@ -170,10 +170,10 @@ export function useExcelImport(initialId?: string) {
       if (file.size > MAX_EXCEL_BYTES) throw new Error('EXCEL_FILE_TOO_LARGE');
       const buffer = await file.arrayBuffer();
       setProgress(t('parsing'));
-      const { parseWorkbook } = await import('@/lib/cabochonExcelImport/workbook');
+      const { parseWorkbookAsync } = await import('@/lib/cabochonExcelImport/workbook');
       let parsed: ParsedWorkbook;
       try {
-        parsed = parseWorkbook(new Uint8Array(buffer));
+        parsed = await parseWorkbookAsync(new Uint8Array(buffer));
       } catch (error) {
         if (error instanceof Error && error.message.startsWith('EXCEL_')) throw error;
         throw new Error('EXCEL_INVALID_FILE');

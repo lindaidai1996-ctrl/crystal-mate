@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { emptyExcelValues, excelRowInputSchema } from '@/lib/cabochonExcelImport/contracts';
 import {
   detectColumns,
+  excelMeasurementValue,
   normalizeExcelCostNotes,
   normalizeExcelRow,
   parseExcelAmount,
@@ -174,6 +175,43 @@ describe('cabochon spreadsheet conversion', () => {
       }),
     ).toEqual({ nickname: 'B', type: 'C', correctedPrice: 'D', measurement: 'E' });
     expect(detectColumns({ A: '售价', B: '售价' }).price).toBeUndefined();
+  });
+  it('maps dimensions when spreadsheet line breaks remain as numeric entities', () => {
+    expect(detectColumns({ J: '尺寸&#xA;(裸蛋&#xA;带镶嵌)' }).measurement).toBe('J');
+    expect(detectColumns({ J: '尺寸&#10;(裸蛋&#10;带镶嵌)' }).measurement).toBe('J');
+    expect(detectColumns({ E: '尺寸', K: '尺寸&#xA;(裸蛋&#xA;带镶嵌)' }).measurement).toBe('K');
+    expect(
+      detectColumns({ J: '尺寸（裸蛋带镶嵌）', K: '尺寸&#xA;(裸蛋&#xA;带镶嵌)' }).measurement,
+    ).toBeUndefined();
+    expect(normalizeExcelRow(row({ measurement: '24.6*23.9*15' }), [], []).measurement).toEqual({
+      lengthMm: 24.6,
+      widthMm: 23.9,
+      heightMm: 15,
+    });
+  });
+  it('recovers dimensions from saved source cells without replacing manual edits', () => {
+    const saved = {
+      ...row(),
+      original: [
+        { column: 'E 尺寸', value: '' },
+        { column: 'K 尺寸&#xA;(裸蛋&#xA;带镶嵌)', value: '30x25.5x15' },
+      ],
+    };
+    expect(excelMeasurementValue(saved)).toBe('30x25.5x15');
+    expect(normalizeExcelRow(saved, [], []).measurement).toEqual({
+      lengthMm: 30,
+      widthMm: 25.5,
+      heightMm: 15,
+    });
+    const changed = { ...saved, values: { ...saved.values, measurement: '20x19x8' } };
+    expect(excelMeasurementValue(changed)).toBe('20x19x8');
+    const cleared = excelRowInputSchema.parse({
+      ...saved,
+      measurementEdited: true,
+      values: { ...saved.values, measurement: '' },
+    });
+    expect(excelMeasurementValue(cleared)).toBe('');
+    expect(normalizeExcelRow(cleared, [], []).measurement).toBeNull();
   });
   it('allows blank fields with unknown type, zero price and one unit in stock', () => {
     expect(normalizeExcelRow(row(), [], [])).toMatchObject({

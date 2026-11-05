@@ -1,15 +1,17 @@
 'use client';
 
-import { PlusOutlined } from '@ant-design/icons';
-import { App, Button, Empty, Form, Input, Modal } from 'antd';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { App, Button, Empty, Form, Input, Modal, Popconfirm, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from '@/i18n/navigation';
 import { PaginatedTable } from '@/components/paginated-table';
 import { TextTag } from '@/components/text-tag';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { SettingStyle } from '@/lib/client-types';
 import { CLIENT_TABLE_PAGINATION, DEFAULT_TABLE_PAGE_SIZE } from '@/lib/table-pagination';
+import { useSessionListState } from './useSessionListState';
 
 export function SettingStylesPage() {
   const t = useTranslations('settingStyles');
@@ -17,14 +19,17 @@ export function SettingStylesPage() {
   const { message } = App.useApp();
   const [form] = Form.useForm<{ magicBoxStyle: string }>();
   const [items, setItems] = useState<SettingStyle[]>([]);
-  const [query, setQuery] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_TABLE_PAGE_SIZE);
+  const [query, setQuery] = useSessionListState('setting-styles:query', '');
+  const [page, setPage] = useSessionListState('setting-styles:page', 1);
+  const [pageSize, setPageSize] = useSessionListState(
+    'setting-styles:pageSize',
+    DEFAULT_TABLE_PAGE_SIZE,
+  );
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [loadRevision, setLoadRevision] = useState(0);
   const [saving, setSaving] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<SettingStyle | null | undefined>(undefined);
 
   useEffect(() => {
     let active = true;
@@ -55,16 +60,28 @@ export function SettingStylesPage() {
   }, [items, query]);
   const currentPage = Math.min(page, Math.max(1, Math.ceil(visibleItems.length / pageSize)));
 
+  function open(item: SettingStyle | null) {
+    setEditing(item);
+    form.setFieldsValue({ magicBoxStyle: item?.magicBoxStyle ?? '' });
+  }
+
   async function save(values: { magicBoxStyle: string }) {
     if (saving) return;
     setSaving(true);
     try {
-      const item = await apiFetch<SettingStyle>('/api/setting-styles', {
-        method: 'POST',
-        body: JSON.stringify(values),
-      });
-      setItems((current) => [...current, item]);
-      setOpen(false);
+      const item = await apiFetch<SettingStyle>(
+        editing ? `/api/setting-styles/${editing.id}` : '/api/setting-styles',
+        {
+          method: editing ? 'PUT' : 'POST',
+          body: JSON.stringify(values),
+        },
+      );
+      setItems((current) =>
+        editing
+          ? current.map((entry) => (entry.id === item.id ? { ...entry, ...item } : entry))
+          : [...current, item],
+      );
+      setEditing(undefined);
       message.success(common('saved'));
     } catch (error) {
       message.error(
@@ -72,6 +89,18 @@ export function SettingStylesPage() {
       );
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function remove(id: string) {
+    try {
+      await apiFetch(`/api/setting-styles/${id}`, { method: 'DELETE' });
+      setItems((current) => current.filter((item) => item.id !== id));
+      message.success(common('deleted'));
+    } catch (error) {
+      message.error(
+        common(`errors.${error instanceof ClientApiError ? error.code : 'SERVER_ERROR'}` as never),
+      );
     }
   }
 
@@ -88,7 +117,39 @@ export function SettingStylesPage() {
       title: t('productCount'),
       dataIndex: 'productCount',
       key: 'productCount',
+      render: (count: number, item) => (
+        <Link href={`/admin/catalog/cabochons?settingStyleId=${encodeURIComponent(item.id)}`}>
+          {count}
+        </Link>
+      ),
       sorter: (a, b) => a.productCount - b.productCount,
+    },
+    {
+      title: t('actions'),
+      key: 'actions',
+      width: 110,
+      render: (_, item) => (
+        <span className="row-actions">
+          <Tooltip title={common('edit')}>
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              aria-label={common('edit')}
+              onClick={() => open(item)}
+            />
+          </Tooltip>
+          <Popconfirm
+            title={t('deleteConfirm')}
+            okText={common('delete')}
+            cancelText={common('cancel')}
+            onConfirm={() => remove(item.id)}
+          >
+            <Tooltip title={common('delete')}>
+              <Button type="text" danger icon={<DeleteOutlined />} aria-label={common('delete')} />
+            </Tooltip>
+          </Popconfirm>
+        </span>
+      ),
     },
   ];
 
@@ -99,7 +160,7 @@ export function SettingStylesPage() {
           <h1>{t('title')}</h1>
           <p>{t('count', { count: visibleItems.length })}</p>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => open(null)}>
           {t('new')}
         </Button>
       </div>
@@ -151,10 +212,10 @@ export function SettingStylesPage() {
         />
       </div>
       <Modal
-        title={t('new')}
-        open={open}
+        title={editing ? t('editTitle') : t('newTitle')}
+        open={editing !== undefined}
         onCancel={() => {
-          if (!saving) setOpen(false);
+          if (!saving) setEditing(undefined);
         }}
         onOk={() => form.submit()}
         okText={common('save')}
@@ -162,7 +223,12 @@ export function SettingStylesPage() {
         confirmLoading={saving}
         afterClose={() => form.resetFields()}
       >
-        <Form form={form} layout="vertical" onFinish={save}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={save}
+          onFinishFailed={() => message.error(common('checkRequiredFields'))}
+        >
           <Form.Item
             name="magicBoxStyle"
             label={t('magicBoxStyle')}

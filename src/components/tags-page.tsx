@@ -10,6 +10,7 @@ import { TextTag } from '@/components/text-tag';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { Tag } from '@/lib/client-types';
 import { CLIENT_TABLE_PAGINATION, DEFAULT_TABLE_PAGE_SIZE } from '@/lib/table-pagination';
+import { useSessionListState } from './useSessionListState';
 
 export function TagsPage() {
   const t = useTranslations('tags');
@@ -17,9 +18,9 @@ export function TagsPage() {
   const { message } = App.useApp();
   const [form] = Form.useForm<{ name: string }>();
   const [items, setItems] = useState<Tag[]>([]);
-  const [query, setQuery] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_TABLE_PAGE_SIZE);
+  const [query, setQuery] = useSessionListState('tags:query', '');
+  const [page, setPage] = useSessionListState('tags:page', 1);
+  const [pageSize, setPageSize] = useSessionListState('tags:pageSize', DEFAULT_TABLE_PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState<Tag | null | undefined>(undefined);
@@ -57,7 +58,11 @@ export function TagsPage() {
     form.setFieldsValue({ name: item?.name ?? '' });
   }
   async function save() {
-    const values = await form.validateFields();
+    const values = await form.validateFields().catch(() => null);
+    if (!values) {
+      message.error(common('checkRequiredFields'));
+      return;
+    }
     setSaving(true);
     try {
       await apiFetch(editing ? `/api/tags/${editing.id}` : '/api/tags', {

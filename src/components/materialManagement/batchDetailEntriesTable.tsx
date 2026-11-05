@@ -10,6 +10,8 @@ import { MaterialStockButton } from '@/components/inventory/materialStockButton'
 import type { MaterialBatchDetail } from '@/lib/client-types';
 import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
 import { ImageHoverPreview } from './imageHoverPreview';
+import { useSessionListState } from '@/components/useSessionListState';
+import { withAdminReturnTo } from '@/lib/admin-return-path';
 
 export type BatchEntryType = 'all' | 'product' | 'material';
 type BatchEntryRow =
@@ -19,11 +21,13 @@ type BatchEntryRow =
 export function BatchDetailEntriesTable({
   batch,
   type,
+  returnTo,
   onRemove,
   onStockSaved,
 }: {
   batch: MaterialBatchDetail;
   type: BatchEntryType;
+  returnTo: string;
   onRemove: (entry: MaterialBatchDetail['entries'][number]) => Promise<void>;
   onStockSaved: () => void | Promise<void>;
 }) {
@@ -31,6 +35,23 @@ export function BatchDetailEntriesTable({
   const common = useTranslations('common');
   const inventory = useTranslations('inventory');
   const editor = useTranslations('materialEditor');
+  const [page, setPage] = useSessionListState(`material-batch-detail:${batch.id}:${type}:page`, 1);
+  const [pageSize, setPageSize] = useSessionListState(
+    `material-batch-detail:${batch.id}:${type}:pageSize`,
+    20,
+  );
+  const price = (value: string | null, suffix: string) =>
+    value === null ? '—' : `${value} ${suffix}`;
+  const unitSuffix = (row: BatchEntryRow) =>
+    row.type === 'product'
+      ? `${editor('yuan')}/${t('PIECE')}`
+      : editor(
+          row.entry.material.unit === 'GRAM'
+            ? 'yuanPerGram'
+            : row.entry.material.unit === 'STRAND'
+              ? 'yuanPerStrand'
+              : 'yuanPerBead',
+        );
   const rows: BatchEntryRow[] = [
     ...batch.productEntries.map((entry) => ({ type: 'product' as const, entry })),
     ...batch.entries.map((entry) => ({ type: 'material' as const, entry })),
@@ -44,16 +65,9 @@ export function BatchDetailEntriesTable({
 
   const columns: ColumnsType<BatchEntryRow> = [
     {
-      title: t('type'),
-      key: 'type',
-      width: 80,
-      fixed: 'left',
-      render: (_, row) => <Tag color={row.type === 'product' ? 'blue' : 'gold'}>{t(row.type)}</Tag>,
-    },
-    {
       title: t('item'),
       key: 'item',
-      width: 240,
+      width: 280,
       fixed: 'left',
       render: (_, row) => {
         const product = row.type === 'product' ? row.entry.product : null;
@@ -68,11 +82,47 @@ export function BatchDetailEntriesTable({
             <div>
               <Link
                 className="product-name"
-                href={`/admin/${row.type === 'product' ? 'products' : 'materials'}/${itemId}`}
+                href={withAdminReturnTo(
+                  `/admin/${row.type === 'product' ? 'products' : 'materials'}/${itemId}`,
+                  returnTo,
+                )}
               >
                 {name}
               </Link>
+              <div>
+                <Tag color={row.type === 'product' ? 'blue' : 'gold'}>{t(row.type)}</Tag>
+              </div>
               {product && <div className="product-code">{product.code}</div>}
+              {row.type === 'material' && (
+                <div className="material-source-label">
+                  {row.entry.weightGrams !== null && (
+                    <div>
+                      {editor('unitWeight', { unit: t(row.entry.material.unit) })}:{' '}
+                      {row.entry.weightGrams} g
+                    </div>
+                  )}
+                  {row.entry.material.unit === 'STRAND' && row.entry.childCount !== null && (
+                    <div>
+                      {editor('childCount')}: {row.entry.childCount}
+                    </div>
+                  )}
+                  {row.entry.material.unit === 'STRAND' && row.entry.childWeightGrams !== null && (
+                    <div>
+                      {editor('childWeightGrams')}: {row.entry.childWeightGrams} g
+                    </div>
+                  )}
+                  {(['lengthMm', 'widthMm', 'heightMm'] as const).some(
+                    (field) => row.entry[field] !== null,
+                  ) && (
+                    <div>
+                      {(['lengthMm', 'widthMm', 'heightMm'] as const)
+                        .filter((field) => row.entry[field] !== null)
+                        .map((field) => `${editor(field)} ${row.entry[field]} mm`)
+                        .join(' · ')}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -85,104 +135,95 @@ export function BatchDetailEntriesTable({
       render: (_, row) => row.entry.distributor.name,
     },
     {
-      title: t('quantity'),
+      title: t('quantityAndStock'),
       key: 'quantity',
-      width: 110,
-      render: (_, row) =>
-        row.type === 'product'
-          ? `${row.entry.quantity} ${t('PIECE')}`
-          : row.entry.receivedQty === null
-            ? t('quantityUnknown', { unit: t(row.entry.material.unit) })
-            : `${row.entry.receivedQty} ${t(row.entry.material.unit)}`,
-    },
-    ...(type !== 'product'
-      ? ([
-          {
-            title: inventory('current'),
-            key: 'stock',
-            width: 110,
-            render: (_, row) =>
-              row.type === 'material'
-                ? `${row.entry.remainingQty ?? inventory('unknown')} ${t(row.entry.material.unit)}`
-                : '—',
-          },
-        ] satisfies ColumnsType<BatchEntryRow>)
-      : []),
-    ...(type !== 'product'
-      ? ([
-          {
-            title: t('totalWeightGrams'),
-            key: 'totalWeightGrams',
-            width: 110,
-            render: (_, row) =>
-              row.type === 'material' && row.entry.purchase.totalWeightGrams !== null
-                ? `${row.entry.purchase.totalWeightGrams} g`
-                : '—',
-          },
-          {
-            title: t('totalAmount'),
-            key: 'totalAmount',
-            width: 100,
-            render: (_, row) =>
-              row.type === 'material' ? (row.entry.purchase.totalAmount ?? '—') : '—',
-          },
-        ] satisfies ColumnsType<BatchEntryRow>)
-      : []),
-    {
-      title: t('purchaseUnitPrice'),
-      key: 'purchaseUnitPrice',
-      width: 130,
-      render: (_, row) =>
-        row.type === 'product' ? (
-          row.entry.unitCost
-        ) : (
-          <span>
-            {row.entry.purchaseUnitPrice ?? '—'}
-            {row.entry.material.unit === 'GRAM' && ` ${editor('yuanPerGram')}`}
-            {(row.entry.unitPriceSource === 'ESTIMATED' ||
-              row.entry.unitPriceSource === 'MANUAL') && (
-              <span className="material-source-label">
-                {' '}
-                · {t(`priceSource_${row.entry.unitPriceSource}`)}
-              </span>
-            )}
-          </span>
-        ),
-    },
-    ...(type !== 'product'
-      ? ([
-          {
-            title: t('gramPrice'),
-            key: 'gramPrice',
-            width: 100,
-            render: (_, row) =>
-              row.type === 'material' ? (row.entry.purchaseGramPrice ?? '—') : '—',
-          },
-        ] satisfies ColumnsType<BatchEntryRow>)
-      : []),
-    {
-      title: t('salePrice'),
-      key: 'salePrice',
-      width: 100,
-      render: (_, row) =>
-        row.type === 'product' ? (
-          (row.entry.product.priceCents / 100).toFixed(2)
-        ) : (
-          <div>
+      width: 180,
+      render: (_, row) => {
+        if (row.type === 'product') return `${t('quantity')}: ${row.entry.quantity} ${t('PIECE')}`;
+        const unit = t(row.entry.material.unit);
+        return (
+          <div className="material-batch-names">
             <div>
-              {row.entry.saleUnitPrice ?? '—'}
-              {row.entry.material.unit === 'GRAM' && ` ${editor('yuanPerGram')}`}
+              {t('quantity')}:{' '}
+              {row.entry.receivedQty === null
+                ? t('quantityUnknown', { unit })
+                : `${row.entry.receivedQty} ${unit}`}
             </div>
-            {row.entry.material.unit === 'STRAND' && row.entry.saleChildUnitPrice !== null && (
-              <div className="material-source-label">
-                <div>{t('saleBeadPrice')}</div>
-                <div>
-                  {row.entry.saleChildUnitPrice} {editor('yuanPerBead')}
-                </div>
-              </div>
-            )}
+            <div>
+              {inventory('current')}: {row.entry.remainingQty ?? inventory('unknown')} {unit}
+            </div>
+            <span className="material-price-summary">
+              {t('totalWeightGrams')}:{' '}
+              {row.entry.purchase.totalWeightGrams === null
+                ? '—'
+                : `${row.entry.purchase.totalWeightGrams} g`}
+            </span>
           </div>
-        ),
+        );
+      },
+    },
+    {
+      title: t('priceDetails'),
+      key: 'prices',
+      width: 410,
+      render: (_, row) => {
+        const suffix = unitSuffix(row);
+        if (row.type === 'product')
+          return (
+            <div className="material-batch-names">
+              <div>
+                {t('purchaseUnitPrice')}: {price(row.entry.unitCost, suffix)}
+              </div>
+              <div>
+                {t('salePrice')}: {price((row.entry.product.priceCents / 100).toFixed(2), suffix)}
+              </div>
+            </div>
+          );
+        const { entry } = row;
+        const gram = entry.material.unit === 'GRAM';
+        const sourceLabel =
+          entry.unitPriceSource === 'ESTIMATED' || entry.unitPriceSource === 'MANUAL'
+            ? ` (${t(`priceSource_${entry.unitPriceSource}`)})`
+            : '';
+        const gramPrices = [
+          `${t('gramPrice')}: ${price(entry.purchaseGramPrice, editor('yuanPerGram'))}`,
+          ...(entry.saleGramPrice === null
+            ? []
+            : [`${t('saleGramPrice')}: ${price(entry.saleGramPrice, editor('yuanPerGram'))}`]),
+        ];
+        const beadPrices =
+          entry.material.unit === 'STRAND'
+            ? [
+                ...(entry.childUnitPrice === null
+                  ? []
+                  : [
+                      `${t('purchaseBeadPrice')}: ${price(entry.childUnitPrice, editor('yuanPerBead'))}`,
+                    ]),
+                ...(entry.saleChildUnitPrice === null
+                  ? []
+                  : [
+                      `${t('saleBeadPrice')}: ${price(entry.saleChildUnitPrice, editor('yuanPerBead'))}`,
+                    ]),
+              ]
+            : [];
+        return (
+          <div className="material-batch-names">
+            <div>
+              {t('purchaseUnitPrice')}: {price(entry.purchaseUnitPrice, suffix)}
+              {sourceLabel}
+              {' · '}
+              {t('salePrice')}: {price(gram ? entry.saleGramPrice : entry.saleUnitPrice, suffix)}
+            </div>
+            {!gram && <span className="material-price-summary">{gramPrices.join(' · ')}</span>}
+            {beadPrices.length > 0 && (
+              <span className="material-price-summary">{beadPrices.join(' · ')}</span>
+            )}
+            <span className="material-price-summary">
+              {t('totalAmount')}: {price(entry.purchase.totalAmount, editor('yuan'))}
+            </span>
+          </div>
+        );
+      },
     },
     {
       title: t('actions'),
@@ -201,11 +242,12 @@ export function BatchDetailEntriesTable({
             />
           )}
           <Link
-            href={
+            href={withAdminReturnTo(
               row.type === 'product'
                 ? `/admin/products/${row.entry.productId}`
-                : `/admin/materials/${row.entry.materialId}/batches/${row.entry.id}`
-            }
+                : `/admin/materials/${row.entry.materialId}/batches/${row.entry.id}`,
+              returnTo,
+            )}
           >
             <Tooltip title={common('edit')}>
               <Button type="text" icon={<EditOutlined />} aria-label={common('edit')} />
@@ -240,8 +282,16 @@ export function BatchDetailEntriesTable({
         rowKey={(row) => `${row.type}:${row.entry.id}`}
         dataSource={rows}
         columns={columns}
-        scroll={{ x: type === 'product' ? 970 : 1390 }}
-        pagination={CLIENT_TABLE_PAGINATION}
+        scroll={{ x: 1180 }}
+        pagination={{
+          ...CLIENT_TABLE_PAGINATION,
+          current: Math.min(page, Math.max(1, Math.ceil(rows.length / pageSize))),
+          pageSize,
+          onChange: (nextPage, nextPageSize) => {
+            setPage(nextPageSize === pageSize ? nextPage : 1);
+            setPageSize(nextPageSize);
+          },
+        }}
         locale={{
           emptyText: (
             <Empty

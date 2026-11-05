@@ -18,6 +18,7 @@ export function useNameTagRecognition({
   const [error, setError] = useState<string | null>(null);
   const [missingTags, setMissingTags] = useState<string[]>([]);
   const [matchedCount, setMatchedCount] = useState<number | null>(null);
+  const [cancelled, setCancelled] = useState(false);
   const request = useRef<{ controller: AbortController; name: string } | null>(null);
   const lastName = useRef<string | null>(null);
   const automatic = useRef<string[]>([]);
@@ -36,10 +37,15 @@ export function useNameTagRecognition({
     setError(null);
     setMissingTags([]);
     setMatchedCount(null);
+    setCancelled(false);
   }
   function reset() {
     invalidate();
     automatic.current = [];
+  }
+  function cancel() {
+    invalidate();
+    setCancelled(true);
   }
   function manualChange(ids: string[]) {
     // A manual action while AI is running wins over the pending response.
@@ -56,6 +62,7 @@ export function useNameTagRecognition({
     setError(null);
     setMissingTags([]);
     setMatchedCount(null);
+    setCancelled(false);
     try {
       const [match] = await matchNameTags([name], current.controller.signal);
       if (
@@ -89,7 +96,9 @@ export function useNameTagRecognition({
     error,
     missingTags,
     matchedCount,
+    cancelled,
     recognize,
+    cancel,
     invalidate,
     reset,
     manualChange,

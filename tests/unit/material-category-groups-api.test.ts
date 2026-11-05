@@ -70,7 +70,11 @@ describe('material category group API filters', () => {
         take: 20,
         where: {
           categoryId: { in: ids },
-          OR: [{ name: { contains: '扣头', mode: 'insensitive' } }, { id: { in: [] } }],
+          OR: [
+            { name: { contains: '扣头', mode: 'insensitive' } },
+            { id: { in: [] } },
+            { tags: { some: { tag: { name: { contains: '扣头', mode: 'insensitive' } } } } },
+          ],
           imageImportItems: { some: { entryId: { not: null } } },
           createdAt: {
             gte: new Date('2026-10-31T16:00:00Z'),
@@ -115,5 +119,21 @@ describe('material category group API filters', () => {
     mocks.auth.mockResolvedValue(null);
     expect((await request({ categoryGroup: 'silver' })).status).toBe(401);
     expect(mocks.materials).not.toHaveBeenCalled();
+  });
+});
+
+describe('material search API filters', () => {
+  it('includes names, aliases, and tag names in the DIY material search', async () => {
+    mocks.aliases.mockResolvedValue(['alias-material']);
+
+    expect((await request({ q: '和田玉' })).status).toBe(200);
+    const where = mocks.materials.mock.calls[0][0].where;
+    expect(where.OR).toEqual([
+      { name: { contains: '和田玉', mode: 'insensitive' } },
+      { id: { in: ['alias-material'] } },
+      { tags: { some: { tag: { name: { contains: '和田玉', mode: 'insensitive' } } } } },
+    ]);
+    expect(mocks.aliases).toHaveBeenCalledWith('material', '和田玉');
+    expect(mocks.count).toHaveBeenCalledWith({ where });
   });
 });

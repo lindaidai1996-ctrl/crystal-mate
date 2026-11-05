@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { Material, MaterialImageImportSource } from '@/lib/client-types';
+import { withAdminReturnTo } from '@/lib/admin-return-path';
 import sourceStyles from './materialImportSources.module.css';
 
 export function MaterialImportSources({ material }: { material: Material }) {
@@ -129,7 +130,12 @@ export function MaterialImportSources({ material }: { material: Material }) {
                     <dd>{source.distributor.name}</dd>
                     <dt>{t('batch')}</dt>
                     <dd>
-                      <Link href={`/admin/materials/batches/${source.batch.id}`}>
+                      <Link
+                        href={withAdminReturnTo(
+                          `/admin/materials/batches/${source.batch.id}`,
+                          '/admin/materials',
+                        )}
+                      >
                         {source.batch.name}
                       </Link>
                     </dd>

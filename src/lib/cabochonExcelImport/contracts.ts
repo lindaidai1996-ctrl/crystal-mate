@@ -3,7 +3,7 @@ import { cabochonImageKeyPattern } from '@/lib/image-storage';
 import { nameTagMatchSchema } from '@/lib/name-tag-matching';
 
 export const MAX_EXCEL_ROWS = 300;
-export const MAX_EXCEL_BYTES = 50 * 1024 * 1024;
+export const MAX_EXCEL_BYTES = 150 * 1024 * 1024;
 export const excelFields = [
   'nickname',
   'type',
@@ -30,6 +30,7 @@ export const excelValuesSchema = z.record(z.enum(excelFields), z.string().max(10
 export const excelRowInputSchema = z.strictObject({
   rowNumber: z.number().int().min(1).max(1048576),
   values: excelValuesSchema,
+  measurementEdited: z.boolean().optional(),
   productName: z.string().max(120).nullable().optional(),
   sourceStyle: z.string().max(10000).optional(),
   styleChoice: z.enum(['AUTO', 'SELECT', 'NEW', 'NONE']).optional(),

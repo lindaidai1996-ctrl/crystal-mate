@@ -47,7 +47,11 @@ export function CategoriesPage() {
     form.setFieldsValue({ name: item?.name ?? '', prefix: item?.prefix ?? undefined });
   }
   async function save() {
-    const values = await form.validateFields();
+    const values = await form.validateFields().catch(() => null);
+    if (!values) {
+      message.error(common('checkRequiredFields'));
+      return;
+    }
     setSaving(true);
     try {
       await apiFetch(editing ? `/api/categories/${editing.id}` : '/api/categories', {
@@ -80,12 +84,15 @@ export function CategoriesPage() {
       dataIndex: 'prefix',
       key: 'prefix',
       width: 120,
+      sorter: (a, b) => (a.prefix ?? '').localeCompare(b.prefix ?? '', 'en'),
+      defaultSortOrder: 'ascend',
       render: (prefix: string | null) => prefix || '—',
     },
     {
       title: t('productCount'),
       key: 'count',
       width: 150,
+      sorter: (a, b) => (a._count?.products ?? 0) - (b._count?.products ?? 0),
       render: (_, item) => item._count?.products ?? 0,
     },
     {

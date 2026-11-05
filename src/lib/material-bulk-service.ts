@@ -7,6 +7,7 @@ import type { MaterialValues } from './client-types';
 import {
   bulkSaleValues,
   bulkStockQuantity,
+  bulkTagChanges,
   type BulkIssue,
   type MaterialBulkSnapshot,
   type MaterialBulkUpdate,
@@ -140,6 +141,12 @@ export async function updateMaterialBulk(input: MaterialBulkUpdate) {
       )
         fail('CATEGORY_NOT_FOUND');
       if (
+        changes.tags &&
+        (await tx.tag.count({ where: { id: { in: changes.tags.ids } } })) !==
+          changes.tags.ids.length
+      )
+        fail('TAG_NOT_FOUND');
+      if (
         changes.distributorId &&
         !(await tx.distributor.findUnique({ where: { id: changes.distributorId } }))
       )
@@ -217,9 +224,27 @@ export async function updateMaterialBulk(input: MaterialBulkUpdate) {
             },
           });
       }
-      const affectedIds = changes.categoryId
-        ? items.map((item) => item.id)
-        : [...new Set(targets.map(({ item }) => item.id))];
+      if (changes.tags) {
+        for (const item of items) {
+          const { add, remove } = bulkTagChanges(
+            item.tags.map(({ tagId }) => tagId),
+            changes.tags.ids,
+            changes.tags.replace,
+          );
+          if (remove.length)
+            await tx.materialTag.deleteMany({
+              where: { materialId: item.id, tagId: { in: remove } },
+            });
+          if (add.length)
+            await tx.materialTag.createMany({
+              data: add.map((tagId) => ({ materialId: item.id, tagId })),
+            });
+        }
+      }
+      const affectedIds =
+        changes.categoryId || changes.tags
+          ? items.map((item) => item.id)
+          : [...new Set(targets.map(({ item }) => item.id))];
       await tx.material.updateMany({
         where: { id: { in: affectedIds } },
         data: {

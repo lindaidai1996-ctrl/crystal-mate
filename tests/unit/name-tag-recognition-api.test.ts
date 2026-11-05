@@ -20,12 +20,14 @@ beforeEach(() => {
 });
 describe('name tag recognition API', () => {
   it('uses the server tag library and returns suggestions without writing catalog data', async () => {
-    const response = await POST(request([' 粉云母 ']));
+    const pendingRequest = request([' 粉云母 ']);
+    const response = await POST(pendingRequest);
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ matches: [{ tagIds: ['tag-1'], missingTags: [] }] });
     expect(mocks.recognize).toHaveBeenCalledExactlyOnceWith(
       ['粉云母'],
       [{ id: 'tag-1', name: '云母' }],
+      pendingRequest.signal,
     );
   });
   it('rejects unauthenticated and cross-origin requests before calling AI', async () => {

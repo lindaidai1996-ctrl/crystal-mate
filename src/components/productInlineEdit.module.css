@@ -1,0 +1,80 @@
+.cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  max-width: 100%;
+}
+
+.value {
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.editButton {
+  flex: none;
+  color: var(--ant-color-text-tertiary);
+}
+
+.cell:hover .editButton,
+.editButton:focus-visible {
+  color: var(--ant-color-primary);
+}
+
+.form {
+  width: min(340px, calc(100vw - 48px));
+}
+
+.title {
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.dimensions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.dimension {
+  min-width: 0;
+}
+
+.dimension span,
+.recognitionLabel {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+}
+
+.unit {
+  margin-top: 4px;
+  color: var(--ant-color-text-tertiary);
+  font-size: 12px;
+  text-align: right;
+}
+
+.recognitionLabel {
+  margin-top: 12px;
+}
+
+.recognition {
+  display: flex;
+  gap: 8px;
+}
+
+.recognition :global(.ant-input) {
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}

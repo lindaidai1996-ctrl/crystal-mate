@@ -15,16 +15,29 @@ import { coverFirstAttachments } from '@/lib/attachments';
 import { ImageHoverPreview } from './imageHoverPreview';
 import { DateRangeFilter } from '@/components/date-range-filter';
 import { inDateRange, type DateRange } from '@/lib/date-range';
+import { useSessionListState } from '@/components/useSessionListState';
+
+type BatchSort = {
+  key: 'date' | 'entries' | 'productEntries';
+  order: 'ascend' | 'descend';
+};
 
 export function MaterialBatchesPage() {
   const t = useTranslations('materialBatches');
   const common = useTranslations('common');
   const { message } = App.useApp();
   const [items, setItems] = useState<MaterialBatch[]>([]);
-  const [query, setQuery] = useState('');
-  const [receivedRange, setReceivedRange] = useState<DateRange>(null);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [query, setQuery] = useSessionListState('material-batches:query', '');
+  const [receivedRange, setReceivedRange] = useSessionListState<DateRange>(
+    'material-batches:receivedRange',
+    null,
+  );
+  const [page, setPage] = useSessionListState('material-batches:page', 1);
+  const [pageSize, setPageSize] = useSessionListState('material-batches:pageSize', 20);
+  const [sort, setSort] = useSessionListState<BatchSort | null>('material-batches:sort', {
+    key: 'date',
+    order: 'descend',
+  });
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<MaterialBatch | null | undefined>(undefined);
   const visible = useMemo(() => {
@@ -86,18 +99,24 @@ export function MaterialBatchesPage() {
       title: t('date'),
       key: 'date',
       width: 150,
+      sorter: (a, b) => a.receivedAt.localeCompare(b.receivedAt),
+      sortOrder: sort?.key === 'date' ? sort.order : null,
       render: (_, item) => item.receivedAt.slice(0, 10),
     },
     {
       title: t('materialCount'),
       key: 'entries',
       width: 130,
+      sorter: (a, b) => (a._count?.entries ?? 0) - (b._count?.entries ?? 0),
+      sortOrder: sort?.key === 'entries' ? sort.order : null,
       render: (_, item) => item._count?.entries ?? 0,
     },
     {
       title: t('productCount'),
       key: 'productEntries',
       width: 130,
+      sorter: (a, b) => (a._count?.productEntries ?? 0) - (b._count?.productEntries ?? 0),
+      sortOrder: sort?.key === 'productEntries' ? sort.order : null,
       render: (_, item) => item._count?.productEntries ?? 0,
     },
     {
@@ -183,6 +202,19 @@ export function MaterialBatchesPage() {
           columns={columns}
           dataSource={visible}
           loading={loading}
+          onChange={(_, __, sorter, extra) => {
+            if (extra.action !== 'sort') return;
+            const selected = Array.isArray(sorter) ? sorter[0] : sorter;
+            const key = selected?.columnKey;
+            const order = selected?.order;
+            setSort(
+              (key === 'date' || key === 'entries' || key === 'productEntries') &&
+                (order === 'ascend' || order === 'descend')
+                ? { key, order }
+                : null,
+            );
+            setPage(1);
+          }}
           scroll={{ x: 760 }}
           pagination={{
             ...CLIENT_TABLE_PAGINATION,
@@ -201,7 +233,6 @@ export function MaterialBatchesPage() {
           batch={editing}
           onClose={() => setEditing(undefined)}
           onSaved={(batch) => {
-            setPage(1);
             setItems((current) =>
               current.some((item) => item.id === batch.id)
                 ? current.map((item) => (item.id === batch.id ? batch : item))

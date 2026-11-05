@@ -326,7 +326,12 @@ export function MaterialBasicFields({
         confirmLoading={creatingCategory}
         forceRender
       >
-        <Form form={categoryForm} layout="vertical" onFinish={createCategory}>
+        <Form
+          form={categoryForm}
+          layout="vertical"
+          onFinish={createCategory}
+          onFinishFailed={() => message.error(common('checkRequiredFields'))}
+        >
           <Form.Item
             name="name"
             label={t('categoryName')}
@@ -360,7 +365,12 @@ export function MaterialBasicFields({
         confirmLoading={creatingTag}
         forceRender
       >
-        <Form form={tagForm} layout="vertical" onFinish={createTag}>
+        <Form
+          form={tagForm}
+          layout="vertical"
+          onFinish={createTag}
+          onFinishFailed={() => message.error(common('checkRequiredFields'))}
+        >
           <Form.Item
             name="name"
             label={tagText('name')}

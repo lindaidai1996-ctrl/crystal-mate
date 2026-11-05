@@ -1,4 +1,4 @@
-import { strFromU8, unzipSync } from 'fflate';
+import { strFromU8, unzip, unzipSync, type Unzipped } from 'fflate';
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import { detectColumns } from './normalize';
 import { MAX_EXCEL_BYTES, type ColumnMapping } from './contracts';
@@ -69,17 +69,35 @@ function flattenNodes(value: unknown, name: string): Xml[] {
 
 export function parseWorkbook(bytes: Uint8Array): ParsedWorkbook {
   if (!bytes.length || bytes.length > MAX_EXCEL_BYTES) throw new Error('EXCEL_FILE_TOO_LARGE');
+  return parseFiles(unzipSync(bytes, unzipOptions()));
+}
+
+export async function parseWorkbookAsync(bytes: Uint8Array): Promise<ParsedWorkbook> {
+  if (!bytes.length || bytes.length > MAX_EXCEL_BYTES) throw new Error('EXCEL_FILE_TOO_LARGE');
+  const files = await new Promise<Unzipped>((resolve, reject) => {
+    unzip(bytes, unzipOptions(), (error, result) => {
+      if (error) reject(error);
+      else resolve(result);
+    });
+  });
+  return parseFiles(files);
+}
+
+function unzipOptions() {
   let expanded = 0;
   let fileCount = 0;
-  const files = unzipSync(bytes, {
+  return {
     filter(file) {
       fileCount += 1;
       expanded += file.originalSize;
-      if (fileCount > 5000 || expanded > 200 * 1024 * 1024 || file.originalSize > MAX_EXCEL_BYTES)
+      if (fileCount > 5000 || expanded > 300 * 1024 * 1024 || file.originalSize > MAX_EXCEL_BYTES)
         throw new Error('EXCEL_FILE_TOO_LARGE');
       return /\.(?:xml|rels|png|jpe?g|webp|gif|bmp|tiff?)$/i.test(file.name);
     },
-  });
+  } satisfies Parameters<typeof unzipSync>[1];
+}
+
+function parseFiles(files: Unzipped): ParsedWorkbook {
   const parser = new XMLParser({
     ignoreAttributes: false,
     removeNSPrefix: true,

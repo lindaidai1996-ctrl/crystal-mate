@@ -88,6 +88,7 @@ export function MaterialCategoriesPage() {
     try {
       values = await form.validateFields();
     } catch {
+      message.error(common('checkRequiredFields'));
       return;
     }
     setSaving(true);

@@ -44,7 +44,11 @@ export function BatchEditorDrawer({
 
   async function save() {
     setSubmitted(true);
-    if (!draft.name.trim() || !draft.receivedAt || saving || uploading) return;
+    if (saving || uploading) return;
+    if (!draft.name.trim() || !draft.receivedAt) {
+      message.error(t('required'));
+      return;
+    }
     setSaving(true);
     try {
       const saved = await apiFetch<MaterialBatch>(

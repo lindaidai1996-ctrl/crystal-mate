@@ -145,6 +145,7 @@ export function StockAdjustmentDrawer({
                 form={form}
                 layout="vertical"
                 onFinish={(values) => void save(values)}
+                onFinishFailed={() => message.error(common('checkRequiredFields'))}
                 disabled={saving || !!error}
               >
                 <Form.Item

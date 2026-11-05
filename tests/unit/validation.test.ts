@@ -89,6 +89,13 @@ describe('catalog validation', () => {
     expect(listSchema.safeParse({ tagId: 'invalid' }).success).toBe(false);
   });
 
+  it('accepts a setting style or unset filter and rejects invalid IDs', () => {
+    const settingStyleId = 'clx1234567890123456789012';
+    expect(listSchema.parse({ settingStyleId }).settingStyleId).toBe(settingStyleId);
+    expect(listSchema.parse({ settingStyleId: 'unset' }).settingStyleId).toBe('unset');
+    expect(listSchema.safeParse({ settingStyleId: 'invalid' }).success).toBe(false);
+  });
+
   it('limits direct marketing updates to the three cabochon list switches', () => {
     for (const field of ['videoShot', 'xiaohongshuVideoPublished', 'xiaohongshuListed']) {
       expect(marketingToggleSchema.parse({ field, value: true })).toEqual({ field, value: true });

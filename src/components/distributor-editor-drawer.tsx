@@ -41,7 +41,11 @@ export function DistributorEditorDrawer({
 
   async function save() {
     const values = await form.validateFields().catch(() => null);
-    if (!values || uploading || saving) return;
+    if (!values) {
+      message.error(common('checkRequiredFields'));
+      return;
+    }
+    if (uploading || saving) return;
     setSaving(true);
     try {
       const saved = await apiFetch<Distributor>(

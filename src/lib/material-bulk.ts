@@ -44,12 +44,19 @@ export const materialBulkSnapshotSchema = z.strictObject({
   entries: z.array(version),
 });
 export const materialBulkDeleteSchema = z.strictObject({ snapshot: materialBulkSnapshotSchema });
+const bulkTagsSchema = z
+  .strictObject({
+    ids: z.array(id).refine((ids) => new Set(ids).size === ids.length),
+    replace: z.boolean(),
+  })
+  .refine(({ ids, replace }) => replace || ids.length > 0);
 export const materialBulkUpdateSchema = z.strictObject({
   snapshot: materialBulkSnapshotSchema,
   entryIds: z.array(id),
   changes: z
     .strictObject({
       categoryId: id.optional(),
+      tags: bulkTagsSchema.optional(),
       batchId: id.optional(),
       distributorId: id.optional(),
       stock: bulkStockSchema.optional(),
@@ -68,6 +75,15 @@ export type MaterialBulkPreview = {
   snapshot: MaterialBulkSnapshot;
   deleteBlockers: BulkIssue[];
 };
+
+export function bulkTagChanges(currentIds: string[], selectedIds: string[], replace: boolean) {
+  const current = new Set(currentIds);
+  const selected = new Set(selectedIds);
+  return {
+    add: selectedIds.filter((id) => !current.has(id)),
+    remove: replace ? currentIds.filter((id) => !selected.has(id)) : [],
+  };
+}
 
 export function bulkStockQuantity(
   current: number | null,

@@ -25,6 +25,7 @@ import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
 import { coverFirstAttachments } from '@/lib/attachments';
 import { ImageHoverPreview } from './materialManagement/imageHoverPreview';
 import { DistributorEditorDrawer } from './distributor-editor-drawer';
+import { useSessionListState } from './useSessionListState';
 
 const pagination = { ...CLIENT_TABLE_PAGINATION, defaultPageSize: 20 };
 
@@ -36,7 +37,13 @@ export function DistributorsPage() {
   const [items, setItems] = useState<DistributorListItem[]>([]);
   const [savedAreas, setSavedAreas] = useState<string[]>([]);
   const [areaItems, setAreaItems] = useState<DistributorArea[]>([]);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useSessionListState('distributors:query', '');
+  const [page, setPage] = useSessionListState('distributors:page', 1);
+  const [pageSize, setPageSize] = useSessionListState('distributors:pageSize', 20);
+  const [countSort, setCountSort] = useSessionListState<'ascend' | 'descend' | null>(
+    'distributors:countSort',
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [savingArea, setSavingArea] = useState(false);
   const [editing, setEditing] = useState<Distributor | null | undefined>(undefined);
@@ -110,7 +117,10 @@ export function DistributorsPage() {
   }
   async function saveArea() {
     const values = await areaForm.validateFields().catch(() => null);
-    if (!values) return;
+    if (!values) {
+      message.error(common('checkRequiredFields'));
+      return;
+    }
     setSavingArea(true);
     try {
       await apiFetch(
@@ -216,6 +226,8 @@ export function DistributorsPage() {
       ),
       key: 'itemCounts',
       width: 190,
+      sorter: (a, b) => a.itemCounts.total - b.itemCounts.total,
+      sortOrder: countSort,
       render: (_, { itemCounts }) => (
         <div className="distributor-item-counts">
           <div className="distributor-item-total">
@@ -340,7 +352,10 @@ export function DistributorsPage() {
           aria-label={t('search')}
           placeholder={t('search')}
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setPage(1);
+          }}
           allowClear
         />
       </div>
@@ -350,8 +365,22 @@ export function DistributorsPage() {
           dataSource={visibleItems}
           columns={columns}
           loading={loading}
+          onChange={(_, __, sorter, extra) => {
+            if (extra.action !== 'sort') return;
+            const order = Array.isArray(sorter) ? sorter[0]?.order : sorter.order;
+            setCountSort(order === 'ascend' || order === 'descend' ? order : null);
+            setPage(1);
+          }}
           scroll={{ x: 1200 }}
-          pagination={pagination}
+          pagination={{
+            ...pagination,
+            current: page,
+            pageSize,
+            onChange: (nextPage, nextPageSize) => {
+              setPage(nextPageSize === pageSize ? nextPage : 1);
+              setPageSize(nextPageSize);
+            },
+          }}
           locale={{ emptyText: <Empty description={t('empty')} /> }}
         />
       </div>

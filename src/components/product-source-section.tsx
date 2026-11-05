@@ -1078,7 +1078,7 @@ export function ProductSourceSection({
         }
         open={mode !== null}
         onClose={() => setMode(null)}
-        width="min(760px, 100vw)"
+        width="min(1280px, 100vw)"
         extra={
           <Button type="primary" loading={saving} onClick={() => void saveSource()}>
             {t('save')}

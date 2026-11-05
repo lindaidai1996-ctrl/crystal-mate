@@ -22,6 +22,7 @@ const aliases: Record<ExcelField, string[]> = {
 const normalizeHeader = (value: string) =>
   value
     .normalize('NFKC')
+    .replace(/&#(?:xA|10);/gi, '')
     .replace(/[\s（）()\[\]【】/\\：:]/g, '')
     .toLowerCase();
 
@@ -32,8 +33,26 @@ export function detectColumns(cells: Record<string, string>): ColumnMapping {
       aliases[field].includes(normalizeHeader(value)),
     );
     if (matches.length === 1) mapping[field] = matches[0][0];
+    else if (field === 'measurement') {
+      const detailed = matches.filter(([, value]) =>
+        normalizeHeader(value).startsWith('尺寸裸蛋带镶嵌'),
+      );
+      if (detailed.length === 1) mapping[field] = detailed[0][0];
+    }
   }
   return mapping;
+}
+
+export function excelMeasurementValue(row: ExcelRowInput): string {
+  if (row.values.measurement.trim() || row.measurementEdited) return row.values.measurement;
+  const headers: Record<string, string> = {};
+  for (const cell of row.original) {
+    const match = /^([A-Z]{1,3}) (.+)$/.exec(cell.column);
+    if (match) headers[match[1]] = match[2];
+  }
+  const column = detectColumns(headers).measurement;
+  if (!column) return '';
+  return row.original.find((cell) => cell.column.startsWith(`${column} `))?.value ?? '';
 }
 
 export function parseExcelBoolean(value: string): boolean | null {
@@ -140,7 +159,7 @@ export function normalizeExcelRow(
     errors.push('TOTAL_COST_INVALID');
   const cost = totalCost === null ? null : { ...details, totalCost };
   const measurementText =
-    values.measurement
+    excelMeasurementValue(row)
       .split(/\r?\n/)
       .map((line) => line.trim())
       .filter(Boolean)

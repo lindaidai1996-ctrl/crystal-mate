@@ -91,6 +91,14 @@ export const measurementSchema = z.object({
   heightMm: millimetersSchema.nullable().optional(),
 });
 
+export const productQuickEditSchema = z.discriminatedUnion('field', [
+  z.strictObject({
+    field: z.literal('price'),
+    priceCents: z.number().int().min(0).max(2147483647),
+  }),
+  z.strictObject({ field: z.literal('measurement'), measurement: measurementSchema.nullable() }),
+]);
+
 const costAmount = z.string().regex(/^\d{1,10}(?:\.\d{1,2})?$/);
 
 export const silverPricingSchema = z.strictObject({
@@ -192,8 +200,14 @@ export const listSchema = z
     categoryId: z.string().optional(),
     excludeCategoryName: z.literal('蛋面').optional(),
     tagId: z.string().cuid().optional(),
+    origin: z.enum(['PURCHASED', 'DIY']).optional(),
+    settingStyleId: z.union([z.string().cuid(), z.literal('unset')]).optional(),
     published: z.enum(['true', 'false']).optional(),
     stock: z.enum(['0', '1']).optional(),
+    videoShot: z.enum(['true', 'false']).optional(),
+    xiaohongshuVideoPublished: z.enum(['true', 'false']).optional(),
+    xiaohongshuListed: z.enum(['true', 'false']).optional(),
+    sortPrice: z.enum(['asc', 'desc']).optional(),
     page: z.coerce.number().int().min(1).default(1),
     pageSize: z.coerce.number().int().min(1).max(50).default(20),
   })

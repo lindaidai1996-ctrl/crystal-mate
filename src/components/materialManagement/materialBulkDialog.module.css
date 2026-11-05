@@ -30,6 +30,30 @@
 .input {
   width: 100%;
 }
+.tagControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tagSelect {
+  flex: 1;
+  min-width: 0;
+}
+.tagMode {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.helpIcon {
+  color: var(--ant-color-text-tertiary);
+  cursor: help;
+}
+@media (max-width: 560px) {
+  .tagModeLabel {
+    display: none;
+  }
+}
 .hint {
   color: var(--ant-color-text-secondary);
   margin: 0;

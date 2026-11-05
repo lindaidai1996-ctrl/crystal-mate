@@ -16,6 +16,17 @@ model Admin {
   updatedAt    DateTime @updatedAt
 }
 
+model EditorDraft {
+  id        String   @id @default(cuid())
+  kind      String
+  title     String   @default("")
+  data      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([kind, updatedAt(sort: Desc)])
+}
+
 model Category {
   id        String    @id @default(cuid())
   name      String    @unique

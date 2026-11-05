@@ -1,5 +1,6 @@
 'use client';
 
+import { InfoCircleOutlined } from '@ant-design/icons';
 import {
   Alert,
   Button,
@@ -13,6 +14,8 @@ import {
   Select,
   Skeleton,
   Space,
+  Switch,
+  Tooltip,
 } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
@@ -22,6 +25,7 @@ import type {
   MaterialBatch,
   MaterialCategory,
   MaterialSaleRule,
+  Tag,
 } from '@/lib/client-types';
 import {
   bulkUnits,
@@ -54,6 +58,7 @@ export function MaterialBulkDialog({ intent, materialIds, categories, onClose, o
   const common = useTranslations('common');
   const [preview, setPreview] = useState<MaterialBulkPreview | null>(null);
   const [batches, setBatches] = useState<MaterialBatch[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [distributors, setDistributors] = useState<DistributorPage['items']>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -64,6 +69,8 @@ export function MaterialBulkDialog({ intent, materialIds, categories, onClose, o
   const [entryIds, setEntryIds] = useState<string[]>([]);
   const [enabled, setEnabled] = useState<Partial<Record<Field, boolean>>>({});
   const [categoryId, setCategoryId] = useState<string>();
+  const [tagIds, setTagIds] = useState<string[]>([]);
+  const [replaceTags, setReplaceTags] = useState(false);
   const [batchId, setBatchId] = useState<string>();
   const [distributorId, setDistributorId] = useState<string>();
   const [stockMode, setStockMode] = useState<BulkStock['mode']>('SET');
@@ -87,12 +94,16 @@ export function MaterialBulkDialog({ intent, materialIds, categories, onClose, o
       intent === 'edit'
         ? apiFetch<DistributorPage>('/api/distributors', { signal: controller.signal })
         : Promise.resolve({ items: [] }),
+      intent === 'edit'
+        ? apiFetch<Tag[]>('/api/tags', { signal: controller.signal })
+        : Promise.resolve([]),
     ])
-      .then(([data, batchList, distributorPage]) => {
+      .then(([data, batchList, distributorPage, tagList]) => {
         if (controller.signal.aborted) return;
         setPreview(data);
         setBatches(batchList);
         setDistributors(distributorPage.items);
+        setTags(tagList);
         setEntryIds((ids) =>
           ids.filter((id) => data.snapshot.entries.some((entry) => entry.id === id)),
         );
@@ -186,6 +197,7 @@ export function MaterialBulkDialog({ intent, materialIds, categories, onClose, o
     if (intent === 'edit') {
       const changes: Record<string, unknown> = {};
       if (enabled.categoryId) changes.categoryId = categoryId ?? '';
+      if (enabled.tags) changes.tags = { ids: tagIds, replace: replaceTags };
       if (enabled.batchId) changes.batchId = batchId ?? '';
       if (enabled.distributorId) changes.distributorId = distributorId ?? '';
       if (enabled.stock) changes.stock = { mode: stockMode, quantities, reason };
@@ -324,6 +336,39 @@ export function MaterialBulkDialog({ intent, materialIds, categories, onClose, o
                     changeOnSelect
                     placeholder={t('category')}
                   />
+                )}
+              </section>
+              <section className={bulkStyles.section}>
+                {field('tags', t('tags'))}
+                {enabled.tags && (
+                  <div className={bulkStyles.tagControls}>
+                    <Select
+                      className={bulkStyles.tagSelect}
+                      mode="multiple"
+                      showSearch
+                      optionFilterProp="label"
+                      value={tagIds}
+                      onChange={setTagIds}
+                      aria-label={t('tags')}
+                      placeholder={t('selectTags')}
+                      options={tags.map((tag) => ({ value: tag.id, label: tag.name }))}
+                    />
+                    <div className={bulkStyles.tagMode}>
+                      <Switch
+                        checked={replaceTags}
+                        onChange={setReplaceTags}
+                        aria-label={t('replaceTags')}
+                      />
+                      <span className={bulkStyles.tagModeLabel}>{t('replaceTags')}</span>
+                      <Tooltip title={t('replaceTagsHelp')}>
+                        <InfoCircleOutlined
+                          className={bulkStyles.helpIcon}
+                          tabIndex={0}
+                          aria-label={t('replaceTagsHelp')}
+                        />
+                      </Tooltip>
+                    </div>
+                  </div>
                 )}
               </section>
               <section className={bulkStyles.section}>

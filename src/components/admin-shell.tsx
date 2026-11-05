@@ -94,15 +94,6 @@ function AdminShellContent({
           },
         },
         {
-          key: 'settingStyles',
-          icon: <ToolOutlined />,
-          label: t('settingStyles'),
-          onClick: () => {
-            navigate(() => router.push('/admin/setting-styles'));
-            setOpen(false);
-          },
-        },
-        {
           key: 'finishedStrands',
           icon: <DeploymentUnitOutlined />,
           label: t('finishedStrands'),
@@ -135,6 +126,15 @@ function AdminShellContent({
           label: t('materialBatches'),
           onClick: () => {
             navigate(() => router.push('/admin/materials/batches'));
+            setOpen(false);
+          },
+        },
+        {
+          key: 'settingStyles',
+          icon: <ToolOutlined />,
+          label: t('settingStyles'),
+          onClick: () => {
+            navigate(() => router.push('/admin/setting-styles'));
             setOpen(false);
           },
         },

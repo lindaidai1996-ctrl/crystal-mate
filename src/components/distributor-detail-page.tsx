@@ -1,7 +1,23 @@
 'use client';
 
-import { ArrowLeftOutlined, EditOutlined } from '@ant-design/icons';
-import { App, Button, Descriptions, Empty, Input, Result, Segmented, Skeleton, Tag } from 'antd';
+import {
+  ArrowLeftOutlined,
+  EditOutlined,
+  MinusSquareOutlined,
+  PlusSquareOutlined,
+} from '@ant-design/icons';
+import {
+  App,
+  Button,
+  Descriptions,
+  Empty,
+  Input,
+  Result,
+  Segmented,
+  Skeleton,
+  Tag,
+  Tooltip,
+} from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -17,8 +33,12 @@ import type {
   DistributorPurchasePage,
   DistributorPurchaseSummary,
 } from '@/lib/client-types';
+import { DistributorAttachmentGallery } from './distributorAttachmentGallery';
 import { DistributorEditorDrawer } from './distributor-editor-drawer';
 import { distributorPurchasePriceColumns } from './distributorPurchasePriceColumns';
+import { ImageHoverPreview } from './materialManagement/imageHoverPreview';
+import { useSessionListState } from './useSessionListState';
+import { withAdminReturnTo } from '@/lib/admin-return-path';
 
 type PurchaseType = 'all' | 'product' | 'material';
 
@@ -29,6 +49,7 @@ function dateLabel(value: string) {
 }
 
 export function DistributorDetailPage({ id }: { id: string }) {
+  const listStateKey = `distributor-detail:${id}`;
   const t = useTranslations('distributorDetail');
   const distributorT = useTranslations('distributors');
   const common = useTranslations('common');
@@ -40,10 +61,15 @@ export function DistributorDetailPage({ id }: { id: string }) {
   const [notFound, setNotFound] = useState(false);
   const [detailAttempt, setDetailAttempt] = useState(0);
   const [editing, setEditing] = useState(false);
-  const [type, setType] = useState<PurchaseType>('all');
-  const [query, setQuery] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [showAttachments, setShowAttachments] = useSessionListState(
+    `${listStateKey}:showAttachments`,
+    false,
+  );
+  const [editingAttachment, setEditingAttachment] = useState(false);
+  const [type, setType] = useSessionListState<PurchaseType>(`${listStateKey}:type`, 'all');
+  const [query, setQuery] = useSessionListState(`${listStateKey}:query`, '');
+  const [page, setPage] = useSessionListState(`${listStateKey}:page`, 1);
+  const [pageSize, setPageSize] = useSessionListState(`${listStateKey}:pageSize`, 20);
   const [purchasePage, setPurchasePage] = useState<DistributorPurchasePage | null>(null);
   const [purchaseLoading, setPurchaseLoading] = useState(true);
   const [purchaseFailed, setPurchaseFailed] = useState(false);
@@ -163,7 +189,14 @@ export function DistributorDetailPage({ id }: { id: string }) {
         title: t('batch'),
         key: 'batch',
         render: (_, entry) => (
-          <Link href={`/admin/materials/batches/${entry.batchId}`}>{entry.batchName}</Link>
+          <Link
+            href={withAdminReturnTo(
+              `/admin/materials/batches/${entry.batchId}`,
+              `/admin/distributors/${id}`,
+            )}
+          >
+            {entry.batchName}
+          </Link>
         ),
       },
       { title: t('receivedAt'), dataIndex: 'receivedAt', render: dateLabel },
@@ -238,12 +271,41 @@ export function DistributorDetailPage({ id }: { id: string }) {
     return distributorT('unit_piece');
   }
 
+  const visibleRows = purchasePage?.items ?? [];
+  const allExpanded =
+    visibleRows.length > 0 &&
+    visibleRows.every((row) => expandedKeys.includes(`${row.type}:${row.itemId}`));
+
   const columns: ColumnsType<DistributorPurchaseSummary> = [
     {
-      title: t('type'),
+      title: (
+        <span className="distributor-detail-type-heading">
+          {t('type')}
+          <Tooltip title={t(allExpanded ? 'collapseAll' : 'expandAll')}>
+            <Button
+              type="text"
+              size="small"
+              icon={allExpanded ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
+              aria-label={t(allExpanded ? 'collapseAll' : 'expandAll')}
+              disabled={purchaseLoading || visibleRows.length === 0}
+              onClick={() => {
+                if (allExpanded) {
+                  setExpandedKeys([]);
+                  return;
+                }
+                setExpandedKeys(visibleRows.map((row) => `${row.type}:${row.itemId}`));
+                visibleRows.forEach((row) => {
+                  const key = `${row.type}:${row.itemId}`;
+                  if (!entryPages[key] && !entryLoading[key]) loadEntries(row);
+                });
+              }}
+            />
+          </Tooltip>
+        </span>
+      ),
       dataIndex: 'type',
       key: 'type',
-      width: 100,
+      width: 135,
       render: (value: DistributorPurchaseSummary['type']) => (
         <Tag color={value === 'PRODUCT' ? 'blue' : 'gold'}>
           {value === 'PRODUCT' ? t('product') : t('material')}
@@ -254,13 +316,19 @@ export function DistributorDetailPage({ id }: { id: string }) {
       title: t('item'),
       key: 'item',
       render: (_, row) => (
-        <Link
-          className="product-name"
-          href={`/admin/${row.type === 'PRODUCT' ? 'products' : 'materials'}/${row.itemId}`}
-        >
-          {row.name}
-          {row.code ? ` · ${row.code}` : ''}
-        </Link>
+        <div className="product-cell">
+          <ImageHoverPreview images={row.image ? [row.image] : []} name={row.name} />
+          <Link
+            className="product-name"
+            href={withAdminReturnTo(
+              `/admin/${row.type === 'PRODUCT' ? 'products' : 'materials'}/${row.itemId}`,
+              `/admin/distributors/${id}`,
+            )}
+          >
+            {row.name}
+            {row.code ? ` · ${row.code}` : ''}
+          </Link>
+        </div>
       ),
     },
     ...distributorPurchasePriceColumns<DistributorPurchaseSummary>(t),
@@ -334,12 +402,16 @@ export function DistributorDetailPage({ id }: { id: string }) {
           <Link href="/admin/distributors" className="back-link">
             <ArrowLeftOutlined /> {t('back')}
           </Link>
-          <h1>{distributor.name}</h1>
+          <h1 className="page-record-name">{distributor.name}</h1>
           <p>{t('count', { count: purchasePage?.total ?? 0 })}</p>
         </div>
         <div className="page-heading-actions">
           <CreatePurchaseButton distributorId={distributor.id} />
-          <Button icon={<EditOutlined />} onClick={() => setEditing(true)}>
+          <Button
+            icon={<EditOutlined />}
+            disabled={editingAttachment}
+            onClick={() => setEditing(true)}
+          >
             {common('edit')}
           </Button>
         </div>
@@ -371,89 +443,107 @@ export function DistributorDetailPage({ id }: { id: string }) {
           {distributor.notes || '—'}
         </Descriptions.Item>
       </Descriptions>
-      <div className="filter-bar distributor-detail-filter">
-        <Input.Search
-          className="filter-search"
-          aria-label={t('search')}
-          placeholder={t('search')}
-          value={query}
-          maxLength={200}
-          onChange={(event) => {
-            setPurchaseLoading(true);
-            setQuery(event.target.value);
-            setPage(1);
-            clearExpanded();
+      <div className="distributor-detail-type-filter distributor-detail-toolbar">
+        <Segmented<PurchaseType | 'attachments'>
+          value={showAttachments ? 'attachments' : type}
+          disabled={editingAttachment}
+          onChange={(value) => {
+            setShowAttachments(value === 'attachments');
+            if (value !== 'attachments' && value !== type) resetList(value);
           }}
-          allowClear
-        />
-      </div>
-      <div className="distributor-detail-type-filter">
-        <Segmented<PurchaseType>
-          value={type}
-          onChange={(value) => resetList(value)}
           style={{ background: 'var(--ant-color-fill-tertiary)' }}
           options={[
             { value: 'all', label: t('all') },
             { value: 'product', label: t('productsOnly') },
             { value: 'material', label: t('materialsOnly') },
+            { value: 'attachments', label: distributorT('attachments') },
           ]}
         />
-      </div>
-      <div className="table-surface">
-        {purchaseFailed ? (
-          <Result
-            status="error"
-            title={t('purchasesLoadFailed')}
-            extra={
-              <Button
-                onClick={() => {
-                  setPurchaseLoading(true);
-                  setPurchaseFailed(false);
-                  setPurchaseAttempt((attempt) => attempt + 1);
-                }}
-              >
-                {common('retry')}
-              </Button>
-            }
-          />
-        ) : (
-          <PaginatedTable
-            rowKey={(row) => `${row.type}:${row.itemId}`}
-            dataSource={purchasePage?.items ?? []}
-            columns={columns}
-            loading={purchaseLoading}
-            expandable={{
-              expandedRowKeys: expandedKeys,
-              onExpand: (expanded, row) => {
-                const key = `${row.type}:${row.itemId}`;
-                setExpandedKeys((current) =>
-                  expanded ? [...current, key] : current.filter((item) => item !== key),
-                );
-                if (expanded && !entryPages[key]) loadEntries(row);
-              },
-              expandedRowRender: renderEntryTable,
+        {!showAttachments && (
+          <Input.Search
+            className="filter-search"
+            aria-label={t('search')}
+            placeholder={t('search')}
+            value={query}
+            maxLength={200}
+            onChange={(event) => {
+              setPurchaseLoading(true);
+              setQuery(event.target.value);
+              setPage(1);
+              clearExpanded();
             }}
-            pagination={
-              purchasePage
-                ? {
-                    ...pagination,
-                    current: purchasePage.page,
-                    pageSize: purchasePage.pageSize,
-                    total: purchasePage.total,
-                    onChange: (nextPage, nextPageSize) => {
-                      setPurchaseLoading(true);
-                      setPage(nextPageSize === pageSize ? nextPage : 1);
-                      setPageSize(nextPageSize);
-                      clearExpanded();
-                    },
-                  }
-                : false
-            }
-            locale={{ emptyText: <Empty description={t('empty')} /> }}
-            scroll={{ x: 1470 }}
+            allowClear
           />
         )}
       </div>
+      {showAttachments ? (
+        <section aria-label={distributorT('attachments')}>
+          <DistributorAttachmentGallery
+            distributor={distributor}
+            onUploadingChange={setEditingAttachment}
+            onSaved={(saved) => {
+              setDistributor(saved);
+              setAreas((current) => [...new Set([...current, saved.area])]);
+            }}
+          />
+        </section>
+      ) : (
+        <div className="table-surface">
+          {purchaseFailed ? (
+            <Result
+              status="error"
+              title={t('purchasesLoadFailed')}
+              extra={
+                <Button
+                  onClick={() => {
+                    setPurchaseLoading(true);
+                    setPurchaseFailed(false);
+                    setPurchaseAttempt((attempt) => attempt + 1);
+                  }}
+                >
+                  {common('retry')}
+                </Button>
+              }
+            />
+          ) : (
+            <PaginatedTable
+              rowKey={(row) => `${row.type}:${row.itemId}`}
+              dataSource={purchasePage?.items ?? []}
+              columns={columns}
+              loading={purchaseLoading}
+              expandable={{
+                expandedRowKeys: expandedKeys,
+                onExpand: (expanded, row) => {
+                  const key = `${row.type}:${row.itemId}`;
+                  setExpandedKeys((current) =>
+                    expanded ? [...current, key] : current.filter((item) => item !== key),
+                  );
+                  if (expanded && !entryPages[key]) loadEntries(row);
+                },
+                expandedRowRender: renderEntryTable,
+              }}
+              pagination={
+                purchasePage
+                  ? {
+                      ...pagination,
+                      current: purchasePage.page,
+                      pageSize: purchasePage.pageSize,
+                      total: purchasePage.total,
+                      onChange: (nextPage, nextPageSize) => {
+                        setPurchaseLoading(true);
+                        setPage(nextPageSize === pageSize ? nextPage : 1);
+                        setPageSize(nextPageSize);
+                        clearExpanded();
+                      },
+                    }
+                  : false
+              }
+              locale={{ emptyText: <Empty description={t('empty')} /> }}
+              scroll={{ x: 1505 }}
+            />
+          )}
+        </div>
+      )}
       {editing && (
         <DistributorEditorDrawer
           distributor={distributor}

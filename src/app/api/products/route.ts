@@ -12,6 +12,22 @@ export async function GET(request: NextRequest) {
     await requireAdmin(request);
     const filters = listSchema.parse(Object.fromEntries(request.nextUrl.searchParams));
     const aliasIds = await findAliasIds('product', filters.q ?? '');
+    const additionalConditions: Prisma.ProductWhereInput[] = [];
+    if (filters.settingStyleId === 'unset') {
+      additionalConditions.push({
+        OR: [{ extraInfo: { is: null } }, { extraInfo: { is: { settingStyleId: null } } }],
+      });
+    }
+    for (const field of ['videoShot', 'xiaohongshuVideoPublished', 'xiaohongshuListed'] as const) {
+      const value = filters[field];
+      if (value === 'true') {
+        additionalConditions.push({ marketing: { is: { [field]: true } } });
+      } else if (value === 'false') {
+        additionalConditions.push({
+          OR: [{ marketing: { is: null } }, { marketing: { is: { [field]: false } } }],
+        });
+      }
+    }
     const where: Prisma.ProductWhereInput = {
       ...createdTimeWhere(filters),
       ...(filters.q
@@ -28,14 +44,22 @@ export async function GET(request: NextRequest) {
         ? { category: { name: { not: filters.excludeCategoryName } } }
         : {}),
       ...(filters.tagId ? { tags: { some: { tagId: filters.tagId } } } : {}),
+      ...(filters.origin ? { origin: filters.origin } : {}),
+      ...(filters.settingStyleId && filters.settingStyleId !== 'unset'
+        ? { extraInfo: { is: { settingStyleId: filters.settingStyleId } } }
+        : {}),
       ...(filters.published ? { published: filters.published === 'true' } : {}),
       ...(filters.stock ? { stock: filters.stock === '1' ? { gt: 0 } : 0 } : {}),
+      ...(additionalConditions.length ? { AND: additionalConditions } : {}),
     };
+    const orderBy: Prisma.ProductOrderByWithRelationInput[] = filters.sortPrice
+      ? [{ priceCents: filters.sortPrice }, { id: 'asc' }]
+      : [{ createdAt: 'desc' }, { id: 'desc' }];
     const [items, total] = await db.$transaction([
       db.product.findMany({
         where,
         include: productInclude,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         skip: (filters.page - 1) * filters.pageSize,
         take: filters.pageSize,
       }),

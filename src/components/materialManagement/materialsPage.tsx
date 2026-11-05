@@ -17,21 +17,13 @@ import {
   Pagination,
   Popconfirm,
   Popover,
-  Segmented,
   Select,
   Skeleton,
   Tooltip,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
-import {
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactElement,
-} from 'react';
+import { useCallback, useDeferredValue, useEffect, useState, type ReactElement } from 'react';
 import { Link } from '@/i18n/navigation';
 import { PaginatedTable, useTablePagination } from '@/components/paginated-table';
 import { TextTag } from '@/components/text-tag';
@@ -45,22 +37,20 @@ import type {
   MaterialPage,
 } from '@/lib/client-types';
 import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
-import {
-  materialGroupCategories,
-  type MaterialCategoryGroup,
-} from '@/lib/material-category-groups';
 import { categoryPath } from './categoryTree';
 import { MaterialCategoryFilter } from './materialCategoryFilter';
 import { ImageHoverPreview } from './imageHoverPreview';
 import { MaterialImportSources } from './materialImportSources';
 import { MaterialBulkDialog } from './materialBulkDialog';
+import { EditorDraftBox } from '@/components/editorDraftBox';
 import { togglePageSelection } from '@/lib/material-bulk';
 import bulkStyles from './materialBulkDialog.module.css';
 import { DateRangeFilter } from '@/components/date-range-filter';
 import type { DateRange } from '@/lib/date-range';
+import { useSessionListState } from '@/components/useSessionListState';
+import { withAdminReturnTo } from '@/lib/admin-return-path';
 
 const MATERIAL_PAGE_SIZE = 20;
-type MaterialTab = 'all' | MaterialCategoryGroup;
 type MaterialFilters = {
   query: string;
   categoryId?: string;
@@ -78,26 +68,39 @@ function BatchPrices({ item }: { item: Material }) {
   const t = useTranslations('materialBatches');
   const editor = useTranslations('materialEditor');
   const entries = item.batchEntries;
+  const unitSuffix = editor(
+    item.unit === 'GRAM' ? 'yuanPerGram' : item.unit === 'STRAND' ? 'yuanPerStrand' : 'yuanPerBead',
+  );
+  const price = (value: string | null, suffix: string) =>
+    value === null ? '—' : `${value} ${suffix}`;
   const priceText = (
     value: Pick<
       Material,
       | 'purchaseUnitPrice'
       | 'purchaseGramPrice'
       | 'saleUnitPrice'
+      | 'saleGramPrice'
       | 'saleChildUnitPrice'
       | 'childCount'
       | 'childUnitPrice'
     > &
       Partial<Pick<MaterialBatchEntry, 'unitPriceSource'>>,
-  ) =>
-    [
+  ) => {
+    const sourceLabel =
+      value.unitPriceSource === 'ESTIMATED' || value.unitPriceSource === 'MANUAL'
+        ? ` (${t(`priceSource_${value.unitPriceSource}`)})`
+        : '';
+    return [
       ...(item.unit === 'GRAM'
         ? []
         : [
-            `${t('purchaseUnitPrice')}: ${value.purchaseUnitPrice ?? '—'}${value.unitPriceSource === 'ESTIMATED' || value.unitPriceSource === 'MANUAL' ? ` (${t(`priceSource_${value.unitPriceSource}`)})` : ''}`,
+            `${t('purchaseUnitPrice')}: ${price(value.purchaseUnitPrice, unitSuffix)}${sourceLabel}`,
           ]),
-      `${t('gramPrice')}: ${value.purchaseGramPrice ?? '—'}${item.unit === 'GRAM' ? ` ${editor('yuanPerGram')}` : ''}`,
-      `${t('salePrice')}: ${value.saleUnitPrice ?? '—'}${item.unit === 'GRAM' ? ` ${editor('yuanPerGram')}` : ''}`,
+      `${t('gramPrice')}: ${price(value.purchaseGramPrice, editor('yuanPerGram'))}`,
+      `${t('salePrice')}: ${price(item.unit === 'GRAM' ? value.saleGramPrice : value.saleUnitPrice, unitSuffix)}`,
+      ...(item.unit !== 'GRAM' && value.saleGramPrice !== null
+        ? [`${t('saleGramPrice')}: ${price(value.saleGramPrice, editor('yuanPerGram'))}`]
+        : []),
       ...(item.unit === 'STRAND' && (value.childCount ?? 0) > 0 && value.childUnitPrice !== null
         ? [`${t('purchaseBeadPrice')}: ${value.childUnitPrice} ${editor('yuanPerBead')}`]
         : []),
@@ -105,6 +108,7 @@ function BatchPrices({ item }: { item: Material }) {
         ? [`${t('saleBeadPrice')}: ${value.saleChildUnitPrice} ${editor('yuanPerBead')}`]
         : []),
     ].join(' · ');
+  };
   if (!entries.length)
     return (
       <span className="material-price-summary">
@@ -119,7 +123,7 @@ function BatchPrices({ item }: { item: Material }) {
   const links = entries.map((entry) => (
     <Link
       key={entry.id}
-      href={`/admin/materials/batches/${entry.batchId}`}
+      href={withAdminReturnTo(`/admin/materials/batches/${entry.batchId}`, '/admin/materials')}
       className="material-batch-link"
     >
       {entry.batch.name}
@@ -147,7 +151,14 @@ function BatchPrices({ item }: { item: Material }) {
     <div className="material-batch-prices">
       {entries.map((entry) => (
         <div className="material-batch-price" key={entry.id}>
-          <Link href={`/admin/materials/batches/${entry.batchId}`}>{entry.batch.name}</Link>
+          <Link
+            href={withAdminReturnTo(
+              `/admin/materials/batches/${entry.batchId}`,
+              '/admin/materials',
+            )}
+          >
+            {entry.batch.name}
+          </Link>
           <span>{priceText(entry)}</span>
         </div>
       ))}
@@ -270,20 +281,13 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
   const pagination = useTablePagination();
   const { message } = App.useApp();
   const [categories, setCategories] = useState<MaterialCategory[]>([]);
-  const [activeTab, setActiveTab] = useState<MaterialTab>('all');
-  const [tabFilters, setTabFilters] = useState<Record<MaterialTab, MaterialFilters>>(() => ({
-    all: initialFilters(initialQuery),
-    silver: initialFilters(),
-    hetian: initialFilters(),
-  }));
-  const { query, categoryId, source, createdRange, page, pageSize } = tabFilters[activeTab];
-  const deferredFilters = useDeferredValue(tabFilters);
-  const requestFilters = deferredFilters[activeTab];
-  const categoryGroup = activeTab === 'all' ? undefined : activeTab;
-  const filterCategories = useMemo(
-    () => materialGroupCategories(categories, categoryGroup),
-    [categories, categoryGroup],
+  const [filters, setFilters] = useSessionListState(
+    'materials:filters',
+    initialFilters(initialQuery),
+    !initialQuery,
   );
+  const { query, categoryId, source, createdRange, page, pageSize } = filters;
+  const requestFilters = useDeferredValue(filters);
 
   const [revision, setRevision] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -311,7 +315,6 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
     const controller = new AbortController();
     const { query: search, page, pageSize, categoryId, source, createdRange } = requestFilters;
     const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
-    if (categoryGroup) params.set('categoryGroup', categoryGroup);
     if (search) params.set('q', search);
     if (categoryId) params.set('categoryId', categoryId);
     if (source) params.set('source', source);
@@ -330,13 +333,10 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [requestFilters, categoryGroup, revision, errorText, message]);
+  }, [requestFilters, revision, errorText, message]);
 
   function updateFilters(patch: Partial<MaterialFilters>) {
-    setTabFilters((current) => ({
-      ...current,
-      [activeTab]: { ...current[activeTab], ...patch },
-    }));
+    setFilters((current) => ({ ...current, ...patch }));
   }
 
   function changeFilters(patch: Partial<MaterialFilters>) {
@@ -419,6 +419,7 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
           <p>{t('count', { count: data.total })}</p>
         </div>
         <div className="material-heading-actions">
+          <EditorDraftBox kind="MATERIAL" returnTo="/admin/materials" />
           <Link href="/admin/materials/image-import">
             <Button icon={<ScanOutlined />}>{t('imageImport')}</Button>
           </Link>
@@ -432,27 +433,6 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
           </Link>
         </div>
       </div>
-      <Segmented<MaterialTab>
-        value={activeTab}
-        style={{ background: 'var(--ant-color-fill-tertiary)' }}
-        options={[
-          { value: 'all', label: t('tabAll') },
-          { value: 'silver', label: t('tabSilver') },
-          { value: 'hetian', label: t('tabHetian') },
-        ]}
-        onChange={(key) => {
-          setSelectedIds([]);
-          setBulkAction(undefined);
-          setLoading(true);
-          setData({
-            items: [],
-            total: 0,
-            page: tabFilters[key].page,
-            pageSize: tabFilters[key].pageSize,
-          });
-          setActiveTab(key);
-        }}
-      />
       <div className="filter-bar">
         <Input
           className="filter-search"
@@ -481,8 +461,7 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
         />
       </div>
       <MaterialCategoryFilter
-        key={activeTab}
-        categories={filterCategories}
+        categories={categories}
         value={categoryId}
         onChange={(categoryId) => changeFilters({ categoryId })}
       />

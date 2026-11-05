@@ -1,6 +1,13 @@
 'use client';
 
-import { ArrowLeftOutlined, PlusOutlined, SaveOutlined, ScanOutlined } from '@ant-design/icons';
+import {
+  ArrowLeftOutlined,
+  FileTextOutlined,
+  InfoCircleOutlined,
+  PlusOutlined,
+  SaveOutlined,
+  ScanOutlined,
+} from '@ant-design/icons';
 import {
   App,
   Button,
@@ -53,7 +60,9 @@ import { useProductCode } from './productEditor/useProductCode';
 import { StockFields } from './productEditor/stockFields';
 import { AliasInput } from './catalog/aliasInput';
 import { useNameTagRecognition } from './productEditor/useNameTagRecognition';
-import { NameTagControls } from './productEditor/nameTagControls';
+import { NameTagActions, NameTagFeedback } from './productEditor/nameTagControls';
+import type { EditorDraftRecord } from './editorDraftBox';
+import { withAdminReturnTo } from '@/lib/admin-return-path';
 
 type Values = {
   code: string;
@@ -72,21 +81,32 @@ type Values = {
   cost: CabochonCostValues | null;
 };
 
+type ProductEditorDraft = {
+  values: Partial<Values>;
+  images: ProductImage[];
+  source: ProductSourceInput;
+};
+
 export function ProductEditor({
   id,
   scope,
   initialBatchId,
   initialDistributorId,
+  initialDraftId,
+  initialReturnTo,
 }: {
   id: string;
   scope?: CatalogScope;
   initialBatchId?: string;
   initialDistributorId?: string;
+  initialDraftId?: string;
+  initialReturnTo?: string;
 }) {
   const t = useTranslations('editor');
   const common = useTranslations('common');
   const catalog = useTranslations('catalog');
   const tagText = useTranslations('tags');
+  const nameTagText = useTranslations('nameTagRecognition');
   const settingStyleText = useTranslations('settingStyles');
   const sourceText = useTranslations('productSources');
   const diyImport = useTranslations('diyImport');
@@ -112,6 +132,9 @@ export function ProductEditor({
   const [loadError, setLoadError] = useState(false);
   const [loadRevision, setLoadRevision] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
+  const [activeDraftId, setActiveDraftId] = useState(initialDraftId);
+  const [restoredDraft, setRestoredDraft] = useState(false);
   const [stockConflict, setStockConflict] = useState(false);
   const [refreshingStock, setRefreshingStock] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
@@ -122,6 +145,7 @@ export function ProductEditor({
   const [creatingSettingStyle, setCreatingSettingStyle] = useState(false);
   const [recognitionInput, setRecognitionInput] = useState('');
   const nameBeforeFocus = useRef('');
+  const generatedForDraft = useRef(false);
   const nameTags = useNameTagRecognition({
     readName: () => form.getFieldValue('name') ?? '',
     readTags: () => form.getFieldValue('tagIds') ?? [],
@@ -153,7 +177,7 @@ export function ProductEditor({
     ? `/admin/materials/batches/${encodeURIComponent(returnBatchId)}`
     : returnDistributorId
       ? `/admin/distributors/${encodeURIComponent(returnDistributorId)}`
-      : listPath;
+      : (initialReturnTo ?? listPath);
   const returnLabel = returnBatchId
     ? common('backToBatch')
     : returnDistributorId
@@ -189,16 +213,30 @@ export function ProductEditor({
       setLoading(true);
       setLoadError(false);
       try {
-        const [list, tagList, styleList, product] = await Promise.all([
+        const [list, tagList, styleList, product, savedDraft] = await Promise.all([
           apiFetch<Category[]>('/api/categories'),
           apiFetch<Tag[]>('/api/tags'),
           apiFetch<SettingStyle[]>('/api/setting-styles'),
           isNew ? Promise.resolve(null) : apiFetch<Product>(`/api/products/${id}`),
+          isNew && initialDraftId
+            ? apiFetch<EditorDraftRecord<ProductEditorDraft>>(
+                `/api/editor-drafts/${initialDraftId}`,
+              )
+            : Promise.resolve(null),
         ]);
         if (!active) return;
         setCategories(list);
         setTags(tagList);
         setSettingStyles(styleList);
+        if (savedDraft) {
+          if (savedDraft.kind !== 'PRODUCT') throw new Error('INVALID_DRAFT');
+          const values = { ...savedDraft.data.values, code: '' };
+          setInitialValues(values);
+          form.setFieldsValue(values);
+          setImages(savedDraft.data.images ?? []);
+          setSourceDraft(savedDraft.data.source ?? initialSource());
+          setRestoredDraft(true);
+        }
         if (product) {
           setProduct(product);
           setProductCategoryId(product.categoryId);
@@ -244,13 +282,43 @@ export function ProductEditor({
     return () => {
       active = false;
     };
-  }, [id, isNew, loadRevision]);
+  }, [id, isNew, initialDraftId, loadRevision, form]);
 
   useEffect(() => {
-    if (!isNew || scope?.key !== 'cabochons' || !scopedCategory?.id) return;
+    if (!isNew || initialDraftId || scope?.key !== 'cabochons' || !scopedCategory?.id) return;
     const timer = window.setTimeout(() => void generateCode(scopedCategory.id), 0);
     return () => window.clearTimeout(timer);
-  }, [generateCode, isNew, scope, scopedCategory?.id]);
+  }, [generateCode, initialDraftId, isNew, scope, scopedCategory?.id]);
+
+  useEffect(() => {
+    if (!restoredDraft || !selectedCategoryId || generatedForDraft.current) return;
+    generatedForDraft.current = true;
+    void generateCode(selectedCategoryId);
+  }, [restoredDraft, selectedCategoryId, generateCode]);
+
+  async function saveDraft() {
+    if (saving || savingDraft || uploadingImages) return;
+    setSavingDraft(true);
+    try {
+      const values = form.getFieldsValue(true) as Partial<Values>;
+      const data: ProductEditorDraft = { values, images, source: sourceDraft };
+      const saved = await apiFetch<EditorDraftRecord<ProductEditorDraft>>(
+        activeDraftId ? `/api/editor-drafts/${activeDraftId}` : '/api/editor-drafts',
+        {
+          method: activeDraftId ? 'PUT' : 'POST',
+          body: JSON.stringify({ kind: 'PRODUCT', title: values.name?.trim() ?? '', data }),
+        },
+      );
+      setActiveDraftId(saved.id);
+      message.success(t('draftSaved'));
+    } catch (error) {
+      message.error(
+        common(`errors.${error instanceof ClientApiError ? error.code : 'SERVER_ERROR'}` as never),
+      );
+    } finally {
+      setSavingDraft(false);
+    }
+  }
 
   async function save(values: Values) {
     if (generatingCode || saving || uploadingImages || refreshingStock || nameTags.isMatching())
@@ -299,13 +367,21 @@ export function ProductEditor({
         }),
       });
       if (isNew) {
+        if (activeDraftId) {
+          try {
+            await apiFetch(`/api/editor-drafts/${activeDraftId}`, { method: 'DELETE' });
+            setActiveDraftId(undefined);
+          } catch {
+            message.warning(t('draftCleanupFailed'));
+          }
+        }
         setCreatedProduct(saved);
         router.refresh();
         window.scrollTo(0, 0);
         return;
       }
       message.success(common('saved'));
-      router.push(listPath);
+      router.push(returnPath);
       router.refresh();
     } catch (error) {
       if (error instanceof ClientApiError && error.code === 'STOCK_CHANGED') {
@@ -386,6 +462,7 @@ export function ProductEditor({
       douyinListed: false,
     };
     setCreatedProduct(null);
+    setActiveDraftId(undefined);
     setProduct(null);
     setProductCategoryId(undefined);
     setInitialValues({});
@@ -517,7 +594,7 @@ export function ProductEditor({
             : catalog('otherCategoryMismatch')
         }
         extra={
-          <Link href={listPath}>
+          <Link href={returnPath}>
             <Button>{catalog('backToList')}</Button>
           </Link>
         }
@@ -561,8 +638,11 @@ export function ProductEditor({
           <Link
             href={
               isNew
-                ? '/admin/products/diy-image-import'
-                : `/admin/products/diy-image-import?product=${id}`
+                ? withAdminReturnTo('/admin/products/diy-image-import', returnPath)
+                : withAdminReturnTo(
+                    `/admin/products/diy-image-import?product=${id}`,
+                    withAdminReturnTo(`${listPath}/${id}`, returnPath),
+                  )
             }
           >
             <Button icon={<ScanOutlined />}>{diyImport('entry')}</Button>
@@ -593,6 +673,7 @@ export function ProductEditor({
           ...initialValues,
         }}
         onFinish={save}
+        onFinishFailed={() => message.error(common('checkRequiredFields'))}
       >
         <div className="editor-surface">
           <section className="editor-block">
@@ -692,18 +773,32 @@ export function ProductEditor({
                 onRefresh={() => void refreshStock()}
               />
               <div className="editor-field-tags">
-                <Form.Item
-                  name="tagIds"
-                  label={t('tags')}
-                  extra={
-                    <NameTagControls
-                      {...nameTags}
-                      disabled={saving}
-                      onRecognize={() => void nameTags.recognize(true)}
-                    />
-                  }
-                >
+                <div className="editor-tag-heading">
+                  <div className="editor-tag-title">
+                    <span>{t('tags')}</span>
+                    <Tooltip title={nameTagText('help')}>
+                      <InfoCircleOutlined
+                        className="editor-tag-help-icon"
+                        tabIndex={0}
+                        aria-label={nameTagText('help')}
+                      />
+                    </Tooltip>
+                  </div>
+                  <NameTagActions
+                    {...nameTags}
+                    compact
+                    disabled={saving}
+                    onRecognize={() => void nameTags.recognize(true)}
+                    onCancel={nameTags.cancel}
+                    onCreateTag={() => {
+                      tagForm.resetFields();
+                      setTagModalOpen(true);
+                    }}
+                  />
+                </div>
+                <Form.Item name="tagIds">
                   <Select
+                    aria-label={t('tags')}
                     mode="multiple"
                     showSearch
                     optionFilterProp="label"
@@ -712,16 +807,7 @@ export function ProductEditor({
                     onChange={(ids: string[]) => nameTags.manualChange(ids)}
                   />
                 </Form.Item>
-                <Tooltip title={tagText('new')}>
-                  <Button
-                    icon={<PlusOutlined />}
-                    aria-label={tagText('new')}
-                    onClick={() => {
-                      tagForm.resetFields();
-                      setTagModalOpen(true);
-                    }}
-                  />
-                </Tooltip>
+                <NameTagFeedback {...nameTags} showHelp={false} />
               </div>
               {isCabochon && (
                 <div className="editor-field-setting-style">
@@ -985,6 +1071,16 @@ export function ProductEditor({
             <Link href={returnPath} replace>
               <Button>{common('cancel')}</Button>
             </Link>
+            {isNew && (
+              <Button
+                icon={<FileTextOutlined />}
+                onClick={() => void saveDraft()}
+                loading={savingDraft}
+                disabled={saving || uploadingImages}
+              >
+                {t('saveDraft')}
+              </Button>
+            )}
             <Button
               type="primary"
               icon={<SaveOutlined />}
@@ -1018,7 +1114,12 @@ export function ProductEditor({
         confirmLoading={creatingTag}
         forceRender
       >
-        <Form form={tagForm} layout="vertical" onFinish={createTag}>
+        <Form
+          form={tagForm}
+          layout="vertical"
+          onFinish={createTag}
+          onFinishFailed={() => message.error(common('checkRequiredFields'))}
+        >
           <Form.Item
             name="name"
             label={tagText('name')}
@@ -1040,7 +1141,12 @@ export function ProductEditor({
         confirmLoading={creatingSettingStyle}
         afterClose={() => settingStyleForm.resetFields()}
       >
-        <Form form={settingStyleForm} layout="vertical" onFinish={createSettingStyle}>
+        <Form
+          form={settingStyleForm}
+          layout="vertical"
+          onFinish={createSettingStyle}
+          onFinishFailed={() => message.error(common('checkRequiredFields'))}
+        >
           <Form.Item
             name="magicBoxStyle"
             label={settingStyleText('magicBoxStyle')}

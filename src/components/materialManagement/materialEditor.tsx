@@ -1,11 +1,13 @@
 'use client';
 
-import { ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, FileTextOutlined, SaveOutlined } from '@ant-design/icons';
 import { App, Button, Form, Result, Skeleton, Space } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
+import { withAdminReturnTo } from '@/lib/admin-return-path';
 import { emptyMaterial } from '@/lib/material-defaults';
+import type { EditorDraftRecord } from '@/components/editorDraftBox';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type {
   Material,
@@ -58,11 +60,15 @@ export function MaterialEditor({
   entryId,
   initialBatchId,
   initialDistributorId,
+  initialDraftId,
+  initialReturnTo,
 }: {
   id: string;
   entryId?: string;
   initialBatchId?: string;
   initialDistributorId?: string;
+  initialDraftId?: string;
+  initialReturnTo?: string;
 }) {
   const t = useTranslations('materialEditor');
   const batchText = useTranslations('materialBatches');
@@ -74,7 +80,7 @@ export function MaterialEditor({
       ? `${newMaterialDraftKey}:${JSON.stringify([initialBatchId, initialDistributorId])}`
       : newMaterialDraftKey;
   const [savedDraft] = useState(() =>
-    id === 'new' ? readNewMaterialDraft(draftStorageKey) : null,
+    id === 'new' && !initialDraftId ? readNewMaterialDraft(draftStorageKey) : null,
   );
   const [inputDraft, setDraft] = useState<MaterialValues>(() => ({
     ...emptyMaterial(),
@@ -112,6 +118,8 @@ export function MaterialEditor({
   const [loadError, setLoadError] = useState(false);
   const [revision, setRevision] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
+  const [activeDraftId, setActiveDraftId] = useState(initialDraftId);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [createdMaterial, setCreatedMaterial] = useState<Material | null>(null);
@@ -122,7 +130,7 @@ export function MaterialEditor({
     ? `/admin/materials/batches/${encodeURIComponent(returnBatchId)}`
     : returnDistributorId
       ? `/admin/distributors/${encodeURIComponent(returnDistributorId)}`
-      : '/admin/materials';
+      : (initialReturnTo ?? '/admin/materials');
   const returnLabel = returnBatchId
     ? common('backToBatch')
     : returnDistributorId
@@ -132,7 +140,7 @@ export function MaterialEditor({
   const isAddingEntry = entryId === 'new';
 
   useEffect(() => {
-    if (!isNew || createdMaterial) return;
+    if (!isNew || createdMaterial || activeDraftId) return;
     try {
       sessionStorage.setItem(
         draftStorageKey,
@@ -154,6 +162,7 @@ export function MaterialEditor({
     draftStorageKey,
     isNew,
     createdMaterial,
+    activeDraftId,
     inputDraft,
     tagIds,
     images,
@@ -225,6 +234,66 @@ export function MaterialEditor({
       active = false;
     };
   }, [id, entryId, isNew, isAddingEntry, revision]);
+
+  useEffect(() => {
+    if (!isNew || !initialDraftId) return;
+    let active = true;
+    apiFetch<EditorDraftRecord<NewMaterialDraft>>(`/api/editor-drafts/${initialDraftId}`)
+      .then((saved) => {
+        if (!active || saved.kind !== 'MATERIAL') throw new Error('INVALID_DRAFT');
+        setDraft({ ...emptyMaterial(), ...saved.data.values });
+        setTagIds(saved.data.tagIds ?? []);
+        setImages(saved.data.images ?? []);
+        setSelection(saved.data.selection ?? null);
+        setDistributorId(saved.data.distributorId);
+        setReceivedQty(saved.data.receivedQty ?? null);
+        setPurchase(saved.data.purchase ?? emptyPurchase());
+        setQuantityUnknown(saved.data.quantityUnknown ?? false);
+      })
+      .catch(() => {
+        if (active) message.error(common('errors.NOT_FOUND'));
+      });
+    return () => {
+      active = false;
+    };
+  }, [initialDraftId, isNew, message, common]);
+
+  async function saveDraft() {
+    if (saving || savingDraft || uploadingImages) return;
+    setSavingDraft(true);
+    try {
+      const data: NewMaterialDraft = {
+        values: inputDraft,
+        tagIds,
+        images,
+        selection,
+        distributorId,
+        receivedQty,
+        purchase,
+        quantityUnknown,
+      };
+      const saved = await apiFetch<EditorDraftRecord<NewMaterialDraft>>(
+        activeDraftId ? `/api/editor-drafts/${activeDraftId}` : '/api/editor-drafts',
+        {
+          method: activeDraftId ? 'PUT' : 'POST',
+          body: JSON.stringify({ kind: 'MATERIAL', title: inputDraft.name.trim(), data }),
+        },
+      );
+      setActiveDraftId(saved.id);
+      try {
+        sessionStorage.removeItem(draftStorageKey);
+      } catch {
+        // The database draft is saved even if browser storage is unavailable.
+      }
+      message.success(t('draftSaved'));
+    } catch (error) {
+      message.error(
+        common(`errors.${error instanceof ClientApiError ? error.code : 'SERVER_ERROR'}` as never),
+      );
+    } finally {
+      setSavingDraft(false);
+    }
+  }
 
   function change(field: keyof MaterialValues, value: string | number | null) {
     if (
@@ -375,6 +444,14 @@ export function MaterialEditor({
         } catch {
           // Storage can be unavailable even after the form was opened.
         }
+        if (activeDraftId) {
+          try {
+            await apiFetch(`/api/editor-drafts/${activeDraftId}`, { method: 'DELETE' });
+            setActiveDraftId(undefined);
+          } catch {
+            message.warning(t('draftCleanupFailed'));
+          }
+        }
         setCreatedMaterial(created);
         router.refresh();
         window.scrollTo(0, 0);
@@ -403,7 +480,7 @@ export function MaterialEditor({
         });
       }
       message.success(common('saved'));
-      router.push('/admin/materials');
+      router.push(returnPath);
       router.refresh();
     } catch (error) {
       if (
@@ -415,7 +492,9 @@ export function MaterialEditor({
         const existing = linkedEntries.find((item) => item.batchId === selection.batchId);
         if (existing) {
           message.warning(common('errors.MATERIAL_ALREADY_IN_BATCH'));
-          router.push(`/admin/materials/${id}/batches/${existing.id}`);
+          router.push(
+            withAdminReturnTo(`/admin/materials/${id}/batches/${existing.id}`, returnPath),
+          );
           return;
         }
       }
@@ -444,6 +523,7 @@ export function MaterialEditor({
     setSelection(reuseBatchAndDistributor && entry ? { batchId: entry.batchId } : null);
     setDistributorId(reuseBatchAndDistributor ? entry?.distributorId : undefined);
     setCreatedMaterial(null);
+    setActiveDraftId(undefined);
     window.scrollTo(0, 0);
   }
 
@@ -582,6 +662,16 @@ export function MaterialEditor({
             <Link href={returnPath} replace>
               <Button>{common('cancel')}</Button>
             </Link>
+            {isNew && (
+              <Button
+                icon={<FileTextOutlined />}
+                onClick={() => void saveDraft()}
+                loading={savingDraft}
+                disabled={saving || uploadingImages}
+              >
+                {t('saveDraft')}
+              </Button>
+            )}
             <Button
               type="primary"
               icon={<SaveOutlined />}

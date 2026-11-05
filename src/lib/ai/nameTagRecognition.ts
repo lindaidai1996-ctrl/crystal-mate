@@ -42,7 +42,7 @@ function configuration() {
   return { apiKey, endpoint, model };
 }
 
-export async function recognizeNameTags(names: string[], tags: NamedTag[]) {
+export async function recognizeNameTags(names: string[], tags: NamedTag[], signal?: AbortSignal) {
   if (!tags.length) return names.map(() => ({ tagIds: [], missingTags: [] }));
   const config = configuration();
   let response: Response;
@@ -51,7 +51,9 @@ export async function recognizeNameTags(names: string[], tags: NamedTag[]) {
       method: 'POST',
       headers: { Authorization: `Bearer ${config.apiKey}`, 'Content-Type': 'application/json' },
       redirect: 'error',
-      signal: AbortSignal.timeout(60_000),
+      signal: signal
+        ? AbortSignal.any([signal, AbortSignal.timeout(60_000)])
+        : AbortSignal.timeout(60_000),
       body: JSON.stringify({
         model: config.model,
         stream: false,

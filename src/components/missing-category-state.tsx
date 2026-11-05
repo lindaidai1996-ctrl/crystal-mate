@@ -14,9 +14,7 @@ export function MissingCategoryState({
 
   return (
     <>
-      <div className="page-heading">
-        <h1>{pageTitle}</h1>
-      </div>
+      <h1 className="page-title-hidden">{pageTitle}</h1>
       <section className="catalog-empty-state">
         <span className="catalog-empty-icon" aria-hidden="true">
           <FolderAddOutlined />
