@@ -1,0 +1,107 @@
+name: crystal-mate
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '3'
+
+x-database-environment: &database-environment
+  DATABASE_URL: postgresql://crystal:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/crystal_mate?schema=public&connection_limit=5
+  DIRECT_URL: postgresql://crystal:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/crystal_mate?schema=public
+
+services:
+  postgres:
+    image: postgres:18-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: crystal
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_DB: crystal_mate
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    # Deliberately no host port: only containers on this network can connect.
+    mem_limit: 768m
+    shm_size: 128m
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U crystal -d crystal_mate']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    logging: *logging
+
+  app:
+    image: crystal-mate-app:${APP_VERSION:-local}
+    build:
+      context: .
+      target: runner
+      args:
+        DEBIAN_MIRROR: ${DEBIAN_MIRROR:-mirrors.tencentyun.com}
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      <<: *database-environment
+      NODE_ENV: production
+      AUTH_TRUST_HOST: 'true'
+      MEDIA_STORAGE: cos
+      MEDIA_CACHE_DIR: /app/.cache/images
+      MEDIA_CACHE_MAX_MB: ${MEDIA_CACHE_MAX_MB:-512}
+    volumes:
+      - image_cache:/app/.cache/images
+    ports:
+      - '127.0.0.1:${APP_PORT:-3000}:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    mem_limit: 1536m
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:3000/zh/login').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+    logging: *logging
+
+  migrate:
+    image: crystal-mate-migration:${APP_VERSION:-local}
+    build:
+      context: .
+      target: migration
+      args:
+        DEBIAN_MIRROR: ${DEBIAN_MIRROR:-mirrors.tencentyun.com}
+    environment: *database-environment
+    profiles: ['tools']
+    depends_on:
+      postgres:
+        condition: service_healthy
+    logging: *logging
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    profiles: ['public']
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:-}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    mem_limit: 192m
+    logging: *logging
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:
+  image_cache:

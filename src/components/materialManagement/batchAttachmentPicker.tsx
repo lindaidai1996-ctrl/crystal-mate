@@ -1,5 +1,7 @@
 'use client';
 
+import { imageThumbnailUrl } from '@/lib/image-storage';
+
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { App, Button, Image, Input, Spin, Tag, Tooltip } from 'antd';
 import { useState } from 'react';
@@ -169,7 +171,14 @@ export function BatchAttachmentPicker({
       )}
       {attachments.map((attachment, index) => (
         <div className="batch-attachment" key={attachment.objectKey}>
-          <Image src={attachment.url} alt={attachment.fileName} width={76} height={76} />
+          <Image
+            src={imageThumbnailUrl(attachment.url)}
+            preview={{ src: attachment.url }}
+            loading="lazy"
+            alt={attachment.fileName}
+            width={76}
+            height={76}
+          />
           <div className="batch-attachment-fields">
             <Tooltip title={attachment.fileName}>
               <span className="batch-attachment-name">{attachment.fileName}</span>

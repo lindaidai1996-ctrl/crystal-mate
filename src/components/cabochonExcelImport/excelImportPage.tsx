@@ -1,8 +1,11 @@
 'use client';
 
+import { imageThumbnailUrl } from '@/lib/image-storage';
+
 import { useRef, useState } from 'react';
 import {
   ArrowLeftOutlined,
+  DownloadOutlined,
   EyeOutlined,
   FileExcelOutlined,
   UploadOutlined,
@@ -86,9 +89,9 @@ export function ExcelImportPage({ initialId }: { initialId?: string }) {
               className={layout.thumbnail}
               width={52}
               height={52}
-              src={images[0]}
+              src={imageThumbnailUrl(images[0])}
               alt={t('rowImage', { row: row.rowNumber })}
-              preview={{ mask: <EyeOutlined /> }}
+              preview={{ src: images[0], mask: <EyeOutlined /> }}
             />
             {images.length > 1 && (
               <div className={layout.muted}>{t('imageCount', { count: images.length })}</div>
@@ -247,6 +250,13 @@ export function ExcelImportPage({ initialId }: { initialId?: string }) {
             onClick={() => navigate(() => input.current?.click())}
           >
             {job || state.workbook ? t('replaceFile') : t('chooseFile')}
+          </Button>
+          <Button
+            icon={<DownloadOutlined />}
+            href="/templates/cabochon-excel-import-template.xlsx"
+            download="水晶蛋面批量导入模版.xlsx"
+          >
+            {t('downloadTemplate')}
           </Button>
           <span>{job?.fileName ?? state.fileName}</span>
           {state.workbook && !job && (

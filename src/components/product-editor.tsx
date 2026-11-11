@@ -11,6 +11,7 @@ import {
 import {
   App,
   Button,
+  ConfigProvider,
   Form,
   Input,
   InputNumber,
@@ -62,6 +63,9 @@ import { AliasInput } from './catalog/aliasInput';
 import { useNameTagRecognition } from './productEditor/useNameTagRecognition';
 import { NameTagActions, NameTagFeedback } from './productEditor/nameTagControls';
 import type { EditorDraftRecord } from './editorDraftBox';
+import editorStyles from './productEditor.module.css';
+import { underlinedTheme } from '@/lib/ui-theme';
+import { ImageHoverPreview } from './materialManagement/imageHoverPreview';
 import { withAdminReturnTo } from '@/lib/admin-return-path';
 
 type Values = {
@@ -170,6 +174,9 @@ export function ProductEditor({
   const isCabochon = categories.some(
     (item) => item.id === selectedCategoryId && item.name === '蛋面',
   );
+  const isFinishedEditor =
+    scope?.key === 'finished-strands' ||
+    (!scope && !isCabochon && initialReturnTo === catalogPath('finished-strands'));
   const listPath = scope ? catalogPath(scope.key) : '/admin/products';
   const returnBatchId = isNew ? initialBatchId : undefined;
   const returnDistributorId = isNew ? initialDistributorId : undefined;
@@ -649,456 +656,480 @@ export function ProductEditor({
           </Link>
         )}
       </div>
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={{
-          aliases: [],
-          description: '',
-          categoryId: scopedCategory?.id,
-          tagIds: [],
-          stock: 0,
-          published: false,
-          settingStyleId: null,
-          marketing: {
-            videoShot: true,
-            xiaohongshuVideoPublished: true,
-            xiaohongshuListed: true,
-            douyinVideoPublished: false,
-            douyinListed: false,
-          },
-          measurement: { lengthMm: null, widthMm: null, heightMm: null },
-          cost: null,
-          pricing: { saleRule: 'PERCENT_50', saleRuleValue: null, saleManual: false, price: null },
-          ...initialValues,
-        }}
-        onFinish={save}
-        onFinishFailed={() => message.error(common('checkRequiredFields'))}
-      >
-        <div className="editor-surface">
-          <section className="editor-block">
-            <h2>{t('details')}</h2>
-            <div className="editor-fields">
-              <Form.Item
-                className="editor-field-name"
-                name="name"
-                label={t('name')}
-                rules={[{ required: true, whitespace: true, message: t('required') }, { max: 120 }]}
-              >
-                <Input
-                  maxLength={120}
-                  onFocus={(event) => {
-                    nameBeforeFocus.current = event.target.value;
-                  }}
-                  onChange={() => nameTags.invalidate()}
-                  onBlur={(event) => {
-                    if (event.target.value !== nameBeforeFocus.current)
-                      recognizeName(event.target.value);
-                  }}
-                />
-              </Form.Item>
-              <Form.Item
-                className="editor-field-name"
-                name="aliases"
-                label={common('aliases')}
-                extra={common('aliasesHelp')}
-              >
-                <AliasInput />
-              </Form.Item>
-              <Form.Item
-                className="editor-field-category"
-                name="categoryId"
-                label={t('category')}
-                rules={[{ required: true, message: t('required') }]}
-              >
-                <Select
-                  disabled={scope?.key === 'cabochons'}
-                  placeholder={t('selectCategory')}
-                  onChange={(categoryId: string) => {
-                    void generateCode(categoryId);
-                  }}
-                  options={(scope?.key === 'cabochons'
-                    ? [scopedCategory!]
-                    : availableCategories
-                  ).map((item) => ({
-                    value: item.id,
-                    label: item.name,
-                  }))}
-                />
-              </Form.Item>
-              <Form.Item
-                className="editor-field-code"
-                name="code"
-                label={t('code')}
-                extra={
-                  categoryChanged ? (
-                    <>
-                      {t('codeCategoryChangedHelp', { code: product.code })}
-                      <Button
-                        type="link"
-                        size="small"
-                        onClick={() => void generateCode(selectedCategoryId)}
-                      >
-                        {t('retryCodeGeneration')}
-                      </Button>
-                    </>
-                  ) : (
-                    t('codeHelp')
-                  )
-                }
-                rules={[
-                  { required: true, message: t('required') },
-                  { pattern: /^[A-Za-z0-9_-]+$/ },
-                  { max: 64 },
-                ]}
-              >
-                <Input
-                  maxLength={64}
-                  readOnly={generatingCode || categoryChanged}
-                  aria-busy={generatingCode}
-                  suffix={
-                    <span style={{ display: 'inline-flex', width: 14, height: 14 }}>
-                      {generatingCode && (
-                        <Spin size="small" delay={200} aria-label={t('codeGenerating')} />
-                      )}
-                    </span>
+      <ConfigProvider theme={isFinishedEditor ? underlinedTheme : undefined}>
+        <Form
+          form={form}
+          layout="vertical"
+          variant={isFinishedEditor ? 'underlined' : undefined}
+          initialValues={{
+            aliases: [],
+            description: '',
+            categoryId: scopedCategory?.id,
+            tagIds: [],
+            stock: 0,
+            published: false,
+            settingStyleId: null,
+            marketing: {
+              videoShot: true,
+              xiaohongshuVideoPublished: true,
+              xiaohongshuListed: true,
+              douyinVideoPublished: false,
+              douyinListed: false,
+            },
+            measurement: { lengthMm: null, widthMm: null, heightMm: null },
+            cost: null,
+            pricing: {
+              saleRule: 'PERCENT_50',
+              saleRuleValue: null,
+              saleManual: false,
+              price: null,
+            },
+            ...initialValues,
+          }}
+          onFinish={save}
+          onFinishFailed={() => message.error(common('checkRequiredFields'))}
+        >
+          <div
+            className={
+              isFinishedEditor ? `editor-surface ${editorStyles.editor}` : 'editor-surface'
+            }
+          >
+            <section className={`editor-block ${editorStyles.details}`}>
+              <h2>{t('details')}</h2>
+              <div className="editor-fields">
+                <Form.Item
+                  className="editor-field-name"
+                  name="name"
+                  label={t('name')}
+                  rules={[
+                    { required: true, whitespace: true, message: t('required') },
+                    { max: 120 },
+                  ]}
+                >
+                  <Input
+                    maxLength={120}
+                    onFocus={(event) => {
+                      nameBeforeFocus.current = event.target.value;
+                    }}
+                    onChange={() => nameTags.invalidate()}
+                    onBlur={(event) => {
+                      if (event.target.value !== nameBeforeFocus.current)
+                        recognizeName(event.target.value);
+                    }}
+                  />
+                </Form.Item>
+                <Form.Item
+                  className="editor-field-name"
+                  name="aliases"
+                  label={common('aliases')}
+                  extra={common('aliasesHelp')}
+                >
+                  <AliasInput />
+                </Form.Item>
+                <Form.Item
+                  className="editor-field-category"
+                  name="categoryId"
+                  label={t('category')}
+                  rules={[{ required: true, message: t('required') }]}
+                >
+                  <Select
+                    disabled={scope?.key === 'cabochons'}
+                    placeholder={t('selectCategory')}
+                    onChange={(categoryId: string) => {
+                      void generateCode(categoryId);
+                    }}
+                    options={(scope?.key === 'cabochons'
+                      ? [scopedCategory!]
+                      : availableCategories
+                    ).map((item) => ({
+                      value: item.id,
+                      label: item.name,
+                    }))}
+                  />
+                </Form.Item>
+                <Form.Item
+                  className="editor-field-code"
+                  name="code"
+                  label={t('code')}
+                  extra={
+                    categoryChanged ? (
+                      <>
+                        {t('codeCategoryChangedHelp', { code: product.code })}
+                        <Button
+                          type="link"
+                          size="small"
+                          onClick={() => void generateCode(selectedCategoryId)}
+                        >
+                          {t('retryCodeGeneration')}
+                        </Button>
+                      </>
+                    ) : (
+                      t('codeHelp')
+                    )
                   }
+                  rules={[
+                    { required: true, message: t('required') },
+                    { pattern: /^[A-Za-z0-9_-]+$/ },
+                    { max: 64 },
+                  ]}
+                >
+                  <Input
+                    maxLength={64}
+                    readOnly={generatingCode || categoryChanged}
+                    aria-busy={generatingCode}
+                    suffix={
+                      <span style={{ display: 'inline-flex', width: 14, height: 14 }}>
+                        {generatingCode && (
+                          <Spin size="small" delay={200} aria-label={t('codeGenerating')} />
+                        )}
+                      </span>
+                    }
+                  />
+                </Form.Item>
+                <StockFields
+                  isNew={isNew}
+                  currentStock={product?.stock}
+                  conflict={stockConflict}
+                  refreshing={refreshingStock}
+                  onRefresh={() => void refreshStock()}
                 />
-              </Form.Item>
-              <StockFields
-                isNew={isNew}
-                currentStock={product?.stock}
-                conflict={stockConflict}
-                refreshing={refreshingStock}
-                onRefresh={() => void refreshStock()}
-              />
-              <div className="editor-field-tags">
-                <div className="editor-tag-heading">
-                  <div className="editor-tag-title">
-                    <span>{t('tags')}</span>
-                    <Tooltip title={nameTagText('help')}>
-                      <InfoCircleOutlined
-                        className="editor-tag-help-icon"
-                        tabIndex={0}
-                        aria-label={nameTagText('help')}
+                <div className="editor-field-tags">
+                  <div className="editor-tag-heading">
+                    <div className="editor-tag-title">
+                      <span>{t('tags')}</span>
+                      <Tooltip title={nameTagText('help')}>
+                        <InfoCircleOutlined
+                          className="editor-tag-help-icon"
+                          tabIndex={0}
+                          aria-label={nameTagText('help')}
+                        />
+                      </Tooltip>
+                    </div>
+                    <NameTagActions
+                      {...nameTags}
+                      compact
+                      disabled={saving}
+                      onRecognize={() => void nameTags.recognize(true)}
+                      onCancel={nameTags.cancel}
+                      onCreateTag={() => {
+                        tagForm.resetFields();
+                        setTagModalOpen(true);
+                      }}
+                    />
+                  </div>
+                  <Form.Item name="tagIds">
+                    <Select
+                      aria-label={t('tags')}
+                      mode="multiple"
+                      showSearch
+                      optionFilterProp="label"
+                      placeholder={t('selectTags')}
+                      options={tags.map((item) => ({ value: item.id, label: item.name }))}
+                      onChange={(ids: string[]) => nameTags.manualChange(ids)}
+                    />
+                  </Form.Item>
+                  <NameTagFeedback {...nameTags} showHelp={false} />
+                </div>
+                {isCabochon && (
+                  <div className="editor-field-setting-style">
+                    <Form.Item name="settingStyleId" label={t('magicBoxStyle')}>
+                      <Select
+                        showSearch
+                        allowClear
+                        optionFilterProp="label"
+                        placeholder={t('unknownSettingStyle')}
+                        options={settingStyles.map((item) => ({
+                          value: item.id,
+                          label: item.magicBoxStyle,
+                        }))}
+                      />
+                    </Form.Item>
+                    <Tooltip title={settingStyleText('new')}>
+                      <Button
+                        icon={<PlusOutlined />}
+                        aria-label={settingStyleText('new')}
+                        onClick={() => setSettingStyleModalOpen(true)}
                       />
                     </Tooltip>
                   </div>
-                  <NameTagActions
-                    {...nameTags}
-                    compact
-                    disabled={saving}
-                    onRecognize={() => void nameTags.recognize(true)}
-                    onCancel={nameTags.cancel}
-                    onCreateTag={() => {
-                      tagForm.resetFields();
-                      setTagModalOpen(true);
-                    }}
-                  />
-                </div>
-                <Form.Item name="tagIds">
-                  <Select
-                    aria-label={t('tags')}
-                    mode="multiple"
-                    showSearch
-                    optionFilterProp="label"
-                    placeholder={t('selectTags')}
-                    options={tags.map((item) => ({ value: item.id, label: item.name }))}
-                    onChange={(ids: string[]) => nameTags.manualChange(ids)}
-                  />
-                </Form.Item>
-                <NameTagFeedback {...nameTags} showHelp={false} />
-              </div>
-              {isCabochon && (
-                <div className="editor-field-setting-style">
-                  <Form.Item name="settingStyleId" label={t('magicBoxStyle')}>
-                    <Select
-                      showSearch
-                      allowClear
-                      optionFilterProp="label"
-                      placeholder={t('unknownSettingStyle')}
-                      options={settingStyles.map((item) => ({
-                        value: item.id,
-                        label: item.magicBoxStyle,
-                      }))}
-                    />
-                  </Form.Item>
-                  <Tooltip title={settingStyleText('new')}>
-                    <Button
-                      icon={<PlusOutlined />}
-                      aria-label={settingStyleText('new')}
-                      onClick={() => setSettingStyleModalOpen(true)}
-                    />
-                  </Tooltip>
-                </div>
-              )}
-              <Form.Item
-                className="editor-field-publication editor-switch-field"
-                name="published"
-                label={t('publication')}
-                valuePropName="checked"
-              >
-                <Switch />
-              </Form.Item>
-              <Form.Item
-                className="editor-field-description"
-                name="description"
-                label={t('description')}
-                rules={[{ max: 10000 }]}
-              >
-                <Input.TextArea rows={3} maxLength={10000} showCount />
-              </Form.Item>
-            </div>
-            {!scope && !categories.length && (
-              <Link href="/admin/categories">{t('noCategories')}</Link>
-            )}
-          </section>
-          <section className="editor-block">
-            <h2>{t('images')}</h2>
-            <ImagePicker
-              purpose={isCabochon ? 'cabochon' : 'catalog'}
-              images={images}
-              onChange={setImages}
-              onUploadingChange={setUploadingImages}
-              disabled={saving}
-            />
-          </section>
-          {isCabochon && (
-            <section className="editor-block">
-              <h2>{t('measurements')}</h2>
-              <div className="measurement-fields">
-                {(['lengthMm', 'widthMm', 'heightMm'] as const).map((field) => (
-                  <Form.Item
-                    key={field}
-                    name={['measurement', field]}
-                    label={
-                      field === 'lengthMm' ? (
-                        <Space size={8}>
-                          {t(field)}
-                          <Button
-                            type="link"
-                            size="small"
-                            htmlType="button"
-                            disabled={
-                              saving ||
-                              lengthMm == null ||
-                              !Number.isFinite(lengthMm) ||
-                              lengthMm <= 0
-                            }
-                            onClick={() =>
-                              form.setFieldsValue({
-                                measurement: { widthMm: lengthMm, heightMm: lengthMm },
-                              })
-                            }
-                          >
-                            {common('applyToWidthHeight')}
-                          </Button>
-                        </Space>
-                      ) : (
-                        t(field)
-                      )
-                    }
-                    rules={[{ type: 'number', min: 0.01, max: 99999999.99 }]}
-                  >
-                    <InputNumber
-                      min={0.01}
-                      max={99999999.99}
-                      precision={2}
-                      step={0.01}
-                      suffix="mm"
-                      style={{ width: '100%' }}
-                    />
-                  </Form.Item>
-                ))}
-              </div>
-              <Form.Item className="editor-recognizer-field" label={t('smartRecognition')}>
-                <div className="measurement-recognizer">
-                  <Input
-                    value={recognitionInput}
-                    onChange={(event) => setRecognitionInput(event.target.value)}
-                    onPressEnter={(event) => {
-                      event.preventDefault();
-                      recognizeMeasurement();
-                    }}
-                    placeholder={t('recognitionPlaceholder')}
-                  />
-                  <Button icon={<ScanOutlined />} onClick={recognizeMeasurement}>
-                    {t('recognize')}
-                  </Button>
-                </div>
-              </Form.Item>
-            </section>
-          )}
-          {isCabochon && (
-            <section className="editor-block">
-              <h2>{t('costs')}</h2>
-              <Form.Item
-                name="cost"
-                className="cabochon-cost-form-item"
-                rules={[
-                  {
-                    validator: (_, value) =>
-                      value === null || cabochonCostSchema.safeParse(value).success
-                        ? Promise.resolve()
-                        : Promise.reject(new Error(t('costInvalid'))),
-                  },
-                ]}
-              >
-                <CabochonCostFields />
-              </Form.Item>
-            </section>
-          )}
-          <ProductSourceSection
-            product={product}
-            value={sourceDraft}
-            onChange={(next) => {
-              if (next.origin !== sourceDraft.origin) {
-                form.setFieldsValue({
-                  pricing:
-                    next.origin === 'DIY' && !isCabochon
-                      ? diyQuotePricing(
-                          productPricingCost(false, null, next).amount,
-                          productDiyQuote(next) ?? null,
-                        )
-                      : {
-                          saleRule: 'PERCENT_50',
-                          saleRuleValue: null,
-                          saleManual: false,
-                          price: null,
-                        },
-                });
-              }
-              setSourceDraft(next);
-            }}
-            categories={categories}
-            onProductChanged={(updated) => {
-              const stock = form.getFieldValue('stock') as number;
-              if (stock === product?.stock) {
-                form.setFieldsValue({ stock: updated.stock });
-              }
-              setProduct(updated);
-              setStockConflict(false);
-            }}
-          />
-          <section className="editor-block">
-            <h2>{t('saleDetails')}</h2>
-            {!isDiyPricing && (
-              <div className="product-pricing-cost">
-                <strong>
-                  {t('pricingCost')}:{' '}
-                  {pricingCost.amount === null ? t('noCost') : `¥${pricingCost.amount}`}
-                </strong>
-                <span>{t(`pricingSource_${pricingCost.kind}`)}</span>
-                {pricingCost.record && (
-                  <span>
-                    {t('pricingRecord', {
-                      date: pricingCost.record.createdAt.slice(0, 10),
-                      id: pricingCost.record.id,
-                      batch: pricingCost.batchName ?? '—',
-                    })}
-                  </span>
                 )}
-              </div>
-            )}
-            <Form.Item
-              name="pricing"
-              dependencies={['cost', 'categoryId']}
-              rules={[
-                {
-                  validator: (_, value: ProductPricingValues | undefined) => {
-                    const price = value?.price == null ? null : amountToCents(value.price);
-                    const automatic =
-                      value &&
-                      calculateProductPrice(
-                        pricingCost.amount,
-                        value.saleRule,
-                        value.saleRuleValue,
-                      );
-                    return price !== null &&
-                      price <= maximumProductPriceCents &&
-                      (value?.saleManual || (automatic !== null && automatic !== undefined))
-                      ? Promise.resolve()
-                      : Promise.reject(new Error(t('pricingInvalid')));
-                  },
-                },
-              ]}
-            >
-              <ProductPricingFields
-                cost={pricingCost.amount}
-                quote={isCabochon ? undefined : productDiyQuote(product ?? sourceDraft)}
-              />
-            </Form.Item>
-            {!isNew && <p className="product-pricing-help">{t('pricingSaveHelp')}</p>}
-            <p
-              className={`product-pricing-profit${profitCents === null ? ' is-pending' : isLoss ? ' is-loss' : ''}`}
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              {profitCents === null
-                ? t('profitPending')
-                : t.rich(isLoss ? 'estimatedLoss' : 'estimatedProfit', {
-                    amount: centsToAmount(isLoss ? -profitCents : profitCents),
-                    money: (chunks) => <strong>{chunks}</strong>,
-                  })}
-            </p>
-          </section>
-          <section className="editor-block">
-            <h2>{t('marketing')}</h2>
-            <div className="editor-marketing-grid">
-              {(
-                [
-                  'videoShot',
-                  'xiaohongshuVideoPublished',
-                  'xiaohongshuListed',
-                  'douyinVideoPublished',
-                  'douyinListed',
-                ] as const
-              ).map((field) => (
                 <Form.Item
-                  key={field}
-                  className="editor-switch-field"
-                  name={['marketing', field]}
-                  label={t(field)}
+                  className="editor-field-publication editor-switch-field"
+                  name="published"
+                  label={t('publication')}
                   valuePropName="checked"
                 >
                   <Switch />
                 </Form.Item>
-              ))}
-            </div>
-          </section>
-          <div className="editor-actions">
-            <Link href={returnPath} replace>
-              <Button>{common('cancel')}</Button>
-            </Link>
-            {isNew && (
-              <Button
-                icon={<FileTextOutlined />}
-                onClick={() => void saveDraft()}
-                loading={savingDraft}
-                disabled={saving || uploadingImages}
-              >
-                {t('saveDraft')}
-              </Button>
+                <Form.Item
+                  className="editor-field-description"
+                  name="description"
+                  label={t('description')}
+                  rules={[{ max: 10000 }]}
+                >
+                  <Input.TextArea rows={3} maxLength={10000} showCount />
+                </Form.Item>
+              </div>
+              {!scope && !categories.length && (
+                <Link href="/admin/categories">{t('noCategories')}</Link>
+              )}
+            </section>
+            <section className={`editor-block ${editorStyles.images}`}>
+              <h2>{t('images')}</h2>
+              {isFinishedEditor && (
+                <div className={editorStyles.leadImage}>
+                  <ImageHoverPreview
+                    images={images}
+                    name={product?.name ?? t('images')}
+                    coverObjectKey={images[0]?.objectKey ?? null}
+                  />
+                </div>
+              )}
+              <ImagePicker
+                purpose={isCabochon ? 'cabochon' : 'catalog'}
+                images={images}
+                onChange={setImages}
+                onUploadingChange={setUploadingImages}
+                disabled={saving}
+              />
+            </section>
+            {isCabochon && (
+              <section className="editor-block">
+                <h2>{t('measurements')}</h2>
+                <div className="measurement-fields">
+                  {(['lengthMm', 'widthMm', 'heightMm'] as const).map((field) => (
+                    <Form.Item
+                      key={field}
+                      name={['measurement', field]}
+                      label={
+                        field === 'lengthMm' ? (
+                          <Space size={8}>
+                            {t(field)}
+                            <Button
+                              type="link"
+                              size="small"
+                              htmlType="button"
+                              disabled={
+                                saving ||
+                                lengthMm == null ||
+                                !Number.isFinite(lengthMm) ||
+                                lengthMm <= 0
+                              }
+                              onClick={() =>
+                                form.setFieldsValue({
+                                  measurement: { widthMm: lengthMm, heightMm: lengthMm },
+                                })
+                              }
+                            >
+                              {common('applyToWidthHeight')}
+                            </Button>
+                          </Space>
+                        ) : (
+                          t(field)
+                        )
+                      }
+                      rules={[{ type: 'number', min: 0.01, max: 99999999.99 }]}
+                    >
+                      <InputNumber
+                        min={0.01}
+                        max={99999999.99}
+                        precision={2}
+                        step={0.01}
+                        suffix="mm"
+                        style={{ width: '100%' }}
+                      />
+                    </Form.Item>
+                  ))}
+                </div>
+                <Form.Item className="editor-recognizer-field" label={t('smartRecognition')}>
+                  <div className="measurement-recognizer">
+                    <Input
+                      value={recognitionInput}
+                      onChange={(event) => setRecognitionInput(event.target.value)}
+                      onPressEnter={(event) => {
+                        event.preventDefault();
+                        recognizeMeasurement();
+                      }}
+                      placeholder={t('recognitionPlaceholder')}
+                    />
+                    <Button icon={<ScanOutlined />} onClick={recognizeMeasurement}>
+                      {t('recognize')}
+                    </Button>
+                  </div>
+                </Form.Item>
+              </section>
             )}
-            <Button
-              type="primary"
-              icon={<SaveOutlined />}
-              htmlType="submit"
-              loading={saving}
-              disabled={
-                nameTags.matching ||
-                generatingCode ||
-                uploadingImages ||
-                !availableCategories.length ||
-                (scope?.key === 'cabochons' && !scopedCategory)
-              }
-            >
-              {common('save')}
-            </Button>
+            {isCabochon && (
+              <section className="editor-block">
+                <h2>{t('costs')}</h2>
+                <Form.Item
+                  name="cost"
+                  className="cabochon-cost-form-item"
+                  rules={[
+                    {
+                      validator: (_, value) =>
+                        value === null || cabochonCostSchema.safeParse(value).success
+                          ? Promise.resolve()
+                          : Promise.reject(new Error(t('costInvalid'))),
+                    },
+                  ]}
+                >
+                  <CabochonCostFields />
+                </Form.Item>
+              </section>
+            )}
+            <ProductSourceSection
+              product={product}
+              value={sourceDraft}
+              onChange={(next) => {
+                if (next.origin !== sourceDraft.origin) {
+                  form.setFieldsValue({
+                    pricing:
+                      next.origin === 'DIY' && !isCabochon
+                        ? diyQuotePricing(
+                            productPricingCost(false, null, next).amount,
+                            productDiyQuote(next) ?? null,
+                          )
+                        : {
+                            saleRule: 'PERCENT_50',
+                            saleRuleValue: null,
+                            saleManual: false,
+                            price: null,
+                          },
+                  });
+                }
+                setSourceDraft(next);
+              }}
+              categories={categories}
+              onProductChanged={(updated) => {
+                const stock = form.getFieldValue('stock') as number;
+                if (stock === product?.stock) {
+                  form.setFieldsValue({ stock: updated.stock });
+                }
+                setProduct(updated);
+                setStockConflict(false);
+              }}
+            />
+            <section className="editor-block">
+              <h2>{t('saleDetails')}</h2>
+              {!isDiyPricing && (
+                <div className="product-pricing-cost">
+                  <strong>
+                    {t('pricingCost')}:{' '}
+                    {pricingCost.amount === null ? t('noCost') : `¥${pricingCost.amount}`}
+                  </strong>
+                  <span>{t(`pricingSource_${pricingCost.kind}`)}</span>
+                  {pricingCost.record && (
+                    <span>
+                      {t('pricingRecord', {
+                        date: pricingCost.record.createdAt.slice(0, 10),
+                        id: pricingCost.record.id,
+                        batch: pricingCost.batchName ?? '—',
+                      })}
+                    </span>
+                  )}
+                </div>
+              )}
+              <Form.Item
+                name="pricing"
+                dependencies={['cost', 'categoryId']}
+                rules={[
+                  {
+                    validator: (_, value: ProductPricingValues | undefined) => {
+                      const price = value?.price == null ? null : amountToCents(value.price);
+                      const automatic =
+                        value &&
+                        calculateProductPrice(
+                          pricingCost.amount,
+                          value.saleRule,
+                          value.saleRuleValue,
+                        );
+                      return price !== null &&
+                        price <= maximumProductPriceCents &&
+                        (value?.saleManual || (automatic !== null && automatic !== undefined))
+                        ? Promise.resolve()
+                        : Promise.reject(new Error(t('pricingInvalid')));
+                    },
+                  },
+                ]}
+              >
+                <ProductPricingFields
+                  cost={pricingCost.amount}
+                  quote={isCabochon ? undefined : productDiyQuote(product ?? sourceDraft)}
+                />
+              </Form.Item>
+              {!isNew && <p className="product-pricing-help">{t('pricingSaveHelp')}</p>}
+              <p
+                className={`product-pricing-profit${profitCents === null ? ' is-pending' : isLoss ? ' is-loss' : ''}`}
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                {profitCents === null
+                  ? t('profitPending')
+                  : t.rich(isLoss ? 'estimatedLoss' : 'estimatedProfit', {
+                      amount: centsToAmount(isLoss ? -profitCents : profitCents),
+                      money: (chunks) => <strong>{chunks}</strong>,
+                    })}
+              </p>
+            </section>
+            <section className="editor-block">
+              <h2>{t('marketing')}</h2>
+              <div className="editor-marketing-grid">
+                {(
+                  [
+                    'videoShot',
+                    'xiaohongshuVideoPublished',
+                    'xiaohongshuListed',
+                    'douyinVideoPublished',
+                    'douyinListed',
+                  ] as const
+                ).map((field) => (
+                  <Form.Item
+                    key={field}
+                    className="editor-switch-field"
+                    name={['marketing', field]}
+                    label={t(field)}
+                    valuePropName="checked"
+                  >
+                    <Switch />
+                  </Form.Item>
+                ))}
+              </div>
+            </section>
+            <div className="editor-actions">
+              <Link href={returnPath} replace>
+                <Button>{common('cancel')}</Button>
+              </Link>
+              {isNew && (
+                <Button
+                  icon={<FileTextOutlined />}
+                  onClick={() => void saveDraft()}
+                  loading={savingDraft}
+                  disabled={saving || uploadingImages}
+                >
+                  {t('saveDraft')}
+                </Button>
+              )}
+              <Button
+                type="primary"
+                icon={<SaveOutlined />}
+                htmlType="submit"
+                loading={saving}
+                disabled={
+                  nameTags.matching ||
+                  generatingCode ||
+                  uploadingImages ||
+                  !availableCategories.length ||
+                  (scope?.key === 'cabochons' && !scopedCategory)
+                }
+              >
+                {common('save')}
+              </Button>
+            </div>
           </div>
-        </div>
-      </Form>
+        </Form>
+      </ConfigProvider>
       <Modal
         title={tagText('newTitle')}
         open={tagModalOpen}

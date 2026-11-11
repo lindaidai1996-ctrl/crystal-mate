@@ -11,7 +11,7 @@ import { App, Button, Image, Spin, Upload, type UploadFile, Tooltip } from 'antd
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import type { ProductImage } from '@/lib/client-types';
-import type { ImageUploadPurpose } from '@/lib/image-storage';
+import { imageThumbnailUrl, type ImageUploadPurpose } from '@/lib/image-storage';
 import { ImageUploadChoiceDialog } from './imageUpload/imageUploadChoiceDialog';
 import { AttachmentImageEditor } from './imageUpload/attachmentImageEditor';
 import { uploadImage } from './imageUpload/uploadImage';
@@ -69,7 +69,7 @@ export function ImagePicker({
     name: t('imageNumber', { number: index + 1 }),
     status: 'done',
     url: image.url,
-    thumbUrl: image.url,
+    thumbUrl: imageThumbnailUrl(image.url),
   }));
 
   function selectFiles(files: File[]) {

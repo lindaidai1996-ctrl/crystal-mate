@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Crystal Mate development database backup at 03:45 China time
+
+[Timer]
+OnCalendar=*-*-* 03:45:00 Asia/Shanghai
+Persistent=true
+RandomizedDelaySec=300
+Unit=crystal-mate-development-backup.service
+
+[Install]
+WantedBy=timers.target

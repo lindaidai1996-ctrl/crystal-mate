@@ -1,0 +1,14 @@
+[Unit]
+Description=Encrypted Crystal Mate development database backup to COS
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/crystal-mate
+EnvironmentFile=/opt/crystal-mate/.env.backup.local
+ExecStart=/bin/sh /opt/crystal-mate/deploy/backup-development.sh
+TimeoutStartSec=15min
+UMask=0077

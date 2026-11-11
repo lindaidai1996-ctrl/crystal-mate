@@ -1,12 +1,14 @@
 'use client';
 
 import {
+  AppstoreOutlined,
   DeleteOutlined,
   EditOutlined,
   FolderOutlined,
   PlusOutlined,
   SearchOutlined,
   ScanOutlined,
+  UnorderedListOutlined,
 } from '@ant-design/icons';
 import {
   App,
@@ -17,6 +19,7 @@ import {
   Pagination,
   Popconfirm,
   Popover,
+  Segmented,
   Select,
   Skeleton,
   Tooltip,
@@ -39,6 +42,7 @@ import type {
 import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
 import { categoryPath } from './categoryTree';
 import { MaterialCategoryFilter } from './materialCategoryFilter';
+import { useCategoryCounts } from '@/components/useCategoryCounts';
 import { ImageHoverPreview } from './imageHoverPreview';
 import { MaterialImportSources } from './materialImportSources';
 import { MaterialBulkDialog } from './materialBulkDialog';
@@ -49,6 +53,8 @@ import { DateRangeFilter } from '@/components/date-range-filter';
 import type { DateRange } from '@/lib/date-range';
 import { useSessionListState } from '@/components/useSessionListState';
 import { withAdminReturnTo } from '@/lib/admin-return-path';
+import { CatalogGallery, CatalogGalleryImage } from '@/components/catalogGallery';
+import catalogStyles from '@/components/productCatalog.module.css';
 
 const MATERIAL_PAGE_SIZE = 20;
 type MaterialFilters = {
@@ -166,18 +172,19 @@ function BatchPrices({ item }: { item: Material }) {
   );
 }
 
-function MaterialIdentity({ item }: { item: Material }) {
+function materialImages(item: Material) {
   const seen = new Set<string>();
-  const images = [...item.batchEntries.flatMap((entry) => entry.images), ...item.images].filter(
-    (image) => {
-      if (seen.has(image.objectKey)) return false;
-      seen.add(image.objectKey);
-      return true;
-    },
-  );
+  return [...item.batchEntries.flatMap((entry) => entry.images), ...item.images].filter((image) => {
+    if (seen.has(image.objectKey)) return false;
+    seen.add(image.objectKey);
+    return true;
+  });
+}
+
+function MaterialIdentity({ item }: { item: Material }) {
   return (
     <div className="product-cell">
-      <ImageHoverPreview images={images} name={item.name} />
+      <ImageHoverPreview images={materialImages(item)} name={item.name} />
       <div>
         <MaterialEditLink item={item} />
         <MaterialImportSources material={item} />
@@ -275,12 +282,14 @@ function MaterialActions({
 
 export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) {
   const t = useTranslations('materials');
+  const products = useTranslations('products');
   const bulk = useTranslations('materialBulk');
   const inventory = useTranslations('inventory');
   const common = useTranslations('common');
   const pagination = useTablePagination();
   const { message } = App.useApp();
   const [categories, setCategories] = useState<MaterialCategory[]>([]);
+  const [view, setView] = useSessionListState<'table' | 'gallery'>('materials:view:v2', 'gallery');
   const [filters, setFilters] = useSessionListState(
     'materials:filters',
     initialFilters(initialQuery),
@@ -300,6 +309,18 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
     page: 1,
     pageSize: MATERIAL_PAGE_SIZE,
   });
+  const countParams = new URLSearchParams();
+  if (requestFilters.query) countParams.set('q', requestFilters.query);
+  if (requestFilters.source) countParams.set('source', requestFilters.source);
+  if (requestFilters.createdRange) {
+    countParams.set('createdFrom', requestFilters.createdRange[0]);
+    countParams.set('createdTo', requestFilters.createdRange[1]);
+  }
+  const filterQuery = countParams.toString();
+  const categoryCounts = useCategoryCounts(
+    `/api/materials/category-counts?${filterQuery}`,
+    revision,
+  );
   const errorText = useCallback(
     (error: unknown) =>
       common(`errors.${error instanceof ClientApiError ? error.code : 'SERVER_ERROR'}` as never),
@@ -313,15 +334,11 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
   }, [errorText, message]);
   useEffect(() => {
     const controller = new AbortController();
-    const { query: search, page, pageSize, categoryId, source, createdRange } = requestFilters;
-    const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
-    if (search) params.set('q', search);
+    const { page, pageSize, categoryId } = requestFilters;
+    const params = new URLSearchParams(filterQuery);
+    params.set('page', String(page));
+    params.set('pageSize', String(pageSize));
     if (categoryId) params.set('categoryId', categoryId);
-    if (source) params.set('source', source);
-    if (createdRange) {
-      params.set('createdFrom', createdRange[0]);
-      params.set('createdTo', createdRange[1]);
-    }
     apiFetch<MaterialPage>(`/api/materials?${params}`, { signal: controller.signal })
       .then((result) => {
         if (!controller.signal.aborted) setData(result);
@@ -333,7 +350,7 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [requestFilters, revision, errorText, message]);
+  }, [requestFilters, filterQuery, revision, errorText, message]);
 
   function updateFilters(patch: Partial<MaterialFilters>) {
     setFilters((current) => ({ ...current, ...patch }));
@@ -463,8 +480,20 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
       <MaterialCategoryFilter
         categories={categories}
         value={categoryId}
+        counts={categoryCounts}
         onChange={(categoryId) => changeFilters({ categoryId })}
       />
+      <div className={catalogStyles.results}>
+        <Segmented
+          aria-label={products('view')}
+          value={view}
+          options={[
+            { value: 'gallery', label: products('galleryView'), icon: <AppstoreOutlined /> },
+            { value: 'table', label: products('tableView'), icon: <UnorderedListOutlined /> },
+          ]}
+          onChange={setView}
+        />
+      </div>
       <div className={bulkStyles.toolbar}>
         <Button
           onClick={() => {
@@ -526,43 +555,25 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
           </>
         )}
       </div>
-      <div className="table-surface">
-        <div className="material-desktop-table">
-          <PaginatedTable
-            rowKey="id"
-            rowSelection={
-              bulkMode
-                ? {
-                    selectedRowKeys: selectedIds,
-                    preserveSelectedRowKeys: true,
-                    onChange: (keys) => setSelectedIds(keys.map(String)),
-                    getCheckboxProps: () => ({ disabled: loading }),
-                  }
-                : undefined
-            }
-            columns={columns}
-            dataSource={data.items}
-            loading={loading}
-            scroll={{ x: bulkMode ? 1458 : 1410 }}
-            pagination={{
-              ...CLIENT_TABLE_PAGINATION,
-              current: page,
-              pageSize,
-              total: data.total,
-              onChange: changePage,
-            }}
-            locale={{ emptyText: <Empty description={t('empty')} /> }}
-          />
-        </div>
-        <div className="material-mobile-list">
-          {loading ? (
-            <Skeleton active paragraph={{ rows: 6 }} />
-          ) : data.items.length ? (
-            data.items.map((item) => (
-              <article className="material-mobile-item" key={item.id}>
-                {bulkMode && (
+      {view === 'gallery' ? (
+        <CatalogGallery
+          loading={loading}
+          emptyDescription={t('empty')}
+          pagination={{
+            ...pagination,
+            current: page,
+            pageSize,
+            total: data.total,
+            onChange: changePage,
+          }}
+        >
+          {data.items.map((item) => (
+            <article key={item.id} className={catalogStyles.card}>
+              {bulkMode && (
+                <div className={catalogStyles.cardSelection}>
                   <Checkbox
                     checked={selectedIds.includes(item.id)}
+                    disabled={loading}
                     onChange={(event) =>
                       setSelectedIds((ids) =>
                         togglePageSelection(ids, [item.id], event.target.checked),
@@ -571,43 +582,126 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
                   >
                     {bulk('selectMaterial', { name: item.name })}
                   </Checkbox>
-                )}
-                <MaterialIdentity item={item} />
-                <div className="material-mobile-meta">
-                  {categoryPath(item.categoryId, categories)
-                    .map(
-                      (categoryId) =>
-                        categories.find((category) => category.id === categoryId)?.name,
-                    )
-                    .join(' / ') || item.category.name}{' '}
-                  · {t(item.unit)}
                 </div>
-                <div className="material-mobile-meta">
+              )}
+              <CatalogGalleryImage
+                images={materialImages(item)}
+                name={item.name}
+                soldOut={item.knownStock === 0 && item.unknownStockBatchCount === 0}
+              />
+              <div className={catalogStyles.cardBody}>
+                <div className={catalogStyles.cardHeading}>
+                  <MaterialEditLink item={item} />
+                </div>
+                <MaterialImportSources material={item} />
+                <div className={catalogStyles.cardMeta}>
+                  <span>
+                    {categoryPath(item.categoryId, categories)
+                      .map((id) => categories.find((category) => category.id === id)?.name)
+                      .join(' / ') || item.category.name}
+                  </span>
+                  <span>{t(item.unit)}</span>
+                </div>
+                <div className="product-tags">
+                  {item.tags.map((tag) => (
+                    <TextTag key={tag.id} text={tag.name} />
+                  ))}
+                </div>
+                <div className={catalogStyles.cardDetails}>
                   <MaterialStockSummary material={item} />
-                </div>
-                <div className="material-mobile-batches">
-                  <span>{t('batchPrices')}</span>
                   <BatchPrices item={item} />
                 </div>
-                <div className="material-mobile-actions">
+                <div className={catalogStyles.cardActions}>
                   <MaterialActions item={item} onRemove={remove} onSaved={refreshStock} />
                 </div>
-              </article>
-            ))
-          ) : (
-            <Empty description={t('empty')} />
-          )}
-          {!loading && (
-            <Pagination
-              {...pagination}
-              current={page}
-              pageSize={pageSize}
-              total={data.total}
-              onChange={changePage}
+              </div>
+            </article>
+          ))}
+        </CatalogGallery>
+      ) : (
+        <div className="table-surface">
+          <div className="material-desktop-table">
+            <PaginatedTable
+              rowKey="id"
+              rowSelection={
+                bulkMode
+                  ? {
+                      selectedRowKeys: selectedIds,
+                      preserveSelectedRowKeys: true,
+                      onChange: (keys) => setSelectedIds(keys.map(String)),
+                      getCheckboxProps: () => ({ disabled: loading }),
+                    }
+                  : undefined
+              }
+              columns={columns}
+              dataSource={data.items}
+              loading={loading}
+              scroll={{ x: bulkMode ? 1458 : 1410 }}
+              pagination={{
+                ...CLIENT_TABLE_PAGINATION,
+                current: page,
+                pageSize,
+                total: data.total,
+                onChange: changePage,
+              }}
+              locale={{ emptyText: <Empty description={t('empty')} /> }}
             />
-          )}
+          </div>
+          <div className="material-mobile-list">
+            {loading ? (
+              <Skeleton active paragraph={{ rows: 6 }} />
+            ) : data.items.length ? (
+              data.items.map((item) => (
+                <article className="material-mobile-item" key={item.id}>
+                  {bulkMode && (
+                    <Checkbox
+                      checked={selectedIds.includes(item.id)}
+                      onChange={(event) =>
+                        setSelectedIds((ids) =>
+                          togglePageSelection(ids, [item.id], event.target.checked),
+                        )
+                      }
+                    >
+                      {bulk('selectMaterial', { name: item.name })}
+                    </Checkbox>
+                  )}
+                  <MaterialIdentity item={item} />
+                  <div className="material-mobile-meta">
+                    {categoryPath(item.categoryId, categories)
+                      .map(
+                        (categoryId) =>
+                          categories.find((category) => category.id === categoryId)?.name,
+                      )
+                      .join(' / ') || item.category.name}{' '}
+                    · {t(item.unit)}
+                  </div>
+                  <div className="material-mobile-meta">
+                    <MaterialStockSummary material={item} />
+                  </div>
+                  <div className="material-mobile-batches">
+                    <span>{t('batchPrices')}</span>
+                    <BatchPrices item={item} />
+                  </div>
+                  <div className="material-mobile-actions">
+                    <MaterialActions item={item} onRemove={remove} onSaved={refreshStock} />
+                  </div>
+                </article>
+              ))
+            ) : (
+              <Empty description={t('empty')} />
+            )}
+            {!loading && (
+              <Pagination
+                {...pagination}
+                current={page}
+                pageSize={pageSize}
+                total={data.total}
+                onChange={changePage}
+              />
+            )}
+          </div>
         </div>
-      </div>
+      )}
       {bulkAction && (
         <MaterialBulkDialog
           intent={bulkAction.intent}

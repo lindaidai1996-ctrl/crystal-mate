@@ -17,7 +17,9 @@ import { Button, Drawer, Layout, Menu, Select, Tooltip } from 'antd';
 import { signOut } from 'next-auth/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/navigation';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import Image from 'next/image';
+import shellStyles from './adminShell.module.css';
 import { catalogPath } from '@/lib/catalog-scopes';
 import { NavigationGuardProvider, useNavigationGuard } from './navigationGuard';
 
@@ -49,6 +51,7 @@ function AdminShellContent({
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
+  const menuButton = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
   const selected = pathname.startsWith('/admin/setting-styles')
     ? 'settingStyles'
@@ -76,118 +79,128 @@ function AdminShellContent({
       selectedKeys={[selected]}
       items={[
         {
-          key: 'products',
-          icon: <AppstoreOutlined />,
-          label: t('products'),
-          onClick: () => {
-            navigate(() => router.push('/admin/products'));
-            setOpen(false);
-          },
+          type: 'group',
+          label: t('catalogGroup'),
+          children: [
+            {
+              key: 'products',
+              icon: <AppstoreOutlined />,
+              label: t('products'),
+              onClick: () => {
+                navigate(() => router.push('/admin/products'));
+                setOpen(false);
+              },
+            },
+            {
+              key: 'cabochons',
+              icon: <GoldOutlined />,
+              label: t('cabochons'),
+              onClick: () => {
+                navigate(() => router.push(catalogPath('cabochons')));
+                setOpen(false);
+              },
+            },
+            {
+              key: 'finishedStrands',
+              icon: <DeploymentUnitOutlined />,
+              label: t('finishedStrands'),
+              onClick: () => {
+                navigate(() => router.push(catalogPath('finished-strands')));
+                setOpen(false);
+              },
+            },
+            {
+              key: 'materials',
+              icon: <ExperimentOutlined />,
+              label: t('materials'),
+              onClick: () => {
+                navigate(() => router.push('/admin/materials'));
+                setOpen(false);
+              },
+            },
+          ],
         },
         {
-          key: 'cabochons',
-          icon: <GoldOutlined />,
-          label: t('cabochons'),
-          onClick: () => {
-            navigate(() => router.push(catalogPath('cabochons')));
-            setOpen(false);
-          },
-        },
-        {
-          key: 'finishedStrands',
-          icon: <DeploymentUnitOutlined />,
-          label: t('finishedStrands'),
-          onClick: () => {
-            navigate(() => router.push(catalogPath('finished-strands')));
-            setOpen(false);
-          },
-        },
-        {
-          key: 'materials',
-          icon: <ExperimentOutlined />,
-          label: t('materials'),
-          onClick: () => {
-            navigate(() => router.push('/admin/materials'));
-            setOpen(false);
-          },
-        },
-        {
-          key: 'distributors',
-          icon: <TeamOutlined />,
-          label: t('distributors'),
-          onClick: () => {
-            navigate(() => router.push('/admin/distributors'));
-            setOpen(false);
-          },
-        },
-        {
-          key: 'materialBatches',
-          icon: <ContainerOutlined />,
-          label: t('materialBatches'),
-          onClick: () => {
-            navigate(() => router.push('/admin/materials/batches'));
-            setOpen(false);
-          },
-        },
-        {
-          key: 'settingStyles',
-          icon: <ToolOutlined />,
-          label: t('settingStyles'),
-          onClick: () => {
-            navigate(() => router.push('/admin/setting-styles'));
-            setOpen(false);
-          },
-        },
-        {
-          key: 'categories',
-          icon: <FolderOutlined />,
-          label: t('categories'),
-          onClick: () => {
-            navigate(() => router.push('/admin/categories'));
-            setOpen(false);
-          },
-        },
-        {
-          key: 'tags',
-          icon: <TagsOutlined />,
-          label: t('tags'),
-          onClick: () => {
-            navigate(() => router.push('/admin/tags'));
-            setOpen(false);
-          },
+          type: 'group',
+          label: t('managementGroup'),
+          children: [
+            {
+              key: 'distributors',
+              icon: <TeamOutlined />,
+              label: t('distributors'),
+              onClick: () => {
+                navigate(() => router.push('/admin/distributors'));
+                setOpen(false);
+              },
+            },
+            {
+              key: 'materialBatches',
+              icon: <ContainerOutlined />,
+              label: t('materialBatches'),
+              onClick: () => {
+                navigate(() => router.push('/admin/materials/batches'));
+                setOpen(false);
+              },
+            },
+            {
+              key: 'settingStyles',
+              icon: <ToolOutlined />,
+              label: t('settingStyles'),
+              onClick: () => {
+                navigate(() => router.push('/admin/setting-styles'));
+                setOpen(false);
+              },
+            },
+            {
+              key: 'categories',
+              icon: <FolderOutlined />,
+              label: t('categories'),
+              onClick: () => {
+                navigate(() => router.push('/admin/categories'));
+                setOpen(false);
+              },
+            },
+            {
+              key: 'tags',
+              icon: <TagsOutlined />,
+              label: t('tags'),
+              onClick: () => {
+                navigate(() => router.push('/admin/tags'));
+                setOpen(false);
+              },
+            },
+          ],
         },
       ]}
     />
   );
   const sidebar = (
-    <div className="sidebar-inner">
-      <div className="sidebar-brand">
-        <span className="brand-mark">C</span>
-        <div>
-          <strong>{t('brand')}</strong>
-          <small>{t('console')}</small>
-        </div>
+    <div className={shellStyles.sidebar}>
+      <div className={shellStyles.brand}>
+        <Image src="/images/logo-white.png" alt={t('brand')} width={150} height={130} priority />
+        <strong>{t('brand')}</strong>
       </div>
       {menu}
-      <div className="sidebar-footer">{username}</div>
+      <div className={shellStyles.footer}>{username}</div>
     </div>
   );
 
   return (
-    <Layout className="admin-layout">
-      <Sider width={226} className="desktop-sidebar">
+    <Layout className={shellStyles.layout}>
+      <Sider width={216} className={shellStyles.desktopSidebar}>
         {sidebar}
       </Sider>
-      <Layout>
-        <Header className="admin-header">
+      <Layout className={shellStyles.workspace}>
+        <Header className={shellStyles.header}>
           <Button
-            className="mobile-menu"
+            className={shellStyles.mobileMenu}
             icon={<MenuOutlined />}
-            aria-label="Menu"
+            aria-label={t('menu')}
+            ref={menuButton}
             onClick={() => setOpen(true)}
           />
-          <div className="header-context">{t(selected)}</div>
-          <div className="header-actions">
+          <div className={shellStyles.context}>{t(selected)}</div>
+          <div className={shellStyles.actions}>
             <Select
               aria-label={t('language')}
               value={locale}
@@ -196,7 +209,7 @@ function AdminShellContent({
                 { value: 'zh', label: '中文' },
                 { value: 'en', label: 'English' },
               ]}
-              className="language-select"
+              className={shellStyles.language}
             />
             <Tooltip title={t('logout')}>
               <Button
@@ -211,16 +224,19 @@ function AdminShellContent({
             </Tooltip>
           </div>
         </Header>
-        <Content className="admin-content">{children}</Content>
+        <Content className={shellStyles.content}>{children}</Content>
       </Layout>
       <Drawer
+        title={t('menu')}
         placement="left"
         open={open}
         onClose={() => setOpen(false)}
-        width={226}
-        closable={false}
+        width={216}
+        afterOpenChange={(visible) => {
+          if (!visible) menuButton.current?.focus();
+        }}
         styles={{ body: { padding: 0 } }}
-        className="mobile-drawer"
+        className={shellStyles.drawer}
       >
         {sidebar}
       </Drawer>

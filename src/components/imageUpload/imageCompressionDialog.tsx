@@ -1,8 +1,11 @@
 'use client';
 
-import { Alert, Button, Modal, Segmented, Spin, Tooltip } from 'antd';
+import { CheckOutlined } from '@ant-design/icons';
+import { Alert, Button, ConfigProvider, Modal, Segmented, Spin, Tooltip } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
+import { imageUploadModeTheme } from '@/lib/ui-theme';
+import dialogStyles from './imageCompressionDialog.module.css';
 import {
   formatImageBytes,
   MAX_UPLOAD_BYTES,
@@ -91,23 +94,36 @@ export function ImageCompressionDialog({
       ) : (
         <div className="image-upload-choice">
           {hasCropped && <Alert type="info" showIcon message={t('croppedVersionHelp')} />}
-          <Segmented<UploadMode>
-            block
-            value={mode}
-            onChange={setMode}
-            options={[
-              {
-                label: t(askCompression ? 'compressYes' : 'compressed'),
-                value: 'compressed',
-                disabled: !canUploadCompressed,
-              },
-              {
-                label: t(hasCropped ? 'uncompressed' : askCompression ? 'compressNo' : 'original'),
-                value: 'original',
-                disabled: !canUploadOriginal,
-              },
-            ]}
-          />
+          <ConfigProvider theme={imageUploadModeTheme}>
+            <Segmented<UploadMode>
+              block
+              className={dialogStyles.modeSwitch}
+              value={mode}
+              onChange={setMode}
+              options={[
+                {
+                  label: (
+                    <span className={dialogStyles.modeLabel}>
+                      <CheckOutlined className={dialogStyles.modeCheck} aria-hidden />
+                      {t(askCompression ? 'compressYes' : 'compressed')}
+                    </span>
+                  ),
+                  value: 'compressed',
+                  disabled: !canUploadCompressed,
+                },
+                {
+                  label: (
+                    <span className={dialogStyles.modeLabel}>
+                      <CheckOutlined className={dialogStyles.modeCheck} aria-hidden />
+                      {t(hasCropped ? 'uncompressed' : askCompression ? 'compressNo' : 'original')}
+                    </span>
+                  ),
+                  value: 'original',
+                  disabled: !canUploadOriginal,
+                },
+              ]}
+            />
+          </ConfigProvider>
           {!canUploadOriginal && canUploadCompressed && (
             <Alert type="info" showIcon message={t('originalUnavailable')} />
           )}

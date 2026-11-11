@@ -80,7 +80,10 @@
     "aliases": "别名（选填）",
     "aliasesHelp": "可填写多个叫法，用于名称搜索；每个最多 120 字，最多 20 个。",
     "aliasesPlaceholder": "输入别名后按回车或逗号添加",
-    "settingStyles": "镶嵌管理"
+    "settingStyles": "镶嵌管理",
+    "menu": "导航菜单",
+    "catalogGroup": "商品档案",
+    "managementGroup": "日常经营"
   },
   "login": {
     "title": "管理员登录",
@@ -124,7 +127,19 @@
     "empty": "暂无商品",
     "marketingConfig": "营销配置",
     "copyProductInfo": "复制商品信息",
-    "deleteConfirm": "删除后无法恢复，确定删除这件商品吗？"
+    "deleteConfirm": "删除后无法恢复，确定删除这件商品吗？",
+    "view": "展示方式",
+    "tableView": "表格",
+    "galleryView": "画廊",
+    "density": "显示密度",
+    "comfortable": "舒适",
+    "compact": "紧凑",
+    "sort": "排序",
+    "sortDefault": "默认排序",
+    "sortPriceAsc": "价格从低到高",
+    "sortPriceDesc": "价格从高到低",
+    "noImage": "暂无图片",
+    "imageCount": "{count} 张图片"
   },
   "marketingConfig": {
     "title": "营销配置",
@@ -1121,6 +1136,7 @@
     "stepReview": "核对并保存草稿",
     "stepImport": "确认导入",
     "chooseFile": "选择 Excel",
+    "downloadTemplate": "下载 Excel 模版",
     "replaceFile": "选择其他 Excel",
     "worksheet": "工作表",
     "fileHelp": "支持 .xlsx，每张表最多 300 条、文件最多 150 MB。支持 Excel / WPS 单元格内嵌图片及随单元格定位的图片；图片链接需另行处理。",

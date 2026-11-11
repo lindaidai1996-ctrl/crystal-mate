@@ -24,6 +24,7 @@ import {
   type AttachmentOwner,
 } from '@/lib/attachments';
 import type { MaterialBatchAttachment } from '@/lib/client-types';
+import { imageThumbnailUrl } from '@/lib/image-storage';
 import styles from './attachmentCandidateDialog.module.css';
 
 export function AttachmentCandidateDialog({
@@ -189,7 +190,14 @@ export function AttachmentCandidateDialog({
                     className={`${styles.card} ${checked ? styles.selected : ''}`}
                     key={`${item.type}:${item.itemId}`}
                   >
-                    <Image src={item.url} alt={item.name} width="100%" height={120} />
+                    <Image
+                      src={imageThumbnailUrl(item.url, 640)}
+                      preview={{ src: item.url }}
+                      loading="lazy"
+                      alt={item.name}
+                      width="100%"
+                      height={120}
+                    />
                     <Checkbox
                       checked={added || checked}
                       disabled={loading || added || (!checked && selected.size >= capacity)}

@@ -9,10 +9,13 @@ import {
   FileTextOutlined,
   CopyOutlined,
   FileExcelOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined,
 } from '@ant-design/icons';
 import {
   App,
   Button,
+  ConfigProvider,
   Empty,
   Input,
   Popconfirm,
@@ -28,7 +31,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState, useDeferredValue, useCallback } from 'react';
 import { Link } from '@/i18n/navigation';
-import { PaginatedTable } from '@/components/paginated-table';
+import { PaginatedTable, useTablePagination } from '@/components/paginated-table';
 import { DateRangeFilter } from '@/components/date-range-filter';
 import type { DateRange } from '@/lib/date-range';
 import {
@@ -53,6 +56,12 @@ import { EditorDraftBox } from './editorDraftBox';
 import { useSessionListState } from './useSessionListState';
 import { withAdminReturnTo } from '@/lib/admin-return-path';
 import { ProductInlineEdit, type ProductQuickEditChange } from './productInlineEdit';
+import { CategoryFilterRow } from './categoryFilterRow';
+import { useCategoryCounts } from './useCategoryCounts';
+import categoryStyles from './categoryFilter.module.css';
+import catalogStyles from './productCatalog.module.css';
+import { ProductGallery } from './productGallery';
+import { underlinedTheme } from '@/lib/ui-theme';
 
 type MarketingFilterValue = '' | 'true' | 'false';
 type MarketingFilterField = CabochonMarketingField;
@@ -101,6 +110,16 @@ export function ProductsPage({
   const isFinishedStrands = scope?.key === 'finished-strands';
   const cabochonActionWidth = locale === 'en' ? 360 : 320;
   const listStateKey = `products:${scope?.key ?? 'all'}`;
+  const paginationDefaults = useTablePagination();
+  const [view, setView] = useSessionListState<'table' | 'gallery'>(
+    `${listStateKey}:view:v2`,
+    'gallery',
+  );
+  const [density, setDensity] = useSessionListState<'comfortable' | 'compact'>(
+    `${listStateKey}:density`,
+    'comfortable',
+  );
+  const [listError, setListError] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryStatus, setCategoryStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [categoryRevision, setCategoryRevision] = useState(0);
@@ -179,6 +198,29 @@ export function ProductsPage({
   const canLoadProducts = !scope || (categoryStatus === 'ready' && hasScopedCategory);
   const listPath = scope ? catalogPath(scope.key) : '/admin/products';
 
+  const filterParams = new URLSearchParams();
+  if (search) filterParams.set('q', search);
+  if (scope?.key === 'finished-strands') filterParams.set('excludeCategoryName', '蛋面');
+  if (tagId) filterParams.set('tagId', tagId);
+  if (isCabochon && settingStyleId) filterParams.set('settingStyleId', settingStyleId);
+  if (published) filterParams.set('published', published);
+  if (isFinishedStrands && origin !== 'all') filterParams.set('origin', origin);
+  if (stock) filterParams.set('stock', stock);
+  if (isCabochon) {
+    for (const field of marketingFilterFields) {
+      if (marketingFilters[field]) filterParams.set(field, marketingFilters[field]);
+    }
+  }
+  if (createdRange) {
+    filterParams.set('createdFrom', createdRange[0]);
+    filterParams.set('createdTo', createdRange[1]);
+  }
+  const filterQuery = filterParams.toString();
+  const categoryCounts = useCategoryCounts(
+    !isCabochon && canLoadProducts ? `/api/products/category-counts?${filterQuery}` : null,
+    revision,
+  );
+
   const errorMessage = useCallback(
     (error: unknown) => {
       const code = error instanceof ClientApiError ? error.code : 'SERVER_ERROR';
@@ -218,48 +260,31 @@ export function ProductsPage({
   useEffect(() => {
     if (!canLoadProducts) return;
     const controller = new AbortController();
-    const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+    const params = new URLSearchParams(filterQuery);
+    params.set('page', String(page));
+    params.set('pageSize', String(pageSize));
     if (priceSort) params.set('sortPrice', priceSort === 'ascend' ? 'asc' : 'desc');
-    if (search) params.set('q', search);
     if (effectiveCategoryId) params.set('categoryId', effectiveCategoryId);
-    if (scope?.key === 'finished-strands') params.set('excludeCategoryName', '蛋面');
-    if (tagId) params.set('tagId', tagId);
-    if (isCabochon && settingStyleId) params.set('settingStyleId', settingStyleId);
-    if (published) params.set('published', published);
-    if (isFinishedStrands && origin !== 'all') params.set('origin', origin);
-    if (stock) params.set('stock', stock);
-    if (isCabochon) {
-      for (const field of marketingFilterFields) {
-        if (marketingFilters[field]) params.set(field, marketingFilters[field]);
-      }
-    }
-    if (createdRange) {
-      params.set('createdFrom', createdRange[0]);
-      params.set('createdTo', createdRange[1]);
-    }
     apiFetch<ProductPage>(`/api/products?${params}`, { signal: controller.signal })
-      .then(setData)
+      .then((result) => {
+        if (controller.signal.aborted) return;
+        setData(result);
+        setListError(null);
+      })
       .catch((error) => {
-        if (!controller.signal.aborted) message.error(errorMessage(error));
+        if (!controller.signal.aborted) {
+          setListError(errorMessage(error));
+          message.error(errorMessage(error));
+        }
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
   }, [
-    search,
+    filterQuery,
     effectiveCategoryId,
     canLoadProducts,
-    scope,
-    tagId,
-    isCabochon,
-    settingStyleId,
-    published,
-    origin,
-    isFinishedStrands,
-    stock,
-    marketingFilters,
-    createdRange,
     page,
     pageSize,
     priceSort,
@@ -360,6 +385,42 @@ export function ProductsPage({
     }
   }
 
+  const renderActions = (item: Product) => (
+    <span className={isCabochon ? 'row-actions cabochon-row-actions' : 'row-actions'}>
+      {!isCabochon && (
+        <Link href={`${listPath}/${item.id}`}>
+          <Tooltip title={common('edit')}>
+            <Button type="text" icon={<EditOutlined />} aria-label={common('edit')} />
+          </Tooltip>
+        </Link>
+      )}
+      {scope?.key === 'cabochons' && (
+        <>
+          <Link href={`${listPath}/${item.id}/marketing`}>
+            <Tooltip title={t('marketingConfig')}>
+              <Button type="text" icon={<FileTextOutlined />} aria-label={t('marketingConfig')}>
+                {t('marketingConfig')}
+              </Button>
+            </Tooltip>
+          </Link>
+          <Button type="text" icon={<CopyOutlined />} onClick={() => void copyProductInfo(item)}>
+            {t('copyProductInfo')}
+          </Button>
+        </>
+      )}
+      <Popconfirm
+        title={t('deleteConfirm')}
+        okText={common('delete')}
+        cancelText={common('cancel')}
+        onConfirm={() => remove(item.id)}
+      >
+        <Tooltip title={common('delete')}>
+          <Button type="text" danger icon={<DeleteOutlined />} aria-label={common('delete')} />
+        </Tooltip>
+      </Popconfirm>
+    </span>
+  );
+
   const columns: ColumnsType<Product> = [
     {
       title: t('name'),
@@ -368,7 +429,11 @@ export function ProductsPage({
       fixed: isCabochon ? 'left' : undefined,
       render: (_, item) => (
         <div className="product-cell">
-          <ImageHoverPreview images={item.images} name={item.name} />
+          <ImageHoverPreview
+            images={item.images}
+            name={item.name}
+            coverObjectKey={isFinishedStrands ? (item.images[0]?.objectKey ?? null) : undefined}
+          />
           <div>
             <div className="product-name-line">
               <Link className="product-name" href={`${listPath}/${item.id}`}>
@@ -515,47 +580,22 @@ export function ProductsPage({
       title: t('actions'),
       key: 'actions',
       width: isCabochon ? cabochonActionWidth : 100,
-      render: (_, item) => (
-        <span className={isCabochon ? 'row-actions cabochon-row-actions' : 'row-actions'}>
-          {!isCabochon && (
-            <Link href={`${listPath}/${item.id}`}>
-              <Tooltip title={common('edit')}>
-                <Button type="text" icon={<EditOutlined />} aria-label={common('edit')} />
-              </Tooltip>
-            </Link>
-          )}
-          {scope?.key === 'cabochons' && (
-            <>
-              <Link href={`${listPath}/${item.id}/marketing`}>
-                <Tooltip title={t('marketingConfig')}>
-                  <Button type="text" icon={<FileTextOutlined />} aria-label={t('marketingConfig')}>
-                    {t('marketingConfig')}
-                  </Button>
-                </Tooltip>
-              </Link>
-              <Button
-                type="text"
-                icon={<CopyOutlined />}
-                onClick={() => void copyProductInfo(item)}
-              >
-                {t('copyProductInfo')}
-              </Button>
-            </>
-          )}
-          <Popconfirm
-            title={t('deleteConfirm')}
-            okText={common('delete')}
-            cancelText={common('cancel')}
-            onConfirm={() => remove(item.id)}
-          >
-            <Tooltip title={common('delete')}>
-              <Button type="text" danger icon={<DeleteOutlined />} aria-label={common('delete')} />
-            </Tooltip>
-          </Popconfirm>
-        </span>
-      ),
+      render: (_, item) => renderActions(item),
     },
   ];
+
+  const pagination = {
+    ...paginationDefaults,
+    ...CLIENT_TABLE_PAGINATION,
+    current: page,
+    pageSize,
+    total: data.total,
+    onChange: (nextPage: number, nextPageSize: number) => {
+      setLoading(true);
+      setPage(nextPageSize === pageSize ? nextPage : 1);
+      setPageSize(nextPageSize);
+    },
+  };
 
   if (scope && categoryStatus === 'loading') return <Skeleton active paragraph={{ rows: 8 }} />;
   if (scope && categoryStatus === 'error')
@@ -584,227 +624,342 @@ export function ProductsPage({
     );
 
   return (
-    <>
-      <div className="page-heading">
-        <div>
-          <h1>{scope ? common(scope.titleKey) : t('title')}</h1>
-          <p>{t('count', { count: data.total })}</p>
+    <ConfigProvider
+      variant={isFinishedStrands ? 'underlined' : undefined}
+      theme={isFinishedStrands ? underlinedTheme : undefined}
+    >
+      <div
+        className={isFinishedStrands ? catalogStyles.catalog : undefined}
+        data-density={isFinishedStrands ? density : undefined}
+      >
+        <div
+          className={isFinishedStrands ? `page-heading ${catalogStyles.toolbar}` : 'page-heading'}
+        >
+          <div>
+            <h1>{scope ? common(scope.titleKey) : t('title')}</h1>
+            <p>{t('count', { count: data.total })}</p>
+          </div>
+          <Space wrap>
+            <EditorDraftBox kind="PRODUCT" returnTo={listPath} />
+            {isCabochon && (
+              <Link href={`${listPath}/excel-import`}>
+                <Button icon={<FileExcelOutlined />}>{excelImport('entry')}</Button>
+              </Link>
+            )}
+            {!isCabochon && (
+              <Link href={withAdminReturnTo('/admin/products/diy-image-import', listPath)}>
+                <Button icon={<ScanOutlined />}>{diyImport('entry')}</Button>
+              </Link>
+            )}
+            <Link href={`${listPath}/new`}>
+              <Button type="primary" icon={<PlusOutlined />}>
+                {t('new')}
+              </Button>
+            </Link>
+          </Space>
         </div>
-        <Space wrap>
-          <EditorDraftBox kind="PRODUCT" returnTo={listPath} />
+        <div
+          className={
+            isFinishedStrands
+              ? 'filter-bar filter-bar--finished'
+              : !scope
+                ? `filter-bar ${catalogStyles.filters}`
+                : 'filter-bar'
+          }
+        >
+          <div className="product-filter-primary">
+            <Input
+              className="filter-search"
+              value={query}
+              onChange={(event) => {
+                setLoading(true);
+                setQuery(event.target.value);
+                setPage(1);
+              }}
+              prefix={<SearchOutlined />}
+              aria-label={t('search')}
+              placeholder={t('search')}
+              allowClear
+            />
+            {isFinishedStrands && (
+              <div className="product-origin-filter">
+                <span className="product-origin-label">{t('originFilter')}</span>
+                <Segmented<'all' | 'PURCHASED' | 'DIY'>
+                  size="small"
+                  aria-label={t('originFilter')}
+                  value={origin}
+                  options={[
+                    { value: 'all', label: t('all') },
+                    { value: 'PURCHASED', label: t('purchased') },
+                    { value: 'DIY', label: t('diy') },
+                  ]}
+                  onChange={(value) => {
+                    setLoading(true);
+                    setOrigin(value);
+                    setPage(1);
+                  }}
+                />
+              </div>
+            )}
+          </div>
           {isCabochon && (
-            <Link href={`${listPath}/excel-import`}>
-              <Button icon={<FileExcelOutlined />}>{excelImport('entry')}</Button>
-            </Link>
+            <Select
+              className="filter-select"
+              value={settingStyleId}
+              onChange={(value) => {
+                setLoading(true);
+                setSettingStyleId(value);
+                setPage(1);
+              }}
+              placeholder={t('setting')}
+              aria-label={t('setting')}
+              allowClear
+              showSearch
+              optionFilterProp="label"
+              options={[
+                ...settingStyles.map((item) => ({ value: item.id, label: item.magicBoxStyle })),
+                { value: 'unset', label: t('unsetSetting') },
+              ]}
+            />
           )}
-          {!isCabochon && (
-            <Link href={withAdminReturnTo('/admin/products/diy-image-import', listPath)}>
-              <Button icon={<ScanOutlined />}>{diyImport('entry')}</Button>
-            </Link>
-          )}
-          <Link href={`${listPath}/new`}>
-            <Button type="primary" icon={<PlusOutlined />}>
-              {t('new')}
-            </Button>
-          </Link>
-        </Space>
-      </div>
-      <div className={isFinishedStrands ? 'filter-bar filter-bar--finished' : 'filter-bar'}>
-        <div className="product-filter-primary">
-          <Input
-            className="filter-search"
-            value={query}
-            onChange={(event) => {
-              setLoading(true);
-              setQuery(event.target.value);
-              setPage(1);
-            }}
-            prefix={<SearchOutlined />}
-            placeholder={t('search')}
-            allowClear
-          />
-          {isFinishedStrands && (
-            <div className="product-origin-filter">
-              <span className="product-origin-label">{t('originFilter')}</span>
-              <Segmented<'all' | 'PURCHASED' | 'DIY'>
-                size="small"
-                aria-label={t('originFilter')}
-                value={origin}
-                options={[
-                  { value: 'all', label: t('all') },
-                  { value: 'PURCHASED', label: t('purchased') },
-                  { value: 'DIY', label: t('diy') },
-                ]}
-                onChange={(value) => {
-                  setLoading(true);
-                  setOrigin(value);
-                  setPage(1);
-                }}
-              />
-            </div>
-          )}
-        </div>
-        {!isCabochon && (
           <Select
             className="filter-select"
-            value={categoryId}
+            value={tagId}
             onChange={(value) => {
               setLoading(true);
-              setCategoryId(value);
+              setTagId(value);
               setPage(1);
             }}
-            placeholder={t('category')}
-            allowClear
-            options={availableCategories.map((item) => ({ value: item.id, label: item.name }))}
-          />
-        )}
-        {isCabochon && (
-          <Select
-            className="filter-select"
-            value={settingStyleId}
-            onChange={(value) => {
-              setLoading(true);
-              setSettingStyleId(value);
-              setPage(1);
-            }}
-            placeholder={t('setting')}
-            aria-label={t('setting')}
+            aria-label={t('tags')}
+            placeholder={t('tags')}
             allowClear
             showSearch
             optionFilterProp="label"
-            options={[
-              ...settingStyles.map((item) => ({ value: item.id, label: item.magicBoxStyle })),
-              { value: 'unset', label: t('unsetSetting') },
-            ]}
+            options={tags.map((item) => ({ value: item.id, label: item.name }))}
           />
-        )}
-        <Select
-          className="filter-select"
-          value={tagId}
-          onChange={(value) => {
-            setLoading(true);
-            setTagId(value);
-            setPage(1);
-          }}
-          placeholder={t('tags')}
-          allowClear
-          showSearch
-          optionFilterProp="label"
-          options={tags.map((item) => ({ value: item.id, label: item.name }))}
-        />
-        {!isCabochon && (
-          <Select
-            className="filter-select"
-            value={published}
-            onChange={(value) => {
-              setLoading(true);
-              setPublished(value);
-              setPage(1);
-            }}
-            placeholder={t('publication')}
-            allowClear
-            options={[
-              { value: 'true', label: t('published') },
-              { value: 'false', label: t('unpublished') },
-            ]}
-          />
-        )}
-        {!isCabochon && (
-          <Select
-            className="filter-select"
-            value={stock}
-            onChange={(value) => {
-              setLoading(true);
-              setStock(value);
-              setPage(1);
-            }}
-            placeholder={t('inventory')}
-            allowClear
-            options={[
-              { value: '1', label: t('inStock') },
-              { value: '0', label: t('soldOut') },
-            ]}
-          />
-        )}
-        <DateRangeFilter
-          kind="created"
-          value={createdRange}
-          onChange={(range) => {
-            setLoading(true);
-            setCreatedRange(range);
-            setPage(1);
-          }}
-        />
-      </div>
-      {isCabochon && (
-        <div className="cabochon-filter-row">
-          <div className="cabochon-filter-group">
-            <span className="cabochon-filter-label">{t('stockFilter')}</span>
-            <Segmented
-              aria-label={t('stockFilter')}
-              value={stock ?? ''}
+          {!isCabochon && (
+            <Select
+              className="filter-select"
+              value={published}
+              onChange={(value) => {
+                setLoading(true);
+                setPublished(value);
+                setPage(1);
+              }}
+              aria-label={t('publication')}
+              placeholder={t('publication')}
+              allowClear
               options={[
-                { value: '', label: t('all') },
+                { value: 'true', label: t('published') },
+                { value: 'false', label: t('unpublished') },
+              ]}
+            />
+          )}
+          {!isCabochon && (
+            <Select
+              className="filter-select"
+              value={stock}
+              onChange={(value) => {
+                setLoading(true);
+                setStock(value);
+                setPage(1);
+              }}
+              aria-label={t('inventory')}
+              placeholder={t('inventory')}
+              allowClear
+              options={[
                 { value: '1', label: t('inStock') },
                 { value: '0', label: t('soldOut') },
               ]}
+            />
+          )}
+          <DateRangeFilter
+            kind="created"
+            value={createdRange}
+            onChange={(range) => {
+              setLoading(true);
+              setCreatedRange(range);
+              setPage(1);
+            }}
+          />
+        </div>
+        {!isCabochon && (
+          <div className={categoryStyles.filters}>
+            <CategoryFilterRow
+              label={t('category')}
+              options={availableCategories.map((item) => ({ value: item.id, label: item.name }))}
+              selectedId={categoryId}
+              counts={categoryCounts}
               onChange={(value) => {
+                if (value === categoryId) return;
                 setLoading(true);
-                setStock(value || undefined);
+                setCategoryId(value);
                 setPage(1);
               }}
             />
           </div>
-          {marketingFilterFields.map((field) => (
-            <div className="cabochon-filter-group" key={field}>
-              <span className="cabochon-filter-label">{editor(field)}</span>
-              <Segmented<MarketingFilterValue>
-                aria-label={editor(field)}
-                value={marketingFilters[field]}
+        )}
+        {isCabochon && (
+          <div className="cabochon-filter-row">
+            <div className="cabochon-filter-group">
+              <span className="cabochon-filter-label">{t('stockFilter')}</span>
+              <Segmented
+                aria-label={t('stockFilter')}
+                value={stock ?? ''}
                 options={[
                   { value: '', label: t('all') },
-                  { value: 'true', label: t('completed') },
-                  { value: 'false', label: t('incomplete') },
+                  { value: '1', label: t('inStock') },
+                  { value: '0', label: t('soldOut') },
                 ]}
                 onChange={(value) => {
                   setLoading(true);
-                  setMarketingFilters((current) => ({ ...current, [field]: value }));
+                  setStock(value || undefined);
                   setPage(1);
                 }}
               />
             </div>
-          ))}
-        </div>
-      )}
-      <div className="table-surface">
-        <PaginatedTable
-          rowKey="id"
-          dataSource={data.items}
-          columns={columns}
-          scroll={isCabochon ? { x: 1800 + cabochonActionWidth } : undefined}
-          loading={loading}
-          onChange={(_, __, sorter, extra) => {
-            if (extra.action !== 'sort') return;
-            const order = Array.isArray(sorter) ? sorter[0]?.order : sorter.order;
-            setPriceSort(order === 'ascend' || order === 'descend' ? order : null);
-            setPage(1);
-            setLoading(true);
-          }}
-          locale={{ emptyText: <Empty description={t('empty')} /> }}
-          pagination={{
-            ...CLIENT_TABLE_PAGINATION,
-            current: page,
-            pageSize,
-            total: data.total,
-            onChange: (nextPage, nextPageSize) => {
+            {marketingFilterFields.map((field) => (
+              <div className="cabochon-filter-group" key={field}>
+                <span className="cabochon-filter-label">{editor(field)}</span>
+                <Segmented<MarketingFilterValue>
+                  aria-label={editor(field)}
+                  value={marketingFilters[field]}
+                  options={[
+                    { value: '', label: t('all') },
+                    { value: 'true', label: t('completed') },
+                    { value: 'false', label: t('incomplete') },
+                  ]}
+                  onChange={(value) => {
+                    setLoading(true);
+                    setMarketingFilters((current) => ({ ...current, [field]: value }));
+                    setPage(1);
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+        <div className={catalogStyles.results}>
+          <Select<'default' | 'ascend' | 'descend'>
+            aria-label={t('sort')}
+            value={priceSort ?? 'default'}
+            options={[
+              { value: 'default', label: t('sortDefault') },
+              { value: 'ascend', label: t('sortPriceAsc') },
+              { value: 'descend', label: t('sortPriceDesc') },
+            ]}
+            onChange={(value) => {
+              setPriceSort(value === 'default' ? null : value);
+              setPage(1);
               setLoading(true);
-              setPage(nextPageSize === pageSize ? nextPage : 1);
-              setPageSize(nextPageSize);
-            },
-          }}
-        />
+            }}
+          />
+          <div className={catalogStyles.viewControls}>
+            {isFinishedStrands && (
+              <Segmented
+                aria-label={t('density')}
+                value={density}
+                options={[
+                  { value: 'comfortable', label: t('comfortable') },
+                  { value: 'compact', label: t('compact') },
+                ]}
+                onChange={setDensity}
+              />
+            )}
+            <Segmented
+              aria-label={t('view')}
+              value={view}
+              options={[
+                { value: 'gallery', label: t('galleryView'), icon: <AppstoreOutlined /> },
+                { value: 'table', label: t('tableView'), icon: <UnorderedListOutlined /> },
+              ]}
+              onChange={setView}
+            />
+          </div>
+        </div>
+        {listError ? (
+          <Result
+            status="error"
+            title={listError}
+            extra={
+              <Button
+                loading={loading}
+                onClick={() => {
+                  setLoading(true);
+                  setRevision((value) => value + 1);
+                }}
+              >
+                {common('retry')}
+              </Button>
+            }
+          />
+        ) : view === 'gallery' ? (
+          <ProductGallery
+            items={data.items}
+            listPath={listPath}
+            loading={loading}
+            pagination={pagination}
+            renderActions={renderActions}
+            renderDetails={
+              isCabochon
+                ? (item) => (
+                    <>
+                      <div>
+                        {t('setting')}:{' '}
+                        {item.extraInfo?.settingStyle?.magicBoxStyle ||
+                          editor('unknownSettingStyle')}
+                      </div>
+                      <ProductInlineEdit
+                        product={item}
+                        field="measurement"
+                        onSave={(change) => saveQuickEdit(item, change)}
+                      >
+                        {formatCabochonMeasurement(
+                          item.measurement,
+                          marketingConfig('missingDimension'),
+                        )}
+                      </ProductInlineEdit>
+                      <CabochonMarketingStatus
+                        product={item}
+                        pending={pendingMarketing}
+                        onChange={updateMarketing}
+                      />
+                    </>
+                  )
+                : undefined
+            }
+            onQuickEdit={saveQuickEdit}
+          />
+        ) : (
+          <div
+            className={isFinishedStrands ? `table-surface ${catalogStyles.table}` : 'table-surface'}
+          >
+            <PaginatedTable
+              rowKey="id"
+              dataSource={data.items}
+              columns={columns}
+              scroll={
+                isCabochon
+                  ? { x: 1800 + cabochonActionWidth }
+                  : isFinishedStrands
+                    ? { x: 1250 }
+                    : undefined
+              }
+              loading={loading}
+              onChange={(_, __, sorter, extra) => {
+                if (extra.action !== 'sort') return;
+                const order = Array.isArray(sorter) ? sorter[0]?.order : sorter.order;
+                setPriceSort(order === 'ascend' || order === 'descend' ? order : null);
+                setPage(1);
+                setLoading(true);
+              }}
+              locale={{ emptyText: <Empty description={t('empty')} /> }}
+              pagination={pagination}
+            />
+          </div>
+        )}
       </div>
-    </>
+    </ConfigProvider>
   );
 }
 

@@ -1,6 +1,23 @@
 import type { CSSProperties } from 'react';
 
-type TagAppearance = { color: string; style?: CSSProperties };
+type TagAppearance = {
+  style: CSSProperties & { '--tag-tint': string; '--tag-ink': string };
+};
+
+// Muted mineral tones keep neighboring tags harmonious in dense lists.
+const palette = {
+  magenta: '#a65f80',
+  red: '#b36464',
+  volcano: '#b47358',
+  orange: '#b18150',
+  gold: '#a28a46',
+  lime: '#829354',
+  green: '#56836b',
+  cyan: '#53898b',
+  blue: '#6086a6',
+  geekblue: '#6e7ca6',
+  purple: '#8b71a3',
+} as const;
 
 const fallbackColors = [
   'magenta',
@@ -86,7 +103,19 @@ function matchRule<Rule extends KeywordRule>(name: string, rules: readonly Rule[
 }
 
 function jadeAppearance({ background, foreground }: typeof jadeDefault): TagAppearance {
-  return { color: background, style: { color: foreground, borderColor: background } };
+  return softAppearance(background, foreground === '#ffffff' ? undefined : foreground);
+}
+
+function softAppearance(tint: string, foreground?: string): TagAppearance {
+  const channels = [1, 3, 5].map((start) => Number.parseInt(tint.slice(start, start + 2), 16));
+  // Darken the text independently of the translucent surface, including pale jade tones.
+  const ink = channels.map((channel) => Math.round(channel * 0.48 + 30 * 0.52));
+  return {
+    style: {
+      '--tag-tint': channels.join(' '),
+      '--tag-ink': foreground ?? `rgb(${ink.join(' ')})`,
+    },
+  };
 }
 
 export function getTagAppearance(text: string): TagAppearance {
@@ -101,9 +130,9 @@ export function getTagAppearance(text: string): TagAppearance {
   }
   const color = matchedColor ?? getFallbackColor(name);
   if (color === '#f5f5f5' || color === '#d9d9d9') {
-    return { color, style: { color: '#595959', borderColor: '#d9d9d9' } };
+    return softAppearance(color, '#595959');
   }
-  return { color: color.startsWith('#') ? color : `${color}-inverse` };
+  return softAppearance(color in palette ? palette[color as keyof typeof palette] : color);
 }
 
 function getFallbackColor(name: string) {

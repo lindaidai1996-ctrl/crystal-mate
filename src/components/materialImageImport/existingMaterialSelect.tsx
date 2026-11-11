@@ -1,5 +1,7 @@
 'use client';
 
+import { imageThumbnailUrl } from '@/lib/image-storage';
+
 import { useEffect, useState } from 'react';
 import { PictureOutlined } from '@ant-design/icons';
 import { Button, Empty, Form, Image, Select, Spin } from 'antd';
@@ -138,7 +140,7 @@ export function ExistingMaterialSelect({
                   >
                     <NextImage
                       unoptimized
-                      src={images[0].url}
+                      src={imageThumbnailUrl(images[0].url)}
                       alt=""
                       width={44}
                       height={44}

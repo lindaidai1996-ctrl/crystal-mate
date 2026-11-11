@@ -4,6 +4,8 @@ Next.js App Router、React、Ant Design、Prisma 和 PostgreSQL 构成的单项�
 
 ## 本地运行
 
+本项目已配置的服务器开发数据库及自动 SSH 通道使用方式见 [服务器开发数据库说明](deploy/DEVELOPMENT.md)。完成该配置后直接运行 `npm run dev`；下面是从零搭建本机数据库的方法。
+
 要求 Node.js 20.9+、npm，以及 PostgreSQL 16+。可以用 `docker compose up -d postgres` 启动数据库，也可以使用本机 PostgreSQL。
 
 1. 复制 `.env.example` 为 `.env`，设置 `DATABASE_URL`、`DIRECT_URL` 和随机生成的 `AUTH_SECRET`。本地图片使用 `MEDIA_STORAGE=local`。
@@ -34,6 +36,8 @@ Next.js App Router、React、Ant Design、Prisma 和 PostgreSQL 构成的单项�
 识别请求由当前 HTTP 请求执行，最长 120 秒；任务和草稿保存在数据库中，不依赖浏览器内存。关闭页面后可以从最近 50 次导入中恢复；若进程中断，租约到期后可手动重新识别。当前没有独立后台队列、款式自动命名或透明底抠图。模型仅提供候选，坐标与价格均需人工校对；真实图片上的准确率应在配置密钥后实测。
 
 ## 部署
+
+腾讯云单机 Docker 部署及本地数据库迁移见 [部署说明](deploy/README.md)。该方式将应用和 PostgreSQL 放在同一服务器，图片沿用 COS，并提供加密异机备份脚本。
 
 将仓库连接 Vercel，配置生产环境变量、托管 PostgreSQL 和 COS。首次部署前在可访问数据库的环境运行 `npm run db:deploy` 和 `npm run db:admin`；后续数据库变更先执行迁移再发布对应应用版本。Vercel 自动执行 `npm run build`。不要在预览部署和生产部署间共享可写数据库。上线前从中国大陆网络实测访问速度及稳定性。
 

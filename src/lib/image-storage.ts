@@ -34,3 +34,17 @@ export function imageStorageUrl(key: string, mode: 'local' | 'cos') {
   if (mode === 'local') return `/uploads/${key}`;
   return `/api/images/${key.startsWith('images/') ? key.slice('images/'.length) : key}`;
 }
+
+// Keep original URLs in stored data and in full-screen previews.
+export function imageThumbnailUrl(url: string, width: 128 | 640 = 128) {
+  const prefix = url.startsWith('/api/images/')
+    ? '/api/images/'
+    : url.startsWith('/uploads/')
+      ? '/uploads/'
+      : null;
+  if (!prefix) return url;
+  const key = url.slice(prefix.length);
+  const objectKey = prefix === '/api/images/' && !key.includes('/') ? `images/${key}` : key;
+  if (!imageObjectKeyPattern.test(objectKey)) return url;
+  return `${imageStorageUrl(objectKey, 'cos')}?w=${width}`;
+}

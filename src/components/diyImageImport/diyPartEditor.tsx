@@ -1,5 +1,7 @@
 'use client';
 
+import { imageThumbnailUrl } from '@/lib/image-storage';
+
 import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
@@ -331,7 +333,14 @@ export function DiyPartEditor({
                 {previewCabochon && (
                   <Image.PreviewGroup>
                     {cabochon.images.map((image) => (
-                      <Image key={image.objectKey} width={80} src={image.url} alt={cabochon.name} />
+                      <Image
+                        key={image.objectKey}
+                        width={80}
+                        src={imageThumbnailUrl(image.url)}
+                        preview={{ src: image.url }}
+                        loading="lazy"
+                        alt={cabochon.name}
+                      />
                     ))}
                   </Image.PreviewGroup>
                 )}

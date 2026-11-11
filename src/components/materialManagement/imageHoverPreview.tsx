@@ -5,6 +5,7 @@ import { Button, Image, Popover } from 'antd';
 import NextImage from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { imageThumbnailUrl } from '@/lib/image-storage';
 
 type PreviewImage = { objectKey: string; url: string; fileName?: string };
 
@@ -12,10 +13,14 @@ export function ImageHoverPreview({
   images,
   name,
   coverObjectKey,
+  hoverPreview = true,
+  thumbnailSize = 128,
 }: {
   images: PreviewImage[];
   name: string;
   coverObjectKey?: string | null;
+  hoverPreview?: boolean;
+  thumbnailSize?: 128 | 640;
 }) {
   const t = useTranslations('editor');
   const [current, setCurrent] = useState(0);
@@ -34,6 +39,23 @@ export function ImageHoverPreview({
     coverObjectKey === undefined
       ? image
       : (images.find((item) => item.objectKey === coverObjectKey) ?? images[0]);
+  const thumbnailButton = (
+    <button
+      type="button"
+      className="material-image-thumb-button"
+      aria-label={t('previewImage')}
+      onClick={() => setPreviewOpen(true)}
+    >
+      <NextImage
+        unoptimized
+        width={44}
+        height={44}
+        className="product-thumb"
+        src={imageThumbnailUrl(thumbnail.url, thumbnailSize)}
+        alt=""
+      />
+    </button>
+  );
 
   return (
     <Image.PreviewGroup
@@ -45,62 +67,54 @@ export function ImageHoverPreview({
         onChange: setCurrent,
       }}
     >
-      <Popover
-        trigger="hover"
-        content={
-          <div className="material-image-preview">
-            <button
-              type="button"
-              className="material-image-preview-open"
-              onClick={() => setPreviewOpen(true)}
-              aria-label={t('previewImage')}
-            >
-              <NextImage
-                unoptimized
-                width={280}
-                height={280}
-                src={image.url}
-                alt={image.fileName || name}
-              />
-            </button>
-            {images.length > 1 && (
-              <div className="material-image-preview-controls">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<LeftOutlined />}
-                  aria-label={t('previousImage')}
-                  onClick={() => setCurrent((index) => (index - 1 + images.length) % images.length)}
+      {hoverPreview ? (
+        <Popover
+          trigger="hover"
+          content={
+            <div className="material-image-preview">
+              <button
+                type="button"
+                className="material-image-preview-open"
+                onClick={() => setPreviewOpen(true)}
+                aria-label={t('previewImage')}
+              >
+                <NextImage
+                  unoptimized
+                  width={280}
+                  height={280}
+                  src={imageThumbnailUrl(image.url, 640)}
+                  alt={image.fileName || name}
                 />
-                <span>{`${current + 1} / ${images.length}`}</span>
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<RightOutlined />}
-                  aria-label={t('nextImage')}
-                  onClick={() => setCurrent((index) => (index + 1) % images.length)}
-                />
-              </div>
-            )}
-          </div>
-        }
-      >
-        <button
-          type="button"
-          className="material-image-thumb-button"
-          aria-label={t('previewImage')}
-          onClick={() => setPreviewOpen(true)}
+              </button>
+              {images.length > 1 && (
+                <div className="material-image-preview-controls">
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<LeftOutlined />}
+                    aria-label={t('previousImage')}
+                    onClick={() =>
+                      setCurrent((index) => (index - 1 + images.length) % images.length)
+                    }
+                  />
+                  <span>{`${current + 1} / ${images.length}`}</span>
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<RightOutlined />}
+                    aria-label={t('nextImage')}
+                    onClick={() => setCurrent((index) => (index + 1) % images.length)}
+                  />
+                </div>
+              )}
+            </div>
+          }
         >
-          <NextImage
-            unoptimized
-            width={44}
-            height={44}
-            className="product-thumb"
-            src={thumbnail.url}
-            alt=""
-          />
-        </button>
-      </Popover>
+          {thumbnailButton}
+        </Popover>
+      ) : (
+        thumbnailButton
+      )}
     </Image.PreviewGroup>
   );
 }

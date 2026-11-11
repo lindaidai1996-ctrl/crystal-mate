@@ -1,0 +1,65 @@
+.modeSwitch.modeSwitch {
+  padding: 0;
+  background: transparent;
+}
+
+.modeSwitch :global(.ant-segmented-group) {
+  gap: 10px;
+}
+
+.modeSwitch.modeSwitch :global(.ant-segmented-item) {
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 8px;
+  background: var(--ant-color-bg-container);
+  color: var(--ant-color-text-secondary);
+}
+
+.modeSwitch.modeSwitch :global(.ant-segmented-item-selected),
+.modeSwitch.modeSwitch :global(.ant-segmented-thumb) {
+  border-color: var(--ant-color-primary-border);
+  border-radius: 8px;
+  background: var(--ant-color-primary-bg);
+  color: var(--ant-color-primary);
+  box-shadow: inset 0 0 0 1px var(--ant-color-primary-border);
+}
+
+.modeLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 50px;
+  font-weight: 600;
+}
+
+.modeCheck {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--ant-color-border);
+  border-radius: 50%;
+  font-size: 11px;
+}
+
+.modeCheck svg {
+  visibility: hidden;
+}
+
+.modeSwitch :global(.ant-segmented-item-selected) .modeCheck {
+  border-color: var(--ant-color-primary);
+  background: var(--ant-color-primary);
+  color: var(--ant-color-white);
+}
+
+.modeSwitch :global(.ant-segmented-item-selected) .modeCheck svg {
+  visibility: visible;
+}
+
+.modeSwitch.modeSwitch :global(.ant-segmented-item-disabled) {
+  color: var(--ant-color-text-disabled);
+  background: var(--ant-color-fill-quaternary);
+  box-shadow: none;
+}

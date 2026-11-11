@@ -1,0 +1,172 @@
+.layout {
+  min-height: 100vh;
+}
+
+.desktopSidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.workspace {
+  min-width: 0;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  background: #20242b;
+  color: #b9bec7;
+  padding: 40px 20px 0;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.brand img {
+  width: 150px;
+  height: 130px;
+  object-fit: contain;
+}
+
+.brand strong {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: #ffffff;
+}
+
+.sidebar :global(.ant-menu) {
+  flex: 1;
+  background: transparent;
+  border: 0;
+}
+
+.sidebar :global(.ant-menu-item) {
+  padding-inline: 8px;
+  width: 100%;
+  font-size: 13px;
+}
+
+.sidebar :global(.ant-menu-item-selected) {
+  box-shadow: inset 0 -1px #e2e8f1;
+}
+
+.sidebar :global(.ant-menu-item-group-title) {
+  padding: 16px 8px 12px;
+  color: #969eab;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.sidebar :global(.ant-menu-item-group + .ant-menu-item-group) {
+  margin-top: 24px;
+}
+
+.footer {
+  padding: 24px 8px;
+  margin-top: 32px;
+  border-top: 1px solid #353e4b;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+  padding-inline: 56px;
+  background: #ffffff;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.context {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.language {
+  min-width: 100px;
+}
+
+.content {
+  width: 100%;
+  min-width: 0;
+  max-width: 1720px;
+  padding: 28px 56px 60px;
+  margin: 0 auto;
+}
+
+.mobileMenu {
+  display: none;
+}
+
+.drawer :global(.ant-drawer-header) {
+  background: #20242b;
+  color: #e2e8f1;
+  border-color: #353e4b;
+}
+
+.drawer :global(.ant-drawer-close) {
+  color: #e2e8f1;
+}
+
+@media (max-width: 1279px) {
+  .content,
+  .header {
+    padding-inline: 36px;
+  }
+}
+
+@media (max-width: 800px) {
+  .desktopSidebar {
+    display: none;
+  }
+
+  .mobileMenu {
+    display: inline-flex;
+  }
+
+  .context {
+    margin-right: auto;
+    margin-left: 12px;
+  }
+
+  .content {
+    padding: 24px 28px 48px;
+  }
+
+  .header {
+    height: 64px;
+    padding-inline: 24px;
+  }
+}
+
+@media (max-width: 620px) {
+  .content {
+    padding: 20px 24px 40px;
+  }
+
+  .header {
+    padding-inline: 16px;
+  }
+
+  .actions {
+    gap: 8px;
+  }
+}

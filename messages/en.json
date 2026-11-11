@@ -80,7 +80,10 @@
     "aliases": "Aliases (optional)",
     "aliasesHelp": "Add alternative names for search; up to 20 aliases, 120 characters each.",
     "aliasesPlaceholder": "Type an alias, then press Enter or comma",
-    "settingStyles": "Setting Management"
+    "settingStyles": "Setting Management",
+    "menu": "Navigation menu",
+    "catalogGroup": "Catalog",
+    "managementGroup": "Management"
   },
   "login": {
     "title": "Admin sign in",
@@ -124,7 +127,19 @@
     "empty": "No products yet",
     "marketingConfig": "Marketing configuration",
     "copyProductInfo": "Copy product info",
-    "deleteConfirm": "This cannot be undone. Delete this product?"
+    "deleteConfirm": "This cannot be undone. Delete this product?",
+    "view": "View",
+    "tableView": "Table",
+    "galleryView": "Gallery",
+    "density": "Density",
+    "comfortable": "Comfortable",
+    "compact": "Compact",
+    "sort": "Sort",
+    "sortDefault": "Default order",
+    "sortPriceAsc": "Price: low to high",
+    "sortPriceDesc": "Price: high to low",
+    "noImage": "No image",
+    "imageCount": "{count} images"
   },
   "marketingConfig": {
     "title": "Marketing configuration",
@@ -1121,6 +1136,7 @@
     "stepReview": "Review and save draft",
     "stepImport": "Confirm import",
     "chooseFile": "Choose Excel",
+    "downloadTemplate": "Download Excel template",
     "replaceFile": "Choose another Excel",
     "worksheet": "Worksheet",
     "fileHelp": "Supports .xlsx, up to 300 rows per sheet and 150 MB per file. Supports Excel / WPS embedded cell images and pictures anchored to cells; external image links need separate handling.",

@@ -1,0 +1,29 @@
+name: crystal-mate-development
+
+services:
+  postgres:
+    image: postgres:18-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: crystal_dev
+      POSTGRES_PASSWORD: ${DEV_POSTGRES_PASSWORD:?Set DEV_POSTGRES_PASSWORD}
+      POSTGRES_DB: crystal_mate_dev
+    ports:
+      - '127.0.0.1:5433:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    mem_limit: 384m
+    shm_size: 64m
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U crystal_dev -d crystal_mate_dev']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+volumes:
+  postgres_data:

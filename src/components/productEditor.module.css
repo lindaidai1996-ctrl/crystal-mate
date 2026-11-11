@@ -1,0 +1,130 @@
+.editor {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
+  column-gap: 40px;
+  width: 100%;
+  padding: 12px 0 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.editor > :global(.editor-block) {
+  grid-column: 1 / -1;
+  padding-block: 32px;
+}
+
+.editor > :global(.editor-block) > h2 {
+  margin-bottom: 28px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.editor > .details {
+  grid-column: 2;
+  grid-row: 1;
+  padding-top: 0;
+}
+
+.editor > .images {
+  grid-column: 1;
+  grid-row: 1;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.editor :global(.editor-fields) {
+  column-gap: 28px;
+}
+
+.editor :global(.editor-fields > .ant-form-item) {
+  grid-column: span 6;
+  margin-bottom: 28px;
+}
+
+.editor :global(.editor-fields > .editor-field-name),
+.editor :global(.editor-fields > .editor-field-description),
+.editor :global(.editor-fields > .editor-field-tags) {
+  grid-column: 1 / -1;
+}
+
+.editor :global(.editor-field-stock) {
+  grid-column: span 6;
+}
+
+.leadImage {
+  aspect-ratio: 4 / 5;
+  margin-bottom: 20px;
+  background: #eaeef1;
+  color: #626d79;
+}
+
+.leadImage :global(.material-image-thumb-button),
+.leadImage :global(.product-thumb) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.leadImage :global(.product-thumb-empty) {
+  display: grid;
+  color: inherit;
+  font-size: 28px;
+}
+
+.editor :global(.ant-upload-list-item-container),
+.editor :global(.ant-upload.ant-upload-select),
+.editor :global(.ant-upload-list-item) {
+  border-radius: 0;
+}
+
+.editor > :global(.editor-actions) {
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  padding-block: 28px 12px;
+}
+
+@media (max-width: 1050px) {
+  .editor {
+    grid-template-columns: minmax(200px, 1fr) minmax(0, 2fr);
+    column-gap: 28px;
+  }
+}
+
+@media (max-width: 900px) {
+  .editor {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editor > .images {
+    grid-column: 1;
+    grid-row: 1;
+    padding-bottom: 28px;
+  }
+
+  .editor > .details {
+    grid-column: 1;
+    grid-row: 2;
+    padding-top: 28px;
+    border-top: 1px solid var(--ant-color-border-secondary);
+  }
+
+  .leadImage {
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 560px) {
+  .editor :global(.editor-fields > .ant-form-item) {
+    grid-column: 1 / -1;
+  }
+
+  .editor :global(.editor-field-stock) {
+    grid-column: 1 / -1;
+  }
+}

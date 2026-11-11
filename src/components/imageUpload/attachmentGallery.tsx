@@ -12,6 +12,7 @@ import { useRef, useState } from 'react';
 import { attachmentCoverKey, MAX_ATTACHMENTS, type AttachmentOwner } from '@/lib/attachments';
 import { ClientApiError } from '@/lib/client-api';
 import type { MaterialBatchAttachment } from '@/lib/client-types';
+import { imageThumbnailUrl } from '@/lib/image-storage';
 import { AttachmentCandidateDialog } from './attachmentCandidateDialog';
 import { AttachmentImageEditor } from './attachmentImageEditor';
 import { ImageUploadChoiceDialog } from './imageUploadChoiceDialog';
@@ -212,7 +213,14 @@ export function AttachmentGallery({
             <div className={`batch-detail-attachment-list ${galleryStyles.gallery}`}>
               {attachments.map((attachment) => (
                 <div className="batch-detail-attachment" key={attachment.objectKey}>
-                  <Image src={attachment.url} alt={attachment.fileName} width={110} height={110} />
+                  <Image
+                    src={imageThumbnailUrl(attachment.url, 640)}
+                    preview={{ src: attachment.url }}
+                    loading="lazy"
+                    alt={attachment.fileName}
+                    width={110}
+                    height={110}
+                  />
                   <div className="batch-detail-attachment-content">
                     {attachment.notes?.trim() && <p>{attachment.notes}</p>}
                     <Space wrap size="small">

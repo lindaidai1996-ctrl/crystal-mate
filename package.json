@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --hostname 0.0.0.0",
+    "dev": "node scripts/with-dev-db.mjs next dev --hostname 0.0.0.0",
     "build": "prisma generate && next build",
     "start": "next start --hostname 0.0.0.0",
     "typecheck": "tsc --noEmit",
@@ -12,9 +12,11 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:e2e": "node scripts/run-e2e.mjs",
-    "db:migrate": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy",
-    "db:admin": "tsx scripts/create-admin.ts"
+    "db:migrate": "node scripts/with-dev-db.mjs prisma migrate dev",
+    "db:deploy": "node scripts/with-dev-db.mjs prisma migrate deploy",
+    "db:admin": "node scripts/with-dev-db.mjs tsx scripts/create-admin.ts",
+    "db:tunnel": "node scripts/dev-db-tunnel.mjs",
+    "db:tunnel:stop": "node scripts/dev-db-tunnel.mjs stop"
   },
   "dependencies": {
     "@ant-design/cssinjs": "1.24.0",
@@ -35,6 +37,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-easy-crop": "^5.5.7",
+    "sharp": "^0.35.5",
     "zod": "^4.1.12"
   },
   "overrides": {
