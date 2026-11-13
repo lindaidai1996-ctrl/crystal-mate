@@ -1,8 +1,11 @@
-{
-    email {$ACME_EMAIL}
-}
-
 {$APP_DOMAIN} {
     encode zstd gzip
+
+    @chineseHome path / /zh /zh/
+    redir @chineseHome /zh/admin 307
+
+    @englishHome path /en /en/
+    redir @englishHome /en/admin 307
+
     reverse_proxy app:3000
 }
