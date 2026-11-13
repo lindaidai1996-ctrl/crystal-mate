@@ -84,6 +84,26 @@ Caddy 会申请并续期证书。核对 COS CORS 允许新域名发起 PUT 和 C
 
 ## 备份与运维
 
+### 网站备案页脚
+
+登录页和所有管理页面底部均显示 `粤ICP备2026180719号-1`，链接到工信部备案管理系统。部署此版本后生效。
+
+公安联网备案待审核期间不展示公安备案标识。审核通过后，从公安备案平台获取正式信息，在服务器 `.env.production` 中配置以下三项；三项齐全时才会显示：
+
+- `PUBLIC_SECURITY_RECORD_NUMBER`：平台核发的完整公安备案号，带空格时使用引号包裹。
+- `PUBLIC_SECURITY_RECORD_URL`：平台提供的该网站备案查询链接。
+- `PUBLIC_SECURITY_RECORD_ICON`：平台提供的图标地址，或放入 `public` 目录后的站内路径（例如 `/images/备案图标文件名.png`）。新增本地图标时需要重新构建镜像。
+
+不要使用腾讯云的“公安联网备案数据码”作为正式备案号。配置通过服务端在请求时读取，无需设置 `NEXT_PUBLIC_` 变量。仅修改这三项环境变量时，重新创建应用容器即可：
+
+```bash
+docker compose --env-file .env.production -f compose.production.yaml up -d --no-deps app
+```
+
+更新后核对登录页、管理页的备案号码、图标及查询链接。
+
+### 日常维护
+
 `sh deploy/backup.sh` 生成仅当前用户可读的备份文件，并验证归档目录可读；这还不等于数据库已经能完整恢复，必须定期恢复到独立数据库演练。脚本不会删除旧备份，监控磁盘空间并单独制定保留策略。
 
 异机备份使用 `backup-offsite.sh`：先导出并验证本地归档，再使用 AES-256-GCM 加密，上传同一私有 COS 桶的 `crystal-mate/db-backups/` 前缀，核对远端长度。成功后清理超过 14 天的自动本地备份；COS 备份不会自动删除，需观察用量并按恢复需求设置保留策略。备份运行使用迁移工具镜像，配置见 `backup.env.example`。

@@ -1460,8 +1460,16 @@ body {
   font-size: 12px;
   overflow-wrap: anywhere;
 }
-.login-screen {
+.login-layout {
   min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--ant-color-bg-layout);
+}
+.login-screen {
+  position: relative;
+  flex: 1;
   display: grid;
   place-items: center;
   padding: 80px 20px;

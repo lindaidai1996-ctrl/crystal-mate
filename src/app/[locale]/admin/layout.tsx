@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { AdminShell } from '@/components/admin-shell';
+import { SiteRegistrationFooter } from '@/components/site-registration-footer';
 
 export default async function AdminLayout({
   children,
@@ -12,5 +13,9 @@ export default async function AdminLayout({
   const { locale } = await params;
   const session = await auth();
   if (!session) redirect(`/${locale}/login`);
-  return <AdminShell username={session.user?.name ?? ''}>{children}</AdminShell>;
+  return (
+    <AdminShell username={session.user?.name ?? ''} footer={<SiteRegistrationFooter />}>
+      {children}
+    </AdminShell>
+  );
 }

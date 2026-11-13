@@ -28,13 +28,17 @@ const { Header, Sider, Content } = Layout;
 export function AdminShell({
   children,
   username,
+  footer,
 }: {
   children: React.ReactNode;
   username: string;
+  footer: React.ReactNode;
 }) {
   return (
     <NavigationGuardProvider>
-      <AdminShellContent username={username}>{children}</AdminShellContent>
+      <AdminShellContent username={username} footer={footer}>
+        {children}
+      </AdminShellContent>
     </NavigationGuardProvider>
   );
 }
@@ -42,9 +46,11 @@ export function AdminShell({
 function AdminShellContent({
   children,
   username,
+  footer,
 }: {
   children: React.ReactNode;
   username: string;
+  footer: React.ReactNode;
 }) {
   const { navigate } = useNavigationGuard();
   const t = useTranslations('common');
@@ -225,6 +231,7 @@ function AdminShellContent({
           </div>
         </Header>
         <Content className={shellStyles.content}>{children}</Content>
+        {footer}
       </Layout>
       <Drawer
         title={t('menu')}
