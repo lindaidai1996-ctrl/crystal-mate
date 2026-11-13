@@ -10,6 +10,7 @@ import {
   recalculateProductPricing,
   type ProductPricingValues,
 } from '@/lib/product-pricing';
+import { usePrivacyMode } from './privacyMode';
 
 export function ProductPricingFields({
   value,
@@ -23,6 +24,7 @@ export function ProductPricingFields({
   quote?: string | null;
 }) {
   const t = useTranslations('editor');
+  const privacyMode = usePrivacyMode();
   const automaticMarkup = useRef<boolean | null>(null);
   useEffect(() => {
     if (!value) return;
@@ -51,35 +53,37 @@ export function ProductPricingFields({
   const custom = value.saleRule === 'FIXED_AMOUNT' || value.saleRule === 'CUSTOM_PERCENT';
   return (
     <div className="product-pricing-fields">
-      <div className="source-field">
-        <span>{t('saleRule')}</span>
-        <Radio.Group
-          className="material-rule-options"
-          aria-label={t('saleRule')}
-          value={value.saleRule}
-          onChange={(event) => {
-            automaticMarkup.current = false;
-            onChange?.(editProductPricing(value, cost, { saleRule: event.target.value }));
-          }}
-        >
-          {productSaleRules.map((rule) => (
-            <Radio
-              key={rule}
-              value={rule}
-              onClick={() => {
-                if (rule === value.saleRule && value.saleManual) {
-                  automaticMarkup.current = false;
-                  onChange?.(editProductPricing(value, cost, { saleRule: rule }));
-                }
-              }}
-            >
-              {t(`rule_${rule}`)}
-            </Radio>
-          ))}
-        </Radio.Group>
-      </div>
+      {!privacyMode && (
+        <div className="source-field">
+          <span>{t('saleRule')}</span>
+          <Radio.Group
+            className="material-rule-options"
+            aria-label={t('saleRule')}
+            value={value.saleRule}
+            onChange={(event) => {
+              automaticMarkup.current = false;
+              onChange?.(editProductPricing(value, cost, { saleRule: event.target.value }));
+            }}
+          >
+            {productSaleRules.map((rule) => (
+              <Radio
+                key={rule}
+                value={rule}
+                onClick={() => {
+                  if (rule === value.saleRule && value.saleManual) {
+                    automaticMarkup.current = false;
+                    onChange?.(editProductPricing(value, cost, { saleRule: rule }));
+                  }
+                }}
+              >
+                {t(`rule_${rule}`)}
+              </Radio>
+            ))}
+          </Radio.Group>
+        </div>
+      )}
       <div className="product-source-grid">
-        {custom && (
+        {custom && !privacyMode && (
           <label className="source-field">
             <span>{t(value.saleRule === 'FIXED_AMOUNT' ? 'fixedAmount' : 'customPercent')}</span>
             <InputNumber<string>
@@ -118,17 +122,19 @@ export function ProductPricingFields({
           />
         </label>
       </div>
-      <p className="product-pricing-help">
-        {t(
-          value.saleRule === 'CUSTOM_AMOUNT'
-            ? 'customAmountHelp'
-            : value.saleManual
-              ? 'manualPriceHelp'
-              : quote !== undefined
-                ? 'diyAutoPriceHelp'
-                : 'autoPriceHelp',
-        )}
-      </p>
+      {!privacyMode && (
+        <p className="product-pricing-help">
+          {t(
+            value.saleRule === 'CUSTOM_AMOUNT'
+              ? 'customAmountHelp'
+              : value.saleManual
+                ? 'manualPriceHelp'
+                : quote !== undefined
+                  ? 'diyAutoPriceHelp'
+                  : 'autoPriceHelp',
+          )}
+        </p>
+      )}
     </div>
   );
 }

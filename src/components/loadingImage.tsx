@@ -46,7 +46,11 @@ function LoadingImageState({
       alt={alt}
       loading={loading}
       decoding="async"
-      className={[className, status === 'loading' ? imageStyles.loading : '']
+      className={[
+        className,
+        status === 'loading' ? imageStyles.loading : '',
+        status === 'loaded' ? imageStyles.loaded : '',
+      ]
         .filter(Boolean)
         .join(' ')}
       aria-busy={status === 'loading'}
@@ -79,6 +83,7 @@ function LazyPreviewImageState({
 }: ImageProps) {
   const frame = useRef<HTMLSpanElement>(null);
   const [visible, setVisible] = useState(loading === 'eager');
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     if (visible) return;
@@ -102,7 +107,22 @@ function LazyPreviewImageState({
   }, [visible]);
 
   return (
-    <span ref={frame} className={imageStyles.frame} style={{ width, height }}>
+    <span
+      ref={frame}
+      className={imageStyles.frame}
+      style={{ width, height }}
+      data-loaded={loaded}
+      onLoadCapture={(event) => {
+        const image = event.target;
+        if (
+          visible &&
+          image instanceof HTMLImageElement &&
+          image.getAttribute('src') !== emptyImage
+        ) {
+          setLoaded(true);
+        }
+      }}
+    >
       <Image
         {...props}
         alt={alt}

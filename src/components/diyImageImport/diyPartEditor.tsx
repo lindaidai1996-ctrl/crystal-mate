@@ -1,5 +1,7 @@
 'use client';
 
+import { Sensitive } from '@/components/privacyMode';
+
 import { LazyPreviewImage } from '@/components/loadingImage';
 
 import { imageThumbnailUrl } from '@/lib/image-storage';
@@ -376,22 +378,26 @@ export function DiyPartEditor({
                 onChange={(value) => onPatch({ quantity: value ?? '' })}
               />
             </label>
-            <label className={styles.field}>
-              <span>{t('unitCost')}</span>
-              <InputNumber<string>
-                stringMode
-                min="0"
-                max="9999999999.99"
-                precision={2}
-                value={part.unitCost || null}
-                disabled={disabled}
-                onChange={(value) => onPatch({ unitCost: value ?? '' })}
-              />
-            </label>
-            <div className={styles.field}>
-              <span>{t('lineCost')}</span>
-              <strong>{diyQuoteLineTotal(part.quantity, part.unitCost) ?? '—'}</strong>
-            </div>
+            <Sensitive>
+              <label className={styles.field}>
+                <span>{t('unitCost')}</span>
+                <InputNumber<string>
+                  stringMode
+                  min="0"
+                  max="9999999999.99"
+                  precision={2}
+                  value={part.unitCost || null}
+                  disabled={disabled}
+                  onChange={(value) => onPatch({ unitCost: value ?? '' })}
+                />
+              </label>
+            </Sensitive>
+            <Sensitive>
+              <div className={styles.field}>
+                <span>{t('lineCost')}</span>
+                <strong>{diyQuoteLineTotal(part.quantity, part.unitCost) ?? '—'}</strong>
+              </div>
+            </Sensitive>
           </div>
         </>
       )}

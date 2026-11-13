@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { MAX_SOURCE_BYTES, prepareImage } from '../../src/components/imageUpload/prepareImages';
+import {
+  MAX_SOURCE_BYTES,
+  MAX_UPLOAD_BYTES,
+  prepareImage,
+} from '../../src/components/imageUpload/prepareImages';
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -8,7 +12,7 @@ function mockCanvas(encoded: Blob) {
     width: 0,
     height: 0,
     getContext: () => ({ drawImage: vi.fn() }),
-    toBlob: (callback: (blob: Blob) => void) => callback(encoded),
+    toBlob: vi.fn((callback: (blob: Blob) => void) => callback(encoded)),
   };
   const close = vi.fn();
   vi.stubGlobal('document', { createElement: () => canvas });
@@ -37,8 +41,9 @@ describe('image preparation', () => {
         type: 'image/png',
       }),
     );
-    expect(canvas.width).toBe(1920);
-    expect(canvas.height).toBe(960);
+    expect(canvas.width).toBe(2560);
+    expect(canvas.height).toBe(1280);
+    expect(canvas.toBlob).toHaveBeenCalledWith(expect.any(Function), 'image/webp', 0.9);
     expect(result.compressed).toMatchObject({ name: 'invoice.webp', type: 'image/webp', size: 40 });
     expect(close).toHaveBeenCalledOnce();
   });
@@ -51,7 +56,19 @@ describe('image preparation', () => {
     expect(result.unchanged).toBe(true);
   });
 
-  it('reduces dimensions when quality adjustments cannot reach the size target', async () => {
+  it('keeps detail even when the compressed file exceeds the former size target', async () => {
+    const { canvas } = mockCanvas(
+      new Blob([new Uint8Array(4 * 1024 * 1024)], { type: 'image/webp' }),
+    );
+    const result = await prepareImage(
+      new File([new Uint8Array(6 * 1024 * 1024)], 'detailed.jpg', { type: 'image/jpeg' }),
+    );
+    expect(canvas.width).toBe(2560);
+    expect(canvas.toBlob).toHaveBeenCalledOnce();
+    expect(result.compressed?.size).toBe(4 * 1024 * 1024);
+  });
+
+  it('reduces dimensions only when needed to meet the upload limit', async () => {
     const canvas = { width: 0, height: 0, getContext: () => ({ drawImage: vi.fn() }) } as {
       width: number;
       height: number;
@@ -60,17 +77,17 @@ describe('image preparation', () => {
     };
     canvas.toBlob = (callback) =>
       callback(
-        new Blob([new Uint8Array(canvas.width === 1920 ? 2 * 1024 * 1024 : 800 * 1024)], {
+        new Blob([new Uint8Array(canvas.width === 2560 ? MAX_UPLOAD_BYTES + 1 : 5 * 1024 * 1024)], {
           type: 'image/webp',
         }),
       );
     vi.stubGlobal('document', { createElement: () => canvas });
     vi.stubGlobal('createImageBitmap', async () => ({ width: 3000, height: 1500, close: vi.fn() }));
     const result = await prepareImage(
-      new File([new Uint8Array(3 * 1024 * 1024)], 'detailed.jpg', { type: 'image/jpeg' }),
+      new File([new Uint8Array(10 * 1024 * 1024)], 'detailed.jpg', { type: 'image/jpeg' }),
     );
-    expect(canvas.width).toBe(1600);
-    expect(result.compressed?.size).toBe(800 * 1024);
+    expect(canvas.width).toBe(2240);
+    expect(result.compressed?.size).toBe(5 * 1024 * 1024);
   });
 
   it('reports compression failure and permits the dialog to offer the original', async () => {

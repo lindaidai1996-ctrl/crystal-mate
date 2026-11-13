@@ -8,6 +8,7 @@ import { imageObjectKeyPattern } from './image-storage';
 import { MAX_ATTACHMENTS } from './attachments';
 import { normalizeAliases } from './catalog-aliases';
 import { createdTimeFilterFields, validCreatedTimeRange } from './date-range';
+import { commonFeeIdSchema } from './diy-common-fees';
 
 export const catalogAliasesSchema = z
   .array(z.string().trim().max(120))
@@ -384,6 +385,7 @@ export const productDiySchema = z
           name: z.string().trim().min(1).max(60),
           amount: costAmount,
           quoteAmount: costAmount.nullable().optional(),
+          commonFeeId: commonFeeIdSchema.optional(),
         }),
       )
       .max(50),

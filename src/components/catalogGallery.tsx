@@ -4,8 +4,11 @@ import { Empty, Pagination, Spin } from 'antd';
 import type { PaginationProps } from 'antd';
 import { useTranslations } from 'next-intl';
 import { Children, type ReactNode } from 'react';
+import { ImageSkeleton } from './loadingImage';
+import { ListLoadingIndicator } from './listLoadingIndicator';
 import { ImageHoverPreview } from './materialManagement/imageHoverPreview';
 import catalogStyles from './productCatalog.module.css';
+import motionStyles from './listMotion.module.css';
 
 export function CatalogGallery({
   loading,
@@ -18,25 +21,63 @@ export function CatalogGallery({
   emptyDescription: string;
   children: ReactNode;
 }) {
+  const common = useTranslations('common');
+  const hasItems = Children.toArray(children).length > 0;
+
   return (
-    <Spin spinning={loading}>
-      {Children.count(children) > 0 ? (
-        <div className={catalogStyles.gallery}>{children}</div>
-      ) : (
-        <div className={catalogStyles.empty}>
-          <Empty description={emptyDescription} />
-        </div>
-      )}
+    <div className={motionStyles.surface} data-loading={loading} aria-busy={loading}>
+      <Spin spinning={loading && hasItems} delay={150} indicator={<ListLoadingIndicator />}>
+        {loading && !hasItems ? (
+          <div className={catalogStyles.gallery} role="status" aria-label={common('loading')}>
+            {Array.from({ length: Math.min(pagination.pageSize ?? 8, 12) }, (_, index) => (
+              <div
+                key={index}
+                className={`${catalogStyles.card} ${catalogStyles.skeletonCard}`}
+                aria-hidden="true"
+              >
+                <div className={catalogStyles.cardImage}>
+                  <ImageSkeleton />
+                </div>
+                <div className={catalogStyles.skeletonBody}>
+                  <div className={catalogStyles.skeletonTitle}>
+                    <ImageSkeleton />
+                  </div>
+                  <div className={catalogStyles.skeletonMeta}>
+                    <ImageSkeleton />
+                  </div>
+                  <div className={catalogStyles.skeletonMeta}>
+                    <ImageSkeleton />
+                  </div>
+                  <div className={catalogStyles.skeletonPrice}>
+                    <ImageSkeleton />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : hasItems ? (
+          <div
+            className={`${catalogStyles.gallery} ${motionStyles.stagger}`}
+            data-loading={loading}
+          >
+            {children}
+          </div>
+        ) : (
+          <div className={catalogStyles.empty}>
+            <Empty description={emptyDescription} />
+          </div>
+        )}
+      </Spin>
       <div className={catalogStyles.pagination}>
         {pagination.total === 0 ? (
           <span>
             {typeof pagination.showTotal === 'function' ? pagination.showTotal(0, [0, 0]) : null}
           </span>
         ) : (
-          <Pagination {...pagination} />
+          <Pagination {...pagination} disabled={loading || pagination.disabled} />
         )}
       </div>
-    </Spin>
+    </div>
   );
 }
 

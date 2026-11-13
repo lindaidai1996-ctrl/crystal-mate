@@ -1,0 +1,162 @@
+.section {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ant-color-border-secondary);
+  font-size: 13px;
+  container-type: inline-size;
+}
+
+.header,
+.choices,
+.error {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.header strong {
+  font-size: 13px;
+}
+
+.fees {
+  display: grid;
+  gap: 10px;
+}
+
+.columns,
+.feeRow {
+  display: grid;
+  grid-template-columns: minmax(160px, 2fr) repeat(2, minmax(150px, 1fr)) 32px;
+  align-items: end;
+  gap: 12px;
+}
+
+.private .columns,
+.private .feeRow {
+  grid-template-columns: minmax(160px, 2fr) minmax(150px, 1fr) 32px;
+}
+
+.columns {
+  color: var(--ant-color-text-secondary);
+}
+
+.columns > span:not(:first-child) {
+  text-align: right;
+}
+
+.feeName,
+.amount {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+}
+
+.amount :global(.ant-input-number) {
+  width: 100%;
+}
+
+.amount :global(.ant-input-number-input) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.mobileLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@container (max-width: 620px) {
+  .columns {
+    display: none;
+  }
+
+  .feeRow,
+  .private .feeRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) 32px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--ant-color-border-secondary);
+  }
+
+  .feeName {
+    grid-column: 1 / 3;
+  }
+
+  .remove {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .mobileLabel {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+    color: var(--ant-color-text-secondary);
+    font-size: 12px;
+  }
+
+  .private .amount {
+    grid-column: 1 / 3;
+  }
+}
+
+.hint {
+  margin: 0;
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.error {
+  color: var(--ant-color-error);
+}
+
+.editor {
+  display: grid;
+  gap: 16px;
+}
+
+.editorRow {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
+
+.editorRow label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--ant-color-text-secondary);
+}
+
+.name {
+  flex: 1;
+}
+
+.defaultAmount {
+  width: 100px;
+}
+
+.defaultAmount :global(.ant-input-number) {
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .editorRow {
+    flex-wrap: wrap;
+  }
+
+  .name {
+    flex-basis: 100%;
+  }
+}

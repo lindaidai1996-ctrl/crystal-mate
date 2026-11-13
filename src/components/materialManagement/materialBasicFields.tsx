@@ -216,7 +216,7 @@ export function MaterialBasicFields({
                       aria-label={t('newCategory')}
                     />
                   </Tooltip>
-                  <Tooltip title={t('recognize')}>
+                  <Tooltip title={t('recognizeHelp')}>
                     <Button icon={<ScanOutlined />} onClick={recognize} aria-label={t('recognize')}>
                       {t('recognize')}
                     </Button>

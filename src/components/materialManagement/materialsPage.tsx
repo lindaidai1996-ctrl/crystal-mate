@@ -55,6 +55,8 @@ import { useSessionListState } from '@/components/useSessionListState';
 import { withAdminReturnTo } from '@/lib/admin-return-path';
 import { CatalogGallery, CatalogGalleryImage } from '@/components/catalogGallery';
 import catalogStyles from '@/components/productCatalog.module.css';
+import motionStyles from '@/components/listMotion.module.css';
+import { usePrivacyMode } from '@/components/privacyMode';
 
 const MATERIAL_PAGE_SIZE = 20;
 type MaterialFilters = {
@@ -72,6 +74,7 @@ function initialFilters(query = ''): MaterialFilters {
 
 function BatchPrices({ item }: { item: Material }) {
   const t = useTranslations('materialBatches');
+  const privacyMode = usePrivacyMode();
   const editor = useTranslations('materialEditor');
   const entries = item.batchEntries;
   const unitSuffix = editor(
@@ -97,17 +100,22 @@ function BatchPrices({ item }: { item: Material }) {
         ? ` (${t(`priceSource_${value.unitPriceSource}`)})`
         : '';
     return [
-      ...(item.unit === 'GRAM'
+      ...(privacyMode || item.unit === 'GRAM'
         ? []
         : [
             `${t('purchaseUnitPrice')}: ${price(value.purchaseUnitPrice, unitSuffix)}${sourceLabel}`,
           ]),
-      `${t('gramPrice')}: ${price(value.purchaseGramPrice, editor('yuanPerGram'))}`,
+      ...(!privacyMode
+        ? [`${t('gramPrice')}: ${price(value.purchaseGramPrice, editor('yuanPerGram'))}`]
+        : []),
       `${t('salePrice')}: ${price(item.unit === 'GRAM' ? value.saleGramPrice : value.saleUnitPrice, unitSuffix)}`,
       ...(item.unit !== 'GRAM' && value.saleGramPrice !== null
         ? [`${t('saleGramPrice')}: ${price(value.saleGramPrice, editor('yuanPerGram'))}`]
         : []),
-      ...(item.unit === 'STRAND' && (value.childCount ?? 0) > 0 && value.childUnitPrice !== null
+      ...(!privacyMode &&
+      item.unit === 'STRAND' &&
+      (value.childCount ?? 0) > 0 &&
+      value.childUnitPrice !== null
         ? [`${t('purchaseBeadPrice')}: ${value.childUnitPrice} ${editor('yuanPerBead')}`]
         : []),
       ...(item.unit === 'STRAND' && value.saleChildUnitPrice !== null
@@ -483,17 +491,6 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
         counts={categoryCounts}
         onChange={(categoryId) => changeFilters({ categoryId })}
       />
-      <div className={catalogStyles.results}>
-        <Segmented
-          aria-label={products('view')}
-          value={view}
-          options={[
-            { value: 'gallery', label: products('galleryView'), icon: <AppstoreOutlined /> },
-            { value: 'table', label: products('tableView'), icon: <UnorderedListOutlined /> },
-          ]}
-          onChange={setView}
-        />
-      </div>
       <div className={bulkStyles.toolbar}>
         <Button
           onClick={() => {
@@ -554,6 +551,16 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
             </Button>
           </>
         )}
+        <Segmented
+          className={bulkStyles.viewSwitch}
+          aria-label={products('view')}
+          value={view}
+          options={[
+            { value: 'gallery', label: products('galleryView'), icon: <AppstoreOutlined /> },
+            { value: 'table', label: products('tableView'), icon: <UnorderedListOutlined /> },
+          ]}
+          onChange={setView}
+        />
       </div>
       {view === 'gallery' ? (
         <CatalogGallery
@@ -647,7 +654,11 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
               locale={{ emptyText: <Empty description={t('empty')} /> }}
             />
           </div>
-          <div className="material-mobile-list">
+          <div
+            className={`material-mobile-list ${motionStyles.stagger}`}
+            data-loading={loading}
+            aria-busy={loading}
+          >
             {loading ? (
               <Skeleton active paragraph={{ rows: 6 }} />
             ) : data.items.length ? (

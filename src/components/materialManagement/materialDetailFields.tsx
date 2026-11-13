@@ -18,6 +18,7 @@ import {
 import { ImagePicker } from '@/components/image-picker';
 import { MaterialAmountInput, PurchaseFields } from './purchaseFields';
 import { MaterialSaleFields } from './materialSaleFields';
+import { usePrivacyMode } from '@/components/privacyMode';
 
 export type MaterialDetailSection = 'purchase' | 'images' | 'strand' | 'sale' | 'notes';
 
@@ -65,6 +66,7 @@ export function MaterialDetailFields({
   sections?: MaterialDetailSection[];
 }) {
   const t = useTranslations('materialEditor');
+  const privacyMode = usePrivacyMode();
   const candidates = purchaseCandidates(draft);
   const suggestedChildWeight = childWeightFromStrand(draft);
   const amount = (field: keyof MaterialValues, suffix: string, positive = false) => (
@@ -137,56 +139,60 @@ export function MaterialDetailFields({
                 </div>
               )}
             </Form.Item>
-            <Form.Item label={t('childUnitPrice')}>
-              {amount('childUnitPrice', t('yuanPerBead'))}
-              {draft.childPriceSource && draft.childPriceSource !== 'CUSTOM' && (
-                <div className="material-source-label">{t(`source_${draft.childPriceSource}`)}</div>
-              )}
-              <div className="material-price-suggestions">
-                <div>
-                  <span>
-                    {t('byCount')}: {candidates.count ?? '—'}
-                  </span>
-                  <Button
-                    type="link"
-                    size="small"
-                    disabled={disabled || candidates.count === null}
-                    onClick={() =>
-                      onValuesChange(
-                        recalculateMaterial({
-                          ...draft,
-                          childUnitPrice: candidates.count,
-                          childPriceSource: 'COUNT',
-                        }),
-                      )
-                    }
-                  >
-                    {t('adopt')}
-                  </Button>
+            {!privacyMode && (
+              <Form.Item label={t('childUnitPrice')}>
+                {amount('childUnitPrice', t('yuanPerBead'))}
+                {draft.childPriceSource && draft.childPriceSource !== 'CUSTOM' && (
+                  <div className="material-source-label">
+                    {t(`source_${draft.childPriceSource}`)}
+                  </div>
+                )}
+                <div className="material-price-suggestions">
+                  <div>
+                    <span>
+                      {t('byCount')}: {candidates.count ?? '—'}
+                    </span>
+                    <Button
+                      type="link"
+                      size="small"
+                      disabled={disabled || candidates.count === null}
+                      onClick={() =>
+                        onValuesChange(
+                          recalculateMaterial({
+                            ...draft,
+                            childUnitPrice: candidates.count,
+                            childPriceSource: 'COUNT',
+                          }),
+                        )
+                      }
+                    >
+                      {t('adopt')}
+                    </Button>
+                  </div>
+                  <div>
+                    <span>
+                      {t('byWeight')}: {candidates.weight ?? '—'}
+                    </span>
+                    <Button
+                      type="link"
+                      size="small"
+                      disabled={disabled || candidates.weight === null}
+                      onClick={() =>
+                        onValuesChange(
+                          recalculateMaterial({
+                            ...draft,
+                            childUnitPrice: candidates.weight,
+                            childPriceSource: 'WEIGHT',
+                          }),
+                        )
+                      }
+                    >
+                      {t('adopt')}
+                    </Button>
+                  </div>
                 </div>
-                <div>
-                  <span>
-                    {t('byWeight')}: {candidates.weight ?? '—'}
-                  </span>
-                  <Button
-                    type="link"
-                    size="small"
-                    disabled={disabled || candidates.weight === null}
-                    onClick={() =>
-                      onValuesChange(
-                        recalculateMaterial({
-                          ...draft,
-                          childUnitPrice: candidates.weight,
-                          childPriceSource: 'WEIGHT',
-                        }),
-                      )
-                    }
-                  >
-                    {t('adopt')}
-                  </Button>
-                </div>
-              </div>
-            </Form.Item>
+              </Form.Item>
+            )}
           </div>
         </section>
       )}

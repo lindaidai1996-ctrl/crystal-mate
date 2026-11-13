@@ -1,5 +1,7 @@
 'use client';
 
+import { Sensitive } from '@/components/privacyMode';
+
 import { LazyPreviewImage } from '@/components/loadingImage';
 
 import { imageThumbnailUrl } from '@/lib/image-storage';
@@ -129,14 +131,16 @@ export function ExcelImportPage({ initialId }: { initialId?: string }) {
       render: (_, row) => {
         const { cost } = normalizeExcelRow(row, tags, styles);
         return (
-          <div className={layout.issueList}>
-            <span>
-              {t('stoneShort')}：{cost?.roughStoneCost ?? '—'}
-            </span>
-            <span>
-              {t('settingShort')}：{cost?.settingCost ?? '—'}
-            </span>
-          </div>
+          <Sensitive>
+            <div className={layout.issueList}>
+              <span>
+                {t('stoneShort')}：{cost?.roughStoneCost ?? '—'}
+              </span>
+              <span>
+                {t('settingShort')}：{cost?.settingCost ?? '—'}
+              </span>
+            </div>
+          </Sensitive>
         );
       },
     },

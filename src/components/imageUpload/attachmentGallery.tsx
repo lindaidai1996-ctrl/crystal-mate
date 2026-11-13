@@ -20,6 +20,7 @@ import { AttachmentImageEditor } from './attachmentImageEditor';
 import { ImageUploadChoiceDialog } from './imageUploadChoiceDialog';
 import { uploadImage } from './uploadImage';
 import galleryStyles from './attachmentGallery.module.css';
+import motionStyles from '../listMotion.module.css';
 
 export type AttachmentState = {
   attachments: MaterialBatchAttachment[];
@@ -212,7 +213,10 @@ export function AttachmentGallery({
         </div>
         {attachments.length ? (
           <Image.PreviewGroup>
-            <div className={`batch-detail-attachment-list ${galleryStyles.gallery}`}>
+            <div
+              className={`batch-detail-attachment-list ${galleryStyles.gallery} ${motionStyles.stagger}`}
+              data-loading="false"
+            >
               {attachments.map((attachment) => (
                 <div className="batch-detail-attachment" key={attachment.objectKey}>
                   <LazyPreviewImage

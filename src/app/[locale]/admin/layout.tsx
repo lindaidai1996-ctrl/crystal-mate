@@ -2,6 +2,8 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { AdminShell } from '@/components/admin-shell';
 import { SiteRegistrationFooter } from '@/components/site-registration-footer';
+import { db } from '@/lib/db';
+import { profileSelect } from '@/lib/account';
 
 export default async function AdminLayout({
   children,
@@ -12,9 +14,14 @@ export default async function AdminLayout({
 }) {
   const { locale } = await params;
   const session = await auth();
-  if (!session) redirect(`/${locale}/login`);
+  if (!session?.user?.name) redirect(`/${locale}/login`);
+  const account = await db.admin.findUnique({
+    where: { username: session.user.name },
+    select: profileSelect,
+  });
+  if (!account) redirect(`/${locale}/login`);
   return (
-    <AdminShell username={session.user?.name ?? ''} footer={<SiteRegistrationFooter />}>
+    <AdminShell account={account} footer={<SiteRegistrationFooter />}>
       {children}
     </AdminShell>
   );

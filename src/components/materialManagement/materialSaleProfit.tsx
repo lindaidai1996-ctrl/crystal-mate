@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { amountToCents, centsToAmount } from '@/lib/cabochon-cost';
 import type { MaterialAmount, MaterialUnit } from '@/lib/client-types';
+import { usePrivacyMode } from '@/components/privacyMode';
 
 export function MaterialSaleProfit({
   cost,
@@ -14,6 +15,8 @@ export function MaterialSaleProfit({
   unit: MaterialUnit;
 }) {
   const t = useTranslations('materialEditor');
+  const privacyMode = usePrivacyMode();
+  if (privacyMode) return null;
   const costCents = cost === null ? null : amountToCents(cost);
   const saleCents = salePrice === null ? null : amountToCents(salePrice);
   const profit = costCents === null || saleCents === null ? null : saleCents - costCents;

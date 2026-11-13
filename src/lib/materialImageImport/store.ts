@@ -339,9 +339,17 @@ export async function commitImageImportItem(id: string, input: z.infer<typeof co
           where: { id: input.itemId },
           data: { materialId, entryId },
         });
+        const remaining = await tx.materialImageImportItem.count({
+          where: { importId: id, entryId: null },
+        });
         await tx.materialImageImport.update({
           where: { id },
-          data: { settings: json({ ...settings, selection: { batchId } }) },
+          data: {
+            settings: json({ ...settings, selection: { batchId } }),
+            ...(remaining === 0
+              ? { archivedAt: new Date(), runToken: null, leaseUntil: null }
+              : {}),
+          },
         });
         return serialize(
           await tx.materialImageImport.findUniqueOrThrow({ where: { id }, include }),

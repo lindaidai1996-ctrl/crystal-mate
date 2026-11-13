@@ -1,8 +1,8 @@
 export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 export const MAX_SOURCE_BYTES = 32 * 1024 * 1024;
 
-const TARGET_BYTES = 1024 * 1024;
-const MAX_EDGES = [1920, 1600, 1280, 1024];
+const COMPRESSION_QUALITY = 0.9;
+const MAX_EDGES = [2560, 2240, 1920, 1600, 1280, 1024];
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export type UploadImageSource = { file: File; cropped: boolean };
@@ -60,12 +60,11 @@ export async function prepareImage(
         canvas.width = width;
         canvas.height = height;
         context.drawImage(bitmap, 0, 0, width, height);
-        for (const quality of [0.8, 0.65, 0.5, 0.35]) {
-          const candidate = await encodeWebp(canvas, quality);
-          if (!blob || candidate.size < blob.size) blob = candidate;
-          if (candidate.size <= TARGET_BYTES) break;
-        }
-        if (blob && blob.size <= TARGET_BYTES) break;
+        const candidate = await encodeWebp(canvas, COMPRESSION_QUALITY);
+        if (!blob || candidate.size < blob.size) blob = candidate;
+        // Preserve detail instead of chasing a small file-size target. Reduce
+        // dimensions further only when necessary to meet the upload limit.
+        if (blob.size <= MAX_UPLOAD_BYTES) break;
       }
       if (!blob) throw new Error('ENCODE_FAILED');
       if (blob.size >= original.size) {

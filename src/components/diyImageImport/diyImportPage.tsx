@@ -1,5 +1,7 @@
 'use client';
 
+import { Sensitive } from '@/components/privacyMode';
+
 import { useRef, useState } from 'react';
 import {
   Alert,
@@ -431,16 +433,18 @@ export function DiyImportPage({
           </div>
           {!committed && (
             <footer className={styles.footer}>
-              <div className={styles.cost}>
-                <div>
-                  <span className={styles.muted}>{t('perUnitCost')}</span>
-                  <strong>{cost ? `¥${cost.perUnitCost}` : '—'}</strong>
+              <Sensitive>
+                <div className={styles.cost}>
+                  <div>
+                    <span className={styles.muted}>{t('perUnitCost')}</span>
+                    <strong>{cost ? `¥${cost.perUnitCost}` : '—'}</strong>
+                  </div>
+                  <div>
+                    <span className={styles.muted}>{t('totalCost')}</span>
+                    <strong>{cost ? `¥${cost.totalCost}` : '—'}</strong>
+                  </div>
                 </div>
-                <div>
-                  <span className={styles.muted}>{t('totalCost')}</span>
-                  <strong>{cost ? `¥${cost.totalCost}` : '—'}</strong>
-                </div>
-              </div>
+              </Sensitive>
               <Space wrap>
                 <Popconfirm
                   title={t('deleteDraftConfirm')}

@@ -29,6 +29,7 @@ export function ImageCropDialog({
 }) {
   const t = useTranslations('imageUpload');
   const [url, setUrl] = useState('');
+  const [dialogReady, setDialogReady] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -78,6 +79,7 @@ export function ImageCropDialog({
       style={{ top: 24 }}
       width={640}
       onCancel={onCancel}
+      afterOpenChange={setDialogReady}
       footer={
         <div className="image-crop-footer">
           {onRemove && (
@@ -110,7 +112,8 @@ export function ImageCropDialog({
         <>
           <div className="image-crop-stage" aria-busy={!loaded} inert={saving}>
             {!loaded && <Spin />}
-            {url && (
+            {/* Measure the crop area only after the modal's scale animation finishes. */}
+            {dialogReady && url && (
               <Cropper
                 image={url}
                 crop={crop}

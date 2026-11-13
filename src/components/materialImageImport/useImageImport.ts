@@ -14,6 +14,7 @@ import {
 import { patchImportItem } from '@/lib/materialImageImport/materialDraft';
 import { validateImageImport } from '@/lib/materialImageImport/importValidation';
 import { ImportDraftSession } from '@/lib/materialImageImport/draftSession';
+import { isImportHistory } from '@/lib/materialImageImport/history';
 import type {
   ImageImport,
   ImportItemData,
@@ -25,7 +26,11 @@ import type {
 export type ImportHistoryItem = {
   id: string;
   fileName: string;
+  sourceUrl: string;
+  createdAt: string;
   status: string;
+  archivedAt: string | null;
+  importedCount: number;
   _count: { items: number };
 };
 
@@ -41,6 +46,7 @@ export function useImageImport() {
   const [progress, setProgress] = useState('');
   const [models, setModels] = useState<ImportModelOption[]>([]);
   const [history, setHistory] = useState<ImportHistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [validationJobId, setValidationJobId] = useState<string | null>(null);
   const validation = useMemo(
@@ -86,7 +92,7 @@ export function useImageImport() {
   );
 
   const load = useCallback(
-    async (id: string) => {
+    async (id: string, resume = false) => {
       if (operation.current) return;
       operation.current = true;
       setBusy(true);
@@ -95,6 +101,10 @@ export function useImageImport() {
       try {
         const next = await apiFetch<ImageImport>(`/api/material-image-imports/${id}`);
         session.open(next);
+        if (resume && isImportHistory(next)) {
+          session.clear();
+          return;
+        }
         const url = new URL(window.location.href);
         url.searchParams.set('import', next.id);
         window.history.replaceState(null, '', `${url.pathname}${url.search}`);
@@ -116,7 +126,8 @@ export function useImageImport() {
         setHistory(result.items);
         setModels(result.models);
       })
-      .catch((error) => setError(errorText(error)));
+      .catch((error) => setError(errorText(error)))
+      .finally(() => setHistoryLoading(false));
   }, [errorText]);
 
   useEffect(() => {
@@ -383,6 +394,13 @@ export function useImageImport() {
         }
       }
       message.success(t('importSuccess', { count: selected.length }));
+      if (isImportHistory(current)) {
+        session.clear();
+        setValidationJobId(null);
+        const url = new URL(window.location.href);
+        url.searchParams.delete('import');
+        window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+      }
       await refreshHistory();
     });
   }
@@ -395,6 +413,7 @@ export function useImageImport() {
     progress,
     models,
     history,
+    historyLoading,
     error,
     validation,
     errorText,

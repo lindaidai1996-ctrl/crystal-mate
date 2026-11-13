@@ -1,5 +1,7 @@
 'use client';
 
+import { Sensitive, usePrivacyMode } from '@/components/privacyMode';
+
 import { useState } from 'react';
 import {
   Alert,
@@ -50,6 +52,7 @@ export function ExcelRowEditor({
   createdStyleIds: Set<string>;
 }) {
   const t = useTranslations('cabochonExcel');
+  const privacyMode = usePrivacyMode();
   const { message } = App.useApp();
   const [draft, setDraft] = useState<ExcelRowInput>(() => ({
     ...row,
@@ -150,7 +153,12 @@ export function ExcelRowEditor({
         />
         <div className={layout.editGrid}>
           {excelFields
-            .filter((field) => field !== 'image' && field !== 'style')
+            .filter(
+              (field) =>
+                field !== 'image' &&
+                field !== 'style' &&
+                (!privacyMode || (field !== 'roughStoneCost' && field !== 'settingCost')),
+            )
             .map((field) => (
               <label key={field}>
                 <span>{t(`fields.${field}`)}</span>
@@ -298,17 +306,19 @@ export function ExcelRowEditor({
             }
           />
         )}
-        <Descriptions
-          title={t('originalValues')}
-          column={1}
-          size="small"
-          bordered
-          items={draft.original.map((cell, index) => ({
-            key: index,
-            label: cell.column,
-            children: cell.value || '—',
-          }))}
-        />
+        <Sensitive>
+          <Descriptions
+            title={t('originalValues')}
+            column={1}
+            size="small"
+            bordered
+            items={draft.original.map((cell, index) => ({
+              key: index,
+              label: cell.column,
+              children: cell.value || '—',
+            }))}
+          />
+        </Sensitive>
       </Space>
     </Drawer>
   );

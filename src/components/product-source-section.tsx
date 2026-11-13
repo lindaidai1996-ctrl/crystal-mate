@@ -1,5 +1,7 @@
 'use client';
 
+import { Sensitive } from '@/components/privacyMode';
+
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import {
   Alert,
@@ -23,6 +25,7 @@ import { StockAdjustmentDrawer } from '@/components/inventory/stockAdjustmentDra
 import { StockHistory } from '@/components/inventory/stockHistory';
 import { DistributorSelect } from '@/components/distributorSelect/distributorSelect';
 import { SilverCostFields } from '@/components/productEditor/silverCostFields';
+import { CommonFeeFields } from '@/components/productEditor/commonFeeFields';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type {
   Category,
@@ -123,12 +126,14 @@ function LineTotals({
   const quote = diyQuoteLineTotal(quantity, quoteUnitPrice);
   return (
     <div className="source-line-totals">
-      <span className="source-line-total">
-        {t('lineCost')}:{' '}
-        {unitCost === '' || quantity === ''
-          ? '—'
-          : `¥${money(Number(quantity) * Number(unitCost))}`}
-      </span>
+      <Sensitive>
+        <span className="source-line-total">
+          {t('lineCost')}:{' '}
+          {unitCost === '' || quantity === ''
+            ? '—'
+            : `¥${money(Number(quantity) * Number(unitCost))}`}
+        </span>
+      </Sensitive>
       <span className="source-line-total source-line-quote">
         {t('quoteLineTotal')}: {quote === null ? t('quoteMissing') : `¥${quote}`}
       </span>
@@ -216,6 +221,12 @@ function SourceFields({
       ? (value.craftDesignFee ?? emptyCraftDesignFee())
       : emptyCraftDesignFee();
   const diyCost = value.origin === 'DIY' ? calculateDiyCost(value) : null;
+  const materialCost =
+    value.origin === 'DIY' ? calculateDiyCost({ ...value, extraCosts: [] }) : null;
+  const materialQuote =
+    value.origin === 'DIY'
+      ? calculateDiyQuote({ ...value, extraCosts: [], craftDesignFee: emptyCraftDesignFee() })
+      : null;
   const diyQuote = value.origin === 'DIY' ? calculateDiyQuote(value) : null;
 
   return (
@@ -309,15 +320,17 @@ function SourceFields({
               </label>
             </>
           )}
-          <label className="source-field">
-            <span>{t('unitCost')}</span>
-            <InputNumber
-              min={0}
-              precision={2}
-              value={value.unitCost === '' ? null : Number(value.unitCost)}
-              onChange={(amount) => update({ unitCost: amount == null ? '' : String(amount) })}
-            />
-          </label>
+          <Sensitive>
+            <label className="source-field">
+              <span>{t('unitCost')}</span>
+              <InputNumber
+                min={0}
+                precision={2}
+                value={value.unitCost === '' ? null : Number(value.unitCost)}
+                onChange={(amount) => update({ unitCost: amount == null ? '' : String(amount) })}
+              />
+            </label>
+          </Sensitive>
         </div>
       ) : (
         <>
@@ -420,17 +433,19 @@ function SourceFields({
                         }
                       />
                     </label>
-                    <label className="source-field">
-                      <span>{t('inputUnitCost')}</span>
-                      <InputNumber
-                        min={0}
-                        precision={2}
-                        value={line.unitCost === '' ? null : Number(line.unitCost)}
-                        onChange={(amount) =>
-                          change({ unitCost: amount == null ? '' : String(amount) })
-                        }
-                      />
-                    </label>
+                    <Sensitive>
+                      <label className="source-field">
+                        <span>{t('inputUnitCost')}</span>
+                        <InputNumber
+                          min={0}
+                          precision={2}
+                          value={line.unitCost === '' ? null : Number(line.unitCost)}
+                          onChange={(amount) =>
+                            change({ unitCost: amount == null ? '' : String(amount) })
+                          }
+                        />
+                      </label>
+                    </Sensitive>
                     <QuotePriceField
                       value={line.quoteUnitPrice}
                       onChange={(quoteUnitPrice) => change({ quoteUnitPrice })}
@@ -530,17 +545,19 @@ function SourceFields({
                     onChange={(quantity) => change({ quantity: quantity ?? 0 })}
                   />
                 </label>
-                <label className="source-field">
-                  <span>{t('inputUnitCost')}</span>
-                  <InputNumber
-                    min={0}
-                    precision={2}
-                    value={line.unitCost === '' ? null : Number(line.unitCost)}
-                    onChange={(amount) =>
-                      change({ unitCost: amount == null ? '' : String(amount) })
-                    }
-                  />
-                </label>
+                <Sensitive>
+                  <label className="source-field">
+                    <span>{t('inputUnitCost')}</span>
+                    <InputNumber
+                      min={0}
+                      precision={2}
+                      value={line.unitCost === '' ? null : Number(line.unitCost)}
+                      onChange={(amount) =>
+                        change({ unitCost: amount == null ? '' : String(amount) })
+                      }
+                    />
+                  </label>
+                </Sensitive>
                 <QuotePriceField
                   value={line.quoteUnitPrice}
                   onChange={(quoteUnitPrice) => change({ quoteUnitPrice })}
@@ -562,74 +579,22 @@ function SourceFields({
               </div>
             );
           })}
-          <div className="product-source-subheading">
-            <strong>{t('extraCosts')}</strong>
-            <Button
-              icon={<PlusOutlined />}
-              onClick={() =>
-                update({
-                  extraCosts: [...value.extraCosts, { name: '', amount: '', quoteAmount: null }],
-                })
-              }
-            >
-              {t('addExtra')}
-            </Button>
+          <div className="product-source-material-totals source-line-totals">
+            <Sensitive>
+              <span className="source-line-total">
+                {t('materialSilverCostTotal')}:{' '}
+                {materialCost ? `¥${materialCost.perUnitCost}` : '—'}
+              </span>
+            </Sensitive>
+            <span className="source-line-total source-line-quote">
+              {t('materialQuoteTotal')}:{' '}
+              {materialQuote ? `¥${materialQuote.perUnitQuote}` : t('quoteMissing')}
+            </span>
           </div>
-          {value.extraCosts.map((line, index) => (
-            <div className="product-source-line" key={`extra-${index}`}>
-              <label className="source-field source-field-wide">
-                <span>{t('costName')}</span>
-                <Input
-                  value={line.name}
-                  maxLength={60}
-                  onChange={(event) =>
-                    update({
-                      extraCosts: value.extraCosts.map((item, at) =>
-                        at === index ? { ...item, name: event.target.value } : item,
-                      ),
-                    })
-                  }
-                />
-              </label>
-              <label className="source-field">
-                <span>{t('costAmount')}</span>
-                <InputNumber
-                  min={0}
-                  precision={2}
-                  value={line.amount === '' ? null : Number(line.amount)}
-                  onChange={(amount) =>
-                    update({
-                      extraCosts: value.extraCosts.map((item, at) =>
-                        at === index
-                          ? { ...item, amount: amount == null ? '' : String(amount) }
-                          : item,
-                      ),
-                    })
-                  }
-                />
-              </label>
-              <QuotePriceField
-                label={t('extraQuoteAmount')}
-                value={line.quoteAmount}
-                onChange={(quoteAmount) =>
-                  update({
-                    extraCosts: value.extraCosts.map((item, at) =>
-                      at === index ? { ...item, quoteAmount } : item,
-                    ),
-                  })
-                }
-              />
-              <Tooltip title={t('removeExtra')}>
-                <Button
-                  icon={<DeleteOutlined />}
-                  aria-label={t('removeExtra')}
-                  onClick={() =>
-                    update({ extraCosts: value.extraCosts.filter((_, at) => at !== index) })
-                  }
-                />
-              </Tooltip>
-            </div>
-          ))}
+          <CommonFeeFields
+            value={value.extraCosts}
+            onChange={(extraCosts) => update({ extraCosts })}
+          />
           <div className="product-source-craft-fee">
             <div className="product-source-craft-fee-inputs">
               <CraftDesignFeeInput
@@ -683,25 +648,29 @@ function SourceFields({
               )}
             </div>
           </div>
-          <div className="product-source-totals">
-            <span>
-              {t('perUnitCost')}: ¥{diyCost?.perUnitCost ?? '—'}
-            </span>
-            {value.quantity > 1 && (
-              <strong>
-                {t('runTotal')}: ¥{diyCost?.totalCost ?? '—'}
-              </strong>
-            )}
-          </div>
-          <div className="product-source-totals product-source-quote-totals">
-            <span>
-              {t('perUnitQuote')}: {diyQuote ? `¥${diyQuote.perUnitQuote}` : t('quoteIncomplete')}
-            </span>
-            {value.quantity > 1 && (
-              <strong>
-                {t('totalQuote')}: {diyQuote ? `¥${diyQuote.totalQuote}` : t('quoteIncomplete')}
-              </strong>
-            )}
+          <div className="product-source-summary">
+            <Sensitive>
+              <div className="product-source-summary-column">
+                <span>{t('perUnitCost')}</span>
+                <strong>{diyCost ? `¥${diyCost.perUnitCost}` : '—'}</strong>
+                {value.quantity > 1 && (
+                  <div className="product-source-summary-run">
+                    <span>{t('runTotal')}</span>
+                    <strong>{diyCost ? `¥${diyCost.totalCost}` : '—'}</strong>
+                  </div>
+                )}
+              </div>
+            </Sensitive>
+            <div className="product-source-summary-column product-source-quote-totals">
+              <span>{t('perUnitQuote')}</span>
+              <strong>{diyQuote ? `¥${diyQuote.perUnitQuote}` : t('quoteIncomplete')}</strong>
+              {value.quantity > 1 && (
+                <div className="product-source-summary-run">
+                  <span>{t('totalQuote')}</span>
+                  <strong>{diyQuote ? `¥${diyQuote.totalQuote}` : t('quoteIncomplete')}</strong>
+                </div>
+              )}
+            </div>
           </div>
           <span className="material-input-help">{t('quoteHelp')}</span>
         </>
@@ -1020,7 +989,7 @@ export function ProductSourceSection({
               {
                 title: t('unitCost'),
                 dataIndex: 'unitCost',
-                render: (amount: string) => `¥${amount}`,
+                render: (amount: string) => <Sensitive>{`¥${amount}`}</Sensitive>,
               },
               {
                 title: t('customerQuote'),

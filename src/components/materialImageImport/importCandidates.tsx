@@ -9,6 +9,7 @@ import type { ImageImport, ImportItemData } from '@/lib/materialImageImport/cont
 import type { ImportValidation } from '@/lib/materialImageImport/importValidation';
 import { CropPreview } from './importImageCanvas';
 import importStyles from './materialImageImport.module.css';
+import { usePrivacyMode } from '@/components/privacyMode';
 
 export function ImportCandidates({
   job,
@@ -27,6 +28,7 @@ export function ImportCandidates({
 }) {
   const t = useTranslations('imageImport');
   const materials = useTranslations('materials');
+  const privacyMode = usePrivacyMode();
   const listRef = useRef<HTMLElement>(null);
   useEffect(() => {
     const list = listRef.current;
@@ -94,12 +96,14 @@ export function ImportCandidates({
                     {index + 1}. {values.name || t('unnamed')}
                   </strong>
                   <span className={importStyles.candidatePrices}>
-                    <span>
-                      {t('candidatePurchasePrice', {
-                        price: purchasePrice === null ? '—' : Number(purchasePrice).toFixed(2),
-                        unit,
-                      })}
-                    </span>
+                    {!privacyMode && (
+                      <span>
+                        {t('candidatePurchasePrice', {
+                          price: purchasePrice === null ? '—' : Number(purchasePrice).toFixed(2),
+                          unit,
+                        })}
+                      </span>
+                    )}
                     <span>
                       {t('candidateSalePrice', {
                         price: salePrice === null ? '—' : Number(salePrice).toFixed(2),
@@ -107,7 +111,7 @@ export function ImportCandidates({
                       })}
                     </span>
                   </span>
-                  {priceAdjusted && (
+                  {priceAdjusted && (!privacyMode || item.data.priceKind === 'SALE') && (
                     <span className={importStyles.candidateRecognition}>
                       {t('recognizedPriceAdjusted', {
                         price: Number(item.data.price).toFixed(2),

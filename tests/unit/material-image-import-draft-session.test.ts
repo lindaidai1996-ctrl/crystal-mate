@@ -56,6 +56,35 @@ function rename(session: ImportDraftSession, name: string) {
 }
 
 describe('material image import draft persistence', () => {
+  it('keeps completed legacy imports in read-only history instead of resuming them', () => {
+    const storage = memoryStorage();
+    const session = new ImportDraftSession(() => storage);
+    session.open(job());
+    rename(session, '入库前的本地修改');
+    const completed = job();
+    completed.items = completed.items.map((item) => ({ ...item, entryId: `entry-${item.id}` }));
+    session.open(completed);
+    expect(session.lastId()).toBeNull();
+    expect(session.getSnapshot()).toMatchObject({ dirty: false, recovery: null });
+    rename(session, '已完成后不允许修改');
+    session.select(second);
+    expect(session.getSnapshot().job?.items[0].data.name).toBe('');
+    expect(session.getSnapshot().activeId).toBe(second);
+    expect(session.lastId()).toBeNull();
+  });
+
+  it('keeps partially imported drafts resumable and does not replace them with viewed history', () => {
+    const memory = memoryStorage();
+    const session = new ImportDraftSession(() => memory);
+    const partial = job();
+    partial.items[0].entryId = 'entry-1';
+    session.accept(partial);
+    expect(session.lastId()).toBe(partial.id);
+    session.open({ ...job(), id: 'archived-import', archivedAt: '2026-11-13T01:00:00.000Z' });
+    session.select(second);
+    expect(session.lastId()).toBe(partial.id);
+  });
+
   it('retains unfinished numeric input and all other edits even when server validation would fail', () => {
     const storage = memoryStorage();
     const session = new ImportDraftSession(() => storage);

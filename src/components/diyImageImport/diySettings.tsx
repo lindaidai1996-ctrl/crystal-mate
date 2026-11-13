@@ -1,5 +1,7 @@
 'use client';
 
+import { Sensitive } from '@/components/privacyMode';
+
 import { useEffect, useState } from 'react';
 import { Alert, Button, Input, InputNumber, Select } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
@@ -8,6 +10,7 @@ import { apiFetch } from '@/lib/client-api';
 import type { Category } from '@/lib/client-types';
 import type { DiyData } from '@/lib/diyImageImport/contracts';
 import styles from './diyImport.module.css';
+import { usePrivacyMode } from '@/components/privacyMode';
 
 export function DiySettings({
   data,
@@ -19,6 +22,7 @@ export function DiySettings({
   onPatch: (patch: Partial<DiyData>) => void;
 }) {
   const t = useTranslations('diyImport');
+  const privacyMode = usePrivacyMode();
   const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -135,24 +139,26 @@ export function DiySettings({
         <summary>{t('extraSettings')}</summary>
         <p className={styles.muted}>{t('silverHint')}</p>
         <div className={styles.fields}>
-          {(['weightGrams', 'costGramPrice', 'quoteGramPrice'] as const).map((field) => (
-            <label className={styles.field} key={field}>
-              <span>{t(field)}</span>
-              <InputNumber<string>
-                stringMode
-                min="0"
-                max="9999999999.99"
-                precision={2}
-                disabled={disabled}
-                value={data.silverCost[field] || null}
-                onChange={(value) =>
-                  onPatch({
-                    silverCost: { ...data.silverCost, [field]: value ?? '' },
-                  })
-                }
-              />
-            </label>
-          ))}
+          {(['weightGrams', 'costGramPrice', 'quoteGramPrice'] as const)
+            .filter((field) => !privacyMode || field !== 'costGramPrice')
+            .map((field) => (
+              <label className={styles.field} key={field}>
+                <span>{t(field)}</span>
+                <InputNumber<string>
+                  stringMode
+                  min="0"
+                  max="9999999999.99"
+                  precision={2}
+                  disabled={disabled}
+                  value={data.silverCost[field] || null}
+                  onChange={(value) =>
+                    onPatch({
+                      silverCost: { ...data.silverCost, [field]: value ?? '' },
+                    })
+                  }
+                />
+              </label>
+            ))}
           <label className={`${styles.field} ${styles.wide}`}>
             <span>{t('notes')}</span>
             <Input.TextArea
@@ -181,22 +187,24 @@ export function DiySettings({
                 })
               }
             />
-            <InputNumber<string>
-              aria-label={t('feeAmount')}
-              stringMode
-              min="0"
-              max="9999999999.99"
-              precision={2}
-              disabled={disabled}
-              value={cost.amount || null}
-              onChange={(value) =>
-                onPatch({
-                  extraCosts: data.extraCosts.map((item, i) =>
-                    i === index ? { ...item, amount: value ?? '' } : item,
-                  ),
-                })
-              }
-            />
+            <Sensitive>
+              <InputNumber<string>
+                aria-label={t('feeAmount')}
+                stringMode
+                min="0"
+                max="9999999999.99"
+                precision={2}
+                disabled={disabled}
+                value={cost.amount || null}
+                onChange={(value) =>
+                  onPatch({
+                    extraCosts: data.extraCosts.map((item, i) =>
+                      i === index ? { ...item, amount: value ?? '' } : item,
+                    ),
+                  })
+                }
+              />
+            </Sensitive>
             <Button
               icon={<DeleteOutlined />}
               aria-label={t('deleteFee')}

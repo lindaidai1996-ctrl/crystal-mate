@@ -1,0 +1,5 @@
+ALTER TABLE "Admin"
+ADD COLUMN "nickname" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "avatarObjectKey" TEXT,
+ADD COLUMN "avatarUrl" TEXT,
+ADD COLUMN "sessionVersion" INTEGER NOT NULL DEFAULT 0;

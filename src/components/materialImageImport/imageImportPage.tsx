@@ -3,6 +3,7 @@
 import {
   ArrowLeftOutlined,
   DeleteOutlined,
+  HistoryOutlined,
   InboxOutlined,
   PictureOutlined,
   ScanOutlined,
@@ -14,13 +15,14 @@ import {
   App,
   Button,
   Collapse,
-  Empty,
+  Drawer,
   Image,
   Popconfirm,
   Select,
   Space,
   Steps,
   Tag,
+  Tooltip,
   Upload,
 } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -43,6 +45,8 @@ import { ImportSettings } from './importSettings';
 import { useImageImport } from './useImageImport';
 import { ImportDraftFeedback, ImportDraftStatus } from './importDraftFeedback';
 import { ImportValidationFeedback } from './importValidationFeedback';
+import { ImportGuide } from './importGuide';
+import { ImportHistory } from './importHistory';
 import importStyles from './materialImageImport.module.css';
 
 export function ImageImportPage({ initialId }: { initialId?: string }) {
@@ -62,6 +66,7 @@ export function ImageImportPage({ initialId }: { initialId?: string }) {
   const [batches, setBatches] = useState<MaterialBatch[]>([]);
   const [distributors, setDistributors] = useState<Distributor[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const settingsTarget = useRef<HTMLDivElement>(null);
   const reviewTarget = useRef<HTMLDivElement>(null);
 
@@ -82,7 +87,7 @@ export function ImageImportPage({ initialId }: { initialId?: string }) {
 
   useEffect(() => {
     const id = initialId ?? lastId();
-    if (id) void load(id);
+    if (id) void load(id, !initialId);
   }, [initialId, lastId, load]);
 
   const [now, setNow] = useState(() => Date.now());
@@ -111,7 +116,7 @@ export function ImageImportPage({ initialId }: { initialId?: string }) {
   const disabled = busy || processing || uploadingImages || !!sourceFile || !!state.recovery;
   const selected = job?.items.filter((item) => item.data.selected && !item.entryId) ?? [];
   const committed = job?.items.filter((item) => item.entryId).length ?? 0;
-  const archived = !!job?.archivedAt;
+  const archived = !!job?.archivedAt || (!!job?.items.length && committed === job.items.length);
   const model = state.models.find((item) => item.id === provider);
 
   const leaveDraft = useCallback(
@@ -244,38 +249,45 @@ export function ImageImportPage({ initialId }: { initialId?: string }) {
               { title: t('stepImport') },
             ]}
           />
-          <p className={importStyles.hint}>{t('workflowHelp')}</p>
         </>
       )}
       <div className={importStyles.toolbar}>
         <Space wrap>
-          <Select
-            aria-label={t('model')}
-            value={provider}
-            disabled={disabled}
-            className={importStyles.modelSelect}
-            options={
-              state.models.length
-                ? state.models.map((item) => ({
-                    value: item.id,
-                    label: `${item.label}${item.model ? ` · ${item.model}` : ''}`,
-                    disabled: !item.configured,
-                  }))
-                : [{ value: 'deepseek', label: 'DeepSeek', disabled: false }]
-            }
-            onChange={setProvider}
-          />
-          {!job && (
+          <Tooltip title={t('modelHelp')} trigger={['hover', 'focus']} placement="topLeft">
             <Select
-              aria-label={t('defaultPriceKind')}
-              value={priceKind}
+              aria-label={t('model')}
+              value={provider}
               disabled={disabled}
-              options={[
-                { value: 'PURCHASE', label: t('purchase') },
-                { value: 'SALE', label: t('sale') },
-              ]}
-              onChange={setPriceKind}
+              className={importStyles.modelSelect}
+              options={
+                state.models.length
+                  ? state.models.map((item) => ({
+                      value: item.id,
+                      label: `${item.label}${item.model ? ` · ${item.model}` : ''}`,
+                      disabled: !item.configured,
+                    }))
+                  : [{ value: 'deepseek', label: 'DeepSeek', disabled: false }]
+              }
+              onChange={setProvider}
             />
+          </Tooltip>
+          {!job && (
+            <Tooltip
+              title={t('defaultPriceKindHelp')}
+              trigger={['hover', 'focus']}
+              placement="topLeft"
+            >
+              <Select
+                aria-label={t('defaultPriceKind')}
+                value={priceKind}
+                disabled={disabled}
+                options={[
+                  { value: 'PURCHASE', label: t('purchase') },
+                  { value: 'SALE', label: t('sale') },
+                ]}
+                onChange={setPriceKind}
+              />
+            </Tooltip>
           )}
           <Upload
             accept="image/jpeg,image/png,image/webp"
@@ -311,48 +323,32 @@ export function ImageImportPage({ initialId }: { initialId?: string }) {
           )}
         </Space>
         <Space wrap>
-          <Select
-            aria-label={t('history')}
-            placeholder={t('history')}
-            value={job?.id}
-            className={importStyles.historySelect}
-            disabled={disabled}
-            options={[
-              ...(job && !state.history.some((item) => item.id === job.id)
-                ? [{ value: job.id, label: job.fileName }]
-                : []),
-              ...state.history.map((item) => ({
-                value: item.id,
-                label: `${item.fileName} · ${t('itemCount', { count: item._count.items })}`,
-              })),
-            ]}
-            onChange={(id) =>
-              void leaveDraft(() => {
-                void load(id);
-              })
-            }
-          />
-          <Button
-            danger={!committed}
-            icon={committed ? <InboxOutlined /> : <DeleteOutlined />}
-            disabled={!job || disabled || archived}
-            onClick={() => {
-              if (!job) return;
-              modal.confirm({
-                title: t(committed ? 'archiveRecordConfirm' : 'deleteRecordConfirm'),
-                content: t(committed ? 'archiveRecordHelp' : 'deleteRecordHelp', {
-                  name: job.fileName,
-                }),
-                okText: t(committed ? 'archiveRecord' : 'deleteRecord'),
-                cancelText: t('cancel'),
-                okButtonProps: { danger: !committed },
-                autoFocusButton: 'cancel',
-                onOk: state.remove,
-              });
-            }}
-          >
-            {t(committed ? 'archiveRecord' : 'deleteRecord')}
+          <Button icon={<HistoryOutlined />} onClick={() => setHistoryOpen(true)}>
+            {t('historyButton', { count: state.history.length })}
           </Button>
+          {job && (
+            <Button
+              danger={!committed}
+              icon={committed ? <InboxOutlined /> : <DeleteOutlined />}
+              disabled={!job || disabled || archived}
+              onClick={() => {
+                if (!job) return;
+                modal.confirm({
+                  title: t(committed ? 'archiveRecordConfirm' : 'deleteRecordConfirm'),
+                  content: t(committed ? 'archiveRecordHelp' : 'deleteRecordHelp', {
+                    name: job.fileName,
+                  }),
+                  okText: t(committed ? 'archiveRecord' : 'deleteRecord'),
+                  cancelText: t('cancel'),
+                  okButtonProps: { danger: !committed },
+                  autoFocusButton: 'cancel',
+                  onOk: state.remove,
+                });
+              }}
+            >
+              {t(committed ? 'archiveRecord' : 'deleteRecord')}
+            </Button>
+          )}
         </Space>
       </div>
       {state.progress && (
@@ -458,11 +454,40 @@ export function ImageImportPage({ initialId }: { initialId?: string }) {
           </div>
         </>
       ) : (
-        <div className={importStyles.empty}>
-          <Empty description={t('empty')} />
-          <p>{t('emptyHelp')}</p>
+        <div className={importStyles.startLayout}>
+          <ImportGuide />
+          <ImportHistory
+            items={state.history}
+            loading={state.historyLoading}
+            disabled={disabled}
+            onSelect={(id) =>
+              void leaveDraft(() => {
+                void load(id);
+              })
+            }
+          />
         </div>
       )}
+      <Drawer
+        rootClassName={importStyles.historyDrawer}
+        title={t('historyTitle')}
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        width="min(520px, 100vw)"
+      >
+        <ImportHistory
+          items={state.history}
+          loading={state.historyLoading}
+          disabled={disabled}
+          currentId={job?.id}
+          onSelect={(id) =>
+            void leaveDraft(() => {
+              setHistoryOpen(false);
+              void load(id);
+            })
+          }
+        />
+      </Drawer>
       {sourceFile && (
         <ImageCropDialog
           file={sourceFile}

@@ -6,8 +6,8 @@
 }
 body {
   margin: 0;
-  background: var(--ant-color-bg-layout, #f5f6f7);
-  color: var(--ant-color-text, #242930);
+  background: var(--ant-color-bg-layout, #f7f8f2);
+  color: var(--ant-color-text, #30483e);
 }
 .page-heading {
   display: flex;
@@ -464,6 +464,8 @@ body {
 .product-source-craft-fee {
   display: grid;
   gap: 6px;
+  border-top: 1px solid var(--ant-color-border-secondary);
+  padding-top: 16px;
 }
 .product-source-craft-fee-inputs {
   display: flex;
@@ -735,11 +737,52 @@ body {
   align-self: center;
   white-space: nowrap;
   font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 .source-line-totals {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-self: end;
-  gap: 4px;
+  gap: 8px 20px;
+}
+.product-material-inputs .source-line-totals {
+  grid-template-columns: minmax(0, 1fr);
+}
+.product-source-material-totals {
+  padding-top: 4px;
+}
+.product-source-material-totals .source-line-total {
+  white-space: normal;
+}
+.product-source-summary {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 20px 40px;
+  padding-top: 18px;
+  border-top: 1px solid var(--ant-color-border-secondary);
+}
+.product-source-summary-column {
+  display: grid;
+  flex: 1 1 180px;
+  gap: 8px;
+  text-align: right;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.product-source-summary-column > strong {
+  font-size: 20px;
+}
+.product-source-summary-run {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+.source-line-quote {
+  grid-column: -2 / -1;
 }
 .source-line-quote,
 .product-source-quote-totals {
@@ -796,6 +839,9 @@ body {
   .product-source-line .source-field-wide {
     grid-column: auto;
   }
+  .source-line-totals {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .editor-section {
   background: var(--ant-color-bg-container);
@@ -816,6 +862,12 @@ body {
 .measurement-fields .ant-form-item,
 .editor-recognizer-field {
   margin-bottom: 0;
+}
+:is(.measurement-fields, .material-three-columns) .ant-form-item-label .ant-btn-link {
+  height: auto;
+  padding-block: 0;
+  border: 0;
+  line-height: inherit;
 }
 .editor-recognizer-field {
   max-width: 540px;
@@ -1399,7 +1451,7 @@ body {
   margin-top: 16px;
   overflow: hidden;
   border-radius: 6px;
-  background: var(--ant-color-fill-alter, #f5f6f7);
+  background: var(--ant-color-fill-alter, #eff3ed);
 }
 .image-crop-controls {
   display: grid;
@@ -1694,7 +1746,7 @@ body {
   max-width: min(320px, calc(100vw - 24px));
 }
 .ant-tooltip .ant-tooltip-inner {
-  border: 1px solid var(--ant-color-border-secondary, #e1e5e9);
+  border: 1px solid var(--ant-color-border-secondary, #e5eae2);
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
@@ -1705,7 +1757,7 @@ body {
 /* Keep fallback focus rings below Ant Design's component and inner-input resets. */
 @layer antd.focus-defaults {
   :where(a, button, input, select, textarea, [tabindex='0']):focus-visible {
-    outline: 2px solid var(--ant-color-primary, #4c596a);
+    outline: 2px solid var(--ant-color-primary, #547566);
     outline-offset: 3px;
   }
 }

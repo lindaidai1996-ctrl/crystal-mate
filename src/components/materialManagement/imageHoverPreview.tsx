@@ -20,7 +20,7 @@ export function ImageHoverPreview({
   name: string;
   coverObjectKey?: string | null;
   hoverPreview?: boolean;
-  thumbnailSize?: 128 | 640;
+  thumbnailSize?: 128 | 640 | 'original';
 }) {
   const t = useTranslations('editor');
   const [current, setCurrent] = useState(0);
@@ -51,7 +51,11 @@ export function ImageHoverPreview({
         width={44}
         height={44}
         className="product-thumb"
-        src={imageThumbnailUrl(thumbnail.url, thumbnailSize)}
+        src={
+          thumbnailSize === 'original'
+            ? thumbnail.url
+            : imageThumbnailUrl(thumbnail.url, thumbnailSize)
+        }
         alt=""
       />
     </button>

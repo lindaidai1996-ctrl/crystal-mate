@@ -1,4 +1,5 @@
 'use client';
+import { Sensitive } from '@/components/privacyMode';
 
 import { InfoCircleOutlined } from '@ant-design/icons';
 import {
@@ -473,34 +474,38 @@ export function MaterialBulkDialog({ intent, materialIds, categories, onClose, o
                 {field('sale', t('sale'))}
                 {enabled.sale && (
                   <>
-                    <Select
-                      className={bulkStyles.input}
-                      aria-label={t('sale')}
-                      value={saleRule}
-                      onChange={setSaleRule}
-                      options={(
-                        [
-                          'COST',
-                          'PERCENT_30',
-                          'PERCENT_50',
-                          'PERCENT_60',
-                          'FIXED_AMOUNT',
-                          'CUSTOM_PERCENT',
-                          'CUSTOM_AMOUNT',
-                        ] as const
-                      ).map((value) => ({ value, label: editor(`rule_${value}`) }))}
-                    />
-                    {(saleRule === 'FIXED_AMOUNT' || saleRule === 'CUSTOM_PERCENT') && (
-                      <InputNumber<string>
-                        aria-label={t('ruleValue')}
-                        stringMode
+                    <Sensitive>
+                      <Select
                         className={bulkStyles.input}
-                        min="0"
-                        precision={2}
-                        value={saleValue}
-                        addonAfter={saleRule === 'CUSTOM_PERCENT' ? '%' : '¥'}
-                        onChange={(value) => setSaleValue(value ?? undefined)}
+                        aria-label={t('sale')}
+                        value={saleRule}
+                        onChange={setSaleRule}
+                        options={(
+                          [
+                            'COST',
+                            'PERCENT_30',
+                            'PERCENT_50',
+                            'PERCENT_60',
+                            'FIXED_AMOUNT',
+                            'CUSTOM_PERCENT',
+                            'CUSTOM_AMOUNT',
+                          ] as const
+                        ).map((value) => ({ value, label: editor(`rule_${value}`) }))}
                       />
+                    </Sensitive>
+                    {(saleRule === 'FIXED_AMOUNT' || saleRule === 'CUSTOM_PERCENT') && (
+                      <Sensitive>
+                        <InputNumber<string>
+                          aria-label={t('ruleValue')}
+                          stringMode
+                          className={bulkStyles.input}
+                          min="0"
+                          precision={2}
+                          value={saleValue}
+                          addonAfter={saleRule === 'CUSTOM_PERCENT' ? '%' : '¥'}
+                          onChange={(value) => setSaleValue(value ?? undefined)}
+                        />
+                      </Sensitive>
                     )}
                     {saleRule !== 'CUSTOM_AMOUNT' ? (
                       <p className={bulkStyles.hint}>{t('repriceWarning')}</p>

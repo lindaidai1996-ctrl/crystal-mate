@@ -1,4 +1,5 @@
 'use client';
+import { usePrivacyMode } from '@/components/privacyMode';
 
 import { useState } from 'react';
 import { Alert, Button, Checkbox, Modal, Space } from 'antd';
@@ -41,6 +42,7 @@ export function ImportRecognitionDialog({
   errorText: (error: unknown) => string;
 }) {
   const t = useTranslations('imageImport');
+  const privacyMode = usePrivacyMode();
   const [boxes, setBoxes] = useState<Boxes>({
     objectBox: item.data.objectBox,
     priceBox: item.data.priceBox,
@@ -139,104 +141,106 @@ export function ImportRecognitionDialog({
           className={importStyles.notice}
         />
       )}
-      <div className={importStyles.recognitionLayout}>
-        <ImportImageCanvas
-          job={canvasJob}
-          activeId={item.id}
-          originalBoxes={item.data}
-          disabled={busy}
-          onBox={(field, box) => updateBoxes({ ...boxes, [field]: box })}
-          onClearPrice={() => updateBoxes({ ...boxes, priceBox: null })}
-        />
-        <section
-          className={importStyles.recognitionComparison}
-          aria-label={t('recognitionComparison')}
-          aria-live="polite"
-        >
-          <h3>{t(preview ? 'recognitionComparison' : 'currentSelection')}</h3>
-          {preview ? (
-            <>
-              <Checkbox.Group
-                value={fields}
-                onChange={setFields}
-                className={importStyles.recognitionChoices}
-                disabled={busy || stale}
-              >
-                <Checkbox value="ranges">{t('applyRanges')}</Checkbox>
-                <Checkbox value="evidence">{t('applyEvidence')}</Checkbox>
-                <Checkbox value="price" disabled={preview.data.price === null}>
-                  {t('applyRecognizedPrice', { field: priceLabel })}
-                </Checkbox>
-              </Checkbox.Group>
-              <p className={importStyles.hint}>{t('keepConfigurationHelp')}</p>
-              <table className={importStyles.comparisonTable}>
-                <thead>
-                  <tr>
-                    <th>{t('comparisonField')}</th>
-                    <th>{t('currentValue')}</th>
-                    <th>{t('afterApply')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th>{t('recognizedPriceLabel')}</th>
-                    <td>{item.data.priceText || '—'}</td>
-                    <td>{next?.priceText || '—'}</td>
-                  </tr>
-                  <tr>
-                    <th>{priceLabel}</th>
-                    <td>{priceValue(item.data) ?? '—'}</td>
-                    <td>{next ? (priceValue(next) ?? '—') : '—'}</td>
-                  </tr>
-                </tbody>
-              </table>
-              {!!preview.data.warnings.length && (
-                <Alert
-                  type="warning"
-                  showIcon
-                  message={t('checkRequired')}
-                  description={preview.data.warnings.join('；')}
-                />
-              )}
-            </>
-          ) : (
-            <p className={importStyles.hint}>{t('singleSelectionHelp')}</p>
-          )}
-          <div className={importStyles.rangeComparison}>
-            {[
-              { label: t('currentValue'), data: item.data },
-              {
-                label: t(preview ? 'recognizedValue' : 'currentSelection'),
-                data: preview?.data ?? { ...item.data, ...boxes },
-              },
-            ].map(({ label, data }) => (
-              <div key={label}>
-                <strong>{label}</strong>
-                <span className={importStyles.hint}>{t('thumbnail')}</span>
-                <CropPreview
-                  url={job.sourceUrl}
-                  sourceRatio={job.width / job.height}
-                  box={data.objectBox}
-                  label={`${label} · ${t('thumbnail')}`}
-                  size={150}
-                />
-                <span className={importStyles.hint}>{t('priceEvidence')}</span>
-                {data.priceBox ? (
+      {(!privacyMode || item.data.priceKind === 'SALE') && (
+        <div className={importStyles.recognitionLayout}>
+          <ImportImageCanvas
+            job={canvasJob}
+            activeId={item.id}
+            originalBoxes={item.data}
+            disabled={busy}
+            onBox={(field, box) => updateBoxes({ ...boxes, [field]: box })}
+            onClearPrice={() => updateBoxes({ ...boxes, priceBox: null })}
+          />
+          <section
+            className={importStyles.recognitionComparison}
+            aria-label={t('recognitionComparison')}
+            aria-live="polite"
+          >
+            <h3>{t(preview ? 'recognitionComparison' : 'currentSelection')}</h3>
+            {preview ? (
+              <>
+                <Checkbox.Group
+                  value={fields}
+                  onChange={setFields}
+                  className={importStyles.recognitionChoices}
+                  disabled={busy || stale}
+                >
+                  <Checkbox value="ranges">{t('applyRanges')}</Checkbox>
+                  <Checkbox value="evidence">{t('applyEvidence')}</Checkbox>
+                  <Checkbox value="price" disabled={preview.data.price === null}>
+                    {t('applyRecognizedPrice', { field: priceLabel })}
+                  </Checkbox>
+                </Checkbox.Group>
+                <p className={importStyles.hint}>{t('keepConfigurationHelp')}</p>
+                <table className={importStyles.comparisonTable}>
+                  <thead>
+                    <tr>
+                      <th>{t('comparisonField')}</th>
+                      <th>{t('currentValue')}</th>
+                      <th>{t('afterApply')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th>{t('recognizedPriceLabel')}</th>
+                      <td>{item.data.priceText || '—'}</td>
+                      <td>{next?.priceText || '—'}</td>
+                    </tr>
+                    <tr>
+                      <th>{priceLabel}</th>
+                      <td>{priceValue(item.data) ?? '—'}</td>
+                      <td>{next ? (priceValue(next) ?? '—') : '—'}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                {!!preview.data.warnings.length && (
+                  <Alert
+                    type="warning"
+                    showIcon
+                    message={t('checkRequired')}
+                    description={preview.data.warnings.join('；')}
+                  />
+                )}
+              </>
+            ) : (
+              <p className={importStyles.hint}>{t('singleSelectionHelp')}</p>
+            )}
+            <div className={importStyles.rangeComparison}>
+              {[
+                { label: t('currentValue'), data: item.data },
+                {
+                  label: t(preview ? 'recognizedValue' : 'currentSelection'),
+                  data: preview?.data ?? { ...item.data, ...boxes },
+                },
+              ].map(({ label, data }) => (
+                <div key={label}>
+                  <strong>{label}</strong>
+                  <span className={importStyles.hint}>{t('thumbnail')}</span>
                   <CropPreview
                     url={job.sourceUrl}
                     sourceRatio={job.width / job.height}
-                    box={data.priceBox}
-                    label={`${label} · ${t('priceEvidence')}`}
-                    size={110}
+                    box={data.objectBox}
+                    label={`${label} · ${t('thumbnail')}`}
+                    size={150}
                   />
-                ) : (
-                  <span className={importStyles.hint}>{t('noPriceBox')}</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
+                  <span className={importStyles.hint}>{t('priceEvidence')}</span>
+                  {data.priceBox ? (
+                    <CropPreview
+                      url={job.sourceUrl}
+                      sourceRatio={job.width / job.height}
+                      box={data.priceBox}
+                      label={`${label} · ${t('priceEvidence')}`}
+                      size={110}
+                    />
+                  ) : (
+                    <span className={importStyles.hint}>{t('noPriceBox')}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
     </Modal>
   );
 }

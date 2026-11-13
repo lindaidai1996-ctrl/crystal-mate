@@ -7,9 +7,11 @@ const mocks = vi.hoisted(() => ({
   recognizeItem: vi.fn(),
   commit: vi.fn(),
   remove: vi.fn(),
+  list: vi.fn(),
 }));
 vi.mock('@/auth', () => ({ auth: mocks.auth }));
-vi.mock('@/lib/db', () => ({ db: {} }));
+vi.mock('@/lib/db', () => ({ db: { materialImageImport: { findMany: mocks.list } } }));
+vi.mock('@/lib/ai/imageRecognition', () => ({ imageRecognitionModels: () => [] }));
 vi.mock('@/lib/materialImageImport/store', () => ({
   recognizeImageImport: mocks.recognize,
   commitImageImportItem: mocks.commit,
@@ -22,6 +24,7 @@ import { POST as recognize } from '@/app/api/material-image-imports/[id]/recogni
 import { POST as commit } from '@/app/api/material-image-imports/[id]/commit/route';
 import { POST as recognizeItem } from '@/app/api/material-image-imports/[id]/recognize-item/route';
 import { DELETE as remove } from '@/app/api/material-image-imports/[id]/route';
+import { GET as list } from '@/app/api/material-image-imports/route';
 
 const context = { params: Promise.resolve({ id: 'test-import' }) };
 beforeEach(() => {
@@ -29,6 +32,31 @@ beforeEach(() => {
 });
 
 describe('image import API authorization', () => {
+  it('includes archived receipts and progress in import history', async () => {
+    mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+    mocks.list.mockResolvedValue([
+      {
+        id: 'completed',
+        fileName: 'supplier.png',
+        archivedAt: '2026-11-13T01:00:00.000Z',
+        _count: { items: 2 },
+        items: [{ id: 'first' }, { id: 'second' }],
+      },
+    ]);
+    const response = await list(new NextRequest('http://localhost/api/material-image-imports'));
+    expect(response.status).toBe(200);
+    expect((await response.json()).items).toEqual([
+      {
+        id: 'completed',
+        fileName: 'supplier.png',
+        archivedAt: '2026-11-13T01:00:00.000Z',
+        _count: { items: 2 },
+        importedCount: 2,
+      },
+    ]);
+    expect(mocks.list.mock.calls[0][0].where?.archivedAt).toBeUndefined();
+  });
+
   it('validates the deletion version and returns an empty success response', async () => {
     mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
     const request = (body: unknown) =>

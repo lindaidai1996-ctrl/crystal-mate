@@ -192,6 +192,7 @@ describe.skipIf(!enabled)('image import purchase transactions', () => {
       imageKey: crop.objectKey,
     };
     current = await commitImageImportItem(current.id, firstRequest);
+    expect(current.archivedAt).toBeNull();
     const first = current.items.find((row) => row.id === firstRequest.itemId)!;
     expect(first.entryId).toBeTruthy();
     const entry = await db.materialBatchEntry.findUniqueOrThrow({ where: { id: first.entryId! } });
@@ -279,14 +280,13 @@ describe.skipIf(!enabled)('image import purchase transactions', () => {
         entryId: entry.id,
         fileName: 'supplier.png',
         sourceUrl: current.sourceUrl,
-        archivedAt: null,
+        archivedAt: current.archivedAt,
         batch: { id: entry.batchId },
         distributor: { id: distributorId },
       },
     ]);
-    // Archiving committed history preserves both receipts and the stock-to-image source chain.
+    // Completing all candidates archives the import and preserves the stock-to-image source chain.
     materials.push(...current.items.flatMap((row) => (row.materialId ? [row.materialId] : [])));
-    await deleteImageImport(current.id, current.version);
     expect(await db.materialImageImportItem.count({ where: { importId: current.id } })).toBe(2);
     const archived = await getImageImport(current.id);
     expect(archived.archivedAt).toBeTruthy();

@@ -3,6 +3,7 @@
 import { Alert, Checkbox, ConfigProvider, Form, InputNumber, Radio } from 'antd';
 import { useTranslations } from 'next-intl';
 import type { MaterialAmount, MaterialValues } from '@/lib/client-types';
+import { Sensitive, usePrivacyMode } from '@/components/privacyMode';
 import {
   calculatePurchase,
   editPurchase,
@@ -61,25 +62,27 @@ export function PurchaseFields({
   onValueChange: (field: keyof MaterialValues, value: string | number | null) => void;
 }) {
   const t = useTranslations('materialEditor');
+  const privacyMode = usePrivacyMode();
   const batchText = useTranslations('materialBatches');
   const { componentDisabled } = ConfigProvider.useConfig();
   const unit = t(values.unit);
   const batch = purchase.mode === 'BATCH';
   const result = calculatePurchase(values, purchase, quantityUnknown ? null : quantity);
-  const totalInput = (field: PurchaseTotalField, suffix: string, positive = false) => (
-    <Form.Item label={t(field)}>
-      <MaterialAmountInput
-        value={result.purchase[field]}
-        suffix={suffix}
-        label={t(field)}
-        positive={positive}
-        onChange={(value) => onPurchaseChange(editPurchase(result.purchase, field, value))}
-      />
-      {result.purchase.autoField === field && (
-        <div className="material-source-label">{t('autoCalculated')}</div>
-      )}
-    </Form.Item>
-  );
+  const totalInput = (field: PurchaseTotalField, suffix: string, positive = false) =>
+    privacyMode && field !== 'totalWeightGrams' ? null : (
+      <Form.Item label={t(field)}>
+        <MaterialAmountInput
+          value={result.purchase[field]}
+          suffix={suffix}
+          label={t(field)}
+          positive={positive}
+          onChange={(value) => onPurchaseChange(editPurchase(result.purchase, field, value))}
+        />
+        {result.purchase.autoField === field && (
+          <div className="material-source-label">{t('autoCalculated')}</div>
+        )}
+      </Form.Item>
+    );
   if (values.unit === 'GRAM') {
     return (
       <section className="editor-block">
@@ -90,15 +93,19 @@ export function PurchaseFields({
           {totalInput('quotedGramPrice', t('yuanPerGram'))}
           {totalInput('totalAmount', t('yuan'))}
         </div>
-        <p>
-          {t('actualGramPrice')}: {result.values.purchaseGramPrice ?? '—'} {t('yuanPerGram')}
-        </p>
+        <Sensitive>
+          <p>
+            {t('actualGramPrice')}: {result.values.purchaseGramPrice ?? '—'} {t('yuanPerGram')}
+          </p>
+        </Sensitive>
         {result.difference !== null && result.difference !== '0.00' && (
-          <Alert
-            type="warning"
-            showIcon
-            message={t('purchaseDifference', { amount: result.difference })}
-          />
+          <Sensitive>
+            <Alert
+              type="warning"
+              showIcon
+              message={t('purchaseDifference', { amount: result.difference })}
+            />
+          </Sensitive>
         )}
         {result.belowPrecision && <Alert type="warning" showIcon message={t('belowPrecision')} />}
         {!result.valid && <div className="material-input-help">{t('gramValuesRequired')}</div>}
@@ -148,14 +155,16 @@ export function PurchaseFields({
           </>
         ) : (
           <>
-            <Form.Item label={t('unitPurchasePrice', { unit })}>
-              <MaterialAmountInput
-                value={values.purchaseUnitPrice}
-                label={t('unitPurchasePrice', { unit })}
-                suffix={`${t('yuan')}/${unit}`}
-                onChange={(value) => onValueChange('purchaseUnitPrice', value)}
-              />
-            </Form.Item>
+            <Sensitive>
+              <Form.Item label={t('unitPurchasePrice', { unit })}>
+                <MaterialAmountInput
+                  value={values.purchaseUnitPrice}
+                  label={t('unitPurchasePrice', { unit })}
+                  suffix={`${t('yuan')}/${unit}`}
+                  onChange={(value) => onValueChange('purchaseUnitPrice', value)}
+                />
+              </Form.Item>
+            </Sensitive>
             <Form.Item label={t('unitWeight', { unit })}>
               <MaterialAmountInput
                 value={values.weightGrams}
@@ -165,26 +174,30 @@ export function PurchaseFields({
                 onChange={(value) => onValueChange('weightGrams', value)}
               />
             </Form.Item>
-            <Form.Item label={t('purchaseGramPrice')}>
-              <MaterialAmountInput
-                value={values.purchaseGramPrice}
-                label={t('purchaseGramPrice')}
-                suffix={t('yuanPerGram')}
-                onChange={(value) => onValueChange('purchaseGramPrice', value)}
-              />
-            </Form.Item>
+            <Sensitive>
+              <Form.Item label={t('purchaseGramPrice')}>
+                <MaterialAmountInput
+                  value={values.purchaseGramPrice}
+                  label={t('purchaseGramPrice')}
+                  suffix={t('yuanPerGram')}
+                  onChange={(value) => onValueChange('purchaseGramPrice', value)}
+                />
+              </Form.Item>
+            </Sensitive>
           </>
         )}
       </div>
       {batch && (
         <>
           {result.difference !== null && result.difference !== '0.00' && (
-            <Alert
-              className="material-purchase-alert"
-              type="warning"
-              showIcon
-              message={t('purchaseDifference', { amount: result.difference })}
-            />
+            <Sensitive>
+              <Alert
+                className="material-purchase-alert"
+                type="warning"
+                showIcon
+                message={t('purchaseDifference', { amount: result.difference })}
+              />
+            </Sensitive>
           )}
           {quantityUnknown && (
             <div className="material-field-grid">
@@ -202,52 +215,58 @@ export function PurchaseFields({
               </Form.Item>
             </div>
           )}
-          <Form.Item label={t('manualUnitPrice', { unit })}>
-            <MaterialAmountInput
-              value={purchase.manualUnitPrice}
-              label={t('manualUnitPrice', { unit })}
-              suffix={`${t('yuan')}/${unit}`}
-              onChange={(value) => onPurchaseChange({ ...result.purchase, manualUnitPrice: value })}
-            />
-            <div className="material-input-help">{t('manualPriceHelp')}</div>
-          </Form.Item>
-          <div className="material-purchase-results" aria-live="polite">
-            <h3 className="material-subheading">{t('calculationResults')}</h3>
-            <dl>
-              <div>
-                <dt>
-                  {t(result.source === 'AVERAGE' ? 'averageUnitPrice' : 'unitPurchasePrice', {
-                    unit,
-                  })}
-                </dt>
-                <dd>
-                  {result.values.purchaseUnitPrice ?? t('pendingQuantity')}
-                  {result.values.purchaseUnitPrice !== null && ` ${t('yuan')}/${unit}`}
-                  {(result.source === 'ESTIMATED' || result.source === 'MANUAL') && (
-                    <span className="material-source-label">
-                      {' '}
-                      · {t(`priceSource_${result.source}`)}
-                    </span>
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt>
-                  {t(quantityUnknown ? 'estimatedUnitWeight' : 'averageUnitWeight', { unit })}
-                </dt>
-                <dd>
-                  {result.values.weightGrams ?? t('pendingQuantity')}
-                  {result.values.weightGrams !== null && ` g/${unit}`}
-                </dd>
-              </div>
-              <div>
-                <dt>{t('actualGramPrice')}</dt>
-                <dd>
-                  {result.values.purchaseGramPrice ?? '—'} {t('yuanPerGram')}
-                </dd>
-              </div>
-            </dl>
-          </div>
+          <Sensitive>
+            <Form.Item label={t('manualUnitPrice', { unit })}>
+              <MaterialAmountInput
+                value={purchase.manualUnitPrice}
+                label={t('manualUnitPrice', { unit })}
+                suffix={`${t('yuan')}/${unit}`}
+                onChange={(value) =>
+                  onPurchaseChange({ ...result.purchase, manualUnitPrice: value })
+                }
+              />
+              <div className="material-input-help">{t('manualPriceHelp')}</div>
+            </Form.Item>
+          </Sensitive>
+          <Sensitive>
+            <div className="material-purchase-results" aria-live="polite">
+              <h3 className="material-subheading">{t('calculationResults')}</h3>
+              <dl>
+                <div>
+                  <dt>
+                    {t(result.source === 'AVERAGE' ? 'averageUnitPrice' : 'unitPurchasePrice', {
+                      unit,
+                    })}
+                  </dt>
+                  <dd>
+                    {result.values.purchaseUnitPrice ?? t('pendingQuantity')}
+                    {result.values.purchaseUnitPrice !== null && ` ${t('yuan')}/${unit}`}
+                    {(result.source === 'ESTIMATED' || result.source === 'MANUAL') && (
+                      <span className="material-source-label">
+                        {' '}
+                        · {t(`priceSource_${result.source}`)}
+                      </span>
+                    )}
+                  </dd>
+                </div>
+                <div>
+                  <dt>
+                    {t(quantityUnknown ? 'estimatedUnitWeight' : 'averageUnitWeight', { unit })}
+                  </dt>
+                  <dd>
+                    {result.values.weightGrams ?? t('pendingQuantity')}
+                    {result.values.weightGrams !== null && ` g/${unit}`}
+                  </dd>
+                </div>
+                <div>
+                  <dt>{t('actualGramPrice')}</dt>
+                  <dd>
+                    {result.values.purchaseGramPrice ?? '—'} {t('yuanPerGram')}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </Sensitive>
           {result.belowPrecision && <Alert type="warning" showIcon message={t('belowPrecision')} />}
           {!result.valid && <div className="material-input-help">{t('batchValuesRequired')}</div>}
         </>

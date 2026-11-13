@@ -20,6 +20,7 @@ import {
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
+import { Sensitive } from '@/components/privacyMode';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { PaginatedTable } from '@/components/paginated-table';
@@ -211,13 +212,13 @@ export function DistributorDetailPage({ id }: { id: string }) {
       {
         title: t('unitPrice'),
         dataIndex: 'unitPrice',
-        render: (value: string | null) => value ?? '—',
+        render: (value: string | null) => <Sensitive>{value ?? '—'}</Sensitive>,
       },
       ...distributorPurchasePriceColumns<DistributorPurchaseEntry>(t),
       {
         title: t('amount'),
         dataIndex: 'amount',
-        render: (value: string | null) => value ?? t('unknownValue'),
+        render: (value: string | null) => <Sensitive>{value ?? t('unknownValue')}</Sensitive>,
       },
       ...(row.type === 'MATERIAL'
         ? ([
@@ -353,10 +354,13 @@ export function DistributorDetailPage({ id }: { id: string }) {
       title: t('amount'),
       key: 'amount',
       width: 130,
-      render: (_, row) =>
-        row.totalAmount
-          ? `${row.totalAmount}${row.hasUnknownAmount ? ` · ${t('knownSubtotal')}` : ''}`
-          : t('unknownValue'),
+      render: (_, row) => (
+        <Sensitive>
+          {row.totalAmount
+            ? `${row.totalAmount}${row.hasUnknownAmount ? ` · ${t('knownSubtotal')}` : ''}`
+            : t('unknownValue')}
+        </Sensitive>
+      ),
     },
     {
       title: t('weightGrams'),

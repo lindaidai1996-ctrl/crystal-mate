@@ -9,18 +9,26 @@ export async function GET(request: NextRequest) {
   try {
     await requireAdmin(request);
     const items = await db.materialImageImport.findMany({
-      where: { archivedAt: null },
       orderBy: { createdAt: 'desc' },
       take: 50,
       select: {
         id: true,
         fileName: true,
+        sourceUrl: true,
         status: true,
+        archivedAt: true,
         createdAt: true,
         _count: { select: { items: true } },
+        items: { where: { entryId: { not: null } }, select: { id: true } },
       },
     });
-    return NextResponse.json({ items, models: imageRecognitionModels() });
+    return NextResponse.json({
+      items: items.map(({ items: committed, ...item }) => ({
+        ...item,
+        importedCount: committed.length,
+      })),
+      models: imageRecognitionModels(),
+    });
   } catch (error) {
     return apiError(error);
   }

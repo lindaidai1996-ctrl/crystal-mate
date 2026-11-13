@@ -3,6 +3,7 @@ import type { MaterialPurchase } from './material-purchase';
 import type { ProductSaleRule } from './product-pricing';
 import type { CraftDesignFee } from './product-diy-cost';
 import type { SilverCost } from './silver-cost';
+import type { DiyExtraCost } from './diy-common-fees';
 
 export type Category = {
   id: string;
@@ -198,7 +199,7 @@ export type ProductDiyRun = {
   totalQuote: string | null;
   craftDesignFee: CraftDesignFee;
   silverCost: SilverCost;
-  extraCosts: { name: string; amount: string; quoteAmount?: string | null }[];
+  extraCosts: DiyExtraCost[];
   notes: string;
   materialLines: ProductDiyMaterial[];
   cabochonLines: ProductDiyCabochon[];
@@ -248,7 +249,7 @@ export type ProductSourceInput =
         unitCost: string;
         quoteUnitPrice?: string | null;
       }[];
-      extraCosts: { name: string; amount: string; quoteAmount?: string | null }[];
+      extraCosts: DiyExtraCost[];
       craftDesignFee?: CraftDesignFee;
     };
 export type ProductPage = { items: Product[]; total: number; page: number; pageSize: number };

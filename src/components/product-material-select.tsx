@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import type { Material, MaterialBatchEntry, ProductSourceInput } from '@/lib/client-types';
+import { Sensitive } from '@/components/privacyMode';
 
 export type MaterialOption = { entry: MaterialBatchEntry; material: Material; label: string };
 type UsageUnit = Extract<ProductSourceInput, { origin: 'DIY' }>['materials'][number]['usageUnit'];
@@ -33,10 +34,14 @@ function MaterialPrices({ option }: { option: MaterialOption }) {
 
   return (
     <>
-      {batchT('purchaseUnitPrice')}:{' '}
-      {unitPrice == null ? '—' : `¥${unitPrice}/${t(option.material.unit)}`}
+      <Sensitive>
+        {batchT('purchaseUnitPrice')}:{' '}
+        {unitPrice == null ? '—' : `¥${unitPrice}/${t(option.material.unit)}`}
+      </Sensitive>
       {' · '}
-      {batchT('gramPrice')}: {gramPrice == null ? '—' : `¥${gramPrice}/${t('GRAM')}`}
+      <Sensitive>
+        {batchT('gramPrice')}: {gramPrice == null ? '—' : `¥${gramPrice}/${t('GRAM')}`}
+      </Sensitive>
     </>
   );
 }

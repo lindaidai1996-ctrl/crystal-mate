@@ -10,6 +10,7 @@ import {
 } from '@/lib/material-calculations';
 import { MaterialAmountInput } from './purchaseFields';
 import { MaterialSaleProfit } from './materialSaleProfit';
+import { usePrivacyMode } from '@/components/privacyMode';
 
 export function MaterialSaleFields({
   values,
@@ -23,6 +24,7 @@ export function MaterialSaleFields({
   onAdopt: () => void;
 }) {
   const t = useTranslations('materialEditor');
+  const privacyMode = usePrivacyMode();
   const strandPrice = saleUnitPriceFromBeads(values);
   const recommendedGramPrice = saleGramPriceFromUnit(values);
   const gram = values.unit === 'GRAM';
@@ -54,7 +56,7 @@ export function MaterialSaleFields({
     price: string | null,
     suffix: string,
   ) => {
-    if (manual) return null;
+    if (manual || privacyMode) return null;
     const result = percentageSalePrice(cost, values);
     if (result === null || result.price !== price) return null;
     return (
@@ -70,31 +72,36 @@ export function MaterialSaleFields({
   return (
     <section className="editor-block">
       <h2>{t('saleDetails')}</h2>
-      <Form.Item
-        label={t('saleRule')}
-        extra={values.saleRule === 'CUSTOM_AMOUNT' ? t('customAmountHelp') : undefined}
-      >
-        <Radio.Group
-          className="material-rule-options"
-          value={values.saleRule}
-          aria-label={t('saleRule')}
-          onChange={(event) => onRuleChange(event.target.value)}
-          options={(
-            [
-              'COST',
-              'PERCENT_30',
-              'PERCENT_50',
-              'PERCENT_60',
-              'FIXED_AMOUNT',
-              'CUSTOM_PERCENT',
-              'CUSTOM_AMOUNT',
-            ] as const
-          ).map((rule) => ({ label: t(`rule_${rule}`), value: rule }))}
-        />
-      </Form.Item>
-      {(values.saleRule === 'FIXED_AMOUNT' || values.saleRule === 'CUSTOM_PERCENT') && (
-        <Form.Item label={t(ruleValueLabel)}>{amount('saleRuleValue', ruleValueSuffix)}</Form.Item>
+      {!privacyMode && (
+        <Form.Item
+          label={t('saleRule')}
+          extra={values.saleRule === 'CUSTOM_AMOUNT' ? t('customAmountHelp') : undefined}
+        >
+          <Radio.Group
+            className="material-rule-options"
+            value={values.saleRule}
+            aria-label={t('saleRule')}
+            onChange={(event) => onRuleChange(event.target.value)}
+            options={(
+              [
+                'COST',
+                'PERCENT_30',
+                'PERCENT_50',
+                'PERCENT_60',
+                'FIXED_AMOUNT',
+                'CUSTOM_PERCENT',
+                'CUSTOM_AMOUNT',
+              ] as const
+            ).map((rule) => ({ label: t(`rule_${rule}`), value: rule }))}
+          />
+        </Form.Item>
       )}
+      {(values.saleRule === 'FIXED_AMOUNT' || values.saleRule === 'CUSTOM_PERCENT') &&
+        !privacyMode && (
+          <Form.Item label={t(ruleValueLabel)}>
+            {amount('saleRuleValue', ruleValueSuffix)}
+          </Form.Item>
+        )}
       <div className="material-field-grid material-three-columns">
         {values.unit !== 'GRAM' && (
           <Form.Item label={t('saleUnitPrice')}>

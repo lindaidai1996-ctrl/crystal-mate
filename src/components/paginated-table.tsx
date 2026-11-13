@@ -4,6 +4,8 @@ import { Table } from 'antd';
 import type { TableProps } from 'antd';
 import { useTranslations } from 'next-intl';
 import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
+import { ListLoadingIndicator } from './listLoadingIndicator';
+import motionStyles from './listMotion.module.css';
 
 export function useTablePagination() {
   const common = useTranslations('common');
@@ -18,6 +20,7 @@ export function PaginatedTable<RecordType extends object>({
   dataSource,
   footer,
   loading,
+  className,
   ...props
 }: TableProps<RecordType>) {
   const defaults = useTablePagination();
@@ -27,8 +30,22 @@ export function PaginatedTable<RecordType extends object>({
   return (
     <Table<RecordType>
       {...props}
+      className={[
+        motionStyles.surface,
+        motionStyles.table,
+        isLoading ? motionStyles.pending : motionStyles.ready,
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      data-loading={Boolean(isLoading)}
+      aria-busy={Boolean(isLoading)}
       dataSource={dataSource}
-      loading={loading}
+      loading={{
+        indicator: <ListLoadingIndicator />,
+        delay: 150,
+        ...(typeof loading === 'object' ? loading : { spinning: Boolean(loading) }),
+      }}
       pagination={pagination === false ? false : { ...defaults, ...pagination }}
       // Ant Design omits pagination when total is zero, so keep the count in the footer.
       footer={footer ?? (total === 0 && !isLoading ? () => defaults.showTotal(0) : undefined)}

@@ -55,6 +55,7 @@ import { CabochonCostFields } from './cabochonCost/cabochonCostFields';
 import { ImagePicker } from './image-picker';
 import { MissingCategoryState } from './missing-category-state';
 import { initialSource, ProductSourceSection } from './product-source-section';
+import { Sensitive, usePrivacyMode } from './privacyMode';
 import type { ProductSourceInput } from '@/lib/client-types';
 import { productSourceSchema } from '@/lib/validation';
 import { useProductCode } from './productEditor/useProductCode';
@@ -107,6 +108,7 @@ export function ProductEditor({
   initialReturnTo?: string;
 }) {
   const t = useTranslations('editor');
+  const privacyMode = usePrivacyMode();
   const common = useTranslations('common');
   const catalog = useTranslations('catalog');
   const tagText = useTranslations('tags');
@@ -882,6 +884,7 @@ export function ProductEditor({
                     images={images}
                     name={product?.name ?? t('images')}
                     coverObjectKey={images[0]?.objectKey ?? null}
+                    thumbnailSize="original"
                   />
                 </div>
               )}
@@ -960,7 +963,11 @@ export function ProductEditor({
               </section>
             )}
             {isCabochon && (
-              <section className="editor-block">
+              <section
+                className="editor-block"
+                style={privacyMode ? { display: 'none' } : undefined}
+                aria-hidden={privacyMode || undefined}
+              >
                 <h2>{t('costs')}</h2>
                 <Form.Item
                   name="cost"
@@ -1013,22 +1020,24 @@ export function ProductEditor({
             <section className="editor-block">
               <h2>{t('saleDetails')}</h2>
               {!isDiyPricing && (
-                <div className="product-pricing-cost">
-                  <strong>
-                    {t('pricingCost')}:{' '}
-                    {pricingCost.amount === null ? t('noCost') : `¥${pricingCost.amount}`}
-                  </strong>
-                  <span>{t(`pricingSource_${pricingCost.kind}`)}</span>
-                  {pricingCost.record && (
-                    <span>
-                      {t('pricingRecord', {
-                        date: pricingCost.record.createdAt.slice(0, 10),
-                        id: pricingCost.record.id,
-                        batch: pricingCost.batchName ?? '—',
-                      })}
-                    </span>
-                  )}
-                </div>
+                <Sensitive>
+                  <div className="product-pricing-cost">
+                    <strong>
+                      {t('pricingCost')}:{' '}
+                      {pricingCost.amount === null ? t('noCost') : `¥${pricingCost.amount}`}
+                    </strong>
+                    <span>{t(`pricingSource_${pricingCost.kind}`)}</span>
+                    {pricingCost.record && (
+                      <span>
+                        {t('pricingRecord', {
+                          date: pricingCost.record.createdAt.slice(0, 10),
+                          id: pricingCost.record.id,
+                          batch: pricingCost.batchName ?? '—',
+                        })}
+                      </span>
+                    )}
+                  </div>
+                </Sensitive>
               )}
               <Form.Item
                 name="pricing"
@@ -1059,19 +1068,21 @@ export function ProductEditor({
                 />
               </Form.Item>
               {!isNew && <p className="product-pricing-help">{t('pricingSaveHelp')}</p>}
-              <p
-                className={`product-pricing-profit${profitCents === null ? ' is-pending' : isLoss ? ' is-loss' : ''}`}
-                role="status"
-                aria-live="polite"
-                aria-atomic="true"
-              >
-                {profitCents === null
-                  ? t('profitPending')
-                  : t.rich(isLoss ? 'estimatedLoss' : 'estimatedProfit', {
-                      amount: centsToAmount(isLoss ? -profitCents : profitCents),
-                      money: (chunks) => <strong>{chunks}</strong>,
-                    })}
-              </p>
+              <Sensitive>
+                <p
+                  className={`product-pricing-profit${profitCents === null ? ' is-pending' : isLoss ? ' is-loss' : ''}`}
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  {profitCents === null
+                    ? t('profitPending')
+                    : t.rich(isLoss ? 'estimatedLoss' : 'estimatedProfit', {
+                        amount: centsToAmount(isLoss ? -profitCents : profitCents),
+                        money: (chunks) => <strong>{chunks}</strong>,
+                      })}
+                </p>
+              </Sensitive>
             </section>
             <section className="editor-block">
               <h2>{t('marketing')}</h2>

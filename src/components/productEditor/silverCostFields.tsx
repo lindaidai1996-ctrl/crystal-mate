@@ -1,5 +1,7 @@
 'use client';
 
+import { Sensitive, usePrivacyMode } from '@/components/privacyMode';
+
 import { Alert, App, Button, Collapse, InputNumber, Spin } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
@@ -15,6 +17,7 @@ export function SilverCostFields({
   onChange: (value: SilverCost) => void;
 }) {
   const t = useTranslations('productSources');
+  const privacyMode = usePrivacyMode();
   const common = useTranslations('common');
   const { message } = App.useApp();
   const [loadError, setLoadError] = useState(false);
@@ -125,19 +128,21 @@ export function SilverCostFields({
                         ['costGramPrice', 'silverCostGramPrice'],
                         ['quoteGramPrice', 'silverQuoteGramPrice'],
                       ] as const
-                    ).map(([field, label]) => (
-                      <label className="source-field" key={field}>
-                        <span>{t(label)}</span>
-                        <InputNumber<string>
-                          stringMode
-                          min="0"
-                          max="9999999999.99"
-                          precision={2}
-                          value={value[field] === '' ? null : value[field]}
-                          onChange={(amount) => onChange({ ...value, [field]: amount ?? '' })}
-                        />
-                      </label>
-                    ))}
+                    )
+                      .filter(([field]) => !privacyMode || field !== 'costGramPrice')
+                      .map(([field, label]) => (
+                        <label className="source-field" key={field}>
+                          <span>{t(label)}</span>
+                          <InputNumber<string>
+                            stringMode
+                            min="0"
+                            max="9999999999.99"
+                            precision={2}
+                            value={value[field] === '' ? null : value[field]}
+                            onChange={(amount) => onChange({ ...value, [field]: amount ?? '' })}
+                          />
+                        </label>
+                      ))}
                     <Button
                       loading={saving}
                       disabled={!canApply}
@@ -148,11 +153,13 @@ export function SilverCostFields({
                   </div>
                   <span className="material-input-help">{t('silverDefaultsHelp')}</span>
                   <div className="source-line-totals">
-                    <span className="source-line-total">
-                      {t('lineCost')}: {totals ? `¥${totals.cost}` : '—'}
-                    </span>
+                    <Sensitive>
+                      <span className="source-line-total">
+                        {t('silverCostSubtotal')}: {totals ? `¥${totals.cost}` : '—'}
+                      </span>
+                    </Sensitive>
                     <span className="source-line-total source-line-quote">
-                      {t('quoteLineTotal')}: {totals ? `¥${totals.quote}` : t('quoteMissing')}
+                      {t('silverQuoteSubtotal')}: {totals ? `¥${totals.quote}` : t('quoteMissing')}
                     </span>
                   </div>
                 </>

@@ -12,31 +12,35 @@ import {
   ExperimentOutlined,
   TagsOutlined,
   TeamOutlined,
+  UserOutlined,
+  EyeInvisibleOutlined,
 } from '@ant-design/icons';
-import { Button, Drawer, Layout, Menu, Select, Tooltip } from 'antd';
+import { Avatar, Button, Drawer, Layout, Menu, Select, Switch, Tooltip } from 'antd';
 import { signOut } from 'next-auth/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { useRef, useState } from 'react';
-import Image from 'next/image';
 import shellStyles from './adminShell.module.css';
 import { catalogPath } from '@/lib/catalog-scopes';
 import { NavigationGuardProvider, useNavigationGuard } from './navigationGuard';
+import type { AccountProfile } from '@/lib/account';
+import { imageThumbnailUrl } from '@/lib/image-storage';
+import { setPrivacyMode, usePrivacyMode } from './privacyMode';
 
 const { Header, Sider, Content } = Layout;
 
 export function AdminShell({
   children,
-  username,
+  account,
   footer,
 }: {
   children: React.ReactNode;
-  username: string;
+  account: AccountProfile;
   footer: React.ReactNode;
 }) {
   return (
     <NavigationGuardProvider>
-      <AdminShellContent username={username} footer={footer}>
+      <AdminShellContent account={account} footer={footer}>
         {children}
       </AdminShellContent>
     </NavigationGuardProvider>
@@ -45,11 +49,11 @@ export function AdminShell({
 
 function AdminShellContent({
   children,
-  username,
+  account,
   footer,
 }: {
   children: React.ReactNode;
-  username: string;
+  account: AccountProfile;
   footer: React.ReactNode;
 }) {
   const { navigate } = useNavigationGuard();
@@ -57,31 +61,34 @@ function AdminShellContent({
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
+  const privacyMode = usePrivacyMode();
   const menuButton = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
-  const selected = pathname.startsWith('/admin/setting-styles')
-    ? 'settingStyles'
-    : pathname.startsWith('/admin/categories')
-      ? 'categories'
-      : pathname.startsWith('/admin/distributors')
-        ? 'distributors'
-        : pathname === '/admin/materials/batches' ||
-            pathname.startsWith('/admin/materials/batches/')
-          ? 'materialBatches'
-          : pathname.startsWith('/admin/materials')
-            ? 'materials'
-            : pathname.startsWith('/admin/tags')
-              ? 'tags'
-              : pathname === catalogPath('cabochons') ||
-                  pathname.startsWith(`${catalogPath('cabochons')}/`)
-                ? 'cabochons'
-                : pathname === catalogPath('finished-strands') ||
-                    pathname.startsWith(`${catalogPath('finished-strands')}/`)
-                  ? 'finishedStrands'
-                  : 'products';
+  const selected = pathname.startsWith('/admin/account')
+    ? 'account'
+    : pathname.startsWith('/admin/setting-styles')
+      ? 'settingStyles'
+      : pathname.startsWith('/admin/categories')
+        ? 'categories'
+        : pathname.startsWith('/admin/distributors')
+          ? 'distributors'
+          : pathname === '/admin/materials/batches' ||
+              pathname.startsWith('/admin/materials/batches/')
+            ? 'materialBatches'
+            : pathname.startsWith('/admin/materials')
+              ? 'materials'
+              : pathname.startsWith('/admin/tags')
+                ? 'tags'
+                : pathname === catalogPath('cabochons') ||
+                    pathname.startsWith(`${catalogPath('cabochons')}/`)
+                  ? 'cabochons'
+                  : pathname === catalogPath('finished-strands') ||
+                      pathname.startsWith(`${catalogPath('finished-strands')}/`)
+                    ? 'finishedStrands'
+                    : 'products';
   const menu = (
     <Menu
-      theme="dark"
+      theme="light"
       selectedKeys={[selected]}
       items={[
         {
@@ -183,11 +190,35 @@ function AdminShellContent({
   const sidebar = (
     <div className={shellStyles.sidebar}>
       <div className={shellStyles.brand}>
-        <Image src="/images/logo-white.png" alt={t('brand')} width={150} height={130} priority />
-        <strong>{t('brand')}</strong>
+        <span className={shellStyles.brandMark} aria-hidden="true" />
+        <div className={shellStyles.brandName}>
+          <strong>{t('brand')}</strong>
+          <span>CRYSTAL MATE</span>
+        </div>
       </div>
       {menu}
-      <div className={shellStyles.footer}>{username}</div>
+      <div className={shellStyles.footer}>
+        <button
+          type="button"
+          className={shellStyles.accountButton}
+          onClick={() => {
+            navigate(() => router.push('/admin/account'));
+            setOpen(false);
+          }}
+          aria-label={t('account')}
+          aria-current={selected === 'account' ? 'page' : undefined}
+        >
+          <Avatar
+            size={32}
+            src={account.avatarUrl ? imageThumbnailUrl(account.avatarUrl) : undefined}
+            icon={<UserOutlined />}
+          />
+          <span className={shellStyles.accountIdentity}>
+            <strong>{account.nickname || account.username}</strong>
+            <span>{t('account')}</span>
+          </span>
+        </button>
+      </div>
     </div>
   );
 
@@ -207,6 +238,25 @@ function AdminShellContent({
           />
           <div className={shellStyles.context}>{t(selected)}</div>
           <div className={shellStyles.actions}>
+            <Tooltip title={t('privacyModeHint')}>
+              <label className={shellStyles.privacyToggle}>
+                <EyeInvisibleOutlined />
+                <span className={shellStyles.privacyLabel}>{t('privacyMode')}</span>
+                <Switch
+                  size="small"
+                  checked={privacyMode}
+                  onChange={setPrivacyMode}
+                  aria-label={t('privacyMode')}
+                />
+              </label>
+            </Tooltip>
+            <Tooltip title={t('account')}>
+              <Button
+                icon={<UserOutlined />}
+                onClick={() => navigate(() => router.push('/admin/account'))}
+                aria-label={t('account')}
+              />
+            </Tooltip>
             <Select
               aria-label={t('language')}
               value={locale}

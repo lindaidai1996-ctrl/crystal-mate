@@ -6,6 +6,7 @@ import type {
   DistributorPurchaseEntry,
   DistributorPurchaseSummary,
 } from '@/lib/client-types';
+import { Sensitive } from '@/components/privacyMode';
 
 type PriceRow = DistributorPurchaseEntry | DistributorPurchaseSummary;
 
@@ -24,10 +25,12 @@ export function distributorPurchasePriceColumns<Row extends PriceRow>(
         return '—';
       const value: string | DistributorPriceRange | null = row[field];
       if (value === null) return t('unknownValue');
-      if (typeof value === 'string') return value;
+      if (typeof value === 'string')
+        return field === 'childUnitPrice' ? <Sensitive>{value}</Sensitive> : value;
       if (value.min === null || value.max === null) return t('unknownValue');
       const price = value.min === value.max ? value.min : `${value.min} ~ ${value.max}`;
-      return `${price}${value.hasUnknown ? ` · ${t('hasUnknown')}` : ''}`;
+      const label = `${price}${value.hasUnknown ? ` · ${t('hasUnknown')}` : ''}`;
+      return field === 'childUnitPrice' ? <Sensitive>{label}</Sensitive> : label;
     },
   }));
 }

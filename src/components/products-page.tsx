@@ -628,13 +628,8 @@ export function ProductsPage({
       variant={isFinishedStrands ? 'underlined' : undefined}
       theme={isFinishedStrands ? underlinedTheme : undefined}
     >
-      <div
-        className={isFinishedStrands ? catalogStyles.catalog : undefined}
-        data-density={isFinishedStrands ? density : undefined}
-      >
-        <div
-          className={isFinishedStrands ? `page-heading ${catalogStyles.toolbar}` : 'page-heading'}
-        >
+      <div className={catalogStyles.catalog} data-density={isFinishedStrands ? density : undefined}>
+        <div className={`page-heading ${catalogStyles.toolbar}`}>
           <div>
             <h1>{scope ? common(scope.titleKey) : t('title')}</h1>
             <p>{t('count', { count: data.total })}</p>

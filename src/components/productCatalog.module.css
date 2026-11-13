@@ -10,11 +10,9 @@
 }
 
 .toolbar {
-  min-height: 72px;
+  min-height: 44px;
   align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--ant-color-border-secondary);
+  margin-bottom: 20px;
 }
 
 .toolbar p {
@@ -23,13 +21,13 @@
 }
 
 .catalog :global(.filter-bar) {
-  gap: 16px;
-  padding: 12px 0 24px;
+  gap: 12px;
+  padding: 0 0 20px;
 }
 
 .catalog :global(.product-origin-filter) {
   min-height: 44px;
-  border-radius: 0;
+  border-radius: 8px;
 }
 
 .filters :global(.filter-search) {
@@ -55,7 +53,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 12px 0 28px;
+  padding: 8px 0 24px;
 }
 
 .results > :global(.ant-select) {
@@ -71,7 +69,7 @@
 
 .table {
   border-inline: 0;
-  border-radius: 0;
+  border-radius: 12px;
   background: transparent;
 }
 
@@ -92,7 +90,7 @@
 .table :global(.material-image-thumb-button) {
   width: var(--catalog-thumb);
   height: var(--catalog-thumb);
-  border-radius: 0;
+  border-radius: 6px;
 }
 
 .table :global(.product-name) {
@@ -113,7 +111,53 @@
   min-width: 0;
   padding: 10px 10px 0;
   border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 12px;
   background: var(--ant-color-bg-container);
+  transition:
+    border-color 240ms ease,
+    box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    translate 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:not(.skeletonCard):hover {
+    border-color: var(--ant-color-primary-border);
+    box-shadow:
+      0 2px 6px rgb(48 72 62 / 2%),
+      0 16px 32px -10px rgb(48 72 62 / 11%);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .card:not(.skeletonCard):hover {
+    translate: 0 -3px;
+  }
+}
+
+.skeletonBody {
+  display: grid;
+  gap: 14px;
+  padding: 20px 4px 24px;
+}
+
+.skeletonTitle {
+  width: 78%;
+  height: 18px;
+}
+
+.skeletonMeta {
+  width: 55%;
+  height: 12px;
+}
+
+.skeletonMeta + .skeletonMeta {
+  width: 65%;
+}
+
+.skeletonPrice {
+  width: 35%;
+  height: 22px;
+  margin-top: 24px;
 }
 
 .cardSelection {
@@ -125,6 +169,7 @@
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
+  border-radius: 7px;
   background: var(--ant-color-fill-alter);
   color: var(--ant-color-text-tertiary);
 }
@@ -173,6 +218,7 @@
   background: var(--ant-color-bg-container);
   color: var(--ant-color-text-secondary);
   border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 5px;
   font-size: 12px;
   pointer-events: none;
 }
@@ -183,6 +229,7 @@
   right: 8px;
   padding: 4px 10px;
   background: var(--ant-color-text);
+  border-radius: 5px;
   color: var(--ant-color-bg-container);
   font-size: 12px;
   font-weight: 500;
@@ -333,6 +380,12 @@
 
 .catalog[data-density='compact'] .cardBody {
   padding-top: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
 }
 
 @media (max-width: 620px) {

@@ -1,0 +1,150 @@
+.surface {
+  position: relative;
+  min-width: 0;
+}
+
+.surface::before {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 0 0 auto;
+  height: 2px;
+  background: var(--ant-color-primary, #4c596a);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
+
+.surface[data-loading='true']::before,
+.surface.pending::before {
+  animation: loading-sweep 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: 150ms;
+}
+
+.indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 20px;
+  height: 20px;
+  color: var(--ant-color-primary, #4c596a);
+}
+
+.indicator > span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: loading-dot 1.1s ease-in-out infinite;
+}
+
+.indicator > span:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.indicator > span:nth-child(3) {
+  animation-delay: 240ms;
+}
+
+.stagger[data-loading='false'] > * {
+  animation: card-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: var(--list-enter-delay, 180ms);
+}
+
+.table.ready :global(.ant-table-tbody > .ant-table-row) {
+  animation: row-enter 320ms ease-out backwards;
+  animation-delay: var(--list-enter-delay, 180ms);
+}
+
+:is(.stagger > *, .table :global(.ant-table-row)):nth-child(1) {
+  --list-enter-delay: 0ms;
+}
+
+:is(.stagger > *, .table :global(.ant-table-row)):nth-child(2) {
+  --list-enter-delay: 30ms;
+}
+
+:is(.stagger > *, .table :global(.ant-table-row)):nth-child(3) {
+  --list-enter-delay: 60ms;
+}
+
+:is(.stagger > *, .table :global(.ant-table-row)):nth-child(4) {
+  --list-enter-delay: 90ms;
+}
+
+:is(.stagger > *, .table :global(.ant-table-row)):nth-child(5) {
+  --list-enter-delay: 120ms;
+}
+
+:is(.stagger > *, .table :global(.ant-table-row)):nth-child(6) {
+  --list-enter-delay: 150ms;
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes row-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes loading-sweep {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  35% {
+    opacity: 0.65;
+    transform: scaleX(0.55);
+  }
+  75% {
+    opacity: 0.35;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes loading-dot {
+  0%,
+  70%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface[data-loading='true']::before,
+  .surface.pending::before {
+    animation: none;
+    opacity: 0.45;
+    transform: none;
+  }
+
+  .indicator > span,
+  .stagger[data-loading='false'] > *,
+  .table.ready :global(.ant-table-tbody > .ant-table-row) {
+    animation: none;
+  }
+}

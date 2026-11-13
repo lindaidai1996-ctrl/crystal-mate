@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { importDraftSchema, type ImageImport } from './contracts';
 import { patchImportItem } from './materialDraft';
+import { isImportHistory } from './history';
 
 const prefix = 'crystal-mate:material-image-import:';
 const lastKey = `${prefix}last`;
@@ -88,7 +89,7 @@ export function nextPendingItem(job: ImageImport, afterId: string | null) {
 
 export function canRestoreImport(job: ImageImport) {
   return !(
-    job.archivedAt ||
+    isImportHistory(job) ||
     (job.status === 'PROCESSING' &&
       job.leaseUntil &&
       new Date(job.leaseUntil).getTime() > Date.now())
@@ -137,6 +138,11 @@ export class ImportDraftSession {
     if (!job || recovery) return;
     try {
       const storage = this.storage();
+      if (isImportHistory(job)) {
+        storage.removeItem(`${prefix}${job.id}`);
+        if (storage.getItem(lastKey) === job.id) storage.removeItem(lastKey);
+        return;
+      }
       storage.setItem(
         `${prefix}${job.id}`,
         JSON.stringify({
@@ -170,6 +176,10 @@ export class ImportDraftSession {
   }
 
   open(job: ImageImport) {
+    if (isImportHistory(job)) {
+      this.accept(job);
+      return;
+    }
     let backup: Backup | null = null;
     try {
       const raw = this.storage().getItem(`${prefix}${job.id}`);
@@ -258,7 +268,12 @@ export class ImportDraftSession {
   }
 
   edit(transform: (job: ImageImport) => ImageImport) {
-    if (!this.state.job || this.state.job.archivedAt || this.state.saving || this.state.recovery)
+    if (
+      !this.state.job ||
+      isImportHistory(this.state.job) ||
+      this.state.saving ||
+      this.state.recovery
+    )
       return;
     this.update({ job: transform(this.state.job), dirty: true, restored: false });
     this.persist();

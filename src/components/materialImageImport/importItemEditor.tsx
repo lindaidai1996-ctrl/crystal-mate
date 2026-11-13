@@ -26,6 +26,7 @@ import { CropPreview } from './importImageCanvas';
 import { ExistingMaterialSelect } from './existingMaterialSelect';
 import { normalizeAliases } from '@/lib/catalog-aliases';
 import importStyles from './materialImageImport.module.css';
+import { usePrivacyMode } from '@/components/privacyMode';
 
 export function ImportItemEditor({
   item,
@@ -51,6 +52,7 @@ export function ImportItemEditor({
   onUploadingChange: (uploading: boolean) => void;
 }) {
   const t = useTranslations('imageImport');
+  const privacyMode = usePrivacyMode();
   const data = item.data;
   const locked = disabled || !!item.entryId;
   const material = importMaterialDraft(data);
@@ -211,38 +213,42 @@ export function ImportItemEditor({
                 preview
               />
             </div>
-            <div>
-              <span>{t('priceEvidence')}</span>
-              {data.priceBox ? (
-                <CropPreview
-                  sourceRatio={sourceRatio}
-                  url={sourceUrl}
-                  box={data.priceBox}
-                  label={t('priceEvidence')}
-                  size={100}
-                  preview
+            {(!privacyMode || data.priceKind === 'SALE') && (
+              <div>
+                <span>{t('priceEvidence')}</span>
+                {data.priceBox ? (
+                  <CropPreview
+                    sourceRatio={sourceRatio}
+                    url={sourceUrl}
+                    box={data.priceBox}
+                    label={t('priceEvidence')}
+                    size={100}
+                    preview
+                  />
+                ) : (
+                  <p className={importStyles.hint}>{t('noPriceBox')}</p>
+                )}
+                <Tag>{data.priceText || '—'}</Tag>
+              </div>
+            )}
+          </div>
+          {!privacyMode && (
+            <div className={importStyles.priceMeaning}>
+              <Form.Item label={t('priceKind')}>
+                <Select
+                  value={data.priceKind}
+                  options={[
+                    { value: 'PURCHASE', label: t('purchase') },
+                    { value: 'SALE', label: t('sale') },
+                  ]}
+                  onChange={(priceKind) => onChange({ priceKind, reviewed: false })}
                 />
-              ) : (
-                <p className={importStyles.hint}>{t('noPriceBox')}</p>
-              )}
-              <Tag>{data.priceText || '—'}</Tag>
+              </Form.Item>
+              <p className={importStyles.hint}>
+                {t('prefillHelp', { price: data.priceText || '—' })}
+              </p>
             </div>
-          </div>
-          <div className={importStyles.priceMeaning}>
-            <Form.Item label={t('priceKind')}>
-              <Select
-                value={data.priceKind}
-                options={[
-                  { value: 'PURCHASE', label: t('purchase') },
-                  { value: 'SALE', label: t('sale') },
-                ]}
-                onChange={(priceKind) => onChange({ priceKind, reviewed: false })}
-              />
-            </Form.Item>
-            <p className={importStyles.hint}>
-              {t('prefillHelp', { price: data.priceText || '—' })}
-            </p>
-          </div>
+          )}
         </div>
         <Collapse
           ghost

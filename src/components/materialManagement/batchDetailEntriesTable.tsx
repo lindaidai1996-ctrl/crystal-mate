@@ -12,6 +12,7 @@ import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
 import { ImageHoverPreview } from './imageHoverPreview';
 import { useSessionListState } from '@/components/useSessionListState';
 import { withAdminReturnTo } from '@/lib/admin-return-path';
+import { Sensitive, usePrivacyMode } from '@/components/privacyMode';
 
 export type BatchEntryType = 'all' | 'product' | 'material';
 type BatchEntryRow =
@@ -33,6 +34,7 @@ export function BatchDetailEntriesTable({
 }) {
   const t = useTranslations('materialBatches');
   const common = useTranslations('common');
+  const privacyMode = usePrivacyMode();
   const inventory = useTranslations('inventory');
   const editor = useTranslations('materialEditor');
   const [page, setPage] = useSessionListState(`material-batch-detail:${batch.id}:${type}:page`, 1);
@@ -171,9 +173,11 @@ export function BatchDetailEntriesTable({
         if (row.type === 'product')
           return (
             <div className="material-batch-names">
-              <div>
-                {t('purchaseUnitPrice')}: {price(row.entry.unitCost, suffix)}
-              </div>
+              <Sensitive>
+                <div>
+                  {t('purchaseUnitPrice')}: {price(row.entry.unitCost, suffix)}
+                </div>
+              </Sensitive>
               <div>
                 {t('salePrice')}: {price((row.entry.product.priceCents / 100).toFixed(2), suffix)}
               </div>
@@ -186,7 +190,9 @@ export function BatchDetailEntriesTable({
             ? ` (${t(`priceSource_${entry.unitPriceSource}`)})`
             : '';
         const gramPrices = [
-          `${t('gramPrice')}: ${price(entry.purchaseGramPrice, editor('yuanPerGram'))}`,
+          ...(!privacyMode
+            ? [`${t('gramPrice')}: ${price(entry.purchaseGramPrice, editor('yuanPerGram'))}`]
+            : []),
           ...(entry.saleGramPrice === null
             ? []
             : [`${t('saleGramPrice')}: ${price(entry.saleGramPrice, editor('yuanPerGram'))}`]),
@@ -194,7 +200,7 @@ export function BatchDetailEntriesTable({
         const beadPrices =
           entry.material.unit === 'STRAND'
             ? [
-                ...(entry.childUnitPrice === null
+                ...(privacyMode || entry.childUnitPrice === null
                   ? []
                   : [
                       `${t('purchaseBeadPrice')}: ${price(entry.childUnitPrice, editor('yuanPerBead'))}`,
@@ -209,18 +215,22 @@ export function BatchDetailEntriesTable({
         return (
           <div className="material-batch-names">
             <div>
-              {t('purchaseUnitPrice')}: {price(entry.purchaseUnitPrice, suffix)}
-              {sourceLabel}
-              {' · '}
+              <Sensitive>
+                {t('purchaseUnitPrice')}: {price(entry.purchaseUnitPrice, suffix)}
+                {sourceLabel}
+                {' · '}
+              </Sensitive>
               {t('salePrice')}: {price(gram ? entry.saleGramPrice : entry.saleUnitPrice, suffix)}
             </div>
             {!gram && <span className="material-price-summary">{gramPrices.join(' · ')}</span>}
             {beadPrices.length > 0 && (
               <span className="material-price-summary">{beadPrices.join(' · ')}</span>
             )}
-            <span className="material-price-summary">
-              {t('totalAmount')}: {price(entry.purchase.totalAmount, editor('yuan'))}
-            </span>
+            <Sensitive>
+              <span className="material-price-summary">
+                {t('totalAmount')}: {price(entry.purchase.totalAmount, editor('yuan'))}
+              </span>
+            </Sensitive>
           </div>
         );
       },

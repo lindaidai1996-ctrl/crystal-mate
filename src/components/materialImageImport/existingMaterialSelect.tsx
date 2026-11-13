@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/client-api';
 import type { Material, MaterialPage, ProductImage } from '@/lib/client-types';
 import importStyles from './materialImageImport.module.css';
+import { Sensitive } from '@/components/privacyMode';
 
 export function ExistingMaterialSelect({
   value,
@@ -168,17 +169,19 @@ export function ExistingMaterialSelect({
                     {entry.distributor?.name && ` · ${entry.distributor.name}`}
                   </span>
                 )}
-                <span>
-                  {batchT('purchaseUnitPrice')}:{' '}
-                  {prices.purchaseUnitPrice == null
-                    ? '—'
-                    : `¥${prices.purchaseUnitPrice}/${editor(material.unit)}`}
-                  {' · '}
-                  {batchT('gramPrice')}:{' '}
-                  {prices.purchaseGramPrice == null
-                    ? '—'
-                    : `¥${prices.purchaseGramPrice}/${editor('GRAM')}`}
-                </span>
+                <Sensitive>
+                  <span>
+                    {batchT('purchaseUnitPrice')}:{' '}
+                    {prices.purchaseUnitPrice == null
+                      ? '—'
+                      : `¥${prices.purchaseUnitPrice}/${editor(material.unit)}`}
+                    {' · '}
+                    {batchT('gramPrice')}:{' '}
+                    {prices.purchaseGramPrice == null
+                      ? '—'
+                      : `¥${prices.purchaseGramPrice}/${editor('GRAM')}`}
+                  </span>
+                </Sensitive>
               </div>
             </div>
           );
