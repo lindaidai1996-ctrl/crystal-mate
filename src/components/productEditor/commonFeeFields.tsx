@@ -195,6 +195,7 @@ export function CommonFeeFields({
               </label>
               <Button
                 className={commonFeeStyles.remove}
+                danger
                 icon={<DeleteOutlined />}
                 aria-label={`${t('removeExtra')} ${fee.name}`}
                 title={t('removeExtra')}

@@ -1,0 +1,98 @@
+.batchList,
+.batchGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.batchGroup > a {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.batchGroup > :global(.ant-btn) {
+  align-self: flex-start;
+}
+
+.batchList {
+  gap: 16px;
+}
+
+.batchGroup + .batchGroup {
+  padding-top: 12px;
+  border-top: 1px solid var(--ant-color-border-secondary);
+}
+
+.priceGrid {
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--ant-color-fill-alter);
+}
+
+.priceRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.priceRow + .priceRow {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--ant-color-border-secondary);
+}
+
+.priceCell {
+  min-width: 0;
+}
+
+.priceCell[data-sale='true'] {
+  grid-column: 2;
+}
+
+.priceCell dt,
+.priceCell small {
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.priceCell dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 4px;
+  margin: 4px 0 0;
+  color: var(--ant-color-text);
+  overflow-wrap: anywhere;
+}
+
+.priceCell strong {
+  font-size: 16px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+}
+
+.priceCell[data-sale='true'] strong {
+  color: var(--ant-color-primary);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.priceCell dd span {
+  color: var(--ant-color-text-secondary);
+  font-size: 11px;
+}
+
+.priceRow:has(> :only-child) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.priceCell[data-sale='true']:only-child {
+  grid-column: 1;
+}

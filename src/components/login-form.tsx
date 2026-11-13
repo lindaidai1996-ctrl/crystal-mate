@@ -55,12 +55,9 @@ export function LoginForm() {
           <div className={loginStyles.lightVeil} />
         </div>
         <header className={loginStyles.header}>
-          <div className={loginStyles.brand}>
-            <span className={loginStyles.brandMark} aria-hidden="true" />
-            <span className={loginStyles.brandName}>
-              <strong>{common('brand')}</strong>
-              <span>CRYSTAL MATE</span>
-            </span>
+          <div className={loginStyles.brandName}>
+            <strong>{common('brand')}</strong>
+            <span>CRYSTAL MATE</span>
           </div>
           <div className={loginStyles.headerActions}>
             <Button
@@ -105,9 +102,6 @@ export function LoginForm() {
           </div>
           <section className={loginStyles.panel} aria-labelledby="login-title">
             <div className={loginStyles.panelHeading}>
-              <span className={loginStyles.welcomeMark} aria-hidden="true">
-                <span />
-              </span>
               <p className={loginStyles.eyebrow}>WELCOME BACK</p>
               <h1 id="login-title">{t('welcome')}</h1>
               <p className={loginStyles.description}>{t('description')}</p>

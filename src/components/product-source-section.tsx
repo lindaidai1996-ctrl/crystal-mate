@@ -367,7 +367,7 @@ function SourceFields({
                 ),
               });
             return (
-              <div className="product-material-row-scroll" key={`material-${index}`}>
+              <div className="product-material-row-container" key={`material-${index}`}>
                 <div className="product-material-row">
                   <div className="product-material-inputs">
                     <div className="source-field source-field-wide">
@@ -395,7 +395,7 @@ function SourceFields({
                         }}
                       />
                     </div>
-                    <div className="source-field">
+                    <div className="source-field source-material-unit-field">
                       <span>{t('usageUnit')}</span>
                       <Radio.Group
                         className="source-material-unit-radio"
@@ -569,6 +569,7 @@ function SourceFields({
                 />
                 <Tooltip title={t('removeCabochon')}>
                   <Button
+                    danger
                     icon={<DeleteOutlined />}
                     aria-label={t('removeCabochon')}
                     onClick={() =>

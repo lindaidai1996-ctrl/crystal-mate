@@ -9,6 +9,7 @@ import type { Product } from '@/lib/client-types';
 import { CatalogGallery, CatalogGalleryImage } from './catalogGallery';
 import { ProductInlineEdit, type ProductQuickEditChange } from './productInlineEdit';
 import { TextTag } from './text-tag';
+import { CatalogNote } from './catalogNote';
 import catalogStyles from './productCatalog.module.css';
 
 export function ProductGallery({
@@ -57,36 +58,46 @@ export function ProductGallery({
               <span>{item.category.name}</span>
               {item.origin && <span>{sources(item.origin)}</span>}
             </div>
-            <div className={`product-tags ${catalogStyles.cardTags}`}>
-              {item.tags.map((tag) => (
-                <TextTag key={tag.id} text={tag.name} />
-              ))}
-            </div>
+            {!!item.tags.length && (
+              <div className={`product-tags ${catalogStyles.cardTags}`}>
+                {item.tags.map((tag) => (
+                  <TextTag key={tag.id} text={tag.name} />
+                ))}
+              </div>
+            )}
+            <CatalogNote text={item.description} />
             {renderDetails && (
               <div className={catalogStyles.cardDetails}>{renderDetails(item)}</div>
             )}
-            <div className={catalogStyles.cardBottom}>
-              <ProductInlineEdit
-                product={item}
-                field="price"
-                onSave={(change) => onQuickEdit(item, change)}
-              >
-                <span className={catalogStyles.money}>
-                  {currency.format(item.priceCents / 100)}
-                </span>
-              </ProductInlineEdit>
-            </div>
+            <dl className={catalogStyles.cardBottom}>
+              <div className={catalogStyles.cardMetric}>
+                <dt>{t('price')}</dt>
+                <dd>
+                  <ProductInlineEdit
+                    product={item}
+                    field="price"
+                    onSave={(change) => onQuickEdit(item, change)}
+                  >
+                    <span className={catalogStyles.money}>
+                      {currency.format(item.priceCents / 100)}
+                    </span>
+                  </ProductInlineEdit>
+                </dd>
+              </div>
+              <div className={catalogStyles.cardMetric}>
+                <dt>{t('stockQuantity')}</dt>
+                <dd className={catalogStyles.stock}>
+                  <ProductInlineEdit
+                    product={item}
+                    field="stock"
+                    onSave={(change) => onQuickEdit(item, change)}
+                  >
+                    {item.stock}
+                  </ProductInlineEdit>
+                </dd>
+              </div>
+            </dl>
             <div className={catalogStyles.cardFooter}>
-              <span className={catalogStyles.stock}>
-                {t('stockQuantity')}
-                <ProductInlineEdit
-                  product={item}
-                  field="stock"
-                  onSave={(change) => onQuickEdit(item, change)}
-                >
-                  {item.stock}
-                </ProductInlineEdit>
-              </span>
               <div className={catalogStyles.cardActions}>{renderActions(item)}</div>
             </div>
           </div>

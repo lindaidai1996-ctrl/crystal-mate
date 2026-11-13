@@ -61,6 +61,7 @@ import { useCategoryCounts } from './useCategoryCounts';
 import categoryStyles from './categoryFilter.module.css';
 import catalogStyles from './productCatalog.module.css';
 import { ProductGallery } from './productGallery';
+import { CatalogNote } from './catalogNote';
 import { underlinedTheme } from '@/lib/ui-theme';
 
 type MarketingFilterValue = '' | 'true' | 'false';
@@ -434,7 +435,7 @@ export function ProductsPage({
             name={item.name}
             coverObjectKey={isFinishedStrands ? (item.images[0]?.objectKey ?? null) : undefined}
           />
-          <div>
+          <div className={catalogStyles.identity}>
             <div className="product-name-line">
               <Link className="product-name" href={`${listPath}/${item.id}`}>
                 {item.name}
@@ -453,6 +454,7 @@ export function ProductsPage({
               )}
             </div>
             <div className="product-code">{item.code}</div>
+            <CatalogNote text={item.description} />
           </div>
         </div>
       ),
@@ -899,26 +901,40 @@ export function ProductsPage({
               isCabochon
                 ? (item) => (
                     <>
-                      <div>
-                        {t('setting')}:{' '}
-                        {item.extraInfo?.settingStyle?.magicBoxStyle ||
-                          editor('unknownSettingStyle')}
+                      <dl className={catalogStyles.cardSpecifications}>
+                        <div>
+                          <dt>{t('setting')}</dt>
+                          <dd>
+                            {item.extraInfo?.settingStyle?.magicBoxStyle ||
+                              editor('unknownSettingStyle')}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>{t('dimensions')}</dt>
+                          <dd>
+                            <ProductInlineEdit
+                              product={item}
+                              field="measurement"
+                              onSave={(change) => saveQuickEdit(item, change)}
+                            >
+                              {formatCabochonMeasurement(
+                                item.measurement,
+                                marketingConfig('missingDimension'),
+                              )}
+                            </ProductInlineEdit>
+                          </dd>
+                        </div>
+                      </dl>
+                      <div className={catalogStyles.cardMarketing}>
+                        <div className={catalogStyles.cardMarketingLabel}>
+                          {editor('marketing')}
+                        </div>
+                        <CabochonMarketingStatus
+                          product={item}
+                          pending={pendingMarketing}
+                          onChange={updateMarketing}
+                        />
                       </div>
-                      <ProductInlineEdit
-                        product={item}
-                        field="measurement"
-                        onSave={(change) => saveQuickEdit(item, change)}
-                      >
-                        {formatCabochonMeasurement(
-                          item.measurement,
-                          marketingConfig('missingDimension'),
-                        )}
-                      </ProductInlineEdit>
-                      <CabochonMarketingStatus
-                        product={item}
-                        pending={pendingMarketing}
-                        onChange={updateMarketing}
-                      />
                     </>
                   )
                 : undefined

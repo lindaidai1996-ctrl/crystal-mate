@@ -3,7 +3,7 @@ import { AntdRegistry } from '@ant-design/nextjs-registry';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Crystal Mate',
+  title: '祝余水晶',
   description: 'Crystal Mate catalog manager',
   icons: { icon: '/images/logo.png' },
 };

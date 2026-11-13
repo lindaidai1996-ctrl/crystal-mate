@@ -49,11 +49,13 @@ import { MaterialBulkDialog } from './materialBulkDialog';
 import { EditorDraftBox } from '@/components/editorDraftBox';
 import { togglePageSelection } from '@/lib/material-bulk';
 import bulkStyles from './materialBulkDialog.module.css';
+import materialStyles from './materialsPage.module.css';
 import { DateRangeFilter } from '@/components/date-range-filter';
 import type { DateRange } from '@/lib/date-range';
 import { useSessionListState } from '@/components/useSessionListState';
 import { withAdminReturnTo } from '@/lib/admin-return-path';
 import { CatalogGallery, CatalogGalleryImage } from '@/components/catalogGallery';
+import { CatalogNote } from '@/components/catalogNote';
 import catalogStyles from '@/components/productCatalog.module.css';
 import motionStyles from '@/components/listMotion.module.css';
 import { usePrivacyMode } from '@/components/privacyMode';
@@ -72,7 +74,7 @@ function initialFilters(query = ''): MaterialFilters {
   return { query, createdRange: null, page: 1, pageSize: MATERIAL_PAGE_SIZE };
 }
 
-function BatchPrices({ item }: { item: Material }) {
+function BatchPrices({ item, card = false }: { item: Material; card?: boolean }) {
   const t = useTranslations('materialBatches');
   const privacyMode = usePrivacyMode();
   const editor = useTranslations('materialEditor');
@@ -82,7 +84,7 @@ function BatchPrices({ item }: { item: Material }) {
   );
   const price = (value: string | null, suffix: string) =>
     value === null ? '—' : `${value} ${suffix}`;
-  const priceText = (
+  const priceRows = (
     value: Pick<
       Material,
       | 'purchaseUnitPrice'
@@ -95,39 +97,120 @@ function BatchPrices({ item }: { item: Material }) {
     > &
       Partial<Pick<MaterialBatchEntry, 'unitPriceSource'>>,
   ) => {
-    const sourceLabel =
+    const source =
       value.unitPriceSource === 'ESTIMATED' || value.unitPriceSource === 'MANUAL'
-        ? ` (${t(`priceSource_${value.unitPriceSource}`)})`
-        : '';
+        ? t(`priceSource_${value.unitPriceSource}`)
+        : undefined;
     return [
-      ...(privacyMode || item.unit === 'GRAM'
-        ? []
-        : [
-            `${t('purchaseUnitPrice')}: ${price(value.purchaseUnitPrice, unitSuffix)}${sourceLabel}`,
-          ]),
-      ...(!privacyMode
-        ? [`${t('gramPrice')}: ${price(value.purchaseGramPrice, editor('yuanPerGram'))}`]
+      [
+        ...(!privacyMode
+          ? [
+              {
+                label: t('purchaseUnitPrice'),
+                value: item.unit === 'GRAM' ? value.purchaseGramPrice : value.purchaseUnitPrice,
+                suffix: unitSuffix,
+                source,
+                sale: false,
+              },
+            ]
+          : []),
+        {
+          label: t('salePrice'),
+          value: item.unit === 'GRAM' ? value.saleGramPrice : value.saleUnitPrice,
+          suffix: unitSuffix,
+          sale: true,
+        },
+      ],
+      ...(item.unit !== 'GRAM' &&
+      (!card || (!privacyMode && value.purchaseGramPrice !== null) || value.saleGramPrice !== null)
+        ? [
+            [
+              ...(!privacyMode
+                ? [
+                    {
+                      label: t('gramPrice'),
+                      value: value.purchaseGramPrice,
+                      suffix: editor('yuanPerGram'),
+                      sale: false,
+                    },
+                  ]
+                : []),
+              ...(value.saleGramPrice !== null
+                ? [
+                    {
+                      label: t('saleGramPrice'),
+                      value: value.saleGramPrice,
+                      suffix: editor('yuanPerGram'),
+                      sale: true,
+                    },
+                  ]
+                : []),
+            ],
+          ]
         : []),
-      `${t('salePrice')}: ${price(item.unit === 'GRAM' ? value.saleGramPrice : value.saleUnitPrice, unitSuffix)}`,
-      ...(item.unit !== 'GRAM' && value.saleGramPrice !== null
-        ? [`${t('saleGramPrice')}: ${price(value.saleGramPrice, editor('yuanPerGram'))}`]
+      ...(item.unit === 'STRAND'
+        ? [
+            [
+              ...(!privacyMode && (value.childCount ?? 0) > 0 && value.childUnitPrice !== null
+                ? [
+                    {
+                      label: t('purchaseBeadPrice'),
+                      value: value.childUnitPrice,
+                      suffix: editor('yuanPerBead'),
+                      sale: false,
+                    },
+                  ]
+                : []),
+              ...(value.saleChildUnitPrice !== null
+                ? [
+                    {
+                      label: t('saleBeadPrice'),
+                      value: value.saleChildUnitPrice,
+                      suffix: editor('yuanPerBead'),
+                      sale: true,
+                    },
+                  ]
+                : []),
+            ],
+          ]
         : []),
-      ...(!privacyMode &&
-      item.unit === 'STRAND' &&
-      (value.childCount ?? 0) > 0 &&
-      value.childUnitPrice !== null
-        ? [`${t('purchaseBeadPrice')}: ${value.childUnitPrice} ${editor('yuanPerBead')}`]
-        : []),
-      ...(item.unit === 'STRAND' && value.saleChildUnitPrice !== null
-        ? [`${t('saleBeadPrice')}: ${value.saleChildUnitPrice} ${editor('yuanPerBead')}`]
-        : []),
-    ].join(' · ');
+    ].filter((row) => row.length > 0);
   };
+  const priceText = (value: Material | MaterialBatchEntry) =>
+    priceRows(value)
+      .flat()
+      .map(
+        (field) =>
+          `${field.label}: ${price(field.value, field.suffix)}${'source' in field && field.source ? ` (${field.source})` : ''}`,
+      )
+      .join(' · ');
+  const priceDetails = (value: Material | MaterialBatchEntry) =>
+    card ? (
+      <div className={materialStyles.priceGrid}>
+        {priceRows(value).map((row) => (
+          <dl className={materialStyles.priceRow} key={row[0].label}>
+            {row.map((field) => (
+              <div className={materialStyles.priceCell} data-sale={field.sale} key={field.label}>
+                <dt>{field.label}</dt>
+                <dd>
+                  <strong>{field.value ?? '—'}</strong>
+                  {field.value !== null && <span>{field.suffix}</span>}
+                </dd>
+                {'source' in field && field.source && <small>{field.source}</small>}
+              </div>
+            ))}
+          </dl>
+        ))}
+      </div>
+    ) : (
+      <span className="material-price-summary">{priceText(value)}</span>
+    );
   if (!entries.length)
     return (
-      <span className="material-price-summary">
-        {t('unassigned')} · {priceText(item)}
-      </span>
+      <div className={card ? materialStyles.batchGroup : 'material-price-summary'}>
+        <span>{t('unassigned')}</span>
+        {priceDetails(item)}
+      </div>
     );
   const samePrice = entries.every(
     (entry) =>
@@ -145,7 +228,7 @@ function BatchPrices({ item }: { item: Material }) {
   ));
   if (samePrice)
     return (
-      <div className="material-batch-names">
+      <div className={card ? materialStyles.batchGroup : 'material-batch-names'}>
         {links.slice(0, 2)}
         {entries.length > 2 && (
           <Popover
@@ -158,13 +241,13 @@ function BatchPrices({ item }: { item: Material }) {
             </Button>
           </Popover>
         )}
-        <span className="material-price-summary">{priceText(entries[0])}</span>
+        {priceDetails(entries[0])}
       </div>
     );
   return (
-    <div className="material-batch-prices">
+    <div className={card ? materialStyles.batchList : 'material-batch-prices'}>
       {entries.map((entry) => (
-        <div className="material-batch-price" key={entry.id}>
+        <div className={card ? materialStyles.batchGroup : 'material-batch-price'} key={entry.id}>
           <Link
             href={withAdminReturnTo(
               `/admin/materials/batches/${entry.batchId}`,
@@ -173,7 +256,7 @@ function BatchPrices({ item }: { item: Material }) {
           >
             {entry.batch.name}
           </Link>
-          <span>{priceText(entry)}</span>
+          {priceDetails(entry)}
         </div>
       ))}
     </div>
@@ -193,7 +276,7 @@ function MaterialIdentity({ item }: { item: Material }) {
   return (
     <div className="product-cell">
       <ImageHoverPreview images={materialImages(item)} name={item.name} />
-      <div>
+      <div className={catalogStyles.identity}>
         <MaterialEditLink item={item} />
         <MaterialImportSources material={item} />
         {!!item.tags.length && (
@@ -203,6 +286,7 @@ function MaterialIdentity({ item }: { item: Material }) {
             ))}
           </div>
         )}
+        <CatalogNote text={item.notes} />
       </div>
     </div>
   );
@@ -609,14 +693,17 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
                   </span>
                   <span>{t(item.unit)}</span>
                 </div>
-                <div className="product-tags">
-                  {item.tags.map((tag) => (
-                    <TextTag key={tag.id} text={tag.name} />
-                  ))}
-                </div>
+                {!!item.tags.length && (
+                  <div className={`product-tags ${catalogStyles.cardTags}`}>
+                    {item.tags.map((tag) => (
+                      <TextTag key={tag.id} text={tag.name} />
+                    ))}
+                  </div>
+                )}
+                <CatalogNote text={item.notes} />
                 <div className={catalogStyles.cardDetails}>
                   <MaterialStockSummary material={item} />
-                  <BatchPrices item={item} />
+                  <BatchPrices item={item} card />
                 </div>
                 <div className={catalogStyles.cardActions}>
                   <MaterialActions item={item} onRemove={remove} onSaved={refreshStock} />

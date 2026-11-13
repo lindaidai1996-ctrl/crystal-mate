@@ -83,20 +83,6 @@
   padding: 18px clamp(24px, 4.5vw, 76px);
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-}
-
-.brandMark {
-  width: 49px;
-  height: 43px;
-  flex: none;
-  background: var(--login-sage);
-  mask: url('/images/logo-white.png') center / contain no-repeat;
-}
-
 .brandName {
   display: grid;
   gap: 3px;
@@ -278,23 +264,7 @@
 }
 
 .panelHeading {
-  position: relative;
   margin-bottom: 18px;
-}
-
-.welcomeMark {
-  position: absolute;
-  top: 2px;
-  right: 0;
-  width: 42px;
-  height: 37px;
-  background: #8ba48c;
-  mask: url('/images/logo-white.png') center / contain no-repeat;
-}
-
-.eyebrow,
-.panel h1 {
-  padding-right: 50px;
 }
 
 .eyebrow {
@@ -528,13 +498,6 @@
   .brandName > span {
     font-size: 8px;
     letter-spacing: 1.5px;
-  }
-  .brand {
-    gap: 10px;
-  }
-  .brandMark {
-    width: 42px;
-    height: 36px;
   }
   .content {
     display: flex;

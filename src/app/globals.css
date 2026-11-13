@@ -519,23 +519,36 @@ body {
   padding-bottom: 14px;
   border-bottom: 1px solid var(--ant-color-border-secondary);
 }
-.product-material-row-scroll {
+.product-material-row-container {
   min-width: 0;
-  overflow-x: auto;
 }
 .product-material-row {
   display: grid;
   gap: 8px;
-  min-width: 1040px;
+  min-width: 0;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--ant-color-border-secondary);
 }
 .product-material-inputs {
-  display: grid;
-  grid-template-columns: minmax(240px, 340px) max-content 96px 112px 112px max-content 32px;
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
   align-items: end;
-  justify-content: start;
   gap: 20px;
+}
+.product-material-inputs > .source-field {
+  flex: 1 1 112px;
+}
+.product-material-inputs > .source-field-wide {
+  flex: 2 1 240px;
+  max-width: 340px;
+}
+.product-material-inputs > .source-material-unit-field {
+  flex: 0 1 auto;
+}
+.product-material-inputs > .ant-btn {
+  flex: none;
+  margin-inline-start: auto;
 }
 .source-material-unit-radio {
   display: flex;
@@ -556,6 +569,8 @@ body {
   font-size: 16px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .source-field {
   display: grid;
@@ -747,6 +762,7 @@ body {
   gap: 8px 20px;
 }
 .product-material-inputs .source-line-totals {
+  min-width: 0;
   grid-template-columns: minmax(0, 1fr);
 }
 .product-source-material-totals {
