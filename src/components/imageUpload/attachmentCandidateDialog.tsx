@@ -1,12 +1,13 @@
 'use client';
 
+import { LazyPreviewImage } from '@/components/loadingImage';
+
 import {
   Alert,
   App,
   Button,
   Checkbox,
   Empty,
-  Image,
   Input,
   Modal,
   Pagination,
@@ -190,7 +191,7 @@ export function AttachmentCandidateDialog({
                     className={`${styles.card} ${checked ? styles.selected : ''}`}
                     key={`${item.type}:${item.itemId}`}
                   >
-                    <Image
+                    <LazyPreviewImage
                       src={imageThumbnailUrl(item.url, 640)}
                       preview={{ src: item.url }}
                       loading="lazy"

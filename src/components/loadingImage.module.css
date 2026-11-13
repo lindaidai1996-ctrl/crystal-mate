@@ -1,0 +1,48 @@
+.skeleton {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 1px;
+}
+
+.skeleton,
+.loading {
+  color: transparent;
+  background: linear-gradient(
+    100deg,
+    var(--ant-color-fill-secondary, #ededed) 25%,
+    var(--ant-color-fill, #e3e3e3) 45%,
+    var(--ant-color-fill-secondary, #ededed) 65%
+  ) !important;
+  background-size: 250% 100% !important;
+  animation: image-shimmer 1.5s ease-in-out infinite;
+}
+
+.frame {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.pending {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+@keyframes image-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton,
+  .loading {
+    animation: none;
+  }
+}

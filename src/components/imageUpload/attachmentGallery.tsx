@@ -1,5 +1,7 @@
 'use client';
 
+import { LazyPreviewImage } from '@/components/loadingImage';
+
 import {
   ArrowRightOutlined,
   EditOutlined,
@@ -213,7 +215,7 @@ export function AttachmentGallery({
             <div className={`batch-detail-attachment-list ${galleryStyles.gallery}`}>
               {attachments.map((attachment) => (
                 <div className="batch-detail-attachment" key={attachment.objectKey}>
-                  <Image
+                  <LazyPreviewImage
                     src={imageThumbnailUrl(attachment.url, 640)}
                     preview={{ src: attachment.url }}
                     loading="lazy"

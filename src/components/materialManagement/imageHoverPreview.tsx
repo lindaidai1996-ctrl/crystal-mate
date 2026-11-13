@@ -2,7 +2,7 @@
 
 import { LeftOutlined, PictureOutlined, RightOutlined } from '@ant-design/icons';
 import { Button, Image, Popover } from 'antd';
-import NextImage from 'next/image';
+import { LoadingImage } from '@/components/loadingImage';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { imageThumbnailUrl } from '@/lib/image-storage';
@@ -46,7 +46,7 @@ export function ImageHoverPreview({
       aria-label={t('previewImage')}
       onClick={() => setPreviewOpen(true)}
     >
-      <NextImage
+      <LoadingImage
         unoptimized
         width={44}
         height={44}
@@ -78,7 +78,7 @@ export function ImageHoverPreview({
                 onClick={() => setPreviewOpen(true)}
                 aria-label={t('previewImage')}
               >
-                <NextImage
+                <LoadingImage
                   unoptimized
                   width={280}
                   height={280}

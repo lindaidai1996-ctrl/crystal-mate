@@ -1,9 +1,11 @@
 'use client';
 
+import { LazyPreviewImage } from '@/components/loadingImage';
+
 import { imageThumbnailUrl } from '@/lib/image-storage';
 
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { App, Button, Image, Input, Spin, Tag, Tooltip } from 'antd';
+import { App, Button, Input, Spin, Tag, Tooltip } from 'antd';
 import { useState } from 'react';
 import type { MaterialBatchAttachment } from '@/lib/client-types';
 import { useTranslations } from 'next-intl';
@@ -171,7 +173,7 @@ export function BatchAttachmentPicker({
       )}
       {attachments.map((attachment, index) => (
         <div className="batch-attachment" key={attachment.objectKey}>
-          <Image
+          <LazyPreviewImage
             src={imageThumbnailUrl(attachment.url)}
             preview={{ src: attachment.url }}
             loading="lazy"

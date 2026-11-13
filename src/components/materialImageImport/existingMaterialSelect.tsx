@@ -5,7 +5,7 @@ import { imageThumbnailUrl } from '@/lib/image-storage';
 import { useEffect, useState } from 'react';
 import { PictureOutlined } from '@ant-design/icons';
 import { Button, Empty, Form, Image, Select, Spin } from 'antd';
-import NextImage from 'next/image';
+import { LoadingImage } from '@/components/loadingImage';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/client-api';
 import type { Material, MaterialPage, ProductImage } from '@/lib/client-types';
@@ -138,7 +138,7 @@ export function ExistingMaterialSelect({
                     aria-label={sourcesT('viewMaterialImages', { name: material.name })}
                     onClick={() => setPreview({ name: material.name, images, current: 0 })}
                   >
-                    <NextImage
+                    <LoadingImage
                       unoptimized
                       src={imageThumbnailUrl(images[0].url)}
                       alt=""

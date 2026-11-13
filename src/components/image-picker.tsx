@@ -15,6 +15,7 @@ import { imageThumbnailUrl, type ImageUploadPurpose } from '@/lib/image-storage'
 import { ImageUploadChoiceDialog } from './imageUpload/imageUploadChoiceDialog';
 import { AttachmentImageEditor } from './imageUpload/attachmentImageEditor';
 import { uploadImage } from './imageUpload/uploadImage';
+import { LoadingImage } from './loadingImage';
 
 export function ImagePicker({
   images,
@@ -147,7 +148,7 @@ export function ImagePicker({
           previewIcon: <ZoomInOutlined style={{ color: '#fff' }} />,
           removeIcon: <DeleteOutlined style={{ color: '#fff' }} />,
         }}
-        itemRender={(originNode, file) => (
+        itemRender={(_originNode, file, _files, actions) => (
           <Tooltip title={t('reorderImages')}>
             <div
               className="image-picker-sortable"
@@ -166,7 +167,39 @@ export function ImagePicker({
                 }
               }}
             >
-              {originNode}
+              <div className="ant-upload-list-item ant-upload-list-item-done">
+                <button
+                  type="button"
+                  className="ant-upload-list-item-thumbnail"
+                  aria-label={`${t('previewImage')} ${file.name}`}
+                  onClick={actions.preview}
+                >
+                  <LoadingImage
+                    src={file.thumbUrl || file.url!}
+                    alt={file.name}
+                    width={104}
+                    height={104}
+                    className="ant-upload-list-item-image"
+                  />
+                </button>
+                <span className="ant-upload-list-item-actions">
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<ZoomInOutlined />}
+                    aria-label={`${t('previewImage')} ${file.name}`}
+                    onClick={actions.preview}
+                  />
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<DeleteOutlined />}
+                    disabled={busy}
+                    aria-label={`${common('delete')} ${file.name}`}
+                    onClick={actions.remove}
+                  />
+                </span>
+              </div>
               <Tooltip title={imageT('editImage')}>
                 <Button
                   className="image-picker-edit"

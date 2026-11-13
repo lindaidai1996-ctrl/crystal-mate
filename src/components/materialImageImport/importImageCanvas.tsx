@@ -1,5 +1,7 @@
 'use client';
 
+import { LoadingImage } from '@/components/loadingImage';
+
 import { useRef, useState, type PointerEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Checkbox, Modal, Radio, Select, Space } from 'antd';
@@ -25,10 +27,24 @@ export function CropPreview({
   const ratio = (box.width * sourceRatio) / box.height;
   const cropStyle = {
     aspectRatio: String(ratio),
-    backgroundImage: `url(${JSON.stringify(url)})`,
-    backgroundSize: `${100000 / box.width}% ${100000 / box.height}%`,
-    backgroundPosition: `${box.width === 1000 ? 0 : (box.x / (1000 - box.width)) * 100}% ${box.height === 1000 ? 0 : (box.y / (1000 - box.height)) * 100}%`,
   };
+  const cropImage = (
+    <LoadingImage
+      src={url}
+      alt=""
+      width={Math.round(sourceRatio * 1000)}
+      height={1000}
+      draggable={false}
+      style={{
+        position: 'absolute',
+        maxWidth: 'none',
+        width: `${100000 / box.width}%`,
+        height: `${100000 / box.height}%`,
+        left: `${(-box.x / box.width) * 100}%`,
+        top: `${(-box.y / box.height) * 100}%`,
+      }}
+    />
+  );
   const thumbnail = (
     <div
       className={importStyles.cropPreview}
@@ -38,7 +54,9 @@ export function CropPreview({
         ...cropStyle,
         width: `${Math.min(size, size * ratio)}px`,
       }}
-    />
+    >
+      {cropImage}
+    </div>
   );
 
   if (!preview) return thumbnail;
@@ -68,7 +86,9 @@ export function CropPreview({
             role="img"
             aria-label={label}
             style={{ ...cropStyle, width: `min(100%, calc(70dvh * ${ratio}))` }}
-          />
+          >
+            {cropImage}
+          </div>
         </div>
       </Modal>
     </>
@@ -196,8 +216,14 @@ export function ImportImageCanvas({
           }}
         >
           {/* The authenticated source retains its original pixel geometry at every zoom level. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={job.sourceUrl} alt={job.fileName} draggable={false} />
+          <LoadingImage
+            src={job.sourceUrl}
+            alt={job.fileName}
+            width={job.width}
+            height={job.height}
+            draggable={false}
+            loading="eager"
+          />
           {outlines.map(
             ({ field, box, original }) =>
               box && (

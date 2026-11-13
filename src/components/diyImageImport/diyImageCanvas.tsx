@@ -1,5 +1,7 @@
 'use client';
 
+import { LoadingImage } from '@/components/loadingImage';
+
 import { useRef, useState, type PointerEvent } from 'react';
 import { Button, Select, Space } from 'antd';
 import { useTranslations } from 'next-intl';
@@ -93,8 +95,14 @@ export function DiyImageCanvas({
           }}
         >
           {/* The image keeps its source geometry so normalized evidence boxes stay aligned. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image.url} alt={image.fileName} draggable={false} />
+          <LoadingImage
+            src={image.url}
+            alt={image.fileName}
+            width={image.width}
+            height={image.height}
+            draggable={false}
+            loading="eager"
+          />
           {parts
             .filter((part) => !part.excluded)
             .flatMap((part, index) => {

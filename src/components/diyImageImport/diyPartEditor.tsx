@@ -1,5 +1,7 @@
 'use client';
 
+import { LazyPreviewImage } from '@/components/loadingImage';
+
 import { imageThumbnailUrl } from '@/lib/image-storage';
 
 import { useEffect, useRef, useState } from 'react';
@@ -333,7 +335,7 @@ export function DiyPartEditor({
                 {previewCabochon && (
                   <Image.PreviewGroup>
                     {cabochon.images.map((image) => (
-                      <Image
+                      <LazyPreviewImage
                         key={image.objectKey}
                         width={80}
                         src={imageThumbnailUrl(image.url)}

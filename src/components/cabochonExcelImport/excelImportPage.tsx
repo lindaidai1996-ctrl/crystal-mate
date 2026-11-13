@@ -1,5 +1,7 @@
 'use client';
 
+import { LazyPreviewImage } from '@/components/loadingImage';
+
 import { imageThumbnailUrl } from '@/lib/image-storage';
 
 import { useRef, useState } from 'react';
@@ -85,7 +87,7 @@ export function ExcelImportPage({ initialId }: { initialId?: string }) {
           [];
         return images.length ? (
           <Image.PreviewGroup items={images}>
-            <Image
+            <LazyPreviewImage
               className={layout.thumbnail}
               width={52}
               height={52}

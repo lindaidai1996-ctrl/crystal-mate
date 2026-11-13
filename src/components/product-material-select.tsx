@@ -1,8 +1,8 @@
 'use client';
 
 import { ExportOutlined, LeftOutlined, PictureOutlined, RightOutlined } from '@ant-design/icons';
-import { Alert, Button, Modal, Popover, Select, Spin } from 'antd';
-import NextImage from 'next/image';
+import { Alert, Button, Modal, Popover, Select } from 'antd';
+import { LoadingImage, ImageSkeleton } from '@/components/loadingImage';
 import { useTranslations } from 'next-intl';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -344,7 +344,7 @@ export function useMaterialImagePreview() {
             }
           />
         ) : src ? (
-          <NextImage
+          <LoadingImage
             unoptimized
             src={src}
             alt={preview.option.material.name}
@@ -353,7 +353,7 @@ export function useMaterialImagePreview() {
             onError={() => setError(true)}
           />
         ) : (
-          <Spin />
+          <ImageSkeleton />
         )}
       </div>
       {images.length > 1 && (

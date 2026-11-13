@@ -1361,6 +1361,15 @@ body {
   height: 100%;
   object-fit: cover !important;
 }
+.image-picker-upload button.ant-upload-list-item-thumbnail {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+.image-picker-upload .ant-upload-list-item-actions .ant-btn {
+  color: #fff;
+}
 .image-picker-upload .ant-upload-list-item-actions a,
 .image-picker-upload .ant-upload-list-item-actions a:hover {
   color: #fff;
