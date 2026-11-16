@@ -1,0 +1,333 @@
+{
+  "checkedAt": "2026-11-16T09:19:55.911Z",
+  "decision": "defer-semantic-index",
+  "frozen": {
+    "fullScope": {
+      "candidateCount": 44,
+      "missingExpected": [],
+      "expectedIncludesRetained": 11,
+      "otherCandidates": 33
+    },
+    "lexicalUnion": {
+      "candidateCount": 32,
+      "missingExpected": [],
+      "expectedIncludesRetained": 11,
+      "otherCandidates": 21
+    },
+    "sourceCounts": [
+      {
+        "route": "aliases",
+        "candidateCount": 2
+      },
+      {
+        "route": "category",
+        "candidateCount": 28
+      },
+      {
+        "route": "full_scope",
+        "candidateCount": 44
+      },
+      {
+        "route": "name",
+        "candidateCount": 24
+      },
+      {
+        "route": "tag",
+        "candidateCount": 25
+      }
+    ],
+    "offlineAnnotationMs": 2.6222910000000184
+  },
+  "constructed": {
+    "fullScope": {
+      "candidateCount": 13,
+      "missingExpected": [],
+      "expectedIncludesRetained": 5,
+      "otherCandidates": 8
+    },
+    "lexicalUnion": {
+      "candidateCount": 11,
+      "missingExpected": [],
+      "expectedIncludesRetained": 5,
+      "otherCandidates": 6
+    },
+    "sourceCounts": [
+      {
+        "route": "aliases",
+        "candidateCount": 1
+      },
+      {
+        "route": "category",
+        "candidateCount": 6
+      },
+      {
+        "route": "full_scope",
+        "candidateCount": 13
+      },
+      {
+        "route": "name",
+        "candidateCount": 10
+      },
+      {
+        "route": "notes",
+        "candidateCount": 1
+      },
+      {
+        "route": "tag",
+        "candidateCount": 5
+      }
+    ],
+    "offlineAnnotationMs": 0.40033299999998917
+  },
+  "measurements": [
+    {
+      "file": "docs/plans/ai-assistant/verification/2026-11-16-p3-03-05-frozen-real-core.json",
+      "source": "frozen-and-constructed",
+      "databaseReadMs": null,
+      "results": [
+        {
+          "label": "frozen-core",
+          "repetition": 1,
+          "durationMs": 10570,
+          "usage": {
+            "calls": 1,
+            "reservedTokens": 127885,
+            "knownPromptTokens": 41376,
+            "knownCompletionTokens": 3210,
+            "unknownUsageCalls": 0
+          },
+          "differences": [],
+          "recall": 1,
+          "precision": 1
+        },
+        {
+          "label": "frozen-core",
+          "repetition": 2,
+          "durationMs": 10003,
+          "usage": {
+            "calls": 1,
+            "reservedTokens": 127885,
+            "knownPromptTokens": 41376,
+            "knownCompletionTokens": 3210,
+            "unknownUsageCalls": 0
+          },
+          "differences": [],
+          "recall": 1,
+          "precision": 1
+        },
+        {
+          "label": "frozen-core",
+          "repetition": 3,
+          "durationMs": 10252,
+          "usage": {
+            "calls": 1,
+            "reservedTokens": 127885,
+            "knownPromptTokens": 41376,
+            "knownCompletionTokens": 3212,
+            "unknownUsageCalls": 0
+          },
+          "differences": [],
+          "recall": 1,
+          "precision": 1
+        }
+      ]
+    },
+    {
+      "file": "docs/plans/ai-assistant/verification/2026-11-16-p3-03-05-frozen-real-core-incomplete-evidence.json",
+      "source": "frozen-and-constructed",
+      "databaseReadMs": null,
+      "results": [
+        {
+          "label": "frozen-core",
+          "repetition": 1,
+          "durationMs": 9979,
+          "usage": {
+            "calls": 1,
+            "reservedTokens": 125156,
+            "knownPromptTokens": 40447,
+            "knownCompletionTokens": 3186,
+            "unknownUsageCalls": 0
+          },
+          "differences": [
+            {
+              "key": "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+              "expected": "exclude",
+              "actual": "uncertain"
+            },
+            {
+              "key": "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+              "expected": "exclude",
+              "actual": "uncertain"
+            }
+          ],
+          "recall": 1,
+          "precision": 1
+        },
+        {
+          "label": "frozen-core",
+          "repetition": 2,
+          "durationMs": 10111,
+          "usage": {
+            "calls": 1,
+            "reservedTokens": 125156,
+            "knownPromptTokens": 40447,
+            "knownCompletionTokens": 3197,
+            "unknownUsageCalls": 0
+          },
+          "differences": [
+            {
+              "key": "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+              "expected": "exclude",
+              "actual": "uncertain"
+            },
+            {
+              "key": "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+              "expected": "exclude",
+              "actual": "uncertain"
+            }
+          ],
+          "recall": 1,
+          "precision": 1
+        },
+        {
+          "label": "frozen-core",
+          "repetition": 3,
+          "durationMs": 9916,
+          "usage": {
+            "calls": 1,
+            "reservedTokens": 125156,
+            "knownPromptTokens": 40447,
+            "knownCompletionTokens": 3171,
+            "unknownUsageCalls": 0
+          },
+          "differences": [
+            {
+              "key": "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+              "expected": "exclude",
+              "actual": "uncertain"
+            },
+            {
+              "key": "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+              "expected": "exclude",
+              "actual": "uncertain"
+            }
+          ],
+          "recall": 1,
+          "precision": 1
+        }
+      ]
+    },
+    {
+      "file": "docs/plans/ai-assistant/verification/2026-11-16-p3-03-05-frozen-real-boundary.json",
+      "source": "frozen-and-constructed",
+      "databaseReadMs": null,
+      "results": [
+        {
+          "label": "constructed-boundaries",
+          "repetition": 1,
+          "durationMs": 3030,
+          "usage": {
+            "calls": 1,
+            "reservedTokens": 37912,
+            "knownPromptTokens": 8327,
+            "knownCompletionTokens": 670,
+            "unknownUsageCalls": 0
+          },
+          "differences": [],
+          "recall": 1,
+          "precision": 1
+        },
+        {
+          "label": "constructed-boundaries",
+          "repetition": 2,
+          "durationMs": 3249,
+          "usage": {
+            "calls": 1,
+            "reservedTokens": 37912,
+            "knownPromptTokens": 8327,
+            "knownCompletionTokens": 682,
+            "unknownUsageCalls": 0
+          },
+          "differences": [],
+          "recall": 1,
+          "precision": 1
+        },
+        {
+          "label": "constructed-boundaries",
+          "repetition": 3,
+          "durationMs": 2777,
+          "usage": {
+            "calls": 1,
+            "reservedTokens": 37912,
+            "knownPromptTokens": 8327,
+            "knownCompletionTokens": 672,
+            "unknownUsageCalls": 0
+          },
+          "differences": [],
+          "recall": 1,
+          "precision": 1
+        },
+        {
+          "label": "SEM-09-used-with",
+          "repetition": 1,
+          "durationMs": 1051,
+          "usage": {
+            "calls": 1,
+            "reservedTokens": 13233,
+            "knownPromptTokens": 1135,
+            "knownCompletionTokens": 64,
+            "unknownUsageCalls": 0
+          },
+          "differences": [],
+          "recall": 1,
+          "precision": 1
+        }
+      ]
+    },
+    {
+      "file": "docs/plans/ai-assistant/verification/2026-11-16-p3-03-05-dev-real.json",
+      "source": "development-read-only",
+      "databaseReadMs": 533,
+      "results": [
+        {
+          "label": "development-read-only-core",
+          "repetition": 1,
+          "durationMs": 10202,
+          "usage": {
+            "calls": 1,
+            "reservedTokens": 127885,
+            "knownPromptTokens": 41376,
+            "knownCompletionTokens": 3208,
+            "unknownUsageCalls": 0
+          },
+          "differences": [],
+          "recall": 1,
+          "precision": 1
+        }
+      ]
+    }
+  ],
+  "vectorComparison": {
+    "implemented": false,
+    "missRate": null,
+    "falsePositiveRate": null,
+    "latencyMs": null,
+    "cost": null,
+    "reason": "No missed positive candidate in current full-scope or lexical union. No measured benefit justifies new index lifecycle/dependency; unknown metadata and field conflicts require evidence, not similarity guesses."
+  },
+  "limitations": [
+    "Full scope deliberately retains semantic negatives/uncertain rows; otherCandidates is retrieval workload, not model false positives",
+    "Offline annotation timing excludes database, network and model latency",
+    "No vector implementation or comparative vector performance claim",
+    "5000-row hard-scope cap remains; no large-scale benchmark",
+    "Prompt token duplication is a measured optimization opportunity before adding an index",
+    "Token costs recorded; monetary amount unknown without current billing/cache rates"
+  ],
+  "reevaluateWhen": [
+    "A reviewed positive with adequate stored evidence is missed after introducing a bounded lexical-only or staged retrieval path",
+    "Typical hard scope exceeds 5000 or repeatedly exhausts execution budget",
+    "Repeated 44-candidate queries exceed 15s p95 after prompt de-duplication; larger representative load tests needed",
+    "Per-query token use/cost exceeds the business-defined budget after prompt compression/caching",
+    "New synonym/long-text cases show incremental vector recall while preserving false-positive and uncertainty limits"
+  ]
+}

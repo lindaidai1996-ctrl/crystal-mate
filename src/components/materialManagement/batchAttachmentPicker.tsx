@@ -14,6 +14,7 @@ import { AttachmentImageEditor } from '@/components/imageUpload/attachmentImageE
 import { AttachmentCandidateDialog } from '@/components/imageUpload/attachmentCandidateDialog';
 import { attachmentCoverKey, MAX_ATTACHMENTS, type AttachmentOwner } from '@/lib/attachments';
 import { uploadImage } from '@/components/imageUpload/uploadImage';
+import { useImageFilePicker } from '@/components/imageUpload/useImageFilePicker';
 
 export function BatchAttachmentPicker({
   attachments,
@@ -43,6 +44,10 @@ export function BatchAttachmentPicker({
   const effectiveCover = attachmentCoverKey(attachments, coverObjectKey);
   const [pendingFiles, setPendingFiles] = useState<File[] | null>(null);
   const [editing, setEditing] = useState<MaterialBatchAttachment | null>(null);
+  const { openFilePicker, filePicker } = useImageFilePicker({
+    disabled: busy || attachments.length >= MAX_ATTACHMENTS,
+    onSelect: selectFiles,
+  });
 
   function finishEditing() {
     setEditing(null);
@@ -82,7 +87,7 @@ export function BatchAttachmentPicker({
     };
   }
 
-  function selectFiles(files: FileList | null) {
+  function selectFiles(files: File[]) {
     if (!files?.length || busy) return;
     const selected = Array.from(files);
     if (selected.length + attachments.length > MAX_ATTACHMENTS) {
@@ -118,6 +123,7 @@ export function BatchAttachmentPicker({
 
   return (
     <div className="batch-attachments">
+      {filePicker}
       {choosing && owner && (
         <AttachmentCandidateDialog
           owner={owner}
@@ -256,21 +262,10 @@ export function BatchAttachmentPicker({
         </div>
       ))}
       {attachments.length < MAX_ATTACHMENTS && (
-        <label className="batch-attachment-upload">
+        <Button className="batch-attachment-upload" disabled={busy} onClick={openFilePicker}>
           {uploading ? <Spin size="small" /> : <PlusOutlined />}
           <span>{uploading ? t('uploading') : t('uploadAttachment')}</span>
-          <input
-            type="file"
-            aria-label={t('uploadAttachment')}
-            accept="image/jpeg,image/png,image/webp"
-            multiple
-            disabled={busy}
-            onChange={(event) => {
-              selectFiles(event.target.files);
-              event.target.value = '';
-            }}
-          />
-        </label>
+        </Button>
       )}
       {owner && (
         <Button

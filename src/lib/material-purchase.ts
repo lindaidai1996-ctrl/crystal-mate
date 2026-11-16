@@ -41,6 +41,24 @@ function divide(numerator: bigint, denominator: bigint) {
     ? fixed((numerator + denominator / BigInt(2)) / denominator)
     : null;
 }
+
+export function purchaseTotalFromManualPrice(
+  purchase: MaterialPurchase,
+  quantity: number | null,
+): MaterialAmount {
+  const price = minor(purchase.manualUnitPrice);
+  if (
+    purchase.mode !== 'BATCH' ||
+    price === null ||
+    quantity === null ||
+    !Number.isSafeInteger(quantity) ||
+    quantity <= 0
+  )
+    return null;
+  const total = price * BigInt(quantity);
+  return total <= BigInt('999999999999') ? fixed(total) : null;
+}
+
 const totalFields: PurchaseTotalField[] = ['quotedGramPrice', 'totalWeightGrams', 'totalAmount'];
 
 export function resolvePurchase(input: MaterialPurchase) {

@@ -265,6 +265,9 @@
   }
 
   .header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
     height: 64px;
     padding-inline: 24px;
   }

@@ -18,6 +18,7 @@ vi.mock('@/lib/db', () => ({
   },
 }));
 import { GET } from '@/app/api/audit-logs/route';
+import { GET as getAttributions } from '@/app/api/record-attributions/route';
 const request = (query = '') => new NextRequest(`http://localhost/api/audit-logs${query}`);
 beforeEach(() => {
   vi.resetAllMocks();
@@ -71,5 +72,57 @@ describe('operation history access and filters', () => {
       actorId: null,
       operationId: 'operation',
     });
+  });
+  it('displays current account nicknames while retaining removed-account and system snapshots', async () => {
+    const actors = [{ id: 'admin2-id', username: 'admin2', nickname: '呆呆' }];
+    const items = [
+      {
+        id: 'known',
+        actorId: 'admin2-id',
+        actorUsername: 'admin2',
+        actorNickname: '呆呆管理员',
+        relatedIds: [],
+      },
+      {
+        id: 'removed',
+        actorId: 'removed-id',
+        actorUsername: 'removed',
+        actorNickname: '历史昵称',
+        relatedIds: [],
+      },
+      { id: 'system', actorId: null, actorNickname: null, relatedIds: [] },
+    ];
+    mocks.transaction.mockResolvedValue([items, items.length, actors]);
+    const response = await GET(request());
+    const body = await response.json();
+    expect(body.items[0]).toMatchObject({ actorUsername: 'admin2', actorNickname: '呆呆' });
+    expect(body.items.slice(1)).toEqual(items.slice(1));
+    expect(items[0].actorNickname).toBe('呆呆管理员');
+  });
+  it('resolves creator and editor nicknames without inventing unknown or system identities', async () => {
+    const creator = { id: 'admin2-id', username: 'admin2', nickname: '呆呆' };
+    const editor = { id: 'admin-id', username: 'admin', nickname: '豆子' };
+    const removed = { id: 'removed-id', username: 'removed', nickname: '历史昵称' };
+    const system = { id: 'SYSTEM', username: 'SYSTEM', nickname: '' };
+    mocks.transaction.mockResolvedValue([
+      [
+        {
+          entityId: 'product',
+          createdBy: { ...creator, nickname: '呆呆管理员' },
+          updatedBy: { ...editor, nickname: '豆子管理员' },
+        },
+        { entityId: 'unknown', createdBy: null, updatedBy: null },
+        { entityId: 'removed', createdBy: removed, updatedBy: system },
+      ],
+      [creator, editor],
+    ]);
+    const response = await getAttributions(
+      request('?entityType=Product&ids=product,unknown,removed'),
+    );
+    expect(await response.json()).toEqual([
+      { entityId: 'product', createdBy: creator, updatedBy: editor },
+      { entityId: 'unknown', createdBy: null, updatedBy: null },
+      { entityId: 'removed', createdBy: removed, updatedBy: system },
+    ]);
   });
 });

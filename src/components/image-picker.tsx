@@ -18,6 +18,7 @@ import { imageThumbnailUrl, type ImageUploadPurpose } from '@/lib/image-storage'
 import { ImageUploadChoiceDialog } from './imageUpload/imageUploadChoiceDialog';
 import { AttachmentImageEditor } from './imageUpload/attachmentImageEditor';
 import { uploadImage } from './imageUpload/uploadImage';
+import { useImageFilePicker } from './imageUpload/useImageFilePicker';
 import { FramedImage } from './framedImage';
 import { ImageFramingDialog } from './imageUpload/imageFramingDialog';
 import pickerStyles from './imagePicker.module.css';
@@ -67,6 +68,10 @@ export function ImagePicker({
   } | null>(null);
   const [drag, setDrag] = useState<ImageDrag | null>(null);
   const busy = uploading || disabled;
+  const { openFilePicker, filePicker } = useImageFilePicker({
+    disabled: busy || images.length >= maxImages,
+    onSelect: selectFiles,
+  });
 
   function changeUploading(value: boolean) {
     setUploading(value);
@@ -205,13 +210,15 @@ export function ImagePicker({
 
   return (
     <div ref={pickerRef}>
+      {filePicker}
       <Upload
         className="image-picker-upload"
         listType="picture-card"
         accept="image/jpeg,image/png,image/webp"
         multiple
         disabled={busy}
-        openFileDialogOnClick={images.length < maxImages}
+        openFileDialogOnClick={false}
+        hasControlInside
         fileList={fileList}
         isImageUrl={() => true}
         beforeUpload={(file, files) => {
@@ -350,10 +357,15 @@ export function ImagePicker({
         )}
       >
         {images.length < maxImages && (
-          <div className="image-picker-trigger">
+          <button
+            type="button"
+            className={`image-picker-trigger ${pickerStyles.uploadTrigger}`}
+            disabled={busy}
+            onClick={openFilePicker}
+          >
             {uploading ? <Spin size="small" /> : <PlusOutlined />}
             <span>{uploading ? t('uploading') : t('upload')}</span>
-          </div>
+          </button>
         )}
       </Upload>
       {drag &&

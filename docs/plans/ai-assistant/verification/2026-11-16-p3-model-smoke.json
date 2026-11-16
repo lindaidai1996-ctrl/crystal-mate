@@ -1,0 +1,14 @@
+{
+  "mode": "real-model",
+  "snapshot": "constructed-only",
+  "promptVersion": "relevance-v1",
+  "checkedAt": "2026-11-16T09:12:29.296Z",
+  "durationMs": 1593,
+  "model": "deepseek-flash",
+  "usage": {
+    "promptTokens": 2377,
+    "completionTokens": 172
+  },
+  "statuses": ["include", "exclude", "uncertain"],
+  "calls": 1
+}

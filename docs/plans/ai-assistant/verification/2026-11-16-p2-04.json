@@ -1,0 +1,77 @@
+{
+  "checkedAt": "2026-11-16T07:43:21.270Z",
+  "source": "crystal_mate_dev",
+  "mode": "read-only-repeatable-read",
+  "mainCase": {
+    "scopeCandidateCount": 44,
+    "purchaseEntryCount": 11,
+    "catalogItemCount": 11,
+    "pageSizes": [3, 3, 3, 2],
+    "duplicateCount": 0,
+    "frozenIdSetMatches": true,
+    "amounts": [
+      {
+        "currency": "CNY",
+        "knownAmount": "1897.60",
+        "unknownAmountEntryCount": 0,
+        "businessDefaultCurrencyEntryCount": 11
+      }
+    ],
+    "quantities": [
+      {
+        "unit": "BEAD",
+        "knownQuantity": "7.00",
+        "unknownQuantityEntryCount": 0
+      },
+      {
+        "unit": "GRAM",
+        "knownQuantity": "4.43",
+        "unknownQuantityEntryCount": 0
+      },
+      {
+        "unit": "STRAND",
+        "knownQuantity": "3.00",
+        "unknownQuantityEntryCount": 0
+      }
+    ],
+    "distributorAmounts": [
+      {
+        "distributorId": "cmwg3g8ak0032oq01pw87gg5k",
+        "purchaseEntryCount": 10,
+        "amounts": [
+          {
+            "currency": "CNY",
+            "knownAmount": "1811.60",
+            "unknownAmountEntryCount": 0,
+            "businessDefaultCurrencyEntryCount": 10
+          }
+        ]
+      },
+      {
+        "distributorId": "cmwg6xshd0071oq01h776t219",
+        "purchaseEntryCount": 1,
+        "amounts": [
+          {
+            "currency": "CNY",
+            "knownAmount": "86.00",
+            "unknownAmountEntryCount": 0,
+            "businessDefaultCurrencyEntryCount": 1
+          }
+        ]
+      }
+    ],
+    "matchesLegacyAmountRule": true,
+    "multiObjectAndDistributorIdsMatch": true,
+    "emptySelectionCount": 0
+  },
+  "additionalMapping": {
+    "allScopeEntryCount": 44,
+    "productEntryCount": 13,
+    "productQuantityUnit": "PIECE"
+  },
+  "limitations": [
+    "Golden selection is a frozen manually reviewed ID set, not a model evaluation",
+    "Purchase currency defaults to CNY; no independent historical currency field",
+    "No real authenticated HTTP session, model call or inventory verification"
+  ]
+}

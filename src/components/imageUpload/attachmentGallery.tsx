@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons';
 import { App, Button, Image, Input, Modal, Space } from 'antd';
 import { useTranslations } from 'next-intl';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { attachmentCoverKey, MAX_ATTACHMENTS, type AttachmentOwner } from '@/lib/attachments';
 import { ClientApiError } from '@/lib/client-api';
 import type { MaterialBatchAttachment } from '@/lib/client-types';
@@ -19,6 +19,7 @@ import { AttachmentCandidateDialog } from './attachmentCandidateDialog';
 import { AttachmentImageEditor } from './attachmentImageEditor';
 import { ImageUploadChoiceDialog } from './imageUploadChoiceDialog';
 import { uploadImage } from './uploadImage';
+import { useImageFilePicker } from './useImageFilePicker';
 import galleryStyles from './attachmentGallery.module.css';
 import motionStyles from '../listMotion.module.css';
 
@@ -44,7 +45,6 @@ export function AttachmentGallery({
   const imageT = useTranslations('imageUpload');
   const common = useTranslations('common');
   const { message } = App.useApp();
-  const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [saving, setSaving] = useState(false);
   const [choosing, setChoosing] = useState(false);
@@ -52,6 +52,17 @@ export function AttachmentGallery({
   const [editing, setEditing] = useState<MaterialBatchAttachment | null>(null);
   const [notesAttachment, setNotesAttachment] = useState<MaterialBatchAttachment | null>(null);
   const [notes, setNotes] = useState('');
+  const { openFilePicker, filePicker } = useImageFilePicker({
+    disabled: busy || attachments.length >= MAX_ATTACHMENTS,
+    onSelect: (selected) => {
+      if (selected.length + attachments.length > MAX_ATTACHMENTS) {
+        message.warning(t('limitExceeded', { limit: MAX_ATTACHMENTS }));
+        return;
+      }
+      changeBusy(true);
+      setFiles(selected);
+    },
+  });
 
   function changeBusy(value: boolean) {
     setBusy(value);
@@ -162,25 +173,7 @@ export function AttachmentGallery({
 
   return (
     <>
-      <input
-        ref={input}
-        hidden
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        multiple
-        disabled={busy || attachments.length >= MAX_ATTACHMENTS}
-        onChange={(event) => {
-          const selected = Array.from(event.target.files ?? []);
-          event.target.value = '';
-          if (!selected.length || busy) return;
-          if (selected.length + attachments.length > MAX_ATTACHMENTS) {
-            message.warning(t('limitExceeded', { limit: MAX_ATTACHMENTS }));
-            return;
-          }
-          changeBusy(true);
-          setFiles(selected);
-        }}
-      />
+      {filePicker}
       <div className={galleryStyles.panel} aria-busy={saving}>
         <div className={galleryStyles.header}>
           <div className={galleryStyles.heading}>
@@ -194,7 +187,7 @@ export function AttachmentGallery({
                 icon={<UploadOutlined />}
                 disabled={busy || attachments.length >= MAX_ATTACHMENTS}
                 loading={saving}
-                onClick={() => input.current?.click()}
+                onClick={openFilePicker}
               >
                 {batchT('uploadAttachment')}
               </Button>
@@ -267,7 +260,7 @@ export function AttachmentGallery({
                 type="button"
                 className={galleryStyles.choice}
                 disabled={busy}
-                onClick={() => input.current?.click()}
+                onClick={openFilePicker}
               >
                 <span className={galleryStyles.icon}>
                   <UploadOutlined />

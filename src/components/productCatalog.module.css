@@ -367,6 +367,12 @@
   margin-left: auto;
 }
 
+.standardActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .cardBody > .cardActions {
   margin-top: auto;
   padding-block: 10px;
@@ -574,6 +580,31 @@
     height: auto;
     padding-inline: 6px;
     white-space: normal;
+  }
+  .standardActions:global(.row-actions) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 6px;
+  }
+  .standardActions > a {
+    display: flex;
+    min-width: 0;
+  }
+  .standardActions :global(.ant-btn) {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    height: auto;
+    padding-inline: 6px;
+    font-size: 12px;
+    white-space: normal;
+  }
+  .standardActions :global(.ant-btn-icon) {
+    display: none;
+  }
+  .cardFooter .standardActions:global(.row-actions) > :last-child {
+    margin-inline-start: 0;
   }
   .results {
     gap: 8px;

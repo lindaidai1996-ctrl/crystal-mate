@@ -54,9 +54,15 @@ export async function GET(request: NextRequest) {
           select: { entityId: true, entityLabel: true },
         })
       : [];
+    const actorsById = new Map(actors.map((actor) => [actor.id, actor]));
     return NextResponse.json(
       {
-        items,
+        items: items.map((item) => {
+          const actor = item.actorId ? actorsById.get(item.actorId) : undefined;
+          return actor
+            ? { ...item, actorUsername: actor.username, actorNickname: actor.nickname }
+            : item;
+        }),
         total,
         actors,
         references: Object.fromEntries(references.map((item) => [item.entityId, item.entityLabel])),

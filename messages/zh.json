@@ -26,6 +26,7 @@
     "addMaterial": "新增物料",
     "backToBatch": "返回批次详情",
     "backToDistributor": "返回渠道商详情",
+    "backToTop": "回到顶部",
     "confirmDelete": "确定删除吗？",
     "loading": "加载中",
     "all": "全部",
@@ -582,6 +583,7 @@
     "quotedGramPrice": "进货克价",
     "totalWeightGrams": "进货总克重",
     "totalAmount": "进货总金额",
+    "suggestedTotalAmount": "推荐金额：{amount} 元（{quantity} × {price}）",
     "autoCalculated": "自动计算（可修改）",
     "unitPurchasePrice": "单{unit}进货价",
     "unitWeight": "单{unit}重量",
@@ -784,6 +786,9 @@
     "nextImage": "下一张图片"
   },
   "imageUpload": {
+    "chooseSource": "选择照片来源",
+    "takePhoto": "拍照",
+    "chooseFromLibrary": "从相册选择",
     "applyCover": "应用封面",
     "adjustCover": "调整封面",
     "coverMode": "封面显示方式",

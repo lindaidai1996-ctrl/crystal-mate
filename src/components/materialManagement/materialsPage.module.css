@@ -1,3 +1,57 @@
+.sectionLabel {
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.stockPanel {
+  min-width: 0;
+  margin-top: 8px;
+}
+
+.stockRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 8px;
+}
+
+.stockValue {
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.pricesSection {
+  display: grid;
+  gap: 8px;
+  margin-block: 12px;
+  min-width: 0;
+}
+
+.actionBar {
+  margin-top: auto;
+  padding-block: 10px;
+  border-top: 1px solid var(--ant-color-border-secondary);
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.actions > a {
+  display: flex;
+  min-width: 0;
+}
+
+.actions :global(.ant-btn) {
+  gap: 4px;
+}
+
 .batchList,
 .batchGroup {
   display: flex;
@@ -95,4 +149,49 @@
 
 .priceCell[data-sale='true']:only-child {
   grid-column: 1;
+}
+
+@media (max-width: 767px) {
+  .stockRow {
+    flex-wrap: wrap;
+  }
+
+  .stockRow > :global(.ant-btn) {
+    margin-inline-start: auto;
+  }
+
+  .priceGrid {
+    padding: 8px;
+  }
+
+  .priceRow {
+    gap: 8px;
+  }
+
+  .priceCell dd {
+    margin-top: 2px;
+  }
+
+  .actionBar .actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 1fr);
+    width: 100%;
+    gap: 4px;
+    white-space: normal;
+  }
+
+  .actionBar .actions :global(.ant-btn) {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    height: auto;
+    padding: 6px 2px;
+    font-size: 12px;
+    white-space: normal;
+    text-wrap: pretty;
+  }
+
+  .actionBar .actions :global(.ant-btn-icon) {
+    display: none;
+  }
 }

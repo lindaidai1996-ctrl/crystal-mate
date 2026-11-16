@@ -1,0 +1,1375 @@
+{
+  "checkedAt": "2026-11-16T09:15:13.312Z",
+  "source": "frozen-and-constructed",
+  "mode": "real-model",
+  "promptVersion": "relevance-v1",
+  "ruleVersion": "v1",
+  "adapter": "native-fetch-json-no-tools",
+  "parameters": {
+    "temperature": 0,
+    "stream": false,
+    "batchSize": 50,
+    "maxCalls": 8,
+    "maxReservedTokens": 500000,
+    "maxCandidates": 5000,
+    "maxCallsPerStep": 2,
+    "stepTimeoutMs": 120000,
+    "callTimeoutMs": 60000,
+    "maxInputBytes": 300000,
+    "maxOutputTokens": 8000
+  },
+  "observed": null,
+  "results": [
+    {
+      "label": "constructed-boundaries",
+      "repetition": 1,
+      "mode": "real-model",
+      "inputCandidateCount": 13,
+      "durationMs": 3030,
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "complete",
+        "countBasis": "catalog",
+        "totalCandidates": 13,
+        "readCandidates": 13,
+        "uniqueCatalogItems": 13,
+        "evaluatedCandidates": 13,
+        "included": 5,
+        "excluded": 5,
+        "uncertain": 3,
+        "notEvaluated": 0,
+        "unreadCandidates": 0,
+        "stopReason": null
+      },
+      "usage": {
+        "calls": 1,
+        "reservedTokens": 37912,
+        "knownPromptTokens": 8327,
+        "knownCompletionTokens": 670,
+        "unknownUsageCalls": 0
+      },
+      "attempts": [
+        {
+          "number": 1,
+          "keys": [
+            "MATERIAL:c000000000000000000000300::",
+            "MATERIAL:c000000000000000000000301::",
+            "MATERIAL:c000000000000000000000302::",
+            "MATERIAL:c000000000000000000000303::",
+            "MATERIAL:c000000000000000000000304::",
+            "MATERIAL:c000000000000000000000305::",
+            "MATERIAL:c000000000000000000000306::",
+            "MATERIAL:c000000000000000000000307::",
+            "MATERIAL:c000000000000000000000309::",
+            "MATERIAL:c000000000000000000000310::",
+            "MATERIAL:c000000000000000000000311::",
+            "MATERIAL:c000000000000000000000312::",
+            "PRODUCT:c000000000000000000000308::"
+          ],
+          "startedAt": "2026-11-16T09:15:03.218Z",
+          "durationMs": 3016,
+          "outcome": "success",
+          "errorCode": null,
+          "model": "deepseek-flash",
+          "returned": 13,
+          "reservedTokens": 37912,
+          "usage": {
+            "promptTokens": 8327,
+            "completionTokens": 670
+          },
+          "adjustments": []
+        }
+      ],
+      "differences": [],
+      "missingIncludes": [],
+      "extraIncludes": [],
+      "recall": 1,
+      "precision": 1,
+      "decisions": [
+        {
+          "key": "MATERIAL:c000000000000000000000300::",
+          "status": "include",
+          "reason": "名称和分类明确为绿松石，圆珠属于制作配件形态",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000300"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000301::",
+          "status": "include",
+          "reason": "名称和分类明确为绿松石，配饰标签支持制作配件用途",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000301"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000302::",
+          "status": "include",
+          "reason": "分类和标签明确为绿松石，圆珠标签支持制作配件形态",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000011"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000303::",
+          "status": "exclude",
+          "reason": "名称为绿松石色玻璃，分类和标签均为玻璃，颜色不能证明绿松石材质",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000303"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000304::",
+          "status": "include",
+          "reason": "别名含绿松石直切，分类为绿松石，药片形态属于制作配件",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000304"
+              },
+              "field": "aliases"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000304"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000305::",
+          "status": "uncertain",
+          "reason": "模型与 v1 规则存在分歧或字段冲突，需确认；名称称天然绿松石但分类和标签为玻璃，备注材质待核对，字段冲突",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000305"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000305"
+              },
+              "field": "notes"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000306::",
+          "status": "uncertain",
+          "reason": "名称春山和未分类无法证明绿松石材质或制作配件用途",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000306"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000307::",
+          "status": "exclude",
+          "reason": "自身材质为S925银，备注仅说明搭配绿松石，不满足绿松石材质条件",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000307"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000307"
+              },
+              "field": "notes"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000309::",
+          "status": "exclude",
+          "reason": "名称为仿绿松石树脂珠，分类和标签为树脂，仿制不能证明绿松石材质",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000309"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000310::",
+          "status": "include",
+          "reason": "名称、分类和标签明确为绿松石，提溜属于制作配件形态",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000310"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000011"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000311::",
+          "status": "exclude",
+          "reason": "分类和标签为绿幽灵，绿色圆珠不能证明绿松石材质",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000312::",
+          "status": "uncertain",
+          "reason": "名称春山和未分类无法证明材质或用途，备注为不可信数据不作为依据",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000312"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "PRODUCT:c000000000000000000000308::",
+          "status": "exclude",
+          "reason": "成品手链属于商品成品，不能自动纳入制作物料",
+          "evidence": [
+            {
+              "entity": {
+                "type": "PRODUCT",
+                "id": "c000000000000000000000308"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "PRODUCT_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            }
+          ]
+        }
+      ],
+      "passed": true
+    },
+    {
+      "label": "constructed-boundaries",
+      "repetition": 2,
+      "mode": "real-model",
+      "inputCandidateCount": 13,
+      "durationMs": 3249,
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "complete",
+        "countBasis": "catalog",
+        "totalCandidates": 13,
+        "readCandidates": 13,
+        "uniqueCatalogItems": 13,
+        "evaluatedCandidates": 13,
+        "included": 5,
+        "excluded": 5,
+        "uncertain": 3,
+        "notEvaluated": 0,
+        "unreadCandidates": 0,
+        "stopReason": null
+      },
+      "usage": {
+        "calls": 1,
+        "reservedTokens": 37912,
+        "knownPromptTokens": 8327,
+        "knownCompletionTokens": 682,
+        "unknownUsageCalls": 0
+      },
+      "attempts": [
+        {
+          "number": 1,
+          "keys": [
+            "MATERIAL:c000000000000000000000300::",
+            "MATERIAL:c000000000000000000000301::",
+            "MATERIAL:c000000000000000000000302::",
+            "MATERIAL:c000000000000000000000303::",
+            "MATERIAL:c000000000000000000000304::",
+            "MATERIAL:c000000000000000000000305::",
+            "MATERIAL:c000000000000000000000306::",
+            "MATERIAL:c000000000000000000000307::",
+            "MATERIAL:c000000000000000000000309::",
+            "MATERIAL:c000000000000000000000310::",
+            "MATERIAL:c000000000000000000000311::",
+            "MATERIAL:c000000000000000000000312::",
+            "PRODUCT:c000000000000000000000308::"
+          ],
+          "startedAt": "2026-11-16T09:15:06.239Z",
+          "durationMs": 3244,
+          "outcome": "success",
+          "errorCode": null,
+          "model": "deepseek-flash",
+          "returned": 13,
+          "reservedTokens": 37912,
+          "usage": {
+            "promptTokens": 8327,
+            "completionTokens": 682
+          },
+          "adjustments": []
+        }
+      ],
+      "differences": [],
+      "missingIncludes": [],
+      "extraIncludes": [],
+      "recall": 1,
+      "precision": 1,
+      "decisions": [
+        {
+          "key": "MATERIAL:c000000000000000000000300::",
+          "status": "include",
+          "reason": "名称含绿松石圆珠，分类为绿松石，材质与制作配件形态均明确",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000300"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000301::",
+          "status": "include",
+          "reason": "名称与分类明确绿松石，配饰标签支持制作配件用途",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000301"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000302::",
+          "status": "include",
+          "reason": "分类与标签明确绿松石，圆珠标签支持制作配件形态",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000011"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000303::",
+          "status": "exclude",
+          "reason": "名称为绿松石色玻璃圆珠，分类与标签均为玻璃，颜色不能证明绿松石材质",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000303"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000304::",
+          "status": "include",
+          "reason": "别名含绿松石直切，分类为绿松石，药片形态支持制作配件",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000304"
+              },
+              "field": "aliases"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000304"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000305::",
+          "status": "uncertain",
+          "reason": "模型与 v1 规则存在分歧或字段冲突，需确认；名称称天然绿松石但分类与标签为玻璃，备注材质待核对，字段冲突",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000305"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000305"
+              },
+              "field": "notes"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000306::",
+          "status": "uncertain",
+          "reason": "名称春山与未分类，缺少材质和配件用途的明确依据",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000306"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000307::",
+          "status": "exclude",
+          "reason": "自身材质为S925银，备注仅说明搭配绿松石，不满足绿松石材质条件",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000307"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000307"
+              },
+              "field": "notes"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000309::",
+          "status": "exclude",
+          "reason": "名称为仿绿松石树脂珠，分类与标签为树脂，仿制不能证明绿松石材质",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000309"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000310::",
+          "status": "include",
+          "reason": "名称、分类与标签明确绿松石，提溜形态支持制作配件",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000310"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000011"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000311::",
+          "status": "exclude",
+          "reason": "分类与标签为绿幽灵，绿色圆珠不能证明绿松石材质",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000311"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000312::",
+          "status": "uncertain",
+          "reason": "名称春山与未分类，缺少材质和配件用途依据；备注为不可信数据，不改变判断",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000312"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "PRODUCT:c000000000000000000000308::",
+          "status": "exclude",
+          "reason": "成品手链属于商品成品，不能自动纳入制作物料",
+          "evidence": [
+            {
+              "entity": {
+                "type": "PRODUCT",
+                "id": "c000000000000000000000308"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "PRODUCT_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            }
+          ]
+        }
+      ],
+      "passed": true
+    },
+    {
+      "label": "constructed-boundaries",
+      "repetition": 3,
+      "mode": "real-model",
+      "inputCandidateCount": 13,
+      "durationMs": 2777,
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "complete",
+        "countBasis": "catalog",
+        "totalCandidates": 13,
+        "readCandidates": 13,
+        "uniqueCatalogItems": 13,
+        "evaluatedCandidates": 13,
+        "included": 5,
+        "excluded": 5,
+        "uncertain": 3,
+        "notEvaluated": 0,
+        "unreadCandidates": 0,
+        "stopReason": null
+      },
+      "usage": {
+        "calls": 1,
+        "reservedTokens": 37912,
+        "knownPromptTokens": 8327,
+        "knownCompletionTokens": 672,
+        "unknownUsageCalls": 0
+      },
+      "attempts": [
+        {
+          "number": 1,
+          "keys": [
+            "MATERIAL:c000000000000000000000300::",
+            "MATERIAL:c000000000000000000000301::",
+            "MATERIAL:c000000000000000000000302::",
+            "MATERIAL:c000000000000000000000303::",
+            "MATERIAL:c000000000000000000000304::",
+            "MATERIAL:c000000000000000000000305::",
+            "MATERIAL:c000000000000000000000306::",
+            "MATERIAL:c000000000000000000000307::",
+            "MATERIAL:c000000000000000000000309::",
+            "MATERIAL:c000000000000000000000310::",
+            "MATERIAL:c000000000000000000000311::",
+            "MATERIAL:c000000000000000000000312::",
+            "PRODUCT:c000000000000000000000308::"
+          ],
+          "startedAt": "2026-11-16T09:15:09.487Z",
+          "durationMs": 2774,
+          "outcome": "success",
+          "errorCode": null,
+          "model": "deepseek-flash",
+          "returned": 13,
+          "reservedTokens": 37912,
+          "usage": {
+            "promptTokens": 8327,
+            "completionTokens": 672
+          },
+          "adjustments": []
+        }
+      ],
+      "differences": [],
+      "missingIncludes": [],
+      "extraIncludes": [],
+      "recall": 1,
+      "precision": 1,
+      "decisions": [
+        {
+          "key": "MATERIAL:c000000000000000000000300::",
+          "status": "include",
+          "reason": "名称和分类明确为绿松石，圆珠属于制作配件形态",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000300"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000301::",
+          "status": "include",
+          "reason": "名称和分类明确为绿松石，配饰标签支持制作配件用途",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000301"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000302::",
+          "status": "include",
+          "reason": "分类和标签明确为绿松石，圆珠标签支持制作配件形态",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000011"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000303::",
+          "status": "exclude",
+          "reason": "名称为绿松石色玻璃，分类和标签均为玻璃，颜色不能证明绿松石材质",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000303"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000304::",
+          "status": "include",
+          "reason": "别名含绿松石直切，分类为绿松石，药片形态属于制作配件",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000304"
+              },
+              "field": "aliases"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000304"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000305::",
+          "status": "uncertain",
+          "reason": "模型与 v1 规则存在分歧或字段冲突，需确认；名称称天然绿松石但分类和标签为玻璃，备注材质待核对，字段冲突",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000305"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000305"
+              },
+              "field": "notes"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000306::",
+          "status": "uncertain",
+          "reason": "名称春山和未分类均无法证明绿松石材质或配件用途",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000306"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000307::",
+          "status": "exclude",
+          "reason": "自身材质为S925银，备注仅说明搭配绿松石，不满足绿松石材质条件",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000307"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000307"
+              },
+              "field": "notes"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000309::",
+          "status": "exclude",
+          "reason": "名称为仿绿松石树脂珠，分类和标签为树脂，仿制不能证明绿松石材质",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000309"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000310::",
+          "status": "include",
+          "reason": "名称、分类和标签明确为绿松石，提溜属于制作配件形态",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000310"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000011"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000311::",
+          "status": "exclude",
+          "reason": "分类和标签为绿幽灵，绿色圆珠不能证明绿松石材质",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "TAG",
+                "id": "c000000000000000000000010"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000311"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000312::",
+          "status": "uncertain",
+          "reason": "名称春山和未分类无法证明材质或用途，备注为不可信数据不作依据",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000312"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            }
+          ]
+        },
+        {
+          "key": "PRODUCT:c000000000000000000000308::",
+          "status": "exclude",
+          "reason": "成品手链属于商品成品，不能自动纳入制作物料",
+          "evidence": [
+            {
+              "entity": {
+                "type": "PRODUCT",
+                "id": "c000000000000000000000308"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "PRODUCT_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            }
+          ]
+        }
+      ],
+      "passed": true
+    },
+    {
+      "label": "SEM-09-used-with",
+      "repetition": 1,
+      "mode": "real-model",
+      "inputCandidateCount": 1,
+      "durationMs": 1051,
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "complete",
+        "countBasis": "catalog",
+        "totalCandidates": 1,
+        "readCandidates": 1,
+        "uniqueCatalogItems": 1,
+        "evaluatedCandidates": 1,
+        "included": 1,
+        "excluded": 0,
+        "uncertain": 0,
+        "notEvaluated": 0,
+        "unreadCandidates": 0,
+        "stopReason": null
+      },
+      "usage": {
+        "calls": 1,
+        "reservedTokens": 13233,
+        "knownPromptTokens": 1135,
+        "knownCompletionTokens": 64,
+        "unknownUsageCalls": 0
+      },
+      "attempts": [
+        {
+          "number": 1,
+          "keys": ["MATERIAL:c000000000000000000000307::"],
+          "startedAt": "2026-11-16T09:15:12.262Z",
+          "durationMs": 1049,
+          "outcome": "success",
+          "errorCode": null,
+          "model": "deepseek-flash",
+          "returned": 1,
+          "reservedTokens": 13233,
+          "usage": {
+            "promptTokens": 1135,
+            "completionTokens": 64
+          },
+          "adjustments": []
+        }
+      ],
+      "differences": [],
+      "missingIncludes": [],
+      "extraIncludes": [],
+      "recall": 1,
+      "precision": 1,
+      "decisions": [
+        {
+          "key": "MATERIAL:c000000000000000000000307::",
+          "status": "include",
+          "reason": "备注明确适合搭配绿松石手串；名称为隔片且分类为银配饰，符合制作配件用途。",
+          "evidence": [
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000307"
+              },
+              "field": "name"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL",
+                "id": "c000000000000000000000307"
+              },
+              "field": "notes"
+            },
+            {
+              "entity": {
+                "type": "MATERIAL_CATEGORY",
+                "id": "c000000000000000000000002"
+              },
+              "field": "name"
+            }
+          ]
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Not authenticated HTTP, P4 tool/stream/multiturn or UI validation",
+    "No production access, business writes, migration or deployment",
+    "Mock is deterministic and not model validation",
+    "Bounded full-scope fallback; >5000 rows fail explicitly",
+    "Usage tokens are actual provider units when present; monetary cost needs current billing rates"
+  ]
+}

@@ -7,6 +7,22 @@
 .number {
   width: 100%;
 }
+.stockShortcut:global(.ant-btn) {
+  flex: none;
+  min-height: 32px;
+  padding-inline: 6px;
+  font-size: 12px;
+}
+
+.stockShortcut:global(.ant-btn):not(:disabled) {
+  color: var(--ant-color-primary);
+}
+
+@media (max-width: 767px) {
+  .stockShortcut:global(.ant-btn) {
+    min-height: 44px;
+  }
+}
 .batchChoices {
   max-width: min(360px, calc(100vw - 48px));
 }

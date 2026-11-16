@@ -1,0 +1,1493 @@
+{
+  "checkedAt": "2026-11-16T09:03:47.323Z",
+  "source": "frozen-and-constructed",
+  "mode": "real-model",
+  "promptVersion": "relevance-v1",
+  "ruleVersion": "v1",
+  "adapter": "native-fetch-json-no-tools",
+  "parameters": {
+    "temperature": 0,
+    "stream": false,
+    "batchSize": 50,
+    "maxCalls": 8,
+    "maxReservedTokens": 500000,
+    "maxCandidates": 5000,
+    "maxCallsPerStep": 2,
+    "stepTimeoutMs": 120000,
+    "callTimeoutMs": 60000,
+    "maxInputBytes": 300000,
+    "maxOutputTokens": 8000
+  },
+  "observed": null,
+  "results": [
+    {
+      "label": "frozen-core",
+      "repetition": 1,
+      "mode": "real-model",
+      "inputCandidateCount": 44,
+      "durationMs": 50,
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "not_started",
+        "countBasis": "purchase_entry",
+        "totalCandidates": 44,
+        "readCandidates": 44,
+        "uniqueCatalogItems": 44,
+        "evaluatedCandidates": 0,
+        "included": 0,
+        "excluded": 0,
+        "uncertain": 0,
+        "notEvaluated": 44,
+        "unreadCandidates": 0,
+        "stopReason": "model_failed"
+      },
+      "usage": {
+        "calls": 1,
+        "reservedTokens": 125156,
+        "knownPromptTokens": 0,
+        "knownCompletionTokens": 0,
+        "unknownUsageCalls": 1
+      },
+      "attempts": [
+        {
+          "number": 1,
+          "keys": [
+            "MATERIAL:cmwg1nejd0017oq01dbrbr9g8:MATERIAL_PURCHASE:cmwg1nejj0019oq015v32pexs",
+            "MATERIAL:cmwg1syeo001goq01lo04ot40:MATERIAL_PURCHASE:cmwg1syez001ioq017yvh5wia",
+            "MATERIAL:cmwg1ydtm001noq01ruchlerr:MATERIAL_PURCHASE:cmwg1ydwz001poq01zug4rson",
+            "MATERIAL:cmwg1zukg001toq01nbdav125:MATERIAL_PURCHASE:cmwg1zuki001voq010pyvuif4",
+            "MATERIAL:cmwg20yat001zoq01l838wus2:MATERIAL_PURCHASE:cmwg20yaw0021oq01s0tn7se9",
+            "MATERIAL:cmwg272pm0026oq01ldwgnote:MATERIAL_PURCHASE:cmwg272r80028oq01zqmqd4ez",
+            "MATERIAL:cmwg2cnkz002eoq01bwj4frmp:MATERIAL_PURCHASE:cmwg2cnlq002goq01oth138kc",
+            "MATERIAL:cmwg2h6cr002noq01rb9hl6wb:MATERIAL_PURCHASE:cmwg2h6d1002poq012l3enech",
+            "MATERIAL:cmwg35d3c002woq01k0ez5ef4:MATERIAL_PURCHASE:cmwg35d3k002yoq01jnveq4fu",
+            "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+            "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+            "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+            "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+            "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+            "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+            "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+            "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+            "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+            "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+            "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+            "MATERIAL:cmwg5jznx005koq01b5yqqvvq:MATERIAL_PURCHASE:cmwg5jzo9005moq01y9d4q07v",
+            "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+            "MATERIAL:cmwg62y0v0064oq018j32l93v:MATERIAL_PURCHASE:cmwg62y0z0066oq01crq24mcy",
+            "MATERIAL:cmwg65500006aoq01r2ugocml:MATERIAL_PURCHASE:cmwg65503006coq016p0qbfgs",
+            "MATERIAL:cmwg695k8006goq01kb6pwyk8:MATERIAL_PURCHASE:cmwg695kc006ioq016bxdz2rx",
+            "MATERIAL:cmwg6kssg006moq01z3u3l03s:MATERIAL_PURCHASE:cmwg6kssl006ooq01j1e3go4p",
+            "MATERIAL:cmv9c5epp000h3we8q5tlmyij:MATERIAL_PURCHASE:cmwg6q67j006uoq012detgflf",
+            "MATERIAL:cmv6czxjh00013wwrw95r1hlf:MATERIAL_PURCHASE:cmwg6sg3j006yoq017kkapoi8",
+            "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c",
+            "MATERIAL:cmwg8cnag007joq01klk7e9a8:MATERIAL_PURCHASE:cmwg8cnak007loq01x206jc2g",
+            "MATERIAL:cmwg8hlup007roq01ic1rtpkd:MATERIAL_PURCHASE:cmwg8hluu007toq01mh5jza4z",
+            "MATERIAL:cmwg8meyi007zoq01cwfk1qsl:MATERIAL_PURCHASE:cmwg8meyk0081oq016gt47ky6",
+            "MATERIAL:cmwg8qfxa0087oq01k5a40ff6:MATERIAL_PURCHASE:cmwg8qfxe0089oq01qgahihor",
+            "MATERIAL:cmwg8ut8u008eoq012d9j7l12:MATERIAL_PURCHASE:cmwg8ut8w008goq01ueld40kz",
+            "MATERIAL:cmwg9w65m008loq01xvsp88og:MATERIAL_PURCHASE:cmwg9w65r008noq01ulq3otqm",
+            "MATERIAL:cmwgb71ot008yoq01o5milsyi:MATERIAL_PURCHASE:cmwgb71ox0090oq01gsqckvse",
+            "MATERIAL:cmwgbadiv0095oq01l5o0dsqx:MATERIAL_PURCHASE:cmwgbadiy0097oq01s67uj9yo",
+            "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj:MATERIAL_PURCHASE:cmwhhwzpx00a1oq01epyun3py",
+            "MATERIAL:cmwhi1vm500a7oq0111yohtth:MATERIAL_PURCHASE:cmwhi1vm800a9oq01675o73dw",
+            "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl:MATERIAL_PURCHASE:cmwhi6lbu00ahoq01k63brjnz",
+            "MATERIAL:cmwhiagbg00aroq01mwdd2uzx:MATERIAL_PURCHASE:cmwhiagbj00atoq01sms4uxt6",
+            "MATERIAL:cmwhid0ei00azoq014888pmoe:MATERIAL_PURCHASE:cmwhid0ek00b1oq01irvvn3cm",
+            "MATERIAL:cmwhijono00b7oq01awsa6sbb:MATERIAL_PURCHASE:cmwhijons00b9oq01lxg5717t",
+            "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa:MATERIAL_PURCHASE:cmwhip6gi00bhoq01n4u1oiul"
+          ],
+          "startedAt": "2026-11-16T09:03:47.254Z",
+          "durationMs": 28,
+          "outcome": "model_failed",
+          "errorCode": "MODEL_INVALID_RESPONSE",
+          "model": null,
+          "returned": 0,
+          "reservedTokens": 125156,
+          "usage": null,
+          "adjustments": []
+        }
+      ],
+      "differences": [
+        {
+          "key": "MATERIAL:cmwg1nejd0017oq01dbrbr9g8:MATERIAL_PURCHASE:cmwg1nejj0019oq015v32pexs",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg1syeo001goq01lo04ot40:MATERIAL_PURCHASE:cmwg1syez001ioq017yvh5wia",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg1ydtm001noq01ruchlerr:MATERIAL_PURCHASE:cmwg1ydwz001poq01zug4rson",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg1zukg001toq01nbdav125:MATERIAL_PURCHASE:cmwg1zuki001voq010pyvuif4",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg20yat001zoq01l838wus2:MATERIAL_PURCHASE:cmwg20yaw0021oq01s0tn7se9",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg272pm0026oq01ldwgnote:MATERIAL_PURCHASE:cmwg272r80028oq01zqmqd4ez",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg2cnkz002eoq01bwj4frmp:MATERIAL_PURCHASE:cmwg2cnlq002goq01oth138kc",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg2h6cr002noq01rb9hl6wb:MATERIAL_PURCHASE:cmwg2h6d1002poq012l3enech",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg35d3c002woq01k0ez5ef4:MATERIAL_PURCHASE:cmwg35d3k002yoq01jnveq4fu",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg5jznx005koq01b5yqqvvq:MATERIAL_PURCHASE:cmwg5jzo9005moq01y9d4q07v",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg62y0v0064oq018j32l93v:MATERIAL_PURCHASE:cmwg62y0z0066oq01crq24mcy",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg65500006aoq01r2ugocml:MATERIAL_PURCHASE:cmwg65503006coq016p0qbfgs",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg695k8006goq01kb6pwyk8:MATERIAL_PURCHASE:cmwg695kc006ioq016bxdz2rx",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg6kssg006moq01z3u3l03s:MATERIAL_PURCHASE:cmwg6kssl006ooq01j1e3go4p",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmv9c5epp000h3we8q5tlmyij:MATERIAL_PURCHASE:cmwg6q67j006uoq012detgflf",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmv6czxjh00013wwrw95r1hlf:MATERIAL_PURCHASE:cmwg6sg3j006yoq017kkapoi8",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8cnag007joq01klk7e9a8:MATERIAL_PURCHASE:cmwg8cnak007loq01x206jc2g",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8hlup007roq01ic1rtpkd:MATERIAL_PURCHASE:cmwg8hluu007toq01mh5jza4z",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8meyi007zoq01cwfk1qsl:MATERIAL_PURCHASE:cmwg8meyk0081oq016gt47ky6",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8qfxa0087oq01k5a40ff6:MATERIAL_PURCHASE:cmwg8qfxe0089oq01qgahihor",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8ut8u008eoq012d9j7l12:MATERIAL_PURCHASE:cmwg8ut8w008goq01ueld40kz",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg9w65m008loq01xvsp88og:MATERIAL_PURCHASE:cmwg9w65r008noq01ulq3otqm",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwgb71ot008yoq01o5milsyi:MATERIAL_PURCHASE:cmwgb71ox0090oq01gsqckvse",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwgbadiv0095oq01l5o0dsqx:MATERIAL_PURCHASE:cmwgbadiy0097oq01s67uj9yo",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj:MATERIAL_PURCHASE:cmwhhwzpx00a1oq01epyun3py",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhi1vm500a7oq0111yohtth:MATERIAL_PURCHASE:cmwhi1vm800a9oq01675o73dw",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl:MATERIAL_PURCHASE:cmwhi6lbu00ahoq01k63brjnz",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhiagbg00aroq01mwdd2uzx:MATERIAL_PURCHASE:cmwhiagbj00atoq01sms4uxt6",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhid0ei00azoq014888pmoe:MATERIAL_PURCHASE:cmwhid0ek00b1oq01irvvn3cm",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhijono00b7oq01awsa6sbb:MATERIAL_PURCHASE:cmwhijons00b9oq01lxg5717t",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa:MATERIAL_PURCHASE:cmwhip6gi00bhoq01n4u1oiul",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        }
+      ],
+      "missingIncludes": [
+        "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+        "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+        "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+        "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+        "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+        "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+        "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+        "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+        "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+        "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+        "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c"
+      ],
+      "extraIncludes": [],
+      "recall": 0,
+      "precision": null,
+      "decisions": [],
+      "passed": false
+    },
+    {
+      "label": "frozen-core",
+      "repetition": 2,
+      "mode": "real-model",
+      "inputCandidateCount": 44,
+      "durationMs": 15,
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "not_started",
+        "countBasis": "purchase_entry",
+        "totalCandidates": 44,
+        "readCandidates": 44,
+        "uniqueCatalogItems": 44,
+        "evaluatedCandidates": 0,
+        "included": 0,
+        "excluded": 0,
+        "uncertain": 0,
+        "notEvaluated": 44,
+        "unreadCandidates": 0,
+        "stopReason": "model_failed"
+      },
+      "usage": {
+        "calls": 1,
+        "reservedTokens": 125156,
+        "knownPromptTokens": 0,
+        "knownCompletionTokens": 0,
+        "unknownUsageCalls": 1
+      },
+      "attempts": [
+        {
+          "number": 1,
+          "keys": [
+            "MATERIAL:cmwg1nejd0017oq01dbrbr9g8:MATERIAL_PURCHASE:cmwg1nejj0019oq015v32pexs",
+            "MATERIAL:cmwg1syeo001goq01lo04ot40:MATERIAL_PURCHASE:cmwg1syez001ioq017yvh5wia",
+            "MATERIAL:cmwg1ydtm001noq01ruchlerr:MATERIAL_PURCHASE:cmwg1ydwz001poq01zug4rson",
+            "MATERIAL:cmwg1zukg001toq01nbdav125:MATERIAL_PURCHASE:cmwg1zuki001voq010pyvuif4",
+            "MATERIAL:cmwg20yat001zoq01l838wus2:MATERIAL_PURCHASE:cmwg20yaw0021oq01s0tn7se9",
+            "MATERIAL:cmwg272pm0026oq01ldwgnote:MATERIAL_PURCHASE:cmwg272r80028oq01zqmqd4ez",
+            "MATERIAL:cmwg2cnkz002eoq01bwj4frmp:MATERIAL_PURCHASE:cmwg2cnlq002goq01oth138kc",
+            "MATERIAL:cmwg2h6cr002noq01rb9hl6wb:MATERIAL_PURCHASE:cmwg2h6d1002poq012l3enech",
+            "MATERIAL:cmwg35d3c002woq01k0ez5ef4:MATERIAL_PURCHASE:cmwg35d3k002yoq01jnveq4fu",
+            "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+            "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+            "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+            "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+            "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+            "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+            "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+            "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+            "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+            "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+            "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+            "MATERIAL:cmwg5jznx005koq01b5yqqvvq:MATERIAL_PURCHASE:cmwg5jzo9005moq01y9d4q07v",
+            "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+            "MATERIAL:cmwg62y0v0064oq018j32l93v:MATERIAL_PURCHASE:cmwg62y0z0066oq01crq24mcy",
+            "MATERIAL:cmwg65500006aoq01r2ugocml:MATERIAL_PURCHASE:cmwg65503006coq016p0qbfgs",
+            "MATERIAL:cmwg695k8006goq01kb6pwyk8:MATERIAL_PURCHASE:cmwg695kc006ioq016bxdz2rx",
+            "MATERIAL:cmwg6kssg006moq01z3u3l03s:MATERIAL_PURCHASE:cmwg6kssl006ooq01j1e3go4p",
+            "MATERIAL:cmv9c5epp000h3we8q5tlmyij:MATERIAL_PURCHASE:cmwg6q67j006uoq012detgflf",
+            "MATERIAL:cmv6czxjh00013wwrw95r1hlf:MATERIAL_PURCHASE:cmwg6sg3j006yoq017kkapoi8",
+            "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c",
+            "MATERIAL:cmwg8cnag007joq01klk7e9a8:MATERIAL_PURCHASE:cmwg8cnak007loq01x206jc2g",
+            "MATERIAL:cmwg8hlup007roq01ic1rtpkd:MATERIAL_PURCHASE:cmwg8hluu007toq01mh5jza4z",
+            "MATERIAL:cmwg8meyi007zoq01cwfk1qsl:MATERIAL_PURCHASE:cmwg8meyk0081oq016gt47ky6",
+            "MATERIAL:cmwg8qfxa0087oq01k5a40ff6:MATERIAL_PURCHASE:cmwg8qfxe0089oq01qgahihor",
+            "MATERIAL:cmwg8ut8u008eoq012d9j7l12:MATERIAL_PURCHASE:cmwg8ut8w008goq01ueld40kz",
+            "MATERIAL:cmwg9w65m008loq01xvsp88og:MATERIAL_PURCHASE:cmwg9w65r008noq01ulq3otqm",
+            "MATERIAL:cmwgb71ot008yoq01o5milsyi:MATERIAL_PURCHASE:cmwgb71ox0090oq01gsqckvse",
+            "MATERIAL:cmwgbadiv0095oq01l5o0dsqx:MATERIAL_PURCHASE:cmwgbadiy0097oq01s67uj9yo",
+            "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj:MATERIAL_PURCHASE:cmwhhwzpx00a1oq01epyun3py",
+            "MATERIAL:cmwhi1vm500a7oq0111yohtth:MATERIAL_PURCHASE:cmwhi1vm800a9oq01675o73dw",
+            "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl:MATERIAL_PURCHASE:cmwhi6lbu00ahoq01k63brjnz",
+            "MATERIAL:cmwhiagbg00aroq01mwdd2uzx:MATERIAL_PURCHASE:cmwhiagbj00atoq01sms4uxt6",
+            "MATERIAL:cmwhid0ei00azoq014888pmoe:MATERIAL_PURCHASE:cmwhid0ek00b1oq01irvvn3cm",
+            "MATERIAL:cmwhijono00b7oq01awsa6sbb:MATERIAL_PURCHASE:cmwhijons00b9oq01lxg5717t",
+            "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa:MATERIAL_PURCHASE:cmwhip6gi00bhoq01n4u1oiul"
+          ],
+          "startedAt": "2026-11-16T09:03:47.293Z",
+          "durationMs": 5,
+          "outcome": "model_failed",
+          "errorCode": "MODEL_INVALID_RESPONSE",
+          "model": null,
+          "returned": 0,
+          "reservedTokens": 125156,
+          "usage": null,
+          "adjustments": []
+        }
+      ],
+      "differences": [
+        {
+          "key": "MATERIAL:cmwg1nejd0017oq01dbrbr9g8:MATERIAL_PURCHASE:cmwg1nejj0019oq015v32pexs",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg1syeo001goq01lo04ot40:MATERIAL_PURCHASE:cmwg1syez001ioq017yvh5wia",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg1ydtm001noq01ruchlerr:MATERIAL_PURCHASE:cmwg1ydwz001poq01zug4rson",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg1zukg001toq01nbdav125:MATERIAL_PURCHASE:cmwg1zuki001voq010pyvuif4",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg20yat001zoq01l838wus2:MATERIAL_PURCHASE:cmwg20yaw0021oq01s0tn7se9",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg272pm0026oq01ldwgnote:MATERIAL_PURCHASE:cmwg272r80028oq01zqmqd4ez",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg2cnkz002eoq01bwj4frmp:MATERIAL_PURCHASE:cmwg2cnlq002goq01oth138kc",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg2h6cr002noq01rb9hl6wb:MATERIAL_PURCHASE:cmwg2h6d1002poq012l3enech",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg35d3c002woq01k0ez5ef4:MATERIAL_PURCHASE:cmwg35d3k002yoq01jnveq4fu",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg5jznx005koq01b5yqqvvq:MATERIAL_PURCHASE:cmwg5jzo9005moq01y9d4q07v",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg62y0v0064oq018j32l93v:MATERIAL_PURCHASE:cmwg62y0z0066oq01crq24mcy",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg65500006aoq01r2ugocml:MATERIAL_PURCHASE:cmwg65503006coq016p0qbfgs",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg695k8006goq01kb6pwyk8:MATERIAL_PURCHASE:cmwg695kc006ioq016bxdz2rx",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg6kssg006moq01z3u3l03s:MATERIAL_PURCHASE:cmwg6kssl006ooq01j1e3go4p",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmv9c5epp000h3we8q5tlmyij:MATERIAL_PURCHASE:cmwg6q67j006uoq012detgflf",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmv6czxjh00013wwrw95r1hlf:MATERIAL_PURCHASE:cmwg6sg3j006yoq017kkapoi8",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8cnag007joq01klk7e9a8:MATERIAL_PURCHASE:cmwg8cnak007loq01x206jc2g",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8hlup007roq01ic1rtpkd:MATERIAL_PURCHASE:cmwg8hluu007toq01mh5jza4z",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8meyi007zoq01cwfk1qsl:MATERIAL_PURCHASE:cmwg8meyk0081oq016gt47ky6",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8qfxa0087oq01k5a40ff6:MATERIAL_PURCHASE:cmwg8qfxe0089oq01qgahihor",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8ut8u008eoq012d9j7l12:MATERIAL_PURCHASE:cmwg8ut8w008goq01ueld40kz",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg9w65m008loq01xvsp88og:MATERIAL_PURCHASE:cmwg9w65r008noq01ulq3otqm",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwgb71ot008yoq01o5milsyi:MATERIAL_PURCHASE:cmwgb71ox0090oq01gsqckvse",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwgbadiv0095oq01l5o0dsqx:MATERIAL_PURCHASE:cmwgbadiy0097oq01s67uj9yo",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj:MATERIAL_PURCHASE:cmwhhwzpx00a1oq01epyun3py",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhi1vm500a7oq0111yohtth:MATERIAL_PURCHASE:cmwhi1vm800a9oq01675o73dw",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl:MATERIAL_PURCHASE:cmwhi6lbu00ahoq01k63brjnz",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhiagbg00aroq01mwdd2uzx:MATERIAL_PURCHASE:cmwhiagbj00atoq01sms4uxt6",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhid0ei00azoq014888pmoe:MATERIAL_PURCHASE:cmwhid0ek00b1oq01irvvn3cm",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhijono00b7oq01awsa6sbb:MATERIAL_PURCHASE:cmwhijons00b9oq01lxg5717t",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa:MATERIAL_PURCHASE:cmwhip6gi00bhoq01n4u1oiul",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        }
+      ],
+      "missingIncludes": [
+        "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+        "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+        "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+        "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+        "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+        "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+        "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+        "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+        "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+        "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+        "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c"
+      ],
+      "extraIncludes": [],
+      "recall": 0,
+      "precision": null,
+      "decisions": [],
+      "passed": false
+    },
+    {
+      "label": "frozen-core",
+      "repetition": 3,
+      "mode": "real-model",
+      "inputCandidateCount": 44,
+      "durationMs": 10,
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "not_started",
+        "countBasis": "purchase_entry",
+        "totalCandidates": 44,
+        "readCandidates": 44,
+        "uniqueCatalogItems": 44,
+        "evaluatedCandidates": 0,
+        "included": 0,
+        "excluded": 0,
+        "uncertain": 0,
+        "notEvaluated": 44,
+        "unreadCandidates": 0,
+        "stopReason": "model_failed"
+      },
+      "usage": {
+        "calls": 1,
+        "reservedTokens": 125156,
+        "knownPromptTokens": 0,
+        "knownCompletionTokens": 0,
+        "unknownUsageCalls": 1
+      },
+      "attempts": [
+        {
+          "number": 1,
+          "keys": [
+            "MATERIAL:cmwg1nejd0017oq01dbrbr9g8:MATERIAL_PURCHASE:cmwg1nejj0019oq015v32pexs",
+            "MATERIAL:cmwg1syeo001goq01lo04ot40:MATERIAL_PURCHASE:cmwg1syez001ioq017yvh5wia",
+            "MATERIAL:cmwg1ydtm001noq01ruchlerr:MATERIAL_PURCHASE:cmwg1ydwz001poq01zug4rson",
+            "MATERIAL:cmwg1zukg001toq01nbdav125:MATERIAL_PURCHASE:cmwg1zuki001voq010pyvuif4",
+            "MATERIAL:cmwg20yat001zoq01l838wus2:MATERIAL_PURCHASE:cmwg20yaw0021oq01s0tn7se9",
+            "MATERIAL:cmwg272pm0026oq01ldwgnote:MATERIAL_PURCHASE:cmwg272r80028oq01zqmqd4ez",
+            "MATERIAL:cmwg2cnkz002eoq01bwj4frmp:MATERIAL_PURCHASE:cmwg2cnlq002goq01oth138kc",
+            "MATERIAL:cmwg2h6cr002noq01rb9hl6wb:MATERIAL_PURCHASE:cmwg2h6d1002poq012l3enech",
+            "MATERIAL:cmwg35d3c002woq01k0ez5ef4:MATERIAL_PURCHASE:cmwg35d3k002yoq01jnveq4fu",
+            "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+            "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+            "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+            "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+            "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+            "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+            "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+            "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+            "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+            "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+            "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+            "MATERIAL:cmwg5jznx005koq01b5yqqvvq:MATERIAL_PURCHASE:cmwg5jzo9005moq01y9d4q07v",
+            "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+            "MATERIAL:cmwg62y0v0064oq018j32l93v:MATERIAL_PURCHASE:cmwg62y0z0066oq01crq24mcy",
+            "MATERIAL:cmwg65500006aoq01r2ugocml:MATERIAL_PURCHASE:cmwg65503006coq016p0qbfgs",
+            "MATERIAL:cmwg695k8006goq01kb6pwyk8:MATERIAL_PURCHASE:cmwg695kc006ioq016bxdz2rx",
+            "MATERIAL:cmwg6kssg006moq01z3u3l03s:MATERIAL_PURCHASE:cmwg6kssl006ooq01j1e3go4p",
+            "MATERIAL:cmv9c5epp000h3we8q5tlmyij:MATERIAL_PURCHASE:cmwg6q67j006uoq012detgflf",
+            "MATERIAL:cmv6czxjh00013wwrw95r1hlf:MATERIAL_PURCHASE:cmwg6sg3j006yoq017kkapoi8",
+            "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c",
+            "MATERIAL:cmwg8cnag007joq01klk7e9a8:MATERIAL_PURCHASE:cmwg8cnak007loq01x206jc2g",
+            "MATERIAL:cmwg8hlup007roq01ic1rtpkd:MATERIAL_PURCHASE:cmwg8hluu007toq01mh5jza4z",
+            "MATERIAL:cmwg8meyi007zoq01cwfk1qsl:MATERIAL_PURCHASE:cmwg8meyk0081oq016gt47ky6",
+            "MATERIAL:cmwg8qfxa0087oq01k5a40ff6:MATERIAL_PURCHASE:cmwg8qfxe0089oq01qgahihor",
+            "MATERIAL:cmwg8ut8u008eoq012d9j7l12:MATERIAL_PURCHASE:cmwg8ut8w008goq01ueld40kz",
+            "MATERIAL:cmwg9w65m008loq01xvsp88og:MATERIAL_PURCHASE:cmwg9w65r008noq01ulq3otqm",
+            "MATERIAL:cmwgb71ot008yoq01o5milsyi:MATERIAL_PURCHASE:cmwgb71ox0090oq01gsqckvse",
+            "MATERIAL:cmwgbadiv0095oq01l5o0dsqx:MATERIAL_PURCHASE:cmwgbadiy0097oq01s67uj9yo",
+            "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj:MATERIAL_PURCHASE:cmwhhwzpx00a1oq01epyun3py",
+            "MATERIAL:cmwhi1vm500a7oq0111yohtth:MATERIAL_PURCHASE:cmwhi1vm800a9oq01675o73dw",
+            "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl:MATERIAL_PURCHASE:cmwhi6lbu00ahoq01k63brjnz",
+            "MATERIAL:cmwhiagbg00aroq01mwdd2uzx:MATERIAL_PURCHASE:cmwhiagbj00atoq01sms4uxt6",
+            "MATERIAL:cmwhid0ei00azoq014888pmoe:MATERIAL_PURCHASE:cmwhid0ek00b1oq01irvvn3cm",
+            "MATERIAL:cmwhijono00b7oq01awsa6sbb:MATERIAL_PURCHASE:cmwhijons00b9oq01lxg5717t",
+            "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa:MATERIAL_PURCHASE:cmwhip6gi00bhoq01n4u1oiul"
+          ],
+          "startedAt": "2026-11-16T09:03:47.305Z",
+          "durationMs": 3,
+          "outcome": "model_failed",
+          "errorCode": "MODEL_INVALID_RESPONSE",
+          "model": null,
+          "returned": 0,
+          "reservedTokens": 125156,
+          "usage": null,
+          "adjustments": []
+        }
+      ],
+      "differences": [
+        {
+          "key": "MATERIAL:cmwg1nejd0017oq01dbrbr9g8:MATERIAL_PURCHASE:cmwg1nejj0019oq015v32pexs",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg1syeo001goq01lo04ot40:MATERIAL_PURCHASE:cmwg1syez001ioq017yvh5wia",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg1ydtm001noq01ruchlerr:MATERIAL_PURCHASE:cmwg1ydwz001poq01zug4rson",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg1zukg001toq01nbdav125:MATERIAL_PURCHASE:cmwg1zuki001voq010pyvuif4",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg20yat001zoq01l838wus2:MATERIAL_PURCHASE:cmwg20yaw0021oq01s0tn7se9",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg272pm0026oq01ldwgnote:MATERIAL_PURCHASE:cmwg272r80028oq01zqmqd4ez",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg2cnkz002eoq01bwj4frmp:MATERIAL_PURCHASE:cmwg2cnlq002goq01oth138kc",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg2h6cr002noq01rb9hl6wb:MATERIAL_PURCHASE:cmwg2h6d1002poq012l3enech",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg35d3c002woq01k0ez5ef4:MATERIAL_PURCHASE:cmwg35d3k002yoq01jnveq4fu",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg5jznx005koq01b5yqqvvq:MATERIAL_PURCHASE:cmwg5jzo9005moq01y9d4q07v",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg62y0v0064oq018j32l93v:MATERIAL_PURCHASE:cmwg62y0z0066oq01crq24mcy",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg65500006aoq01r2ugocml:MATERIAL_PURCHASE:cmwg65503006coq016p0qbfgs",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg695k8006goq01kb6pwyk8:MATERIAL_PURCHASE:cmwg695kc006ioq016bxdz2rx",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg6kssg006moq01z3u3l03s:MATERIAL_PURCHASE:cmwg6kssl006ooq01j1e3go4p",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmv9c5epp000h3we8q5tlmyij:MATERIAL_PURCHASE:cmwg6q67j006uoq012detgflf",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmv6czxjh00013wwrw95r1hlf:MATERIAL_PURCHASE:cmwg6sg3j006yoq017kkapoi8",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8cnag007joq01klk7e9a8:MATERIAL_PURCHASE:cmwg8cnak007loq01x206jc2g",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8hlup007roq01ic1rtpkd:MATERIAL_PURCHASE:cmwg8hluu007toq01mh5jza4z",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8meyi007zoq01cwfk1qsl:MATERIAL_PURCHASE:cmwg8meyk0081oq016gt47ky6",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8qfxa0087oq01k5a40ff6:MATERIAL_PURCHASE:cmwg8qfxe0089oq01qgahihor",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg8ut8u008eoq012d9j7l12:MATERIAL_PURCHASE:cmwg8ut8w008goq01ueld40kz",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwg9w65m008loq01xvsp88og:MATERIAL_PURCHASE:cmwg9w65r008noq01ulq3otqm",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwgb71ot008yoq01o5milsyi:MATERIAL_PURCHASE:cmwgb71ox0090oq01gsqckvse",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwgbadiv0095oq01l5o0dsqx:MATERIAL_PURCHASE:cmwgbadiy0097oq01s67uj9yo",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj:MATERIAL_PURCHASE:cmwhhwzpx00a1oq01epyun3py",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhi1vm500a7oq0111yohtth:MATERIAL_PURCHASE:cmwhi1vm800a9oq01675o73dw",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl:MATERIAL_PURCHASE:cmwhi6lbu00ahoq01k63brjnz",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhiagbg00aroq01mwdd2uzx:MATERIAL_PURCHASE:cmwhiagbj00atoq01sms4uxt6",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhid0ei00azoq014888pmoe:MATERIAL_PURCHASE:cmwhid0ek00b1oq01irvvn3cm",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhijono00b7oq01awsa6sbb:MATERIAL_PURCHASE:cmwhijons00b9oq01lxg5717t",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa:MATERIAL_PURCHASE:cmwhip6gi00bhoq01n4u1oiul",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        }
+      ],
+      "missingIncludes": [
+        "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+        "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+        "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+        "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+        "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+        "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+        "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+        "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+        "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+        "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+        "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c"
+      ],
+      "extraIncludes": [],
+      "recall": 0,
+      "precision": null,
+      "decisions": [],
+      "passed": false
+    },
+    {
+      "label": "constructed-boundaries",
+      "repetition": 1,
+      "mode": "real-model",
+      "inputCandidateCount": 13,
+      "durationMs": 5,
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "not_started",
+        "countBasis": "catalog",
+        "totalCandidates": 13,
+        "readCandidates": 13,
+        "uniqueCatalogItems": 13,
+        "evaluatedCandidates": 0,
+        "included": 0,
+        "excluded": 0,
+        "uncertain": 0,
+        "notEvaluated": 13,
+        "unreadCandidates": 0,
+        "stopReason": "model_failed"
+      },
+      "usage": {
+        "calls": 1,
+        "reservedTokens": 37912,
+        "knownPromptTokens": 0,
+        "knownCompletionTokens": 0,
+        "unknownUsageCalls": 1
+      },
+      "attempts": [
+        {
+          "number": 1,
+          "keys": [
+            "MATERIAL:c000000000000000000000300::",
+            "MATERIAL:c000000000000000000000301::",
+            "MATERIAL:c000000000000000000000302::",
+            "MATERIAL:c000000000000000000000303::",
+            "MATERIAL:c000000000000000000000304::",
+            "MATERIAL:c000000000000000000000305::",
+            "MATERIAL:c000000000000000000000306::",
+            "MATERIAL:c000000000000000000000307::",
+            "MATERIAL:c000000000000000000000309::",
+            "MATERIAL:c000000000000000000000310::",
+            "MATERIAL:c000000000000000000000311::",
+            "MATERIAL:c000000000000000000000312::",
+            "PRODUCT:c000000000000000000000308::"
+          ],
+          "startedAt": "2026-11-16T09:03:47.311Z",
+          "durationMs": 3,
+          "outcome": "model_failed",
+          "errorCode": "MODEL_INVALID_RESPONSE",
+          "model": null,
+          "returned": 0,
+          "reservedTokens": 37912,
+          "usage": null,
+          "adjustments": []
+        }
+      ],
+      "differences": [
+        {
+          "key": "MATERIAL:c000000000000000000000300::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000301::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000302::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000303::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000304::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000305::",
+          "expected": "uncertain",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000306::",
+          "expected": "uncertain",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000307::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "PRODUCT:c000000000000000000000308::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000309::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000310::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000311::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000312::",
+          "expected": "uncertain",
+          "actual": "not_evaluated"
+        }
+      ],
+      "missingIncludes": [
+        "MATERIAL:c000000000000000000000300::",
+        "MATERIAL:c000000000000000000000301::",
+        "MATERIAL:c000000000000000000000302::",
+        "MATERIAL:c000000000000000000000304::",
+        "MATERIAL:c000000000000000000000310::"
+      ],
+      "extraIncludes": [],
+      "recall": 0,
+      "precision": null,
+      "decisions": [],
+      "passed": false
+    },
+    {
+      "label": "constructed-boundaries",
+      "repetition": 2,
+      "mode": "real-model",
+      "inputCandidateCount": 13,
+      "durationMs": 3,
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "not_started",
+        "countBasis": "catalog",
+        "totalCandidates": 13,
+        "readCandidates": 13,
+        "uniqueCatalogItems": 13,
+        "evaluatedCandidates": 0,
+        "included": 0,
+        "excluded": 0,
+        "uncertain": 0,
+        "notEvaluated": 13,
+        "unreadCandidates": 0,
+        "stopReason": "model_failed"
+      },
+      "usage": {
+        "calls": 1,
+        "reservedTokens": 37912,
+        "knownPromptTokens": 0,
+        "knownCompletionTokens": 0,
+        "unknownUsageCalls": 1
+      },
+      "attempts": [
+        {
+          "number": 1,
+          "keys": [
+            "MATERIAL:c000000000000000000000300::",
+            "MATERIAL:c000000000000000000000301::",
+            "MATERIAL:c000000000000000000000302::",
+            "MATERIAL:c000000000000000000000303::",
+            "MATERIAL:c000000000000000000000304::",
+            "MATERIAL:c000000000000000000000305::",
+            "MATERIAL:c000000000000000000000306::",
+            "MATERIAL:c000000000000000000000307::",
+            "MATERIAL:c000000000000000000000309::",
+            "MATERIAL:c000000000000000000000310::",
+            "MATERIAL:c000000000000000000000311::",
+            "MATERIAL:c000000000000000000000312::",
+            "PRODUCT:c000000000000000000000308::"
+          ],
+          "startedAt": "2026-11-16T09:03:47.316Z",
+          "durationMs": 1,
+          "outcome": "model_failed",
+          "errorCode": "MODEL_INVALID_RESPONSE",
+          "model": null,
+          "returned": 0,
+          "reservedTokens": 37912,
+          "usage": null,
+          "adjustments": []
+        }
+      ],
+      "differences": [
+        {
+          "key": "MATERIAL:c000000000000000000000300::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000301::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000302::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000303::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000304::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000305::",
+          "expected": "uncertain",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000306::",
+          "expected": "uncertain",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000307::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "PRODUCT:c000000000000000000000308::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000309::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000310::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000311::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000312::",
+          "expected": "uncertain",
+          "actual": "not_evaluated"
+        }
+      ],
+      "missingIncludes": [
+        "MATERIAL:c000000000000000000000300::",
+        "MATERIAL:c000000000000000000000301::",
+        "MATERIAL:c000000000000000000000302::",
+        "MATERIAL:c000000000000000000000304::",
+        "MATERIAL:c000000000000000000000310::"
+      ],
+      "extraIncludes": [],
+      "recall": 0,
+      "precision": null,
+      "decisions": [],
+      "passed": false
+    },
+    {
+      "label": "constructed-boundaries",
+      "repetition": 3,
+      "mode": "real-model",
+      "inputCandidateCount": 13,
+      "durationMs": 4,
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "not_started",
+        "countBasis": "catalog",
+        "totalCandidates": 13,
+        "readCandidates": 13,
+        "uniqueCatalogItems": 13,
+        "evaluatedCandidates": 0,
+        "included": 0,
+        "excluded": 0,
+        "uncertain": 0,
+        "notEvaluated": 13,
+        "unreadCandidates": 0,
+        "stopReason": "model_failed"
+      },
+      "usage": {
+        "calls": 1,
+        "reservedTokens": 37912,
+        "knownPromptTokens": 0,
+        "knownCompletionTokens": 0,
+        "unknownUsageCalls": 1
+      },
+      "attempts": [
+        {
+          "number": 1,
+          "keys": [
+            "MATERIAL:c000000000000000000000300::",
+            "MATERIAL:c000000000000000000000301::",
+            "MATERIAL:c000000000000000000000302::",
+            "MATERIAL:c000000000000000000000303::",
+            "MATERIAL:c000000000000000000000304::",
+            "MATERIAL:c000000000000000000000305::",
+            "MATERIAL:c000000000000000000000306::",
+            "MATERIAL:c000000000000000000000307::",
+            "MATERIAL:c000000000000000000000309::",
+            "MATERIAL:c000000000000000000000310::",
+            "MATERIAL:c000000000000000000000311::",
+            "MATERIAL:c000000000000000000000312::",
+            "PRODUCT:c000000000000000000000308::"
+          ],
+          "startedAt": "2026-11-16T09:03:47.319Z",
+          "durationMs": 2,
+          "outcome": "model_failed",
+          "errorCode": "MODEL_INVALID_RESPONSE",
+          "model": null,
+          "returned": 0,
+          "reservedTokens": 37912,
+          "usage": null,
+          "adjustments": []
+        }
+      ],
+      "differences": [
+        {
+          "key": "MATERIAL:c000000000000000000000300::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000301::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000302::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000303::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000304::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000305::",
+          "expected": "uncertain",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000306::",
+          "expected": "uncertain",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000307::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "PRODUCT:c000000000000000000000308::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000309::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000310::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000311::",
+          "expected": "exclude",
+          "actual": "not_evaluated"
+        },
+        {
+          "key": "MATERIAL:c000000000000000000000312::",
+          "expected": "uncertain",
+          "actual": "not_evaluated"
+        }
+      ],
+      "missingIncludes": [
+        "MATERIAL:c000000000000000000000300::",
+        "MATERIAL:c000000000000000000000301::",
+        "MATERIAL:c000000000000000000000302::",
+        "MATERIAL:c000000000000000000000304::",
+        "MATERIAL:c000000000000000000000310::"
+      ],
+      "extraIncludes": [],
+      "recall": 0,
+      "precision": null,
+      "decisions": [],
+      "passed": false
+    },
+    {
+      "label": "SEM-09-used-with",
+      "repetition": 1,
+      "mode": "real-model",
+      "inputCandidateCount": 1,
+      "durationMs": 1,
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "not_started",
+        "countBasis": "catalog",
+        "totalCandidates": 1,
+        "readCandidates": 1,
+        "uniqueCatalogItems": 1,
+        "evaluatedCandidates": 0,
+        "included": 0,
+        "excluded": 0,
+        "uncertain": 0,
+        "notEvaluated": 1,
+        "unreadCandidates": 0,
+        "stopReason": "model_failed"
+      },
+      "usage": {
+        "calls": 1,
+        "reservedTokens": 13233,
+        "knownPromptTokens": 0,
+        "knownCompletionTokens": 0,
+        "unknownUsageCalls": 1
+      },
+      "attempts": [
+        {
+          "number": 1,
+          "keys": ["MATERIAL:c000000000000000000000307::"],
+          "startedAt": "2026-11-16T09:03:47.322Z",
+          "durationMs": 0,
+          "outcome": "model_failed",
+          "errorCode": "MODEL_INVALID_RESPONSE",
+          "model": null,
+          "returned": 0,
+          "reservedTokens": 13233,
+          "usage": null,
+          "adjustments": []
+        }
+      ],
+      "differences": [
+        {
+          "key": "MATERIAL:c000000000000000000000307::",
+          "expected": "include",
+          "actual": "not_evaluated"
+        }
+      ],
+      "missingIncludes": ["MATERIAL:c000000000000000000000307::"],
+      "extraIncludes": [],
+      "recall": 0,
+      "precision": null,
+      "decisions": [],
+      "passed": false
+    }
+  ],
+  "limitations": [
+    "Not authenticated HTTP, P4 tool/stream/multiturn or UI validation",
+    "No production access, business writes, migration or deployment",
+    "Mock is deterministic and not model validation",
+    "Bounded full-scope fallback; >5000 rows fail explicitly",
+    "Usage tokens are actual provider units when present; monetary cost needs current billing rates"
+  ]
+}

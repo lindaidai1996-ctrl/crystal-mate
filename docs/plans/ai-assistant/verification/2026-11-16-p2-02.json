@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-11-16T06:37:26.176Z",
+  "source": "crystal_mate_dev",
+  "mode": "read-only-repeatable-read",
+  "command": "node scripts/with-dev-db.mjs tsx scripts/check-ai-assistant-references.ts",
+  "validationBoundary": "Real development rows checked with the pure resolver; authenticated service behavior verified separately using mocked account/database tests. No model, production, migrations or writes.",
+  "distributorCount": 16,
+  "materialCategoryCount": 45,
+  "tagCount": 103,
+  "location": {
+    "status": "resolved",
+    "confirmedCount": 7,
+    "uncertainCount": 2,
+    "missingBaselineIds": [],
+    "additionalIds": [],
+    "baselineOtherIdsIncorrectlyIncluded": []
+  },
+  "categoryAlias": {
+    "totalMatches": 1,
+    "expectedIdFound": true
+  }
+}

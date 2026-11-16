@@ -394,11 +394,19 @@ export function ProductsPage({
   }
 
   const renderActions = (item: Product) => (
-    <span className={isCabochon ? 'row-actions cabochon-row-actions' : 'row-actions'}>
+    <span
+      className={
+        isCabochon
+          ? 'row-actions cabochon-row-actions'
+          : `row-actions ${catalogStyles.standardActions}`
+      }
+    >
       {!isCabochon && (
         <Link href={`${listPath}/${item.id}`}>
           <Tooltip title={common('edit')}>
-            <Button type="text" icon={<EditOutlined />} aria-label={common('edit')} />
+            <Button type="text" icon={<EditOutlined />} aria-label={common('edit')}>
+              {common('edit')}
+            </Button>
           </Tooltip>
         </Link>
       )}
@@ -423,7 +431,9 @@ export function ProductsPage({
         onConfirm={() => remove(item.id)}
       >
         <Tooltip title={common('delete')}>
-          <Button type="text" danger icon={<DeleteOutlined />} aria-label={common('delete')} />
+          <Button type="text" danger icon={<DeleteOutlined />} aria-label={common('delete')}>
+            {common('delete')}
+          </Button>
         </Tooltip>
       </Popconfirm>
     </span>
@@ -603,7 +613,7 @@ export function ProductsPage({
     {
       title: t('actions'),
       key: 'actions',
-      width: isCabochon ? cabochonActionWidth : 100,
+      width: isCabochon ? cabochonActionWidth : 180,
       render: (_, item) => renderActions(item),
     },
   ];

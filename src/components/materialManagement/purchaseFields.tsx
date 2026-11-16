@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Checkbox, ConfigProvider, Form, InputNumber, Radio } from 'antd';
+import { Alert, Button, Checkbox, ConfigProvider, Form, InputNumber, Radio } from 'antd';
 import { CompactFields } from '@/components/responsive/compactFields';
 import { useTranslations } from 'next-intl';
 import type { MaterialAmount, MaterialValues } from '@/lib/client-types';
@@ -8,6 +8,7 @@ import { Sensitive, usePrivacyMode } from '@/components/privacyMode';
 import {
   calculatePurchase,
   editPurchase,
+  purchaseTotalFromManualPrice,
   type MaterialPurchase,
   type PurchaseTotalField,
 } from '@/lib/material-purchase';
@@ -70,6 +71,10 @@ export function PurchaseFields({
   const unit = t(values.unit);
   const batch = purchase.mode === 'BATCH';
   const result = calculatePurchase(values, purchase, quantityUnknown ? null : quantity);
+  const suggestedTotal = purchaseTotalFromManualPrice(
+    result.purchase,
+    quantityUnknown ? null : quantity,
+  );
   const totalInput = (field: PurchaseTotalField, suffix: string, positive = false) =>
     privacyMode && field !== 'totalWeightGrams' ? null : (
       <Form.Item label={t(field)}>
@@ -82,6 +87,28 @@ export function PurchaseFields({
         />
         {result.purchase.autoField === field && (
           <div className="material-source-label">{t('autoCalculated')}</div>
+        )}
+        {field === 'totalAmount' && suggestedTotal !== null && (
+          <div className="material-input-help" aria-live="polite">
+            <span>
+              {t('suggestedTotalAmount', {
+                amount: suggestedTotal,
+                quantity: String(quantity),
+                price: result.values.purchaseUnitPrice ?? purchase.manualUnitPrice ?? '',
+              })}
+            </span>
+            <Button
+              type="link"
+              size="small"
+              htmlType="button"
+              disabled={componentDisabled}
+              onClick={() =>
+                onPurchaseChange(editPurchase(result.purchase, 'totalAmount', suggestedTotal))
+              }
+            >
+              {t('adopt')}
+            </Button>
+          </div>
         )}
       </Form.Item>
     );

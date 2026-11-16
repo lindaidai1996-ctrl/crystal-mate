@@ -63,7 +63,6 @@ import catalogStyles from '@/components/productCatalog.module.css';
 import { usePrivacyMode } from '@/components/privacyMode';
 import { MaterialListFilters } from '@/components/responsive/materialListFilters';
 import { ListPageActions } from '@/components/responsive/listPageActions';
-import { MobileDetails } from '@/components/responsive/mobileDetails';
 
 const MATERIAL_PAGE_SIZE = 20;
 type MaterialFilters = {
@@ -234,8 +233,8 @@ function BatchPrices({ item, card = false }: { item: Material; card?: boolean })
   if (samePrice)
     return (
       <div className={card ? materialStyles.batchGroup : 'material-batch-names'}>
-        {links.slice(0, 2)}
-        {entries.length > 2 && (
+        {card ? links : links.slice(0, 2)}
+        {!card && entries.length > 2 && (
           <Popover
             title={t('batch')}
             content={<div className="material-batch-more">{links}</div>}
@@ -331,36 +330,48 @@ function MaterialEditLink({ item, children }: { item: Material; children?: React
   );
 }
 
-function MaterialActions({
-  item,
-  onRemove,
-  onSaved,
-}: {
-  item: Material;
-  onRemove: (id: string) => void;
-  onSaved: () => void;
-}) {
+function MaterialStock({ item, onSaved }: { item: Material; onSaved: () => void }) {
+  const t = useTranslations('materials');
+  const inventory = useTranslations('inventory');
+  return (
+    <div className={materialStyles.stockPanel}>
+      <span className={materialStyles.sectionLabel}>{inventory('current')}</span>
+      <div className={materialStyles.stockRow}>
+        <span className={materialStyles.stockValue}>
+          <MaterialStockSummary material={item} />
+        </span>
+        <MaterialStockButton
+          compact
+          allowDecimals={item.unit === 'GRAM'}
+          materialId={item.id}
+          name={item.name}
+          unit={t(item.unit)}
+          entries={item.batchEntries}
+          onSaved={onSaved}
+        />
+      </div>
+    </div>
+  );
+}
+
+function MaterialActions({ item, onRemove }: { item: Material; onRemove: (id: string) => void }) {
   const t = useTranslations('materials');
   const common = useTranslations('common');
   const editButton = (
     <Tooltip title={common('edit')}>
-      <Button type="text" icon={<EditOutlined />} aria-label={`${common('edit')} ${item.name}`} />
+      <Button size="small" icon={<EditOutlined />} aria-label={`${common('edit')} ${item.name}`}>
+        {common('edit')}
+      </Button>
     </Tooltip>
   );
   return (
-    <span className="row-actions">
-      <MaterialStockButton
-        allowDecimals={item.unit === 'GRAM'}
-        materialId={item.id}
-        name={item.name}
-        unit={t(item.unit)}
-        entries={item.batchEntries}
-        onSaved={onSaved}
-      />
+    <span className={`row-actions ${materialStyles.actions}`}>
       <MaterialEditLink item={item}>{editButton}</MaterialEditLink>
       <Link href={`/admin/materials/${item.id}/batches/new`}>
         <Tooltip title={t('addBatch')}>
-          <Button type="text" icon={<PlusOutlined />} aria-label={t('addBatch')} />
+          <Button size="small" icon={<PlusOutlined />} aria-label={t('addBatch')}>
+            {t('addBatch')}
+          </Button>
         </Tooltip>
       </Link>
       <Popconfirm
@@ -370,7 +381,9 @@ function MaterialActions({
         onConfirm={() => onRemove(item.id)}
       >
         <Tooltip title={common('delete')}>
-          <Button type="text" danger icon={<DeleteOutlined />} aria-label={common('delete')} />
+          <Button size="small" danger icon={<DeleteOutlined />} aria-label={common('delete')}>
+            {common('delete')}
+          </Button>
         </Tooltip>
       </Popconfirm>
     </span>
@@ -499,12 +512,11 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
           .map((id) => categories.find((category) => category.id === id)?.name)
           .join(' / ') || item.category.name,
     },
-    { title: t('unit'), key: 'unit', width: 90, render: (_, item) => t(item.unit) },
     {
       title: inventory('current'),
       key: 'stock',
-      width: 110,
-      render: (_, item) => <MaterialStockSummary material={item} />,
+      width: 190,
+      render: (_, item) => <MaterialStock item={item} onSaved={refreshStock} />,
     },
     {
       title: t('batchPrices'),
@@ -532,7 +544,7 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
       title: t('actions'),
       key: 'actions',
       width: 250,
-      render: (_, item) => <MaterialActions item={item} onRemove={remove} onSaved={refreshStock} />,
+      render: (_, item) => <MaterialActions item={item} onRemove={remove} />,
     },
   ];
 
@@ -735,7 +747,6 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
                       .map((id) => categories.find((category) => category.id === id)?.name)
                       .join(' / ') || item.category.name}
                   </span>
-                  <span>{t(item.unit)}</span>
                 </div>
                 {!!item.tags.length && (
                   <div className={`product-tags ${catalogStyles.cardTags}`}>
@@ -745,14 +756,13 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
                   </div>
                 )}
                 <CatalogNote text={item.notes} />
-                <MaterialStockSummary material={item} />
-                <MobileDetails label={t('batchPrices')}>
-                  <div className={catalogStyles.cardDetails}>
-                    <BatchPrices item={item} card />
-                  </div>
-                </MobileDetails>
-                <div className={catalogStyles.cardActions}>
-                  <MaterialActions item={item} onRemove={remove} onSaved={refreshStock} />
+                <MaterialStock item={item} onSaved={refreshStock} />
+                <div className={materialStyles.pricesSection}>
+                  <div className={materialStyles.sectionLabel}>{t('batchPrices')}</div>
+                  <BatchPrices item={item} card />
+                </div>
+                <div className={materialStyles.actionBar}>
+                  <MaterialActions item={item} onRemove={remove} />
                 </div>
               </div>
             </article>
@@ -781,24 +791,24 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
                 <p className="mobile-record-meta">
                   {categoryPath(item.categoryId, categories)
                     .map((id) => categories.find((category) => category.id === id)?.name)
-                    .join(' / ') || item.category.name}{' '}
-                  · {t(item.unit)}
+                    .join(' / ') || item.category.name}
                 </p>
-                <MaterialStockSummary material={item} />
-                <MobileDetails label={t('batchPrices')}>
-                  <BatchPrices item={item} />
-                  <p>
-                    {t('updated')}: {new Date(item.updatedAt).toLocaleString()}
-                  </p>
-                </MobileDetails>
+                <MaterialStock item={item} onSaved={refreshStock} />
+                <div className={materialStyles.pricesSection}>
+                  <div className={materialStyles.sectionLabel}>{t('batchPrices')}</div>
+                  <BatchPrices item={item} card />
+                </div>
+                <p className="mobile-record-meta">
+                  {t('updated')}: {new Date(item.updatedAt).toLocaleString()}
+                </p>
                 <RecordAuditSummary
                   entityType="Material"
                   entityId={item.id}
                   record={provenance[item.id]}
                   failed={auditFailed}
                 />
-                <div className="mobile-record-actions">
-                  <MaterialActions item={item} onRemove={remove} onSaved={refreshStock} />
+                <div className={materialStyles.actionBar}>
+                  <MaterialActions item={item} onRemove={remove} />
                 </div>
               </>
             )}

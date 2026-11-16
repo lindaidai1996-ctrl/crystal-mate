@@ -1,0 +1,55 @@
+{
+  "checkedAt": "2026-11-16T08:14:44.389Z",
+  "source": "crystal_mate_dev",
+  "mode": "read-only-repeatable-read",
+  "catalog": {
+    "materialCount": 210,
+    "productCount": 127,
+    "pageLimitOneDoesNotTruncate": true,
+    "matchesBusinessSummary": true,
+    "matchesIndependentSql": true,
+    "matchesProductStock": true
+  },
+  "batches": {
+    "count": 213,
+    "nullRemainingCount": 0,
+    "zeroRemainingCount": 1,
+    "changedFromReceivedCount": 1,
+    "withAdjustmentCount": 1,
+    "withDiyLinesCount": 11,
+    "differentDiyUsageUnitCount": 4,
+    "sourceMappingMatchesPersistedBalances": true
+  },
+  "multiBatchMaterialCount": 3,
+  "historicalSelectionChecks": [
+    {
+      "stockBatchCount": 2,
+      "outsideDateCount": 1,
+      "sourceRemaining": "4.00",
+      "totalKnownStock": "6.00",
+      "unknownStockBatchCount": 0
+    },
+    {
+      "stockBatchCount": 2,
+      "outsideDateCount": 1,
+      "sourceRemaining": "1.00",
+      "totalKnownStock": "2.00",
+      "unknownStockBatchCount": 0
+    },
+    {
+      "stockBatchCount": 2,
+      "outsideDateCount": 1,
+      "sourceRemaining": "1.00",
+      "totalKnownStock": "3.00",
+      "unknownStockBatchCount": 0
+    }
+  ],
+  "emptySelectionCount": 0,
+  "limitations": [
+    "No business writes, migrations, production access or deployment",
+    "No authenticated HTTP session, model call or E2E",
+    "DIY lines do not auto-decrement persisted material remainingQty in current business implementation",
+    "Missing real scenarios are covered by constructed service tests only; see observed counts",
+    "Product purchase source remaining is unavailable; only product total stock is supported"
+  ]
+}

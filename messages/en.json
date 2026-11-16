@@ -26,6 +26,7 @@
     "addMaterial": "Add material",
     "backToBatch": "Back to batch details",
     "backToDistributor": "Back to distributor details",
+    "backToTop": "Back to top",
     "confirmDelete": "Delete this item?",
     "loading": "Loading",
     "all": "All",
@@ -582,6 +583,7 @@
     "quotedGramPrice": "Quoted purchase price per gram",
     "totalWeightGrams": "Total purchase weight",
     "totalAmount": "Total purchase amount",
+    "suggestedTotalAmount": "Suggested amount: {amount} CNY ({quantity} × {price})",
     "autoCalculated": "Calculated automatically (editable)",
     "unitPurchasePrice": "Purchase price per {unit}",
     "unitWeight": "Weight per {unit}",
@@ -784,6 +786,9 @@
     "nextImage": "Next image"
   },
   "imageUpload": {
+    "chooseSource": "Choose photo source",
+    "takePhoto": "Take photo",
+    "chooseFromLibrary": "Choose from library",
     "applyCover": "Apply cover",
     "adjustCover": "Adjust cover",
     "coverMode": "Cover display mode",

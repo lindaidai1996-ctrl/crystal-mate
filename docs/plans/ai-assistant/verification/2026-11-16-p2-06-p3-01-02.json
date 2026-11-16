@@ -1,0 +1,84 @@
+{
+  "checkedAt": "2026-11-16T08:46:07.220Z",
+  "source": "crystal_mate_dev",
+  "mode": "read-only-repeatable-read",
+  "audit": {
+    "existingWrapperExercised": true,
+    "transactionLocalActorVerified": true,
+    "readOnlyVerified": true
+  },
+  "mainCase": {
+    "candidateCount": 44,
+    "expectedFrozenCandidateCount": 44,
+    "frozenMissingCount": 0,
+    "addedSinceBaseline": 0,
+    "expectedConfirmedCount": 11,
+    "recallOfExpectedConfirmed": 1,
+    "pageSizes": [5, 5, 5, 5, 5, 5, 5, 5, 4],
+    "duplicates": 0,
+    "sourceCounts": [
+      {
+        "route": "aliases",
+        "candidateCount": 2
+      },
+      {
+        "route": "category",
+        "candidateCount": 28
+      },
+      {
+        "route": "full_scope",
+        "candidateCount": 44
+      },
+      {
+        "route": "name",
+        "candidateCount": 24
+      },
+      {
+        "route": "tag",
+        "candidateCount": 25
+      }
+    ],
+    "deterministicRuleCounts": {
+      "include": 11,
+      "exclude": 33,
+      "uncertain": 0
+    },
+    "confirmedSetMatchesFrozen": true,
+    "purposeSynonymKeepsConfirmedSet": true
+  },
+  "catalog": {
+    "materialCount": 210,
+    "productCount": 127,
+    "candidateCount": 337,
+    "sourceCounts": [
+      {
+        "route": "aliases",
+        "candidateCount": 12
+      },
+      {
+        "route": "category",
+        "candidateCount": 99
+      },
+      {
+        "route": "full_scope",
+        "candidateCount": 337
+      },
+      {
+        "route": "name",
+        "candidateCount": 124
+      },
+      {
+        "route": "tag",
+        "candidateCount": 98
+      }
+    ]
+  },
+  "limitations": [
+    "Deterministic policy evaluation only, no model or natural-language parsing evaluation",
+    "Recall retains the entire bounded hard scope, lexical routes do not prove semantic inclusion",
+    "No authenticated HTTP or persistent conversation isolation test",
+    "No production access, business data writes, migrations, E2E or deployment",
+    "Broad scopes over 5000 rows fail explicitly; scalable retrieval/budget recovery remains P3-04"
+  ],
+  "auditIdentityAbsentAfterTransaction": true
+}

@@ -27,6 +27,7 @@ import { NavigationGuardProvider, useNavigationGuard } from './navigationGuard';
 import type { AccountProfile } from '@/lib/account';
 import { imageThumbnailUrl } from '@/lib/image-storage';
 import { setPrivacyMode, usePrivacyMode } from './privacyMode';
+import { MobileBackToTop } from './responsive/mobileBackToTop';
 
 const { Header, Sider, Content } = Layout;
 
@@ -295,6 +296,7 @@ function AdminShellContent({
         <Content className={shellStyles.content}>{children}</Content>
         {footer}
       </Layout>
+      <MobileBackToTop key={pathname} />
       <Drawer
         title={t('menu')}
         placement="left"

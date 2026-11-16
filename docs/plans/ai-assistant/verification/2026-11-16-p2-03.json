@@ -1,0 +1,47 @@
+{
+  "checkedAt": "2026-11-16T07:05:42.120Z",
+  "source": "crystal_mate_dev",
+  "mode": "read-only-repeatable-read",
+  "mainCase": {
+    "expectedCount": 44,
+    "actualCount": 44,
+    "pageSizes": [7, 7, 7, 7, 7, 7, 2],
+    "duplicateCount": 0,
+    "missingBaselineIds": [],
+    "additionalIds": [],
+    "completeness": {
+      "scope": "resolved",
+      "traversal": "complete",
+      "evaluation": "not_started",
+      "countBasis": "purchase_entry",
+      "totalCandidates": 44,
+      "readCandidates": 44,
+      "uniqueCatalogItems": 44,
+      "evaluatedCandidates": 0,
+      "included": 0,
+      "excluded": 0,
+      "uncertain": 0,
+      "notEvaluated": 44,
+      "unreadCandidates": 0,
+      "stopReason": "running"
+    },
+    "detailsRead": 7
+  },
+  "boundaries": {
+    "beforeExclusive14": 0,
+    "fromInclusive14": 44,
+    "emptyDateCount": 0,
+    "emptyPlaceCount": 0,
+    "emptyLocationIntersectionCount": 0
+  },
+  "mappingChecks": {
+    "materialCatalogCount": 210,
+    "productCatalogCount": 127,
+    "productPurchaseCount": 13,
+    "categorySubtreeCatalogCount": 9
+  },
+  "limitations": [
+    "No real authenticated HTTP session or model call",
+    "Snapshot fields are observation-time data; no purchase amount or inventory verification"
+  ]
+}

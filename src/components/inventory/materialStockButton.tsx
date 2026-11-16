@@ -15,6 +15,7 @@ export function MaterialStockButton({
   unit,
   entries,
   allowDecimals = false,
+  compact = false,
   onSaved,
 }: {
   materialId: string;
@@ -22,6 +23,7 @@ export function MaterialStockButton({
   unit: string;
   entries: StockEntry[];
   allowDecimals?: boolean;
+  compact?: boolean;
   onSaved: () => void | Promise<void>;
 }) {
   const t = useTranslations('inventory');
@@ -30,6 +32,9 @@ export function MaterialStockButton({
   const button = (
     <Button
       type="text"
+      size={compact ? 'small' : 'middle'}
+      className={compact ? inventoryStyles.stockShortcut : undefined}
+      aria-label={`${t('adjust')} · ${name}`}
       disabled={!entries.length}
       onClick={() => (entries.length === 1 ? setSelected(entries[0]) : setChoosing(true))}
     >
