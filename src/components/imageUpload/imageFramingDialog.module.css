@@ -1,0 +1,42 @@
+.modes {
+  margin-block: 16px;
+}
+
+.modes :global(.ant-segmented-item-label) {
+  min-height: 44px;
+  line-height: 44px;
+}
+
+.stage {
+  position: relative;
+  width: min(100%, 360px, 48dvh);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--ant-color-fill-alter);
+}
+
+.cropper {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.cropper[hidden] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.controls :global(.ant-btn) {
+  min-height: 44px;
+}

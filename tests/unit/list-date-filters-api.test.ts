@@ -30,7 +30,7 @@ import { GET as materials } from '../../src/app/api/materials/route';
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
   mocks.products.mockResolvedValue([]);
   mocks.materials.mockResolvedValue([]);
   mocks.productCount.mockResolvedValue(0);

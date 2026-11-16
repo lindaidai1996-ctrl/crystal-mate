@@ -2,6 +2,7 @@
 
 import {
   AppstoreOutlined,
+  HistoryOutlined,
   ContainerOutlined,
   DeploymentUnitOutlined,
   FolderOutlined,
@@ -64,28 +65,30 @@ function AdminShellContent({
   const privacyMode = usePrivacyMode();
   const menuButton = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
-  const selected = pathname.startsWith('/admin/account')
-    ? 'account'
-    : pathname.startsWith('/admin/setting-styles')
-      ? 'settingStyles'
-      : pathname.startsWith('/admin/categories')
-        ? 'categories'
-        : pathname.startsWith('/admin/distributors')
-          ? 'distributors'
-          : pathname === '/admin/materials/batches' ||
-              pathname.startsWith('/admin/materials/batches/')
-            ? 'materialBatches'
-            : pathname.startsWith('/admin/materials')
-              ? 'materials'
-              : pathname.startsWith('/admin/tags')
-                ? 'tags'
-                : pathname === catalogPath('cabochons') ||
-                    pathname.startsWith(`${catalogPath('cabochons')}/`)
-                  ? 'cabochons'
-                  : pathname === catalogPath('finished-strands') ||
-                      pathname.startsWith(`${catalogPath('finished-strands')}/`)
-                    ? 'finishedStrands'
-                    : 'products';
+  const selected = pathname.startsWith('/admin/audit-logs')
+    ? 'auditLogs'
+    : pathname.startsWith('/admin/account')
+      ? 'account'
+      : pathname.startsWith('/admin/setting-styles')
+        ? 'settingStyles'
+        : pathname.startsWith('/admin/categories')
+          ? 'categories'
+          : pathname.startsWith('/admin/distributors')
+            ? 'distributors'
+            : pathname === '/admin/materials/batches' ||
+                pathname.startsWith('/admin/materials/batches/')
+              ? 'materialBatches'
+              : pathname.startsWith('/admin/materials')
+                ? 'materials'
+                : pathname.startsWith('/admin/tags')
+                  ? 'tags'
+                  : pathname === catalogPath('cabochons') ||
+                      pathname.startsWith(`${catalogPath('cabochons')}/`)
+                    ? 'cabochons'
+                    : pathname === catalogPath('finished-strands') ||
+                        pathname.startsWith(`${catalogPath('finished-strands')}/`)
+                      ? 'finishedStrands'
+                      : 'products';
   const menu = (
     <Menu
       theme="light"
@@ -137,6 +140,15 @@ function AdminShellContent({
           type: 'group',
           label: t('managementGroup'),
           children: [
+            {
+              key: 'auditLogs',
+              icon: <HistoryOutlined />,
+              label: t('auditLogs'),
+              onClick: () => {
+                navigate(() => router.push('/admin/audit-logs'));
+                setOpen(false);
+              },
+            },
             {
               key: 'distributors',
               icon: <TeamOutlined />,

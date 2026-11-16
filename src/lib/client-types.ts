@@ -1,3 +1,4 @@
+import type { ImageFraming } from './image-framing';
 import type { AttachmentSource } from './attachments';
 import type { MaterialPurchase } from './material-purchase';
 import type { ProductSaleRule } from './product-pricing';
@@ -55,7 +56,7 @@ export type DistributorPurchaseSummary = {
   itemId: string;
   name: string;
   code: string | null;
-  image: Pick<ProductImage, 'objectKey' | 'url'> | null;
+  image: Pick<ProductImage, 'objectKey' | 'url' | 'framing'> | null;
   unit: string | null;
   batchCount: number;
   latestReceivedAt: string;
@@ -98,7 +99,13 @@ export type DistributorPurchaseEntriesPage = {
   page: number;
   pageSize: number;
 };
-export type ProductImage = { id?: string; objectKey: string; url: string; position: number };
+export type ProductImage = {
+  id?: string;
+  objectKey: string;
+  url: string;
+  position: number;
+  framing?: ImageFraming | null;
+};
 export type ProductMarketing = {
   videoShot: boolean;
   xiaohongshuVideoPublished: boolean;

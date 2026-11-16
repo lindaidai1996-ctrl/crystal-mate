@@ -1,5 +1,10 @@
 'use client';
 
+import { SearchFilterRow } from '@/components/responsive/searchFilterRow';
+import { ResetFiltersButton } from '@/components/responsive/resetFiltersButton';
+
+import { RecordAuditSummary, useRecordProvenance } from '@/components/audit-history';
+
 import {
   AppstoreOutlined,
   DeleteOutlined,
@@ -16,12 +21,10 @@ import {
   Checkbox,
   Empty,
   Input,
-  Pagination,
   Popconfirm,
   Popover,
   Segmented,
   Select,
-  Skeleton,
   Tooltip,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -57,8 +60,10 @@ import { withAdminReturnTo } from '@/lib/admin-return-path';
 import { CatalogGallery, CatalogGalleryImage } from '@/components/catalogGallery';
 import { CatalogNote } from '@/components/catalogNote';
 import catalogStyles from '@/components/productCatalog.module.css';
-import motionStyles from '@/components/listMotion.module.css';
 import { usePrivacyMode } from '@/components/privacyMode';
+import { MaterialListFilters } from '@/components/responsive/materialListFilters';
+import { ListPageActions } from '@/components/responsive/listPageActions';
+import { MobileDetails } from '@/components/responsive/mobileDetails';
 
 const MATERIAL_PAGE_SIZE = 20;
 type MaterialFilters = {
@@ -475,6 +480,7 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
   const refreshStock = () => {
     setRevision((value) => value + 1);
   };
+  const { records: provenance, failed: auditFailed } = useRecordProvenance('Material', data.items);
   const columns: ColumnsType<Material> = [
     {
       title: t('name'),
@@ -510,7 +516,17 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
       title: t('updated'),
       key: 'updated',
       width: 170,
-      render: (_, item) => new Date(item.updatedAt).toLocaleString(),
+      render: (_, item) => (
+        <>
+          <div>{new Date(item.updatedAt).toLocaleString()}</div>
+          <RecordAuditSummary
+            entityType="Material"
+            entityId={item.id}
+            record={provenance[item.id]}
+            failed={auditFailed}
+          />
+        </>
+      ),
     },
     {
       title: t('actions'),
@@ -520,6 +536,31 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
     },
   ];
 
+  const searchInput = (
+    <SearchFilterRow>
+      <Input
+        className="filter-search"
+        prefix={<SearchOutlined />}
+        value={query}
+        onChange={(event) => changeFilters({ query: event.target.value })}
+        aria-label={t('search')}
+        placeholder={t('search')}
+        allowClear
+      />
+      <ResetFiltersButton
+        onReset={() => {
+          changeFilters({
+            query: '',
+            categoryId: undefined,
+            source: undefined,
+            createdRange: null,
+          });
+          setRevision((current) => current + 1);
+        }}
+      />
+    </SearchFilterRow>
+  );
+
   return (
     <>
       <div className="page-heading">
@@ -527,7 +568,15 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
           <h1>{t('title')}</h1>
           <p>{t('count', { count: data.total })}</p>
         </div>
-        <div className="material-heading-actions">
+        <ListPageActions
+          primary={
+            <Link href="/admin/materials/new">
+              <Button type="primary" icon={<PlusOutlined />}>
+                {t('new')}
+              </Button>
+            </Link>
+          }
+        >
           <EditorDraftBox kind="MATERIAL" returnTo="/admin/materials" />
           <Link href="/admin/materials/image-import">
             <Button icon={<ScanOutlined />}>{t('imageImport')}</Button>
@@ -535,46 +584,41 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
           <Link href="/admin/materials/categories">
             <Button icon={<FolderOutlined />}>{t('manageCategories')}</Button>
           </Link>
-          <Link href="/admin/materials/new">
-            <Button type="primary" icon={<PlusOutlined />}>
-              {t('new')}
-            </Button>
-          </Link>
-        </div>
+        </ListPageActions>
       </div>
-      <div className="filter-bar">
-        <Input
-          className="filter-search"
-          prefix={<SearchOutlined />}
-          value={query}
-          onChange={(event) => changeFilters({ query: event.target.value })}
-          placeholder={t('search')}
-          allowClear
-        />
-        <Select
-          className="filter-select"
-          aria-label={t('source')}
-          placeholder={t('allSources')}
-          value={source}
-          allowClear
-          options={[
-            { value: 'IMAGE_IMPORT', label: t('sourceImageImport') },
-            { value: 'OTHER', label: t('sourceOther') },
-          ]}
-          onChange={(value) => changeFilters({ source: value })}
-        />
-        <DateRangeFilter
-          kind="created"
-          value={createdRange}
-          onChange={(range) => changeFilters({ createdRange: range })}
-        />
-      </div>
-      <MaterialCategoryFilter
+      <MaterialListFilters
+        value={{ categoryId, source, createdRange }}
         categories={categories}
-        value={categoryId}
-        counts={categoryCounts}
-        onChange={(categoryId) => changeFilters({ categoryId })}
-      />
+        onApply={changeFilters}
+        search={searchInput}
+      >
+        <div className="filter-bar">
+          {searchInput}
+          <Select
+            className="filter-select"
+            aria-label={t('source')}
+            placeholder={t('allSources')}
+            value={source}
+            allowClear
+            options={[
+              { value: 'IMAGE_IMPORT', label: t('sourceImageImport') },
+              { value: 'OTHER', label: t('sourceOther') },
+            ]}
+            onChange={(value) => changeFilters({ source: value })}
+          />
+          <DateRangeFilter
+            kind="created"
+            value={createdRange}
+            onChange={(range) => changeFilters({ createdRange: range })}
+          />
+        </div>
+        <MaterialCategoryFilter
+          categories={categories}
+          value={categoryId}
+          counts={categoryCounts}
+          onChange={(categoryId) => changeFilters({ categoryId })}
+        />
+      </MaterialListFilters>
       <div className={bulkStyles.toolbar}>
         <Button
           onClick={() => {
@@ -701,10 +745,12 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
                   </div>
                 )}
                 <CatalogNote text={item.notes} />
-                <div className={catalogStyles.cardDetails}>
-                  <MaterialStockSummary material={item} />
-                  <BatchPrices item={item} card />
-                </div>
+                <MaterialStockSummary material={item} />
+                <MobileDetails label={t('batchPrices')}>
+                  <div className={catalogStyles.cardDetails}>
+                    <BatchPrices item={item} card />
+                  </div>
+                </MobileDetails>
                 <div className={catalogStyles.cardActions}>
                   <MaterialActions item={item} onRemove={remove} onSaved={refreshStock} />
                 </div>
@@ -714,90 +760,71 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
         </CatalogGallery>
       ) : (
         <div className="table-surface">
-          <div className="material-desktop-table">
-            <PaginatedTable
-              rowKey="id"
-              rowSelection={
-                bulkMode
-                  ? {
-                      selectedRowKeys: selectedIds,
-                      preserveSelectedRowKeys: true,
-                      onChange: (keys) => setSelectedIds(keys.map(String)),
-                      getCheckboxProps: () => ({ disabled: loading }),
-                    }
-                  : undefined
-              }
-              columns={columns}
-              dataSource={data.items}
-              loading={loading}
-              scroll={{ x: bulkMode ? 1458 : 1410 }}
-              pagination={{
-                ...CLIENT_TABLE_PAGINATION,
-                current: page,
-                pageSize,
-                total: data.total,
-                onChange: changePage,
-              }}
-              locale={{ emptyText: <Empty description={t('empty')} /> }}
-            />
-          </div>
-          <div
-            className={`material-mobile-list ${motionStyles.stagger}`}
-            data-loading={loading}
-            aria-busy={loading}
-          >
-            {loading ? (
-              <Skeleton active paragraph={{ rows: 6 }} />
-            ) : data.items.length ? (
-              data.items.map((item) => (
-                <article className="material-mobile-item" key={item.id}>
-                  {bulkMode && (
-                    <Checkbox
-                      checked={selectedIds.includes(item.id)}
-                      onChange={(event) =>
-                        setSelectedIds((ids) =>
-                          togglePageSelection(ids, [item.id], event.target.checked),
-                        )
-                      }
-                    >
-                      {bulk('selectMaterial', { name: item.name })}
-                    </Checkbox>
-                  )}
-                  <MaterialIdentity item={item} />
-                  <div className="material-mobile-meta">
-                    {categoryPath(item.categoryId, categories)
-                      .map(
-                        (categoryId) =>
-                          categories.find((category) => category.id === categoryId)?.name,
+          <PaginatedTable
+            rowKey="id"
+            mobileRender={(item) => (
+              <>
+                {bulkMode && (
+                  <Checkbox
+                    checked={selectedIds.includes(item.id)}
+                    disabled={loading}
+                    onChange={(event) =>
+                      setSelectedIds((ids) =>
+                        togglePageSelection(ids, [item.id], event.target.checked),
                       )
-                      .join(' / ') || item.category.name}{' '}
-                    · {t(item.unit)}
-                  </div>
-                  <div className="material-mobile-meta">
-                    <MaterialStockSummary material={item} />
-                  </div>
-                  <div className="material-mobile-batches">
-                    <span>{t('batchPrices')}</span>
-                    <BatchPrices item={item} />
-                  </div>
-                  <div className="material-mobile-actions">
-                    <MaterialActions item={item} onRemove={remove} onSaved={refreshStock} />
-                  </div>
-                </article>
-              ))
-            ) : (
-              <Empty description={t('empty')} />
+                    }
+                  >
+                    {bulk('selectMaterial', { name: item.name })}
+                  </Checkbox>
+                )}
+                <MaterialIdentity item={item} />
+                <p className="mobile-record-meta">
+                  {categoryPath(item.categoryId, categories)
+                    .map((id) => categories.find((category) => category.id === id)?.name)
+                    .join(' / ') || item.category.name}{' '}
+                  · {t(item.unit)}
+                </p>
+                <MaterialStockSummary material={item} />
+                <MobileDetails label={t('batchPrices')}>
+                  <BatchPrices item={item} />
+                  <p>
+                    {t('updated')}: {new Date(item.updatedAt).toLocaleString()}
+                  </p>
+                </MobileDetails>
+                <RecordAuditSummary
+                  entityType="Material"
+                  entityId={item.id}
+                  record={provenance[item.id]}
+                  failed={auditFailed}
+                />
+                <div className="mobile-record-actions">
+                  <MaterialActions item={item} onRemove={remove} onSaved={refreshStock} />
+                </div>
+              </>
             )}
-            {!loading && (
-              <Pagination
-                {...pagination}
-                current={page}
-                pageSize={pageSize}
-                total={data.total}
-                onChange={changePage}
-              />
-            )}
-          </div>
+            rowSelection={
+              bulkMode
+                ? {
+                    selectedRowKeys: selectedIds,
+                    preserveSelectedRowKeys: true,
+                    onChange: (keys) => setSelectedIds(keys.map(String)),
+                    getCheckboxProps: () => ({ disabled: loading }),
+                  }
+                : undefined
+            }
+            columns={columns}
+            dataSource={data.items}
+            loading={loading}
+            scroll={{ x: bulkMode ? 1458 : 1410 }}
+            pagination={{
+              ...CLIENT_TABLE_PAGINATION,
+              current: page,
+              pageSize,
+              total: data.total,
+              onChange: changePage,
+            }}
+            locale={{ emptyText: <Empty description={t('empty')} /> }}
+          />
         </div>
       )}
       {bulkAction && (

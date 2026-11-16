@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="zh-CN">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>移动端布局草案</title>
+  <style>
+    :root {
+      color: #30483e;
+      background: #f7f8f2;
+      font:
+        14px 'PingFang SC',
+        'Microsoft YaHei',
+        sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 32px;
+    }
+    h1 {
+      font-size: 24px;
+      margin: 0 0 12px;
+    }
+    h2 {
+      font-size: 16px;
+      margin: 0;
+    }
+    p,
+    small {
+      color: #607266;
+      line-height: 1.7;
+    }
+    main {
+      display: flex;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 32px;
+      margin-top: 24px;
+    }
+    section {
+      width: min(100%, 360px);
+    }
+    .phone {
+      position: relative;
+      height: 650px;
+      border: 1px solid #dce4dc;
+      border-radius: 16px;
+      overflow: auto;
+      background: #fff;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      border-bottom: 1px solid #e5eae2;
+    }
+    .body {
+      padding: 16px;
+    }
+    button,
+    input,
+    select {
+      min-height: 44px;
+      border: 1px solid #dce4dc;
+      background: #fff;
+      color: inherit;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font: inherit;
+    }
+    button {
+      cursor: pointer;
+    }
+    button:focus-visible {
+      outline: 2px solid #547566;
+      outline-offset: 2px;
+    }
+    .primary {
+      background: #547566;
+      color: white;
+      border-color: #547566;
+    }
+    .search {
+      display: flex;
+      gap: 8px;
+      margin: 16px 0;
+    }
+    input {
+      min-width: 0;
+      width: 100%;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      padding: 16px 0;
+      border-bottom: 1px solid #e5eae2;
+    }
+    .image {
+      display: grid;
+      place-items: center;
+      flex: none;
+      width: 72px;
+      height: 88px;
+      border-radius: 6px;
+      background: #eff3ed;
+      color: #607266;
+    }
+    .info {
+      flex: 1;
+      min-width: 0;
+    }
+    .info p {
+      margin: 6px 0;
+    }
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .chips {
+      display: flex;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .chip {
+      border: 0;
+      background: #e8efe7;
+    }
+    details {
+      margin-top: 12px;
+    }
+    summary {
+      cursor: pointer;
+      padding: 12px 0;
+      color: #547566;
+    }
+    dl {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 0;
+    }
+    dt {
+      color: #607266;
+      margin-bottom: 6px;
+    }
+    dd {
+      margin: 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .card {
+      border: 1px solid #e5eae2;
+      border-radius: 8px;
+      padding: 8px;
+    }
+    .card .image {
+      width: 100%;
+      height: 130px;
+      margin-bottom: 12px;
+    }
+    .card p {
+      margin: 6px 0;
+    }
+    .field {
+      display: grid;
+      gap: 8px;
+      margin: 16px 0;
+    }
+    .upload {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .upload .image {
+      width: 64px;
+      height: 64px;
+    }
+    footer {
+      position: sticky;
+      bottom: 0;
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      border-top: 1px solid #e5eae2;
+      background: #fff;
+    }
+    footer button:last-child {
+      flex: 1;
+    }
+    dialog {
+      width: min(100%, 360px);
+      max-height: 90dvh;
+      border: 0;
+      border-radius: 16px;
+      padding: 20px;
+      color: inherit;
+    }
+    dialog::backdrop {
+      background: #30483e66;
+    }
+    select {
+      width: 100%;
+    }
+    @media (max-width: 450px) {
+      body {
+        padding: 16px;
+      }
+    }
+  </style>
+  <h1>移动端布局草案</h1>
+  <p>沿用现有玉绿色、中文字体、8px 间距与轻量边框。以下均为字段占位，不代表业务数据。</p>
+  <main>
+    <section>
+      <p>01 · 表格在手机上转为摘要列表</p>
+      <div class="phone">
+        <header>
+          <h2>商品</h2>
+          <button class="primary">新建商品</button>
+        </header>
+        <div class="body">
+          <div class="search">
+            <input placeholder="搜索商品" /><button
+              onclick="document.querySelector('dialog').showModal()"
+            >
+              筛选
+            </button>
+          </div>
+          <div class="chips">
+            <button class="chip" onclick="document.querySelector('dialog').showModal()">
+              全部分类</button
+            ><button onclick="document.querySelector('dialog').showModal()">排序</button>
+          </div>
+          <article class="row">
+            <div class="image">[缩略图]</div>
+            <div class="info">
+              <h2>[商品名称]</h2>
+              <p>[编号] · [分类]</p>
+              <dl>
+                <div>
+                  <dt>售价</dt>
+                  <dd>[售价]</dd>
+                </div>
+                <div>
+                  <dt>库存</dt>
+                  <dd>[库存]</dd>
+                </div>
+              </dl>
+              <details>
+                <summary>更多信息</summary>
+                <p>[标签、来源、备注等原有字段]</p>
+              </details>
+              <div class="actions"><button>编辑</button><button>更多</button></div>
+            </div>
+          </article>
+          <article class="row">
+            <div class="image">[缩略图]</div>
+            <div class="info">
+              <h2>[商品名称]</h2>
+              <p>[编号] · [分类]</p>
+              <dl>
+                <div>
+                  <dt>售价</dt>
+                  <dd>[售价]</dd>
+                </div>
+                <div>
+                  <dt>库存</dt>
+                  <dd>[库存]</dd>
+                </div>
+              </dl>
+              <details>
+                <summary>更多信息</summary>
+                <p>[其他字段]</p>
+              </details>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section>
+      <p>02 · 画廊缩为双列，详情按需展开</p>
+      <div class="phone">
+        <header>
+          <h2>物料</h2>
+          <button class="primary">新建物料</button>
+        </header>
+        <div class="body">
+          <div class="search">
+            <input placeholder="搜索物料" /><button
+              onclick="document.querySelector('dialog').showModal()"
+            >
+              筛选
+            </button>
+          </div>
+          <div class="grid">
+            <article class="card">
+              <div class="image">[物料图片]</div>
+              <h2>[物料名称]</h2>
+              <p>[规格 / 单位]</p>
+              <strong>[售价]</strong>
+              <details>
+                <summary>详情与操作</summary>
+                <p>[批次 / 成本 / 库存]</p>
+                <button>编辑</button>
+              </details>
+            </article>
+            <article class="card">
+              <div class="image">[物料图片]</div>
+              <h2>[物料名称]</h2>
+              <p>[规格 / 单位]</p>
+              <strong>[售价]</strong>
+              <details>
+                <summary>详情与操作</summary>
+                <p>[批次 / 成本 / 库存]</p>
+                <button>编辑</button>
+              </details>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section>
+      <p>03 · 编辑使用单列表单与底部保存栏</p>
+      <div class="phone">
+        <header>
+          <h2>新建 / 编辑</h2>
+          <button>返回</button>
+        </header>
+        <div class="body">
+          <h2>基本信息</h2>
+          <label class="field">名称<input placeholder="[名称]" /></label>
+          <label class="field"
+            >分类<select>
+              <option>[选择分类]</option>
+            </select></label
+          >
+          <label class="field"
+            >标签<select>
+              <option>[选择标签]</option>
+            </select></label
+          >
+          <h2>图片</h2>
+          <div class="upload">
+            <div class="image">[封面]</div>
+            <button>添加图片</button>
+          </div>
+          <label class="field">售价<input placeholder="[售价]" inputmode="decimal" /></label>
+          <label class="field">库存<input placeholder="[库存]" inputmode="numeric" /></label>
+        </div>
+        <footer>
+          <button>取消</button><button>存草稿</button><button class="primary">保存</button>
+        </footer>
+      </div>
+    </section>
+  </main>
+  <dialog>
+    <h2>筛选</h2>
+    <p>搜索保留在列表上方，分类、排序、筛选各自打开选项面板。选好后点确定生效；关闭则放弃修改。</p>
+    <label class="field"
+      >分类<select>
+        <option>全部分类</option>
+      </select></label
+    ><label class="field"
+      >库存<select>
+        <option>全部库存</option>
+      </select></label
+    ><label class="field"
+      >来源<select>
+        <option>全部来源</option>
+      </select></label
+    ><label class="field">创建日期<input type="date" /></label
+    ><button class="primary" onclick="this.closest('dialog').close()">完成</button>
+  </dialog>
+</html>

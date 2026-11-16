@@ -1,5 +1,6 @@
 'use client';
 
+import type { FramedImage } from '@/lib/image-framing';
 import { Empty, Pagination, Spin } from 'antd';
 import type { PaginationProps } from 'antd';
 import { useTranslations } from 'next-intl';
@@ -9,6 +10,7 @@ import { ListLoadingIndicator } from './listLoadingIndicator';
 import { ImageHoverPreview } from './materialManagement/imageHoverPreview';
 import catalogStyles from './productCatalog.module.css';
 import motionStyles from './listMotion.module.css';
+import { useMobile } from './responsive/useMobile';
 
 export function CatalogGallery({
   loading,
@@ -22,6 +24,7 @@ export function CatalogGallery({
   children: ReactNode;
 }) {
   const common = useTranslations('common');
+  const mobile = useMobile();
   const hasItems = Children.toArray(children).length > 0;
 
   return (
@@ -74,7 +77,11 @@ export function CatalogGallery({
             {typeof pagination.showTotal === 'function' ? pagination.showTotal(0, [0, 0]) : null}
           </span>
         ) : (
-          <Pagination {...pagination} disabled={loading || pagination.disabled} />
+          <Pagination
+            {...pagination}
+            {...(mobile ? { simple: true, showSizeChanger: false, showQuickJumper: false } : {})}
+            disabled={loading || pagination.disabled}
+          />
         )}
       </div>
     </div>
@@ -86,7 +93,7 @@ export function CatalogGalleryImage({
   name,
   soldOut = false,
 }: {
-  images: { objectKey: string; url: string; fileName?: string }[];
+  images: ({ objectKey: string; url: string; fileName?: string } & FramedImage)[];
   name: string;
   soldOut?: boolean;
 }) {

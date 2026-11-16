@@ -1,3 +1,5 @@
+import { sameOrderedRows } from './unchanged-relations';
+import { readImageFraming, serializeImageFraming } from '@/lib/image-framing';
 import { Prisma } from '@prisma/client';
 import { ApiError } from '@/lib/api';
 import { productSchema } from '@/lib/validation';
@@ -36,6 +38,7 @@ type ProductWithRelations = Prisma.ProductGetPayload<{ include: typeof productIn
 export function serializeProduct(product: ProductWithRelations) {
   return {
     ...product,
+    images: product.images.map(serializeImageFraming),
     saleRuleValue: product.saleRuleValue?.toFixed(2) ?? null,
     tags: product.tags.map(({ tag }) => tag).sort((a, b) => a.name.localeCompare(b.name)),
     marketing: {
@@ -210,22 +213,29 @@ export async function saveProduct(input: ProductInput, id?: string, context?: Pr
       });
     }
     if (input.tagIds !== undefined) {
-      if (id) await tx.productTag.deleteMany({ where: { productId: id } });
+      if (id)
+        await tx.productTag.deleteMany({
+          where: { productId: id, tagId: { notIn: input.tagIds } },
+        });
       if (input.tagIds.length)
         await tx.productTag.createMany({
           data: input.tagIds.map((tagId) => ({ productId: product.id, tagId })),
+          skipDuplicates: true,
         });
     }
-    if (id) await tx.productImage.deleteMany({ where: { productId: id } });
-    if (input.imageKeys.length) {
-      await tx.productImage.createMany({
-        data: input.imageKeys.map((key, position) => ({
-          productId: product.id,
-          objectKey: key,
-          url: oldImages.get(key)?.url ?? heldImages.get(key) ?? grantByKey.get(key)!.url,
-          position,
-        })),
-      });
+    const nextImages = input.imageKeys.map((key, position) => ({
+      productId: product.id,
+      objectKey: key,
+      url: oldImages.get(key)?.url ?? heldImages.get(key) ?? grantByKey.get(key)!.url,
+      position,
+      framing:
+        input.imageFramings?.[key] ??
+        readImageFraming(oldImages.get(key)?.framing) ??
+        Prisma.DbNull,
+    }));
+    if (!sameOrderedRows(current?.images ?? [], nextImages)) {
+      if (id) await tx.productImage.deleteMany({ where: { productId: id } });
+      if (nextImages.length) await tx.productImage.createMany({ data: nextImages });
     }
     if (newKeys.length)
       await tx.uploadGrant.updateMany({

@@ -33,7 +33,7 @@ beforeEach(() => {
 
 describe('image import API authorization', () => {
   it('includes archived receipts and progress in import history', async () => {
-    mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+    mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
     mocks.list.mockResolvedValue([
       {
         id: 'completed',
@@ -58,7 +58,7 @@ describe('image import API authorization', () => {
   });
 
   it('validates the deletion version and returns an empty success response', async () => {
-    mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+    mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
     const request = (body: unknown) =>
       new NextRequest('http://localhost/api/material-image-imports/test-import', {
         method: 'DELETE',
@@ -75,7 +75,7 @@ describe('image import API authorization', () => {
   });
 
   it('validates regions before requesting a single-item preview', async () => {
-    mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+    mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
     const payload = {
       itemId: '641d34e5-8a91-4d8d-8d38-fb4543259f75',
       version: 3,
@@ -122,7 +122,7 @@ describe('image import API authorization', () => {
   });
 
   it('rejects cross-origin stock and model requests', async () => {
-    mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+    mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
     for (const handler of [recognize, recognizeItem, commit, remove]) {
       const response = await handler(
         new NextRequest('http://localhost/api/material-image-imports/test', {

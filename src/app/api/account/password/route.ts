@@ -1,10 +1,11 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { compare, hash } from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { apiError, ApiError, requireAdmin } from '@/lib/api';
 import { passwordSchema } from '@/lib/account';
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
   try {
     const session = await requireAdmin(request);
     const input = passwordSchema.parse(await request.json());
@@ -25,3 +26,5 @@ export async function POST(request: NextRequest) {
     return apiError(error);
   }
 }
+
+export const POST = withAuditRoute(handlePOST);

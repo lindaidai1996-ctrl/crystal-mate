@@ -1,9 +1,10 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiError, requireAdmin } from '@/lib/api';
 import { diyVersionSchema } from '@/lib/diyImageImport/contracts';
 import { commitDiyImport } from '@/lib/diyImageImport/commit';
 
-export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+async function handlePOST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin(request);
     const { version } = diyVersionSchema.parse(await request.json());
@@ -12,3 +13,5 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     return apiError(error);
   }
 }
+
+export const POST = withAuditRoute(handlePOST);

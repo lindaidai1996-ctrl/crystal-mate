@@ -10,3 +10,5 @@ public/uploads
 *.tsbuildinfo
 next-env.d.ts
 AGENTS.md
+
+.next-audit-check

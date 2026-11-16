@@ -30,7 +30,7 @@ const context = { params: Promise.resolve({ id: 'material-1' }) };
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
   mocks.material.mockResolvedValue({ id: 'material-1' });
   mocks.sources.mockResolvedValue([]);
   mocks.list.mockResolvedValue([]);

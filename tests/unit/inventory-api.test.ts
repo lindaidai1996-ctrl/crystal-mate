@@ -21,7 +21,7 @@ const request = (body: object, origin = 'http://localhost') =>
   });
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
 });
 
 describe('inventory API', () => {
@@ -29,7 +29,7 @@ describe('inventory API', () => {
     mocks.auth.mockResolvedValue(null);
     expect((await materialPost(request({}), context)).status).toBe(401);
     expect((await productPost(request({}), context)).status).toBe(401);
-    mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+    mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
     expect(
       (
         await materialPost(

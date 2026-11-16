@@ -23,7 +23,7 @@ function put(body: unknown, origin = 'http://localhost') {
 
 beforeEach(() => {
   vi.resetAllMocks();
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
 });
 
 describe('DIY common fee settings API', () => {
@@ -31,7 +31,7 @@ describe('DIY common fee settings API', () => {
     mocks.auth.mockResolvedValue(null);
     expect((await GET(new NextRequest(url))).status).toBe(401);
     expect((await put([])).status).toBe(401);
-    mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+    mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
     expect((await put([], 'http://other.test')).status).toBe(403);
     expect(mocks.findUnique).not.toHaveBeenCalled();
     expect(mocks.upsert).not.toHaveBeenCalled();

@@ -20,7 +20,7 @@ function request(method: string, body: unknown, origin = 'http://localhost') {
 }
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
 });
 
 describe('material bulk API', () => {
@@ -32,7 +32,7 @@ describe('material bulk API', () => {
     ] as const) {
       mocks.auth.mockResolvedValue(null);
       expect((await handler(request(method, {}))).status).toBe(401);
-      mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+      mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
       expect((await handler(request(method, {}, 'http://other.test'))).status).toBe(403);
     }
     expect(mocks.transaction).not.toHaveBeenCalled();

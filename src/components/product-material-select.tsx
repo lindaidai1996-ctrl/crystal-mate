@@ -1,11 +1,12 @@
 'use client';
 
 import { ExportOutlined, LeftOutlined, PictureOutlined, RightOutlined } from '@ant-design/icons';
-import { Alert, Button, Modal, Popover, Select } from 'antd';
+import { Alert, Button, Popover, Select } from 'antd';
 import { LoadingImage, ImageSkeleton } from '@/components/loadingImage';
 import { useTranslations } from 'next-intl';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from '@/i18n/navigation';
+import { ResponsiveModal as Modal } from '@/components/responsive/responsiveDialog';
 import type { Material, MaterialBatchEntry, ProductSourceInput } from '@/lib/client-types';
 import { Sensitive } from '@/components/privacyMode';
 

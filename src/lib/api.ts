@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import { auditContext } from './audit-context';
 import { Prisma } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
@@ -19,6 +20,15 @@ export async function requireAdmin(request: NextRequest) {
     const origin = request.headers.get('origin');
     const host = request.headers.get('host') ?? request.nextUrl.host;
     if (origin && new URL(origin).host !== host) throw new ApiError(403, 'INVALID_ORIGIN');
+  }
+  const context = auditContext.getStore();
+  if (context && !context.actor) {
+    if (!session.user.id) throw new ApiError(401, 'UNAUTHORIZED');
+    context.actor = {
+      id: session.user.id,
+      username: session.user.name,
+      nickname: session.user.nickname ?? '',
+    };
   }
   return session;
 }
@@ -46,4 +56,14 @@ export function apiError(error: unknown) {
   }
   console.error(error);
   return NextResponse.json({ error: 'SERVER_ERROR' }, { status: 500 });
+}
+
+export async function requireAccount(request: NextRequest) {
+  const session = await requireAdmin(request);
+  if (!session.user?.id || !session.user.name) throw new ApiError(401, 'UNAUTHORIZED');
+  return {
+    id: session.user.id,
+    username: session.user.name,
+    nickname: session.user.nickname ?? '',
+  };
 }

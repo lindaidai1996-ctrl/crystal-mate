@@ -1,21 +1,12 @@
 'use client';
+
 import { PlusOutlined, ScanOutlined } from '@ant-design/icons';
-import {
-  App,
-  Button,
-  Cascader,
-  ConfigProvider,
-  Form,
-  Input,
-  Modal,
-  Radio,
-  Select,
-  Space,
-  Tooltip,
-} from 'antd';
+import { App, Button, Cascader, ConfigProvider, Form, Input, Radio, Select, Tooltip } from 'antd';
 import { useRef, useState } from 'react';
+import { CompactFields } from '@/components/responsive/compactFields';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { ResponsiveModal as Modal } from '@/components/responsive/responsiveDialog';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { MaterialAmount, MaterialCategory, MaterialValues, Tag } from '@/lib/client-types';
 import { recognizeMaterialCategory } from '@/lib/material-calculations';
@@ -275,39 +266,33 @@ export function MaterialBasicFields({
         </div>
         {!isMasterEdit && (
           <>
-            <h3 className="material-subheading">{t('dimensions')}</h3>
-            <div className="material-field-grid material-three-columns">
-              <Form.Item
-                label={
-                  <Space size={8}>
-                    {t('lengthMm')}
-                    <Button
-                      type="link"
-                      size="small"
-                      htmlType="button"
-                      disabled={
-                        componentDisabled ||
-                        !Number.isFinite(Number(draft.lengthMm)) ||
-                        Number(draft.lengthMm) <= 0
-                      }
-                      onClick={() =>
-                        onValuesChange({
-                          ...draft,
-                          widthMm: draft.lengthMm,
-                          heightMm: draft.lengthMm,
-                        })
-                      }
-                    >
-                      {common('applyToWidthHeight')}
-                    </Button>
-                  </Space>
+            <div className="compact-field-heading">
+              <h3 className="material-subheading">{t('dimensions')}</h3>
+              <Button
+                type="link"
+                size="small"
+                htmlType="button"
+                disabled={
+                  componentDisabled ||
+                  !Number.isFinite(Number(draft.lengthMm)) ||
+                  Number(draft.lengthMm) <= 0
+                }
+                onClick={() =>
+                  onValuesChange({
+                    ...draft,
+                    widthMm: draft.lengthMm,
+                    heightMm: draft.lengthMm,
+                  })
                 }
               >
-                {amount('lengthMm', 'mm', true)}
-              </Form.Item>
+                {common('applyToWidthHeight')}
+              </Button>
+            </div>
+            <CompactFields className="material-field-grid material-three-columns" columns={3}>
+              <Form.Item label={t('lengthMm')}>{amount('lengthMm', 'mm', true)}</Form.Item>
               <Form.Item label={t('widthMm')}>{amount('widthMm', 'mm', true)}</Form.Item>
               <Form.Item label={t('heightMm')}>{amount('heightMm', 'mm', true)}</Form.Item>
-            </div>
+            </CompactFields>
           </>
         )}
       </section>

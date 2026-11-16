@@ -21,6 +21,7 @@ model Admin {
 }
 
 model EditorDraft {
+  ownerId   String?
   id        String   @id @default(cuid())
   kind      String
   title     String   @default("")
@@ -29,6 +30,7 @@ model EditorDraft {
   updatedAt DateTime @updatedAt
 
   @@index([kind, updatedAt(sort: Desc)])
+  @@index([ownerId, kind, updatedAt(sort: Desc)])
 }
 
 model Category {
@@ -343,6 +345,9 @@ model ProductImage {
   url       String
   position  Int
 
+  /// Square list cover settings; the original image is preserved.
+  framing Json?
+
   @@unique([productId, position])
 }
 
@@ -437,38 +442,38 @@ model MaterialCategory {
 }
 
 model Material {
-  id                 String               @id @default(cuid())
+  id                 String                    @id @default(cuid())
   name               String
-  aliases            String[]             @default([])
+  aliases            String[]                  @default([])
   categoryId         String
-  category           MaterialCategory     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  unit               MaterialUnit         @default(STRAND)
-  purchaseUnitPrice  Decimal?             @db.Decimal(12, 2)
-  weightGrams        Decimal?             @db.Decimal(12, 2)
-  purchaseGramPrice  Decimal?             @db.Decimal(12, 2)
-  purchaseGramManual Boolean              @default(false)
-  lengthMm           Decimal?             @db.Decimal(12, 2)
-  widthMm            Decimal?             @db.Decimal(12, 2)
-  heightMm           Decimal?             @db.Decimal(12, 2)
+  category           MaterialCategory          @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  unit               MaterialUnit              @default(STRAND)
+  purchaseUnitPrice  Decimal?                  @db.Decimal(12, 2)
+  weightGrams        Decimal?                  @db.Decimal(12, 2)
+  purchaseGramPrice  Decimal?                  @db.Decimal(12, 2)
+  purchaseGramManual Boolean                   @default(false)
+  lengthMm           Decimal?                  @db.Decimal(12, 2)
+  widthMm            Decimal?                  @db.Decimal(12, 2)
+  heightMm           Decimal?                  @db.Decimal(12, 2)
   childCount         Int?
-  childWeightGrams   Decimal?             @db.Decimal(12, 2)
-  childUnitPrice     Decimal?             @db.Decimal(12, 2)
+  childWeightGrams   Decimal?                  @db.Decimal(12, 2)
+  childUnitPrice     Decimal?                  @db.Decimal(12, 2)
   childPriceSource   MaterialPriceSource?
-  saleRule           MaterialSaleRule     @default(COST)
-  saleRuleValue      Decimal?             @db.Decimal(12, 2)
-  saleUnitPrice      Decimal?             @db.Decimal(12, 2)
-  saleGramPrice      Decimal?             @db.Decimal(12, 2)
-  saleChildUnitPrice Decimal?             @db.Decimal(12, 2)
-  saleUnitManual     Boolean              @default(false)
-  saleGramManual     Boolean              @default(false)
-  saleChildManual    Boolean              @default(false)
-  notes              String               @default("") @db.Text
+  saleRule           MaterialSaleRule          @default(COST)
+  saleRuleValue      Decimal?                  @db.Decimal(12, 2)
+  saleUnitPrice      Decimal?                  @db.Decimal(12, 2)
+  saleGramPrice      Decimal?                  @db.Decimal(12, 2)
+  saleChildUnitPrice Decimal?                  @db.Decimal(12, 2)
+  saleUnitManual     Boolean                   @default(false)
+  saleGramManual     Boolean                   @default(false)
+  saleChildManual    Boolean                   @default(false)
+  notes              String                    @default("") @db.Text
   images             MaterialImage[]
   tags               MaterialTag[]
   batchEntries       MaterialBatchEntry[]
   imageImportItems   MaterialImageImportItem[]
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
 
   @@index([categoryId])
   @@index([createdAt])
@@ -586,6 +591,9 @@ model MaterialBatchImage {
   url       String
   position  Int
 
+  /// Square list cover settings; the original image is preserved.
+  framing Json?
+
   @@unique([entryId, position])
 }
 
@@ -596,6 +604,9 @@ model MaterialImage {
   objectKey  String
   url        String
   position   Int
+
+  /// Square list cover settings; the original image is preserved.
+  framing Json?
 
   @@unique([materialId, position])
 }
@@ -623,4 +634,48 @@ model DiyImageImport {
 
   @@index([createdAt])
   @@index([productId])
+}
+
+/// Durable business identity. No cascading FK: history survives object/account deletion.
+model RecordAttribution {
+  entityType  String
+  entityId    String
+  entityLabel String
+  rootType    String
+  rootId      String
+  createdBy   Json?
+  updatedBy   Json?
+  createdAt   DateTime
+  updatedAt   DateTime
+  deletedAt   DateTime?
+
+  @@id([entityType, entityId])
+  @@index([rootType, rootId])
+}
+
+model AuditLog {
+  id            String   @id @default(dbgenerated("(gen_random_uuid())::text"))
+  operationId   String
+  source        String
+  actorId       String?
+  actorUsername String?
+  actorNickname String?
+  action        String
+  entityType    String
+  entityId      String
+  entityLabel   String
+  rootType      String
+  rootId        String
+  relatedIds    String[]
+  before        Json?
+  after         Json?
+  changedFields String[]
+  createdAt     DateTime @default(now())
+
+  @@index([createdAt(sort: Desc), id])
+  @@index([actorId, createdAt(sort: Desc)])
+  @@index([entityType, entityId, createdAt(sort: Desc)])
+  @@index([rootType, rootId, createdAt(sort: Desc)])
+  @@index([operationId])
+  @@index([relatedIds], type: Gin)
 }

@@ -19,7 +19,7 @@ function put(body: unknown, origin = 'http://localhost') {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
 });
 
 describe('silver pricing defaults API', () => {

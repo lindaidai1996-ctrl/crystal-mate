@@ -1,5 +1,7 @@
 'use client';
 
+import { RecordAuditPanel } from '@/components/audit-history';
+
 import { Sensitive } from '@/components/privacyMode';
 
 import { useRef, useState } from 'react';
@@ -150,6 +152,13 @@ export function DiyImportPage({
           {t('newDraft')}
         </Button>
       </div>
+      {job && (
+        <RecordAuditPanel
+          entityType="DiyImageImport"
+          entityId={job.id}
+          revision={String(job.version)}
+        />
+      )}
       <Steps
         size="small"
         current={committed ? 3 : job?.data.parts.length ? 1 : job ? 1 : 0}

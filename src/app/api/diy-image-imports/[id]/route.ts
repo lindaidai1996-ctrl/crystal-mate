@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiError, requireAdmin } from '@/lib/api';
 import { diySaveSchema, diyVersionSchema } from '@/lib/diyImageImport/contracts';
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest, context: Context) {
     return apiError(error);
   }
 }
-export async function PATCH(request: NextRequest, context: Context) {
+async function handlePATCH(request: NextRequest, context: Context) {
   try {
     await requireAdmin(request);
     return NextResponse.json(
@@ -22,7 +23,7 @@ export async function PATCH(request: NextRequest, context: Context) {
     return apiError(error);
   }
 }
-export async function DELETE(request: NextRequest, context: Context) {
+async function handleDELETE(request: NextRequest, context: Context) {
   try {
     await requireAdmin(request);
     const { version } = diyVersionSchema.parse(await request.json());
@@ -32,3 +33,6 @@ export async function DELETE(request: NextRequest, context: Context) {
     return apiError(error);
   }
 }
+
+export const PATCH = withAuditRoute(handlePATCH);
+export const DELETE = withAuditRoute(handleDELETE);

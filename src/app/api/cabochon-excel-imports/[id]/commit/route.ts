@@ -1,10 +1,11 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { apiError, requireAdmin } from '@/lib/api';
 import { commitExcelRowSchema } from '@/lib/cabochonExcelImport/contracts';
 import { commitExcelRow } from '@/lib/cabochonExcelImport/store';
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function handlePOST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin(request);
     const { rowNumber, version } = commitExcelRowSchema.parse(await request.json());
@@ -15,3 +16,5 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return apiError(error);
   }
 }
+
+export const POST = withAuditRoute(handlePOST);

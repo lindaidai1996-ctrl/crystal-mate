@@ -1,5 +1,12 @@
 'use client';
 
+import { imageFramings } from '@/lib/image-framing';
+
+import { RecordAuditPanel } from '@/components/audit-history';
+
+import { CompactFields } from '@/components/responsive/compactFields';
+import { EditorActions } from '@/components/responsive/editorActions';
+
 import {
   ArrowLeftOutlined,
   FileTextOutlined,
@@ -15,7 +22,6 @@ import {
   Form,
   Input,
   InputNumber,
-  Modal,
   Result,
   Select,
   Skeleton,
@@ -27,6 +33,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { useRouter, Link } from '@/i18n/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { ResponsiveModal as Modal } from '@/components/responsive/responsiveDialog';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type {
   CabochonMeasurement,
@@ -373,6 +380,7 @@ export function ProductEditor({
           cost: isCabochon ? values.cost : null,
           extraInfo: isCabochon ? { settingStyleId: values.settingStyleId ?? null } : null,
           imageKeys: images.map((image) => image.objectKey),
+          imageFramings: imageFramings(images),
         }),
       });
       if (isNew) {
@@ -643,21 +651,24 @@ export function ProductEditor({
           </Link>
           <h1>{isNew ? t('newTitle') : t('editTitle')}</h1>
         </div>
-        {!isCabochon && (isNew || product?.origin === 'DIY' || product?.origin == null) && (
-          <Link
-            href={
-              isNew
-                ? withAdminReturnTo('/admin/products/diy-image-import', returnPath)
-                : withAdminReturnTo(
-                    `/admin/products/diy-image-import?product=${id}`,
-                    withAdminReturnTo(`${listPath}/${id}`, returnPath),
-                  )
-            }
-          >
-            <Button icon={<ScanOutlined />}>{diyImport('entry')}</Button>
-          </Link>
-        )}
+        {process.env.NODE_ENV !== 'production' &&
+          !isCabochon &&
+          (isNew || product?.origin === 'DIY' || product?.origin == null) && (
+            <Link
+              href={
+                isNew
+                  ? withAdminReturnTo('/admin/products/diy-image-import', returnPath)
+                  : withAdminReturnTo(
+                      `/admin/products/diy-image-import?product=${id}`,
+                      withAdminReturnTo(`${listPath}/${id}`, returnPath),
+                    )
+              }
+            >
+              <Button icon={<ScanOutlined />}>{diyImport('entry')}</Button>
+            </Link>
+          )}
       </div>
+      {!isNew && <RecordAuditPanel entityType="Product" entityId={id} />}
       <ConfigProvider theme={isFinishedEditor ? underlinedTheme : undefined}>
         <Form
           form={form}
@@ -898,39 +909,30 @@ export function ProductEditor({
             </section>
             {isCabochon && (
               <section className="editor-block">
-                <h2>{t('measurements')}</h2>
-                <div className="measurement-fields">
+                <div className="compact-field-heading">
+                  <h2>{t('measurements')}</h2>
+                  <Button
+                    type="link"
+                    size="small"
+                    htmlType="button"
+                    disabled={
+                      saving || lengthMm == null || !Number.isFinite(lengthMm) || lengthMm <= 0
+                    }
+                    onClick={() =>
+                      form.setFieldsValue({
+                        measurement: { widthMm: lengthMm, heightMm: lengthMm },
+                      })
+                    }
+                  >
+                    {common('applyToWidthHeight')}
+                  </Button>
+                </div>
+                <CompactFields className="measurement-fields" columns={3}>
                   {(['lengthMm', 'widthMm', 'heightMm'] as const).map((field) => (
                     <Form.Item
                       key={field}
                       name={['measurement', field]}
-                      label={
-                        field === 'lengthMm' ? (
-                          <Space size={8}>
-                            {t(field)}
-                            <Button
-                              type="link"
-                              size="small"
-                              htmlType="button"
-                              disabled={
-                                saving ||
-                                lengthMm == null ||
-                                !Number.isFinite(lengthMm) ||
-                                lengthMm <= 0
-                              }
-                              onClick={() =>
-                                form.setFieldsValue({
-                                  measurement: { widthMm: lengthMm, heightMm: lengthMm },
-                                })
-                              }
-                            >
-                              {common('applyToWidthHeight')}
-                            </Button>
-                          </Space>
-                        ) : (
-                          t(field)
-                        )
-                      }
+                      label={t(field)}
                       rules={[{ type: 'number', min: 0.01, max: 99999999.99 }]}
                     >
                       <InputNumber
@@ -938,12 +940,13 @@ export function ProductEditor({
                         max={99999999.99}
                         precision={2}
                         step={0.01}
+                        inputMode="decimal"
                         suffix="mm"
                         style={{ width: '100%' }}
                       />
                     </Form.Item>
                   ))}
-                </div>
+                </CompactFields>
                 <Form.Item className="editor-recognizer-field" label={t('smartRecognition')}>
                   <div className="measurement-recognizer">
                     <Input
@@ -1108,7 +1111,7 @@ export function ProductEditor({
                 ))}
               </div>
             </section>
-            <div className="editor-actions">
+            <EditorActions>
               <Link href={returnPath} replace>
                 <Button>{common('cancel')}</Button>
               </Link>
@@ -1137,7 +1140,7 @@ export function ProductEditor({
               >
                 {common('save')}
               </Button>
-            </div>
+            </EditorActions>
           </div>
         </Form>
       </ConfigProvider>

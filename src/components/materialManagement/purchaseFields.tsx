@@ -1,6 +1,7 @@
 'use client';
 
 import { Alert, Checkbox, ConfigProvider, Form, InputNumber, Radio } from 'antd';
+import { CompactFields } from '@/components/responsive/compactFields';
 import { useTranslations } from 'next-intl';
 import type { MaterialAmount, MaterialValues } from '@/lib/client-types';
 import { Sensitive, usePrivacyMode } from '@/components/privacyMode';
@@ -27,6 +28,7 @@ export function MaterialAmountInput({
   return (
     <InputNumber<string>
       stringMode
+      inputMode="decimal"
       value={value}
       onChange={onChange}
       min={positive ? '0.01' : '0'}
@@ -88,11 +90,11 @@ export function PurchaseFields({
       <section className="editor-block">
         <h2>{t('purchaseInformation')}</h2>
         <p className="material-input-help">{t('gramPurchaseHelp')}</p>
-        <div className="material-field-grid material-three-columns">
+        <CompactFields className="material-field-grid material-three-columns">
           {totalInput('totalWeightGrams', 'g', true)}
           {totalInput('quotedGramPrice', t('yuanPerGram'))}
           {totalInput('totalAmount', t('yuan'))}
-        </div>
+        </CompactFields>
         <Sensitive>
           <p>
             {t('actualGramPrice')}: {result.values.purchaseGramPrice ?? '—'} {t('yuanPerGram')}
@@ -125,7 +127,7 @@ export function PurchaseFields({
           ]}
         />
       </Form.Item>
-      <div className="material-field-grid material-three-columns">
+      <CompactFields className="material-field-grid material-three-columns">
         <Form.Item label={batchText('quantity')} required={!(batch && quantityUnknown)}>
           <InputNumber<number>
             value={batch && quantityUnknown ? null : quantity}
@@ -134,6 +136,7 @@ export function PurchaseFields({
             min={1}
             max={2147483647}
             precision={0}
+            inputMode="numeric"
             suffix={unit}
             aria-label={batchText('quantity')}
             style={{ width: '100%' }}
@@ -186,7 +189,7 @@ export function PurchaseFields({
             </Sensitive>
           </>
         )}
-      </div>
+      </CompactFields>
       {batch && (
         <>
           {result.difference !== null && result.difference !== '0.00' && (
@@ -216,7 +219,7 @@ export function PurchaseFields({
             </div>
           )}
           <Sensitive>
-            <Form.Item label={t('manualUnitPrice', { unit })}>
+            <Form.Item className="mobile-short-field" label={t('manualUnitPrice', { unit })}>
               <MaterialAmountInput
                 value={purchase.manualUnitPrice}
                 label={t('manualUnitPrice', { unit })}

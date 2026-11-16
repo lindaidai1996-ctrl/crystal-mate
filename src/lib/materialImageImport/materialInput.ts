@@ -1,3 +1,4 @@
+import { imageFramings } from '@/lib/image-framing';
 import { z } from 'zod';
 import { materialCreateSchema } from '@/lib/validation';
 import { validMaterialQuantity } from '@/lib/inventory';
@@ -48,6 +49,7 @@ export function validateMaterialImport(
     values: {
       ...calculated.values,
       imageKeys: [imageKey, ...material.images.map((image) => image.objectKey)],
+      imageFramings: imageFramings(material.images),
     },
     tagIds: material.tagIds,
     purchase: calculated.purchase,

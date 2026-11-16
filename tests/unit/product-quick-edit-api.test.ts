@@ -41,7 +41,7 @@ const request = (body: object) =>
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
   mocks.findUnique.mockResolvedValue({ category: { name: '蛋面' } });
   mocks.update.mockResolvedValue({ priceCents: 12345, updatedAt: new Date() });
 });

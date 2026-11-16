@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { apiError, ApiError, requireAdmin } from '@/lib/api';
@@ -5,7 +6,7 @@ import { marketingToggleSchema } from '@/lib/validation';
 
 type Context = { params: Promise<{ id: string }> };
 
-export async function PATCH(request: NextRequest, { params }: Context) {
+async function handlePATCH(request: NextRequest, { params }: Context) {
   try {
     await requireAdmin(request);
     const { field, value } = marketingToggleSchema.parse(await request.json());
@@ -35,3 +36,5 @@ export async function PATCH(request: NextRequest, { params }: Context) {
     return apiError(error);
   }
 }
+
+export const PATCH = withAuditRoute(handlePATCH);

@@ -1,3 +1,5 @@
+import { sameOrderedRows } from './unchanged-relations';
+import { readImageFraming, serializeImageFraming, type ImageFraming } from '@/lib/image-framing';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { db } from '@/lib/db';
@@ -86,6 +88,7 @@ export function serializeEntry(entry: EntryWithRelations) {
   };
   return {
     ...entry,
+    images: entry.images.map(serializeImageFraming),
     ...amounts(entry),
     purchase,
     receivedQty: entry.receivedQty?.toNumber() ?? null,
@@ -111,6 +114,7 @@ export function serializeMaterial(material: MaterialWithRelations) {
     );
   return {
     ...fields,
+    images: material.images.map(serializeImageFraming),
     imageImportCount: _count?.imageImportItems ?? 0,
     tags: tags.map(({ tag }) => tag),
     ...amounts(material),
@@ -131,7 +135,7 @@ function detailValues(
   purchaseInput: MaterialPurchase,
   receivedQty: number | null,
 ) {
-  const { imageKeys, ...fields } = input;
+  const { imageKeys, imageFramings, ...fields } = input;
   const calculated = calculatePurchase(
     {
       ...fields,
@@ -187,6 +191,7 @@ function detailValues(
       unitPriceSource: calculated.source,
     },
     imageKeys,
+    imageFramings,
   };
 }
 
@@ -211,6 +216,7 @@ async function imageUrls(
   heldImages?: ReadonlyMap<string, string>,
 ) {
   const known = new Map(heldImages);
+  const framings = new Map<string, ImageFraming>();
   if (materialId) {
     const [legacy, batched] = await Promise.all([
       tx.materialImage.findMany({ where: { materialId, objectKey: { in: imageKeys } } }),
@@ -218,7 +224,11 @@ async function imageUrls(
         where: { entry: { materialId }, objectKey: { in: imageKeys } },
       }),
     ]);
-    for (const image of [...legacy, ...batched]) known.set(image.objectKey, image.url);
+    for (const image of [...legacy, ...batched]) {
+      known.set(image.objectKey, image.url);
+      const framing = readImageFraming(image.framing);
+      if (framing) framings.set(image.objectKey, framing);
+    }
   }
   const fresh = imageKeys.filter((key) => !known.has(key));
   const grants = await tx.uploadGrant.findMany({
@@ -231,7 +241,7 @@ async function imageUrls(
   });
   if (grants.length !== fresh.length) throw new ApiError(400, 'INVALID_IMAGE');
   for (const grant of grants) known.set(grant.objectKey, grant.url);
-  return { known, fresh };
+  return { known, fresh, framings };
 }
 
 async function replaceEntryImages(
@@ -239,17 +249,20 @@ async function replaceEntryImages(
   entryId: string,
   imageKeys: string[],
   known: Map<string, string>,
+  previousFramings: Map<string, ImageFraming>,
+  framings?: Record<string, ImageFraming>,
 ) {
+  const existing = await tx.materialBatchImage.findMany({ where: { entryId } });
+  const nextImages = imageKeys.map((objectKey, position) => ({
+    entryId,
+    objectKey,
+    url: known.get(objectKey)!,
+    position,
+    framing: framings?.[objectKey] ?? previousFramings.get(objectKey) ?? Prisma.DbNull,
+  }));
+  if (sameOrderedRows(existing, nextImages)) return;
   await tx.materialBatchImage.deleteMany({ where: { entryId } });
-  if (imageKeys.length)
-    await tx.materialBatchImage.createMany({
-      data: imageKeys.map((objectKey, position) => ({
-        entryId,
-        objectKey,
-        url: known.get(objectKey)!,
-        position,
-      })),
-    });
+  if (nextImages.length) await tx.materialBatchImage.createMany({ data: nextImages });
 }
 
 async function consumeGrants(tx: Tx, fresh: string[]) {
@@ -278,13 +291,13 @@ export async function createMaterialInTransaction(
   if (!(await tx.distributor.findUnique({ where: { id: input.distributorId } })))
     throw new ApiError(400, 'DISTRIBUTOR_NOT_FOUND');
   const batch = await resolveBatch(tx, input.selection);
-  const { detail, imageKeys } = detailValues(
+  const { detail, imageKeys, imageFramings } = detailValues(
     input.values,
     { name, categoryId, unit, notes },
     input.purchase,
     input.receivedQty,
   );
-  const { known, fresh } = await imageUrls(tx, null, imageKeys, heldImages);
+  const { known, fresh, framings } = await imageUrls(tx, null, imageKeys, heldImages);
   const material = await tx.material.create({
     data: {
       name,
@@ -305,7 +318,7 @@ export async function createMaterialInTransaction(
       remainingQty: input.receivedQty,
     },
   });
-  await replaceEntryImages(tx, entry.id, imageKeys, known);
+  await replaceEntryImages(tx, entry.id, imageKeys, known, framings, imageFramings);
   await consumeGrants(tx, fresh);
   return serializeMaterial(
     await tx.material.findUniqueOrThrow({
@@ -393,13 +406,13 @@ export async function createMaterialEntryInTransaction(
     })
   )
     throw new ApiError(409, 'MATERIAL_ALREADY_IN_BATCH');
-  const { detail, imageKeys } = detailValues(
+  const { detail, imageKeys, imageFramings } = detailValues(
     input.values,
     material,
     input.purchase,
     input.receivedQty,
   );
-  const { known, fresh } = await imageUrls(tx, materialId, imageKeys, heldImages);
+  const { known, fresh, framings } = await imageUrls(tx, materialId, imageKeys, heldImages);
   const entry = await tx.materialBatchEntry.create({
     data: {
       ...detail,
@@ -410,7 +423,7 @@ export async function createMaterialEntryInTransaction(
       remainingQty: input.receivedQty,
     },
   });
-  await replaceEntryImages(tx, entry.id, imageKeys, known);
+  await replaceEntryImages(tx, entry.id, imageKeys, known, framings, imageFramings);
   await consumeGrants(tx, fresh);
   return serializeEntry(
     await tx.materialBatchEntry.findUniqueOrThrow({
@@ -453,13 +466,13 @@ export async function updateMaterialEntry(
         tagIds: input.tagIds,
       };
       await writeMaterialMaster(tx, material, master);
-      const { detail, imageKeys } = detailValues(
+      const { detail, imageKeys, imageFramings } = detailValues(
         input.values,
         master,
         input.purchase,
         input.receivedQty,
       );
-      const { known, fresh } = await imageUrls(tx, materialId, imageKeys);
+      const { known, fresh, framings } = await imageUrls(tx, materialId, imageKeys);
       await tx.materialBatchEntry.update({
         where: { id: entryId },
         data: {
@@ -469,7 +482,7 @@ export async function updateMaterialEntry(
           remainingQty,
         },
       });
-      await replaceEntryImages(tx, entryId, imageKeys, known);
+      await replaceEntryImages(tx, entryId, imageKeys, known, framings, imageFramings);
       await consumeGrants(tx, fresh);
       return serializeEntry(
         await tx.materialBatchEntry.findUniqueOrThrow({

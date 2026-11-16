@@ -23,16 +23,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages: { signIn: '/zh/login' },
   callbacks: {
+    async session({ session, token }) {
+      session.user.id = token.sub!;
+      session.user.name =
+        typeof token.actorUsername === 'string' ? token.actorUsername : session.user.name;
+      session.user.nickname = typeof token.actorNickname === 'string' ? token.actorNickname : '';
+      return session;
+    },
     async jwt({ token, user }) {
       if (user && 'sessionVersion' in user) token.sessionVersion = user.sessionVersion;
       if (user && 'remember' in user) token.remember = user.remember;
       if (!token.sub) return null;
       const admin = await db.admin.findUnique({
         where: { id: token.sub },
-        select: { sessionVersion: true },
+        select: { sessionVersion: true, username: true, nickname: true },
       });
       // Tokens issued before account settings were introduced belong to version 0.
       if (!admin || (token.sessionVersion ?? 0) !== admin.sessionVersion) return null;
+      if (typeof admin.username === 'string') token.actorUsername = admin.username;
+      if (typeof admin.nickname === 'string') token.actorNickname = admin.nickname;
       return token;
     },
   },

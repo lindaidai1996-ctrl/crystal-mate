@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiError, requireAdmin } from '@/lib/api';
 import { productSourceSchema } from '@/lib/validation';
@@ -9,7 +10,7 @@ import {
 
 type Context = { params: Promise<{ id: string; sourceId: string }> };
 
-export async function PUT(request: NextRequest, { params }: Context) {
+async function handlePUT(request: NextRequest, { params }: Context) {
   try {
     await requireAdmin(request);
     const { id, sourceId } = await params;
@@ -21,7 +22,7 @@ export async function PUT(request: NextRequest, { params }: Context) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: Context) {
+async function handleDELETE(request: NextRequest, { params }: Context) {
   try {
     await requireAdmin(request);
     const { id, sourceId } = await params;
@@ -31,3 +32,6 @@ export async function DELETE(request: NextRequest, { params }: Context) {
     return apiError(error);
   }
 }
+
+export const PUT = withAuditRoute(handlePUT);
+export const DELETE = withAuditRoute(handleDELETE);

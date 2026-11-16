@@ -8,7 +8,6 @@ import {
   App,
   Button,
   Checkbox,
-  Drawer,
   Input,
   InputNumber,
   Popconfirm,
@@ -17,6 +16,7 @@ import {
   Tag,
   Tooltip,
 } from 'antd';
+import { CompactFields } from '@/components/responsive/compactFields';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DateInput } from '@/components/date-input';
@@ -26,6 +26,7 @@ import { StockHistory } from '@/components/inventory/stockHistory';
 import { DistributorSelect } from '@/components/distributorSelect/distributorSelect';
 import { SilverCostFields } from '@/components/productEditor/silverCostFields';
 import { CommonFeeFields } from '@/components/productEditor/commonFeeFields';
+import { ResponsiveDrawer as Drawer } from '@/components/responsive/responsiveDialog';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type {
   Category,
@@ -231,7 +232,7 @@ function SourceFields({
 
   return (
     <div className="product-source-fields">
-      <div className="product-source-grid">
+      <CompactFields className="product-source-grid">
         <label className="source-field">
           <span>{t('origin')}</span>
           <Select
@@ -254,10 +255,10 @@ function SourceFields({
             onChange={(quantity) => update({ quantity: quantity ?? 0 })}
           />
         </label>
-      </div>
+      </CompactFields>
       {value.origin === 'PURCHASED' ? (
-        <div className="product-source-grid">
-          <label className="source-field">
+        <CompactFields className="product-source-grid">
+          <label className="source-field source-field-wide">
             <span>{t('batch')}</span>
             <Select
               showSearch
@@ -279,7 +280,7 @@ function SourceFields({
               ]}
             />
           </label>
-          <label className="source-field">
+          <label className="source-field source-field-wide">
             <span>{t('distributor')}</span>
             <DistributorSelect
               aria-label={t('distributor')}
@@ -290,7 +291,7 @@ function SourceFields({
           </label>
           {'newBatch' in value.selection && value.selection.newBatch && (
             <>
-              <label className="source-field">
+              <label className="source-field source-field-wide">
                 <span>{t('batchName')}</span>
                 <Input
                   value={value.selection.newBatch.name}
@@ -304,7 +305,7 @@ function SourceFields({
                   }
                 />
               </label>
-              <label className="source-field">
+              <label className="source-field source-field-wide">
                 <span>{t('receivedAt')}</span>
                 <DateInput
                   aria-label={t('receivedAt')}
@@ -331,7 +332,7 @@ function SourceFields({
               />
             </label>
           </Sensitive>
-        </div>
+        </CompactFields>
       ) : (
         <>
           <div className="product-source-subheading">

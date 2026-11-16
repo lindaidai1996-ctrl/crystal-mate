@@ -1,3 +1,4 @@
+import { readImageFraming } from '@/lib/image-framing';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { ApiError } from '@/lib/api';
@@ -61,6 +62,7 @@ type SummaryRow = Omit<
 > & {
   imageObjectKey: string | null;
   imageUrl: string | null;
+  imageFraming: Prisma.JsonValue;
   latestReceivedAt: Date;
   totalAmount: Prisma.Decimal | null;
   totalWeightGrams: Prisma.Decimal | null;
@@ -134,7 +136,7 @@ export async function getDistributorPurchaseSummary(
         bool_or("saleChildUnitPrice" IS NULL) AS "saleChildUnitPriceHasUnknown"
       FROM purchases GROUP BY type, "itemId", name, code, unit
     )
-    SELECT paged.*, counted.total, cover."objectKey" AS "imageObjectKey", cover.url AS "imageUrl"
+    SELECT paged.*, counted.total, cover."objectKey" AS "imageObjectKey", cover.url AS "imageUrl", cover.framing AS "imageFraming"
     FROM (SELECT COUNT(*) AS total FROM grouped) counted
     LEFT JOIN (
       SELECT * FROM grouped
@@ -142,18 +144,18 @@ export async function getDistributorPurchaseSummary(
       LIMIT ${options.pageSize} OFFSET ${(options.page - 1) * options.pageSize}
     ) paged ON true
     LEFT JOIN LATERAL (
-      SELECT "objectKey", url FROM (
-        SELECT pi."objectKey", pi.url, 0 AS priority, NULL::timestamp AS "receivedAt", pi.position
+      SELECT "objectKey", url, framing FROM (
+        SELECT pi."objectKey", pi.url, pi.framing, 0 AS priority, NULL::timestamp AS "receivedAt", pi.position
         FROM "ProductImage" pi
         WHERE paged.type = 'PRODUCT' AND pi."productId" = paged."itemId"
         UNION ALL
-        SELECT mbi."objectKey", mbi.url, 0, b."receivedAt", mbi.position
+        SELECT mbi."objectKey", mbi.url, mbi.framing, 0, b."receivedAt", mbi.position
         FROM "MaterialBatchImage" mbi
         JOIN "MaterialBatchEntry" e ON e.id = mbi."entryId"
         JOIN "MaterialBatch" b ON b.id = e."batchId"
         WHERE paged.type = 'MATERIAL' AND e."materialId" = paged."itemId"
         UNION ALL
-        SELECT mi."objectKey", mi.url, 1, NULL::timestamp, mi.position
+        SELECT mi."objectKey", mi.url, mi.framing, 1, NULL::timestamp, mi.position
         FROM "MaterialImage" mi
         WHERE paged.type = 'MATERIAL' AND mi."materialId" = paged."itemId"
       ) images
@@ -172,7 +174,11 @@ export async function getDistributorPurchaseSummary(
         code: row.code,
         image:
           row.imageObjectKey && row.imageUrl
-            ? { objectKey: row.imageObjectKey, url: row.imageUrl }
+            ? {
+                objectKey: row.imageObjectKey,
+                url: row.imageUrl,
+                framing: readImageFraming(row.imageFraming),
+              }
             : null,
         unit: row.unit,
         batchCount: row.batchCount,

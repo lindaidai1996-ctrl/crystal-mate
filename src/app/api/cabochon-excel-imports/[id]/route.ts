@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { apiError, requireAdmin } from '@/lib/api';
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest, { params }: Context) {
     return apiError(error);
   }
 }
-export async function PATCH(request: NextRequest, { params }: Context) {
+async function handlePATCH(request: NextRequest, { params }: Context) {
   try {
     await requireAdmin(request);
     return NextResponse.json(
@@ -26,3 +27,5 @@ export async function PATCH(request: NextRequest, { params }: Context) {
     return apiError(error);
   }
 }
+
+export const PATCH = withAuditRoute(handlePATCH);

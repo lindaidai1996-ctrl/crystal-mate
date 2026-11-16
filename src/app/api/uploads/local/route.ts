@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { NextRequest, NextResponse } from 'next/server';
@@ -5,7 +6,7 @@ import { apiError, ApiError, requireAdmin } from '@/lib/api';
 import { db } from '@/lib/db';
 import { imageTypeFromBytes, MAX_IMAGE_BYTES, storageMode } from '@/lib/media';
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
   try {
     await requireAdmin(request);
     if (storageMode() !== 'local') throw new ApiError(404, 'NOT_FOUND');
@@ -41,3 +42,5 @@ export async function POST(request: NextRequest) {
     return apiError(error);
   }
 }
+
+export const POST = withAuditRoute(handlePOST);

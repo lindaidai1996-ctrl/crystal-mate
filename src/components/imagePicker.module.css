@@ -1,0 +1,22 @@
+.coverBadge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--ant-color-bg-container);
+  background: var(--ant-color-primary);
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.adjustCover {
+  height: auto;
+  min-height: 44px;
+  margin-top: 4px;
+  padding-inline: 4px;
+  font-size: 12px;
+  text-wrap: pretty;
+  white-space: normal;
+}

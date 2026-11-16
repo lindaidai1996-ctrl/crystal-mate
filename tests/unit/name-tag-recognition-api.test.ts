@@ -14,7 +14,7 @@ const request = (names: string[], origin = 'http://localhost:3000') =>
   });
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
   mocks.findMany.mockResolvedValue([{ id: 'tag-1', name: '云母' }]);
   mocks.recognize.mockResolvedValue([{ tagIds: ['tag-1'], missingTags: [] }]);
 });

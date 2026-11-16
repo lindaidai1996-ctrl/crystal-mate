@@ -1,10 +1,11 @@
 'use client';
 
-import { App, Button, Drawer, Form, Input } from 'antd';
+import { App, Button, Form, Input } from 'antd';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DateInput } from '@/components/date-input';
 import { attachmentCoverKey } from '@/lib/attachments';
+import { ResponsiveDrawer as Drawer } from '@/components/responsive/responsiveDialog';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { MaterialBatch, MaterialBatchAttachment } from '@/lib/client-types';
 import { todayInChina } from './batchSelector';

@@ -1,0 +1,491 @@
+.mobile {
+  display: none;
+}
+.actionSpace {
+  grid-column: 1 / -1;
+}
+.choiceGroup {
+  min-width: 0;
+  margin: 0 0 24px;
+  padding: 0;
+  border: 0;
+}
+.choiceGroup legend {
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.choices :global(.ant-btn) {
+  height: auto;
+  min-height: 44px;
+  padding: 10px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.sheetActions {
+  display: flex;
+  gap: 12px;
+}
+.sheetActions > :last-child {
+  flex: 1;
+}
+.filterSheet :global(.ant-drawer-content) {
+  border-radius: 16px 16px 0 0;
+}
+.filterSheet :global(.ant-drawer-body) {
+  padding: 20px 16px;
+}
+.filterSheet :global(.ant-drawer-footer) {
+  padding: 12px 16px max(12px, env(safe-area-inset-bottom));
+}
+.filterSheet :global(.ant-select) {
+  width: 100%;
+}
+.details {
+  min-width: 0;
+  margin-block: 8px;
+}
+.details > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--ant-color-primary);
+  cursor: pointer;
+  list-style: none;
+}
+.details > summary::after {
+  content: '+';
+  flex: none;
+}
+.details[open] > summary::after {
+  content: '−';
+}
+.details > summary::-webkit-details-marker {
+  display: none;
+}
+.details > summary:focus-visible {
+  outline: 2px solid var(--ant-color-primary);
+  outline-offset: 2px;
+}
+.recordList {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.record {
+  padding: 16px;
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 10px;
+  background: var(--ant-color-bg-container);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.recordList :global(.ant-pagination) {
+  justify-content: center;
+}
+
+@media (max-width: 767px) {
+  .desktop {
+    display: none;
+  }
+  .mobile {
+    display: block;
+    min-width: 0;
+  }
+  .search {
+    margin-bottom: 8px;
+  }
+  .search > :global(.ant-input-affix-wrapper) {
+    width: 100%;
+  }
+  .filterBar {
+    display: flex;
+    padding-block: 4px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--ant-color-border-secondary);
+  }
+  .filterBar > :global(.ant-btn) {
+    flex: 1;
+    min-width: 0;
+    gap: 6px;
+    padding-inline: 8px;
+    font-size: 13px;
+  }
+  .filterLabel {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .filterBar > .active {
+    color: var(--ant-color-primary);
+    font-weight: 600;
+  }
+  .count {
+    flex: none;
+    min-width: 18px;
+    padding: 0 4px;
+    border-radius: 9px;
+    background: var(--ant-color-primary-bg);
+    font-size: 11px;
+  }
+  .actionSpace {
+    grid-column: 1 / -1;
+    min-height: calc(var(--editor-actions-height, 88px) + 24px);
+  }
+  .editorActions:global(.editor-actions) {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 20;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 12px 16px max(12px, env(safe-area-inset-bottom));
+    background: var(--ant-color-bg-container);
+    box-shadow: 0 -4px 20px rgb(48 72 62 / 5%);
+  }
+  .editorActions > :global(.ant-btn-primary) {
+    flex: 1;
+  }
+  .editorActions :global(.ant-btn) {
+    min-height: 44px;
+    padding-inline: 12px;
+  }
+  .editorSheet :global(.ant-drawer-body) {
+    padding: 16px;
+  }
+  .editorSheet :global(.ant-drawer-footer) {
+    padding: 12px 16px max(12px, env(safe-area-inset-bottom));
+  }
+  .modal :global(.ant-modal) {
+    position: absolute;
+    inset: auto 0 0;
+    width: 100% !important;
+    max-width: 100vw;
+    margin: 0;
+    padding: 0;
+  }
+  .modal :global(.ant-modal-content) {
+    display: flex;
+    flex-direction: column;
+    max-height: 90dvh;
+    padding: 20px 16px max(16px, env(safe-area-inset-bottom));
+    border-radius: 16px 16px 0 0;
+  }
+  .modal :global(.ant-modal-body) {
+    min-height: 0;
+    overflow-y: auto;
+    padding-top: 12px;
+  }
+  .modal :global(.ant-modal-footer) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 12px;
+  }
+  .modal :global(.ant-modal-footer > .ant-btn) {
+    flex: 1;
+    margin-inline-start: 0 !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .stackedTable :global(.ant-table) {
+    min-width: 0 !important;
+  }
+  .stackedTable :global(table) {
+    display: block;
+    width: 100% !important;
+    table-layout: auto !important;
+  }
+  .stackedTable :global(colgroup) {
+    display: none;
+  }
+  .stackedTable :global(.ant-table-content) {
+    overflow: visible !important;
+  }
+  .stackedTable :global(.ant-table-thead),
+  .stackedTable :global(.ant-table-tbody) {
+    display: block;
+  }
+  .stackedTable :global(.ant-table-thead > tr) {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .stackedTable :global(.ant-table-thead > tr > th) {
+    display: none;
+  }
+  .stackedTable :global(.ant-table-thead > tr > th:has(.ant-table-column-sorters)),
+  .stackedTable :global(.ant-table-thead > tr > th:has(.ant-table-filter-trigger)) {
+    display: block;
+    flex: 1;
+    min-width: 100px;
+    width: auto !important;
+  }
+  .stackedTable :global(.ant-table-tbody > tr) {
+    display: block;
+    padding-block: 8px;
+    border-bottom: 1px solid var(--ant-color-border-secondary);
+  }
+  .stackedTable :global(.ant-table-tbody > tr > td) {
+    display: block;
+    padding: 8px 12px;
+    width: 100%;
+    border: 0;
+  }
+  .stackedTable :global(.ant-table-measure-row) {
+    display: none !important;
+  }
+  .stackedTable :global(.product-cell) {
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+  .stackedTable :global(.row-actions) {
+    display: flex;
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+  .stackedTable :global(.ant-btn) {
+    min-height: 44px;
+    height: auto;
+    white-space: normal;
+  }
+  .tableField {
+    display: grid;
+    grid-template-columns: minmax(64px, 28%) minmax(0, 1fr);
+    align-items: baseline;
+    gap: 12px;
+  }
+  .tableLabel {
+    color: var(--ant-color-text-secondary);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+  .tableValue {
+    min-width: 0;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+}
+
+.datePresets {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.datePresets :global(.ant-btn) {
+  min-width: 0;
+  font-size: 12px;
+  padding-inline: 4px;
+}
+.dateEndpoints {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.dateEndpoints > :global(.ant-btn) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: auto;
+  min-height: 66px;
+  padding: 10px;
+  gap: 4px;
+}
+.dateEndpoints span {
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+}
+.dateEndpoints strong {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.dateEndpoints > .dateEndpointActive {
+  border-color: var(--ant-color-primary);
+  background: var(--ant-color-primary-bg);
+}
+.dateHint {
+  margin: 12px 0;
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+}
+.calendarHeader {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) minmax(0, 1fr) 44px;
+  gap: 4px;
+  align-items: center;
+}
+.calendarHeader :global(.ant-btn) {
+  padding-inline: 0;
+}
+.calendarHeader :global(.ant-select) {
+  min-width: 0;
+}
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  margin-top: 8px;
+}
+.weekday {
+  display: grid;
+  place-items: center;
+  height: 32px;
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+}
+.calendarDay {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ant-color-text);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.calendarDay:hover {
+  background: var(--ant-color-primary-bg-hover);
+}
+.calendarInRange {
+  border-radius: 0;
+  background: var(--ant-color-primary-bg);
+}
+.calendarEndpoint {
+  border-radius: 6px;
+  background: var(--ant-color-primary);
+  color: var(--ant-color-bg-container);
+}
+.calendarEndpoint:hover {
+  background: var(--ant-color-primary);
+}
+.calendarDay[aria-current='date'] {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.calendarDay:focus-visible {
+  outline: 2px solid var(--ant-color-primary);
+  outline-offset: -2px;
+}
+.preciseTime {
+  margin-top: 12px;
+  border-top: 1px solid var(--ant-color-border-secondary);
+}
+.preciseTime summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  color: var(--ant-color-primary);
+}
+.timeRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.timeRow > span {
+  font-size: 12px;
+  color: var(--ant-color-text-secondary);
+}
+
+.calendarSelect {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 8px;
+  border: 1px solid var(--ant-color-border);
+  border-radius: 8px;
+  background: var(--ant-color-bg-container);
+  color: var(--ant-color-text);
+  font: inherit;
+  font-size: 16px;
+}
+.calendarSelect:focus-visible {
+  outline: 2px solid var(--ant-color-primary);
+  outline-offset: 1px;
+}
+.calendarSelect:disabled {
+  opacity: 0.5;
+}
+:global(:lang(en)) .datePresets {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pageActions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+.primaryAction,
+.secondaryActions {
+  display: contents;
+}
+.resetFilters {
+  flex: none;
+}
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(460px, 100%);
+  min-width: 0;
+}
+.searchRow > :global(.filter-search):first-child {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+}
+@media (max-width: 767px) {
+  .pageActions {
+    width: 100%;
+  }
+  .primaryAction {
+    display: block;
+    order: -1;
+    flex: 1 0 100%;
+  }
+  .primaryAction > *,
+  .primaryAction :global(.ant-btn) {
+    width: 100%;
+  }
+  .secondaryActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+  .pageActions .secondaryActions > * {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .pageActions .secondaryActions > :global(.ant-btn) {
+    width: auto;
+  }
+  .secondaryActions :global(.ant-btn) {
+    min-height: 44px;
+    height: auto;
+    padding-inline: 10px;
+    white-space: normal;
+  }
+  .searchRow {
+    width: 100%;
+  }
+  .resetFilters {
+    min-height: 44px;
+    padding-inline: 10px;
+  }
+}

@@ -36,7 +36,7 @@ const categories = [
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
   mocks.aliases.mockResolvedValue(['alias-match']);
   mocks.categories.mockResolvedValue(categories);
   mocks.productGroups.mockResolvedValue([]);

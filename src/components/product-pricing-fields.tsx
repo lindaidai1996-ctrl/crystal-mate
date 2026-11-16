@@ -1,6 +1,7 @@
 'use client';
 
 import { InputNumber, Radio } from 'antd';
+import { CompactFields } from '@/components/responsive/compactFields';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import {
@@ -82,7 +83,7 @@ export function ProductPricingFields({
           </Radio.Group>
         </div>
       )}
-      <div className="product-source-grid">
+      <CompactFields className="product-source-grid">
         {custom && !privacyMode && (
           <label className="source-field">
             <span>{t(value.saleRule === 'FIXED_AMOUNT' ? 'fixedAmount' : 'customPercent')}</span>
@@ -121,7 +122,7 @@ export function ProductPricingFields({
             }}
           />
         </label>
-      </div>
+      </CompactFields>
       {!privacyMode && (
         <p className="product-pricing-help">
           {t(

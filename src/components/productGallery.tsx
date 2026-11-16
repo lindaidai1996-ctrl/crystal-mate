@@ -1,6 +1,7 @@
 'use client';
 
 import { Tag } from 'antd';
+import { RecordAuditSummary, useRecordProvenance } from './audit-history';
 import type { PaginationProps } from 'antd';
 import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -10,6 +11,7 @@ import { CatalogGallery, CatalogGalleryImage } from './catalogGallery';
 import { ProductInlineEdit, type ProductQuickEditChange } from './productInlineEdit';
 import { TextTag } from './text-tag';
 import { CatalogNote } from './catalogNote';
+import { MobileDetails } from './responsive/mobileDetails';
 import catalogStyles from './productCatalog.module.css';
 
 export function ProductGallery({
@@ -29,6 +31,7 @@ export function ProductGallery({
   renderDetails?: (item: Product) => ReactNode;
   onQuickEdit: (item: Product, change: ProductQuickEditChange) => Promise<void>;
 }) {
+  const { records: provenance, failed: auditFailed } = useRecordProvenance('Product', items);
   const t = useTranslations('products');
   const sources = useTranslations('productSources');
   const locale = useLocale();
@@ -58,16 +61,20 @@ export function ProductGallery({
               <span>{item.category.name}</span>
               {item.origin && <span>{sources(item.origin)}</span>}
             </div>
-            {!!item.tags.length && (
-              <div className={`product-tags ${catalogStyles.cardTags}`}>
-                {item.tags.map((tag) => (
-                  <TextTag key={tag.id} text={tag.name} />
-                ))}
-              </div>
-            )}
-            <CatalogNote text={item.description} />
-            {renderDetails && (
-              <div className={catalogStyles.cardDetails}>{renderDetails(item)}</div>
+            {(item.tags.length > 0 || item.description || renderDetails) && (
+              <MobileDetails>
+                {!!item.tags.length && (
+                  <div className={`product-tags ${catalogStyles.cardTags}`}>
+                    {item.tags.map((tag) => (
+                      <TextTag key={tag.id} text={tag.name} />
+                    ))}
+                  </div>
+                )}
+                <CatalogNote text={item.description} />
+                {renderDetails && (
+                  <div className={catalogStyles.cardDetails}>{renderDetails(item)}</div>
+                )}
+              </MobileDetails>
             )}
             <dl className={catalogStyles.cardBottom}>
               <div className={catalogStyles.cardMetric}>
@@ -97,6 +104,12 @@ export function ProductGallery({
                 </dd>
               </div>
             </dl>
+            <RecordAuditSummary
+              entityType="Product"
+              entityId={item.id}
+              record={provenance[item.id]}
+              failed={auditFailed}
+            />
             <div className={catalogStyles.cardFooter}>
               <div className={catalogStyles.cardActions}>{renderActions(item)}</div>
             </div>

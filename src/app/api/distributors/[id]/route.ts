@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { apiError, ApiError, requireAdmin } from '@/lib/api';
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest, { params }: Context) {
   }
 }
 
-export async function PUT(request: NextRequest, { params }: Context) {
+async function handlePUT(request: NextRequest, { params }: Context) {
   try {
     await requireAdmin(request);
     const data = distributorSchema.parse(await request.json());
@@ -40,7 +41,7 @@ export async function PUT(request: NextRequest, { params }: Context) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: Context) {
+async function handleDELETE(request: NextRequest, { params }: Context) {
   try {
     await requireAdmin(request);
     const id = (await params).id;
@@ -55,3 +56,6 @@ export async function DELETE(request: NextRequest, { params }: Context) {
     return apiError(error);
   }
 }
+
+export const PUT = withAuditRoute(handlePUT);
+export const DELETE = withAuditRoute(handleDELETE);

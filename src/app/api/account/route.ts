@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { apiError, ApiError, requireAdmin } from '@/lib/api';
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function PATCH(request: NextRequest) {
+async function handlePATCH(request: NextRequest) {
   try {
     const session = await requireAdmin(request);
     const input = profileSchema.parse(await request.json());
@@ -49,3 +50,5 @@ export async function PATCH(request: NextRequest) {
     return apiError(error);
   }
 }
+
+export const PATCH = withAuditRoute(handlePATCH);

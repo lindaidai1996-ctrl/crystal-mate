@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import type { ProductImage } from '../../src/lib/client-types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ transaction: vi.fn() }));
@@ -21,14 +22,14 @@ const input = {
   imageKeys: [],
 };
 
-function transaction() {
+function transaction(images: ProductImage[] = []) {
   const product = {
     ...input,
     id,
     name: '原商品',
     stock: 10,
     origin: 'PURCHASED',
-    images: [],
+    images,
     tags: [],
     marketing: null,
     measurement: null,
@@ -55,7 +56,14 @@ function transaction() {
     cabochonMeasurement: { deleteMany: vi.fn() },
     cabochonCost: { deleteMany: vi.fn() },
     cabochonExtraInfo: { deleteMany: vi.fn() },
-    productImage: { deleteMany: vi.fn() },
+    productImage: {
+      deleteMany: vi.fn().mockImplementation(async () => {
+        product.images = [];
+      }),
+      createMany: vi.fn().mockImplementation(async ({ data }) => {
+        product.images = data;
+      }),
+    },
     productStockAdjustment: {
       create: vi.fn().mockImplementation(async ({ data }) => {
         product.stockAdjustments.push(data);
@@ -153,5 +161,66 @@ describe('inline product stock edits', () => {
       saveProduct(productSchema.parse({ ...input, stockAdjustment: { expectedQuantity: 10 } }), id),
     ).rejects.toThrow('history write failed');
     expect(tx.product.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('product cover framing persistence', () => {
+  const image: ProductImage = {
+    objectKey: 'images/00000000-0000-4000-8000-000000000001.jpg',
+    url: '/api/images/00000000-0000-4000-8000-000000000001.jpg',
+    position: 0,
+    framing: { mode: 'contain' },
+  };
+
+  it('keeps original image URLs and framing when an older client saves other fields', async () => {
+    tx = transaction([image]);
+    const saved = await saveProduct({ ...input, imageKeys: [image.objectKey] }, id);
+    expect(saved.images[0]).toMatchObject(image);
+    expect(tx.uploadGrant.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ objectKey: { in: [] } }) }),
+    );
+  });
+
+  it('stores a crop, restores it on reopening, and can switch back to the whole image', async () => {
+    tx = transaction([image]);
+    const framing = { mode: 'cover' as const, crop: { x: 0, y: 25, width: 100, height: 50 } };
+    const payload = { ...input, imageKeys: [image.objectKey] };
+    const cropped = await saveProduct(
+      {
+        ...payload,
+        imageFramings: { [image.objectKey]: framing },
+      },
+      id,
+    );
+    expect(cropped.images[0]).toMatchObject({ ...image, framing });
+    const reopened = await saveProduct(payload, id);
+    expect(reopened.images[0]).toMatchObject({ ...image, framing });
+    const whole = await saveProduct(
+      {
+        ...payload,
+        imageFramings: { [image.objectKey]: { mode: 'contain' } },
+      },
+      id,
+    );
+    expect(whole.images[0]).toMatchObject(image);
+  });
+
+  it('keeps framing attached to its image when the list cover is reordered', async () => {
+    const second = {
+      ...image,
+      objectKey: 'images/00000000-0000-4000-8000-000000000002.jpg',
+      url: '/api/images/00000000-0000-4000-8000-000000000002.jpg',
+      position: 1,
+      framing: { mode: 'cover' as const },
+    };
+    tx = transaction([image, second]);
+    const saved = await saveProduct(
+      { ...input, imageKeys: [second.objectKey, image.objectKey] },
+      id,
+    );
+    expect(saved.images).toEqual([
+      expect.objectContaining({ ...second, position: 0 }),
+      expect.objectContaining({ ...image, position: 1 }),
+    ]);
   });
 });

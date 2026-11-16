@@ -3,11 +3,13 @@
 import { LeftOutlined, PictureOutlined, RightOutlined } from '@ant-design/icons';
 import { Button, Image, Popover } from 'antd';
 import { LoadingImage } from '@/components/loadingImage';
+import { FramedImage } from '@/components/framedImage';
+import type { FramedImage as ImageFramingFields } from '@/lib/image-framing';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { imageThumbnailUrl } from '@/lib/image-storage';
 
-type PreviewImage = { objectKey: string; url: string; fileName?: string };
+type PreviewImage = { objectKey: string; url: string; fileName?: string } & ImageFramingFields;
 
 export function ImageHoverPreview({
   images,
@@ -37,7 +39,7 @@ export function ImageHoverPreview({
   // A list cover stays fixed even while the user browses other images in the preview.
   const thumbnail =
     coverObjectKey === undefined
-      ? image
+      ? images[0]
       : (images.find((item) => item.objectKey === coverObjectKey) ?? images[0]);
   const thumbnailButton = (
     <button
@@ -46,18 +48,16 @@ export function ImageHoverPreview({
       aria-label={t('previewImage')}
       onClick={() => setPreviewOpen(true)}
     >
-      <LoadingImage
-        unoptimized
-        width={44}
-        height={44}
-        className="product-thumb"
-        src={
-          thumbnailSize === 'original'
-            ? thumbnail.url
-            : imageThumbnailUrl(thumbnail.url, thumbnailSize)
-        }
-        alt=""
-      />
+      <span className="product-thumb">
+        <FramedImage
+          src={
+            thumbnailSize === 'original'
+              ? thumbnail.url
+              : imageThumbnailUrl(thumbnail.url, thumbnailSize)
+          }
+          framing={thumbnail.framing}
+        />
+      </span>
     </button>
   );
 

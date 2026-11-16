@@ -1,12 +1,16 @@
 'use client';
 
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { App, Button, Empty, Form, Input, Modal, Popconfirm, Tooltip } from 'antd';
+import { App, Button, Empty, Form, Input, Popconfirm, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { SearchFilterRow } from '@/components/responsive/searchFilterRow';
+import { ResetFiltersButton } from '@/components/responsive/resetFiltersButton';
+import { ListPageActions } from '@/components/responsive/listPageActions';
 import { PaginatedTable } from '@/components/paginated-table';
 import { TextTag } from '@/components/text-tag';
+import { ResponsiveModal as Modal } from '@/components/responsive/responsiveDialog';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { Tag } from '@/lib/client-types';
 import { CLIENT_TABLE_PAGINATION, DEFAULT_TABLE_PAGE_SIZE } from '@/lib/table-pagination';
@@ -147,23 +151,36 @@ export function TagsPage() {
           <h1>{t('title')}</h1>
           <p>{t('count', { count: visibleItems.length })}</p>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => open(null)}>
-          {t('new')}
-        </Button>
-      </div>
-      <div className="filter-bar">
-        <Input.Search
-          className="filter-search"
-          aria-label={t('search')}
-          placeholder={t('search')}
-          value={query}
-          onChange={(event) => {
-            setQuery(event.target.value);
-            setPage(1);
-          }}
-          allowClear
+        <ListPageActions
+          primary={
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => open(null)}>
+              {t('new')}
+            </Button>
+          }
         />
       </div>
+      <div className="filter-bar">
+        <SearchFilterRow>
+          <Input.Search
+            className="filter-search"
+            aria-label={t('search')}
+            placeholder={t('search')}
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setPage(1);
+            }}
+            allowClear
+          />
+          <ResetFiltersButton
+            onReset={() => {
+              setQuery('');
+              setPage(1);
+            }}
+          />
+        </SearchFilterRow>
+      </div>
+
       <div className="table-surface">
         <PaginatedTable
           rowKey="id"

@@ -44,7 +44,7 @@ const passwordInput = {
 beforeEach(async () => {
   vi.resetAllMocks();
   passwordHash = await hash('old-password', 4);
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
   mocks.findAdmin.mockResolvedValue({ ...profile, id: 'admin-id', passwordHash });
   mocks.updateAdmin.mockResolvedValue(profile);
   mocks.updatePassword.mockResolvedValue({ count: 1 });
@@ -58,7 +58,7 @@ describe('personal account API', () => {
     expect((await GET(request('GET'))).status).toBe(401);
     expect((await PATCH(request('PATCH', { nickname: 'name' }))).status).toBe(401);
     expect((await POST(request('POST', passwordInput))).status).toBe(401);
-    mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+    mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
     expect((await PATCH(request('PATCH', { nickname: 'name' }, 'http://other.test'))).status).toBe(
       403,
     );

@@ -1,0 +1,2155 @@
+{
+  "status": "captured",
+  "capturedAt": "2026-11-16T03:59:40.637Z",
+  "source": "crystal_mate_dev",
+  "mode": "read-only-repeatable-read",
+  "discoveryLimit": "relatedMaterials/relatedPurchases use lexical discovery only, not exhaustive semantic matching. scopedCandidates contains all 44 purchase rows in the fixed case scope; names, categories, tags and aliases were reviewed.",
+  "counts": {
+    "materials": 210,
+    "products": 127,
+    "distributors": 16,
+    "batches": 13,
+    "materialPurchaseEntries": 213,
+    "productPurchaseEntries": 13
+  },
+  "categories": [
+    {
+      "id": "cmwgaztl2008toq01qr4sf5oa",
+      "name": "18K金",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 9
+    },
+    {
+      "id": "cmv63nupn000d3wm85dwsxgzu",
+      "name": "18K镀金-银配饰",
+      "aliases": ["镀18K金"],
+      "parentId": null,
+      "materialCount": 6
+    },
+    {
+      "id": "cmvhhzv61000d3whvjr1xr7ug",
+      "name": "95沉香",
+      "aliases": ["95沉"],
+      "parentId": "cmvhhz97q00093whvmc2dgadd",
+      "materialCount": 1
+    },
+    {
+      "id": "cmvhhzm7j000b3whvja957k0z",
+      "name": "99沉香",
+      "aliases": ["99沉"],
+      "parentId": "cmvhhz97q00093whvmc2dgadd",
+      "materialCount": 10
+    },
+    {
+      "id": "cmv63iuqm000b3wm84cggk8ga",
+      "name": "S925银配饰",
+      "aliases": ["银饰"],
+      "parentId": null,
+      "materialCount": 75
+    },
+    {
+      "id": "cmwg5shb3005roq012ubkdmxk",
+      "name": "且末",
+      "aliases": [],
+      "parentId": "cmv60ruo200093wap0n1ctxii",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv63hjmj00093wm8eqpbxmqh",
+      "name": "冰白",
+      "aliases": [],
+      "parentId": "cmv60ruo200093wap0n1ctxii",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv97yt3p00013we8796vrydk",
+      "name": "合金配饰",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 0
+    },
+    {
+      "id": "cmv60ruo200093wap0n1ctxii",
+      "name": "和田玉",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 13
+    },
+    {
+      "id": "cmv63pe63000f3wm8eju8hh61",
+      "name": "和田玉配饰",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 2
+    },
+    {
+      "id": "cmv6c50tr002h3wkql4trkwpr",
+      "name": "天河石配饰",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 1
+    },
+    {
+      "id": "cmw09mgi8003h3ww4plellk98",
+      "name": "小树胶花",
+      "aliases": [],
+      "parentId": "cmv51g0ls00073wielruzi6v8",
+      "materialCount": 1
+    },
+    {
+      "id": "cmvaqu22700073wud0nd7qevw",
+      "name": "小米珍珠",
+      "aliases": [],
+      "parentId": "cmvaqb3jq00053wuddl8vyca2",
+      "materialCount": 2
+    },
+    {
+      "id": "cmw0efir500793ww4r4mmapkp",
+      "name": "彼得石",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 1
+    },
+    {
+      "id": "cmv63fx0000013wm80j0qwgib",
+      "name": "晴水",
+      "aliases": [],
+      "parentId": "cmv60ruo200093wap0n1ctxii",
+      "materialCount": 6
+    },
+    {
+      "id": "cmw0bkkv200463ww4yj7mc01m",
+      "name": "月光石",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 1
+    },
+    {
+      "id": "cmw09jhw200383ww4zpeie1gs",
+      "name": "柠檬晶",
+      "aliases": [],
+      "parentId": "cmv51g0ls00073wielruzi6v8",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv51g0ls00073wielruzi6v8",
+      "name": "水晶",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 1
+    },
+    {
+      "id": "cmw8wyp4x00203w4cwls1g7pj",
+      "name": "沉水沉香",
+      "aliases": [],
+      "parentId": "cmvhhz97q00093whvmc2dgadd",
+      "materialCount": 4
+    },
+    {
+      "id": "cmvhhz97q00093whvmc2dgadd",
+      "name": "沉香",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 0
+    },
+    {
+      "id": "cmvz6pnmc000a3ww4fo8zxdqv",
+      "name": "海蓝宝",
+      "aliases": ["魔鬼蓝"],
+      "parentId": null,
+      "materialCount": 6
+    },
+    {
+      "id": "cmvaqb3jq00053wuddl8vyca2",
+      "name": "珍珠",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 4
+    },
+    {
+      "id": "cmv7votfw000p3wgmgodujy0u",
+      "name": "白水晶",
+      "aliases": ["白水"],
+      "parentId": "cmv51g0ls00073wielruzi6v8",
+      "materialCount": 7
+    },
+    {
+      "id": "cmw0dp346005w3ww4dyygmfm7",
+      "name": "石榴石",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 2
+    },
+    {
+      "id": "cmv63h8dp00053wm8syjsl35f",
+      "name": "碧玉",
+      "aliases": [],
+      "parentId": "cmv60ruo200093wap0n1ctxii",
+      "materialCount": 7
+    },
+    {
+      "id": "cmvz80bd0001c3ww4ytjejlb3",
+      "name": "粉水晶",
+      "aliases": ["粉晶", "芙蓉石"],
+      "parentId": "cmv51g0ls00073wielruzi6v8",
+      "materialCount": 2
+    },
+    {
+      "id": "cmv63h1o400033wm8bhlhvd7r",
+      "name": "糖料",
+      "aliases": ["金山糖", "糖料"],
+      "parentId": "cmv60ruo200093wap0n1ctxii",
+      "materialCount": 4
+    },
+    {
+      "id": "cmv51gtm0000b3wiewtj7hpsy",
+      "name": "紫水晶",
+      "aliases": [],
+      "parentId": "cmv51g0ls00073wielruzi6v8",
+      "materialCount": 2
+    },
+    {
+      "id": "cmv7vn5g5000j3wgmxbxgmqib",
+      "name": "红虎眼",
+      "aliases": [],
+      "parentId": "cmv7vmnhk000f3wgmb943cyt3",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw091s6800203ww4nfwggfxv",
+      "name": "绿发晶",
+      "aliases": [],
+      "parentId": "cmv51g0ls00073wielruzi6v8",
+      "materialCount": 1
+    },
+    {
+      "id": "cmw0953da00293ww44hl7ke8s",
+      "name": "绿幽灵",
+      "aliases": [],
+      "parentId": "cmv51g0ls00073wielruzi6v8",
+      "materialCount": 2
+    },
+    {
+      "id": "cmv7svpyw00033w5cdo0qzxd2",
+      "name": "绿松石",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 15
+    },
+    {
+      "id": "cmv7vm1sx00093wgm8efakbmw",
+      "name": "绿龙晶",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 1
+    },
+    {
+      "id": "cmv7vm7kg000b3wgm6uc43uc6",
+      "name": "蓝晶石",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 2
+    },
+    {
+      "id": "cmv7vo9mj000n3wgmorg1t32o",
+      "name": "蓝虎眼",
+      "aliases": [],
+      "parentId": "cmv7vmnhk000f3wgmb943cyt3",
+      "materialCount": 2
+    },
+    {
+      "id": "cmv7vmnhk000f3wgmb943cyt3",
+      "name": "虎眼石",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 0
+    },
+    {
+      "id": "cmw0bprhc004g3ww4aczuhh7b",
+      "name": "金发晶",
+      "aliases": [],
+      "parentId": "cmv51g0ls00073wielruzi6v8",
+      "materialCount": 4
+    },
+    {
+      "id": "cmv7vnbbw000l3wgmp1bkks2a",
+      "name": "金虎眼",
+      "aliases": [],
+      "parentId": "cmv7vmnhk000f3wgmb943cyt3",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv7vmhmh000d3wgm4b69jxct",
+      "name": "银曜石",
+      "aliases": [],
+      "parentId": null,
+      "materialCount": 4
+    },
+    {
+      "id": "cmw097dtk002h3ww4prjnfpo0",
+      "name": "闪灵",
+      "aliases": [],
+      "parentId": "cmv51g0ls00073wielruzi6v8",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv63hd1l00073wm85sitzqp6",
+      "name": "青海白",
+      "aliases": [],
+      "parentId": "cmv60ruo200093wap0n1ctxii",
+      "materialCount": 4
+    },
+    {
+      "id": "cmv60s7b5000b3wap0ekw0e1t",
+      "name": "黄口",
+      "aliases": [],
+      "parentId": "cmv60ruo200093wap0n1ctxii",
+      "materialCount": 1
+    },
+    {
+      "id": "cmw05lftm001r3ww4gkxuenyq",
+      "name": "黄水晶",
+      "aliases": [],
+      "parentId": "cmv51g0ls00073wielruzi6v8",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv7vmyn7000h3wgm0olj8clt",
+      "name": "黄虎眼",
+      "aliases": [],
+      "parentId": "cmv7vmnhk000f3wgmb943cyt3",
+      "materialCount": 1
+    },
+    {
+      "id": "cmw0ee0jj00703ww4scv3img7",
+      "name": "黑爆闪",
+      "aliases": [],
+      "parentId": "cmv51g0ls00073wielruzi6v8",
+      "materialCount": 1
+    }
+  ],
+  "areas": [
+    {
+      "area": "东海",
+      "distributorCount": 1
+    },
+    {
+      "area": "可塘",
+      "distributorCount": 2
+    },
+    {
+      "area": "未知",
+      "distributorCount": 2
+    },
+    {
+      "area": "网络",
+      "distributorCount": 2
+    },
+    {
+      "area": "荔湾",
+      "distributorCount": 9
+    }
+  ],
+  "tags": [
+    {
+      "id": "cmwgb02wn008uoq014ppronb4",
+      "name": "18K金",
+      "materialCount": 9
+    },
+    {
+      "id": "cmwhmfidv00booq01fkd6s7i5",
+      "name": "18K镀金",
+      "materialCount": 4
+    },
+    {
+      "id": "cmw8wzn2u00233w4cjoxu9wt4",
+      "name": "95沉香",
+      "materialCount": 1
+    },
+    {
+      "id": "cmw8wzjgn00223w4cd7gt4jql",
+      "name": "99沉香",
+      "materialCount": 10
+    },
+    {
+      "id": "cmwg5soo9005soq01ns9j785d",
+      "name": "且末",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv6gg27d000z3wrsl870wqbe",
+      "name": "云母",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d00153wrsodsm52ru",
+      "name": "云母沙",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d00143wrsq3o81wn1",
+      "name": "云母片",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d000j3wrs0r8c1dk8",
+      "name": "共生",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw8xwcmb002j3w4cheb64p8d",
+      "name": "冰胶和田玉",
+      "materialCount": 0
+    },
+    {
+      "id": "cmvp2z7bh004l3wa3rcuxu85x",
+      "name": "半镯",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv6cnpgg002q3wkqktm1fm7b",
+      "name": "和田玉",
+      "materialCount": 27
+    },
+    {
+      "id": "cmwejr5oe00033wvm94w9vfoj",
+      "name": "复古银",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d000y3wrs7pfxwcb3",
+      "name": "小树胶花",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv6gg27d00073wrsy91e0ep7",
+      "name": "幻彩兔毛",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d00133wrsyubeqdb4",
+      "name": "异象云母",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv53y5v600043wrgvchwa2cr",
+      "name": "彩幽灵",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw0efmwm007a3ww4j2hcerff",
+      "name": "彼得石",
+      "materialCount": 1
+    },
+    {
+      "id": "cmvp2y7qs004k3wa39v2uaz0k",
+      "name": "提溜",
+      "materialCount": 12
+    },
+    {
+      "id": "cmv6gg27d000d3wrsuwb2phwa",
+      "name": "方解石",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d000e3wrs5kkhzeru",
+      "name": "方解石共生铜矿",
+      "materialCount": 0
+    },
+    {
+      "id": "cmwg5ho8i005hoq01cx0c9mmy",
+      "name": "晴水",
+      "materialCount": 2
+    },
+    {
+      "id": "cmv6gg27d00083wrstudgf9kp",
+      "name": "晶中晶",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d00093wrss6j8brh5",
+      "name": "晶中晶共生兔毛",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d000a3wrskkjydlda",
+      "name": "晶中晶共生黄泥矿",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw0bksmx00473ww4441bfc9g",
+      "name": "月光石",
+      "materialCount": 1
+    },
+    {
+      "id": "cmw09jobr00393ww42tolpmvt",
+      "name": "柠檬晶",
+      "materialCount": 1
+    },
+    {
+      "id": "cmw0efs3d007b3ww4147ile48",
+      "name": "桶珠",
+      "materialCount": 5
+    },
+    {
+      "id": "cmv6gg27d00113wrskyuaguob",
+      "name": "橘云母",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d00003wrs3t1q48g7",
+      "name": "橘幽灵",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d00123wrsp3ju34tr",
+      "name": "橘黄云母",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d000l3wrswe0jb9mh",
+      "name": "水胆",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw8wzfwo00213w4cox7z7tnm",
+      "name": "沉水沉香",
+      "materialCount": 4
+    },
+    {
+      "id": "cmvhitbso000e3whvyzqk0r91",
+      "name": "沉香",
+      "materialCount": 15
+    },
+    {
+      "id": "cmv6gg27d000i3wrs9dxz9sfy",
+      "name": "泥矿",
+      "materialCount": 0
+    },
+    {
+      "id": "cmvz6qfou000b3ww4wx0n4e81",
+      "name": "海蓝宝",
+      "materialCount": 6
+    },
+    {
+      "id": "cmw0bkw9n00483ww4f35xajxm",
+      "name": "灰月光",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv6gg27d00173wrsmwh75s24",
+      "name": "灰蓝云母",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d000w3wrs1xdxug62",
+      "name": "牛血红胶花",
+      "materialCount": 0
+    },
+    {
+      "id": "cmvaqatk900033wud4gr3hm1i",
+      "name": "珍珠",
+      "materialCount": 6
+    },
+    {
+      "id": "cmv6gg27d00033wrsmpfbdhws",
+      "name": "白兔毛",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv53y1za00033wrg0igdnn0q",
+      "name": "白幽灵",
+      "materialCount": 0
+    },
+    {
+      "id": "cmvasfsyr000g3wkmar85vwwi",
+      "name": "白水晶",
+      "materialCount": 8
+    },
+    {
+      "id": "cmv6gg27d000h3wrsxcay7bz8",
+      "name": "白泥矿",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw0i0l2m000v3whxy67aj37y",
+      "name": "白玉",
+      "materialCount": 3
+    },
+    {
+      "id": "cmv6gg27d000x3wrso71ssgzv",
+      "name": "白胶花",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw0dp8kz005x3ww4pfbgfdxb",
+      "name": "石榴石",
+      "materialCount": 2
+    },
+    {
+      "id": "cmv6cnm3e002p3wkqew3h891l",
+      "name": "碧玉",
+      "materialCount": 8
+    },
+    {
+      "id": "cmv6gg27d000q3wrsig4n493q",
+      "name": "碧玺",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d00103wrsuo3nrxxq",
+      "name": "粉云母",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw1o0jpm000t3w0fkh5jsl2j",
+      "name": "粉云母共生绿幽灵",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d00163wrsf9i6eige",
+      "name": "粉云母沙",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d00053wrsx1575qbm",
+      "name": "粉兔毛",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d00023wrslmua5bhk",
+      "name": "粉幽灵",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d001b3wrs8a71ai81",
+      "name": "粉星沙",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d000m3wrsiscrfy90",
+      "name": "粉水晶",
+      "materialCount": 2
+    },
+    {
+      "id": "cmv6gg27d000t3wrslj50yejl",
+      "name": "粉胶花",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv9act4z00023we8ramnv5nx",
+      "name": "糖料",
+      "materialCount": 4
+    },
+    {
+      "id": "cmv6gg27d000n3wrs3c4fgjp2",
+      "name": "紫水晶",
+      "materialCount": 2
+    },
+    {
+      "id": "cmv6gg27d001c3wrsotij2n9s",
+      "name": "紫海胆",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d001f3wrs7koptylq",
+      "name": "紫超七",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d00043wrsqoyx57f9",
+      "name": "红兔毛",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv53xxo300023wrgmdyy943r",
+      "name": "红幽灵",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d000v3wrsapcbd7d8",
+      "name": "红胶花",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw091zwp00213ww4j7j94d8n",
+      "name": "绿发晶",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv4vjb2900003w53tm9oofz0",
+      "name": "绿幽灵",
+      "materialCount": 2
+    },
+    {
+      "id": "cmv6gg27d001a3wrso7ztdavy",
+      "name": "绿星沙",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv7tsswt00003wgmlsnernz6",
+      "name": "绿松石",
+      "materialCount": 15
+    },
+    {
+      "id": "cmvhxtyl900013w3irw3zv0o5",
+      "name": "绿龙晶",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv6gg27d000s3wrsay22dueg",
+      "name": "胶花",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv6gg27d00183wrs3wowm94h",
+      "name": "蓝云母",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d00063wrsct5zuuz7",
+      "name": "蓝兔毛",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv7vrei2000q3wgm0gj8dcpi",
+      "name": "蓝晶石",
+      "materialCount": 2
+    },
+    {
+      "id": "cmv6gg27d001e3wrs73iprz1h",
+      "name": "蓝矿",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d000p3wrsm2c6wt60",
+      "name": "蓝线",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw0dl6mw005h3ww4k03s2ol2",
+      "name": "蓝虎眼",
+      "materialCount": 2
+    },
+    {
+      "id": "cmv6gg27d00193wrs15a1if6g",
+      "name": "蓝金沙",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw0dldrf005i3ww4avujvo5z",
+      "name": "虎眼石",
+      "materialCount": 2
+    },
+    {
+      "id": "cmv6gg27d000k3wrsm70xz8m1",
+      "name": "负晶",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d001g3wrs3lbkxnub",
+      "name": "超七",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6cnsqu002r3wkqwdt7dy88",
+      "name": "配饰",
+      "materialCount": 70
+    },
+    {
+      "id": "cmw0bpxp7004h3ww4gz9yzq9f",
+      "name": "金发晶",
+      "materialCount": 4
+    },
+    {
+      "id": "cmv6gg27d000b3wrs3kwxrfp6",
+      "name": "铜矿",
+      "materialCount": 0
+    },
+    {
+      "id": "cmviuxtrd00003wdnag3jii4c",
+      "name": "银曜石",
+      "materialCount": 4
+    },
+    {
+      "id": "cmwg1oefw001coq01p50z7v9w",
+      "name": "银配饰",
+      "materialCount": 11
+    },
+    {
+      "id": "cmvhtwq0400023w1jighk1jpm",
+      "name": "锆石",
+      "materialCount": 30
+    },
+    {
+      "id": "cmvhtwtce00033w1jg0ihqysj",
+      "name": "镶钻",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw097qgj002i3ww4ca59kxi9",
+      "name": "闪灵",
+      "materialCount": 1
+    },
+    {
+      "id": "cmvz9g4qo001j3ww40dwust8v",
+      "name": "雪花",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv6gg27d000o3wrs6xxbe8oq",
+      "name": "雪霜发",
+      "materialCount": 0
+    },
+    {
+      "id": "cmvanwur8001v3ww4mx00kvez",
+      "name": "青海白",
+      "materialCount": 2
+    },
+    {
+      "id": "cmv6gg27d000f3wrs8ll6bh6f",
+      "name": "骸骨",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv9e7rxx000d3ww40hh5gaq7",
+      "name": "黄口",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv6gg27d00013wrsznhrfqin",
+      "name": "黄幽灵",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw08yl50001s3ww4bu3m53r4",
+      "name": "黄水晶",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv6gg27d000g3wrsybv85l3m",
+      "name": "黄泥矿",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d000u3wrsa2ye2lil",
+      "name": "黄胶花",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw09s244003u3ww4rewvij64",
+      "name": "黄虎眼",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv6gg27d000c3wrs9ra95dpo",
+      "name": "黄铜矿",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d001h3wrsori08p2a",
+      "name": "黑毒液",
+      "materialCount": 0
+    },
+    {
+      "id": "cmw0ee5dy00713ww4o6p4e6it",
+      "name": "黑爆闪",
+      "materialCount": 1
+    },
+    {
+      "id": "cmv6gg27d001d3wrs57mgw9t3",
+      "name": "黑铁矿",
+      "materialCount": 0
+    },
+    {
+      "id": "cmv6gg27d000r3wrsivelz8bx",
+      "name": "黑银钛",
+      "materialCount": 0
+    }
+  ],
+  "relatedMaterials": [
+    {
+      "id": "cmv7tt7hc00033wgmiebrrpx3",
+      "name": "绿松石药片/圆珠",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "STRAND",
+      "tags": ["绿松石"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwbgbtc200053wita58500bj",
+      "name": "绿松石花朵",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "BEAD",
+      "tags": ["绿松石"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwbge0ag000b3wits6ozesdf",
+      "name": "绿松石桶珠",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "BEAD",
+      "tags": ["桶珠", "绿松石"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwbgfosh000h3wit26cvrr56",
+      "name": "绿松石圆珠",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "BEAD",
+      "tags": ["绿松石"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwg3jvmq0038oq017cf73132",
+      "name": "4mm绿松石随形",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "STRAND",
+      "tags": ["绿松石"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwg3tev8003joq01zlvvug0k",
+      "name": "3.5mm绿松石药片",
+      "aliases": ["绿松石直切"],
+      "category": "绿松石",
+      "unit": "STRAND",
+      "tags": ["绿松石"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwg3wwbn003soq01of24lsde",
+      "name": "3mm绿松石圆珠",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "STRAND",
+      "tags": ["绿松石"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwg41qcz0040oq016l565fdh",
+      "name": "13mm绿松石桶珠",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "BEAD",
+      "tags": ["桶珠", "绿松石"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwg462i80047oq01899ruhhw",
+      "name": "7.8mm绿松石勒子",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "BEAD",
+      "tags": ["绿松石"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwg4ekob004doq0122uzteo5",
+      "name": "百香籽绿松石配饰",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "BEAD",
+      "tags": ["提溜", "绿松石", "配饰"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwg4gc8z004joq01mwra61gp",
+      "name": "羽毛绿松石提溜",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "BEAD",
+      "tags": ["提溜", "绿松石"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwg4irgg004poq01fz0k9ffi",
+      "name": "太阳绿松石提溜（大）",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "BEAD",
+      "tags": ["提溜", "绿松石"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwg4l0yi004voq017d2499gv",
+      "name": "太阳绿松石提溜",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "BEAD",
+      "tags": ["提溜", "绿松石"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwg4od7h0051oq01rx3ps154",
+      "name": "藏扣绿松石",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "GRAM",
+      "tags": ["绿松石"],
+      "purchaseEntryCount": 1
+    },
+    {
+      "id": "cmwg6zmtj0074oq01ogtm3q3z",
+      "name": "绿松石羽毛提溜",
+      "aliases": [],
+      "category": "绿松石",
+      "unit": "BEAD",
+      "tags": ["提溜", "绿松石"],
+      "purchaseEntryCount": 1
+    }
+  ],
+  "purchaseCoverage": [
+    {
+      "month": "2026-11",
+      "area": "未知",
+      "entries": 3
+    },
+    {
+      "month": "2026-11",
+      "area": "网络",
+      "entries": 2
+    },
+    {
+      "month": "2026-11",
+      "area": "荔湾",
+      "entries": 44
+    },
+    {
+      "month": "2026-10",
+      "area": "未知",
+      "entries": 19
+    },
+    {
+      "month": "2026-10",
+      "area": "荔湾",
+      "entries": 18
+    },
+    {
+      "month": "2026-08",
+      "area": "可塘",
+      "entries": 1
+    },
+    {
+      "month": "2026-08",
+      "area": "网络",
+      "entries": 1
+    },
+    {
+      "month": "2026-07",
+      "area": "荔湾",
+      "entries": 50
+    },
+    {
+      "month": "2026-06",
+      "area": "东海",
+      "entries": 2
+    },
+    {
+      "month": "2026-06",
+      "area": "未知",
+      "entries": 5
+    },
+    {
+      "month": "2026-06",
+      "area": "网络",
+      "entries": 30
+    },
+    {
+      "month": "2026-01",
+      "area": "可塘",
+      "entries": 15
+    },
+    {
+      "month": "2025-07",
+      "area": "可塘",
+      "entries": 23
+    }
+  ],
+  "relatedPurchases": [
+    {
+      "id": "cmv7tt7hm00053wgmu0lniih4",
+      "materialId": "cmv7tt7hc00033wgmiebrrpx3",
+      "name": "绿松石药片/圆珠",
+      "date": "2026-10-11",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "STRAND",
+      "amount": "217.0000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwbgbtg300073witov7cztal",
+      "materialId": "cmwbgbtc200053wita58500bj",
+      "name": "绿松石花朵",
+      "date": "2026-11-11",
+      "area": "未知",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "93.0000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwbge0d5000d3witiezacewb",
+      "materialId": "cmwbge0ag000b3wits6ozesdf",
+      "name": "绿松石桶珠",
+      "date": "2026-11-11",
+      "area": "未知",
+      "quantity": "2.00",
+      "unit": "BEAD",
+      "amount": "67.0000",
+      "remainingQuantity": "2.00"
+    },
+    {
+      "id": "cmwbgfou9000j3witb12caox0",
+      "materialId": "cmwbgfosh000h3wit26cvrr56",
+      "name": "绿松石圆珠",
+      "date": "2026-11-11",
+      "area": "未知",
+      "quantity": "2.00",
+      "unit": "BEAD",
+      "amount": "108.0000",
+      "remainingQuantity": "2.00"
+    },
+    {
+      "id": "cmwg3jvn7003aoq01w2vzww8r",
+      "materialId": "cmwg3jvmq0038oq017cf73132",
+      "name": "4mm绿松石随形",
+      "date": "2026-11-14",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "STRAND",
+      "amount": "220.00",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg3tevc003loq01iq1raphc",
+      "materialId": "cmwg3tev8003joq01zlvvug0k",
+      "name": "3.5mm绿松石药片",
+      "date": "2026-11-14",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "STRAND",
+      "amount": "185.00",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg3wwbs003uoq01fefb4uhm",
+      "materialId": "cmwg3wwbn003soq01of24lsde",
+      "name": "3mm绿松石圆珠",
+      "date": "2026-11-14",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "STRAND",
+      "amount": "869.40",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg41qd40042oq01bdr95r0f",
+      "materialId": "cmwg41qcz0040oq016l565fdh",
+      "name": "13mm绿松石桶珠",
+      "date": "2026-11-14",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "162.5000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg462ib0049oq01l602ks55",
+      "materialId": "cmwg462i80047oq01899ruhhw",
+      "name": "7.8mm绿松石勒子",
+      "date": "2026-11-14",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "110.0000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg4ekoh004foq01k1uo5kyt",
+      "materialId": "cmwg4ekob004doq0122uzteo5",
+      "name": "百香籽绿松石配饰",
+      "date": "2026-11-14",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "17.6000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg4gc92004loq01w7elwpgm",
+      "materialId": "cmwg4gc8z004joq01mwra61gp",
+      "name": "羽毛绿松石提溜",
+      "date": "2026-11-14",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "22.0000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg4irgl004roq01ldythgge",
+      "materialId": "cmwg4irgg004poq01fz0k9ffi",
+      "name": "太阳绿松石提溜（大）",
+      "date": "2026-11-14",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "29.7000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg4l0yn004xoq01kdmkix3z",
+      "materialId": "cmwg4l0yi004voq017d2499gv",
+      "name": "太阳绿松石提溜",
+      "date": "2026-11-14",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "15.4000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg4od7j0053oq01d96hk3zn",
+      "materialId": "cmwg4od7h0051oq01rx3ps154",
+      "name": "藏扣绿松石",
+      "date": "2026-11-14",
+      "area": "荔湾",
+      "quantity": "4.43",
+      "unit": "GRAM",
+      "amount": "180.00",
+      "remainingQuantity": "4.43"
+    },
+    {
+      "id": "cmwg6zmto0076oq01k1dobc3c",
+      "materialId": "cmwg6zmtj0074oq01ogtm3q3z",
+      "name": "绿松石羽毛提溜",
+      "date": "2026-11-14",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "86.0000",
+      "remainingQuantity": "1.00"
+    }
+  ],
+  "locationEvidence": [
+    {
+      "id": "cmv60i7vq00043wapt6b5xvp9",
+      "area": "荔湾",
+      "addressEmpty": false,
+      "addressMentionsLiwanPlaza": true,
+      "nameMentionsLiwanPlaza": false,
+      "notesMentionLiwanPlaza": false
+    },
+    {
+      "id": "cmv60jdt100063wap7d1npw7r",
+      "area": "荔湾",
+      "addressEmpty": false,
+      "addressMentionsLiwanPlaza": false,
+      "nameMentionsLiwanPlaza": false,
+      "notesMentionLiwanPlaza": false
+    },
+    {
+      "id": "cmv64dmbt00053wxk9l3jka4i",
+      "area": "荔湾",
+      "addressEmpty": false,
+      "addressMentionsLiwanPlaza": true,
+      "nameMentionsLiwanPlaza": false,
+      "notesMentionLiwanPlaza": false
+    },
+    {
+      "id": "cmv6bdhkj001j3wkqric322h3",
+      "area": "荔湾",
+      "addressEmpty": true,
+      "addressMentionsLiwanPlaza": false,
+      "nameMentionsLiwanPlaza": false,
+      "notesMentionLiwanPlaza": false
+    },
+    {
+      "id": "cmvgfk5mi000a3whwjdt6gd24",
+      "area": "荔湾",
+      "addressEmpty": false,
+      "addressMentionsLiwanPlaza": true,
+      "nameMentionsLiwanPlaza": false,
+      "notesMentionLiwanPlaza": false
+    },
+    {
+      "id": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "addressEmpty": false,
+      "addressMentionsLiwanPlaza": true,
+      "nameMentionsLiwanPlaza": false,
+      "notesMentionLiwanPlaza": false
+    },
+    {
+      "id": "cmwg3g8ak0032oq01pw87gg5k",
+      "area": "荔湾",
+      "addressEmpty": false,
+      "addressMentionsLiwanPlaza": true,
+      "nameMentionsLiwanPlaza": false,
+      "notesMentionLiwanPlaza": false
+    },
+    {
+      "id": "cmwg6xshd0071oq01h776t219",
+      "area": "荔湾",
+      "addressEmpty": false,
+      "addressMentionsLiwanPlaza": true,
+      "nameMentionsLiwanPlaza": false,
+      "notesMentionLiwanPlaza": false
+    },
+    {
+      "id": "cmwg9xsc6008roq01cds80ijb",
+      "area": "荔湾",
+      "addressEmpty": false,
+      "addressMentionsLiwanPlaza": true,
+      "nameMentionsLiwanPlaza": false,
+      "notesMentionLiwanPlaza": false
+    }
+  ],
+  "scopedCandidates": [
+    {
+      "id": "cmwg1nejj0019oq015v32pexs",
+      "materialId": "cmwg1nejd0017oq01dbrbr9g8",
+      "name": "1.5mmS925方形碎银",
+      "aliases": [],
+      "category": "S925银配饰",
+      "notes": "",
+      "tags": [],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "10.77",
+      "unit": "GRAM",
+      "amount": "161.55",
+      "remainingQuantity": "10.77"
+    },
+    {
+      "id": "cmwg1syez001ioq017yvh5wia",
+      "materialId": "cmwg1syeo001goq01lo04ot40",
+      "name": "1.5mmS925银定位管",
+      "aliases": [],
+      "category": "S925银配饰",
+      "notes": "",
+      "tags": ["银配饰"],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "2.30",
+      "unit": "GRAM",
+      "amount": "34.50",
+      "remainingQuantity": "2.30"
+    },
+    {
+      "id": "cmwg1ydwz001poq01zug4rson",
+      "materialId": "cmwg1ydtm001noq01ruchlerr",
+      "name": "2mmS925银圆珠",
+      "aliases": [],
+      "category": "S925银配饰",
+      "notes": "",
+      "tags": ["银配饰"],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "3.25",
+      "unit": "GRAM",
+      "amount": "48.75",
+      "remainingQuantity": "3.25"
+    },
+    {
+      "id": "cmwg1zuki001voq010pyvuif4",
+      "materialId": "cmwg1zukg001toq01nbdav125",
+      "name": "3mmS925银圆珠",
+      "aliases": [],
+      "category": "S925银配饰",
+      "notes": "",
+      "tags": [],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "2.81",
+      "unit": "GRAM",
+      "amount": "42.15",
+      "remainingQuantity": "2.81"
+    },
+    {
+      "id": "cmwg20yaw0021oq01s0tn7se9",
+      "materialId": "cmwg20yat001zoq01l838wus2",
+      "name": "4mmS925银圆珠",
+      "aliases": [],
+      "category": "S925银配饰",
+      "notes": "",
+      "tags": [],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "3.07",
+      "unit": "GRAM",
+      "amount": "46.05",
+      "remainingQuantity": "3.07"
+    },
+    {
+      "id": "cmwg272r80028oq01zqmqd4ez",
+      "materialId": "cmwg272pm0026oq01ldwgnote",
+      "name": "6mm18K镀金S925银跑环",
+      "aliases": [],
+      "category": "18K镀金-银配饰",
+      "notes": "",
+      "tags": ["18K镀金", "银配饰"],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "33.00",
+      "unit": "BEAD",
+      "amount": "99.00",
+      "remainingQuantity": "33.00"
+    },
+    {
+      "id": "cmwg2cnlq002goq01oth138kc",
+      "materialId": "cmwg2cnkz002eoq01bwj4frmp",
+      "name": "锆石18K镀金竹节S925银配饰",
+      "aliases": ["锆石竹节"],
+      "category": "S925银配饰",
+      "notes": "",
+      "tags": ["配饰", "银配饰", "锆石"],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "6.00",
+      "unit": "BEAD",
+      "amount": "60.00",
+      "remainingQuantity": "6.00"
+    },
+    {
+      "id": "cmwg2h6d1002poq012l3enech",
+      "materialId": "cmwg2h6cr002noq01rb9hl6wb",
+      "name": "锆石四芒星S925银延长链",
+      "aliases": [],
+      "category": "S925银配饰",
+      "notes": "",
+      "tags": ["银配饰", "锆石"],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "5.00",
+      "unit": "BEAD",
+      "amount": "75.0000",
+      "remainingQuantity": "5.00"
+    },
+    {
+      "id": "cmwg35d3k002yoq01jnveq4fu",
+      "materialId": "cmwg35d3c002woq01k0ez5ef4",
+      "name": "3mm18K镀S925银配饰桶珠",
+      "aliases": [],
+      "category": "S925银配饰",
+      "notes": "",
+      "tags": ["桶珠", "配饰", "银配饰"],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "5.94",
+      "unit": "GRAM",
+      "amount": "118.80",
+      "remainingQuantity": "5.94"
+    },
+    {
+      "id": "cmwg3jvn7003aoq01w2vzww8r",
+      "materialId": "cmwg3jvmq0038oq017cf73132",
+      "name": "4mm绿松石随形",
+      "aliases": [],
+      "category": "绿松石",
+      "notes": "",
+      "tags": ["绿松石"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg3g8ak0032oq01pw87gg5k",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "STRAND",
+      "amount": "220.00",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg3tevc003loq01iq1raphc",
+      "materialId": "cmwg3tev8003joq01zlvvug0k",
+      "name": "3.5mm绿松石药片",
+      "aliases": ["绿松石直切"],
+      "category": "绿松石",
+      "notes": "",
+      "tags": ["绿松石"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg3g8ak0032oq01pw87gg5k",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "STRAND",
+      "amount": "185.00",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg3wwbs003uoq01fefb4uhm",
+      "materialId": "cmwg3wwbn003soq01of24lsde",
+      "name": "3mm绿松石圆珠",
+      "aliases": [],
+      "category": "绿松石",
+      "notes": "",
+      "tags": ["绿松石"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg3g8ak0032oq01pw87gg5k",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "STRAND",
+      "amount": "869.40",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg41qd40042oq01bdr95r0f",
+      "materialId": "cmwg41qcz0040oq016l565fdh",
+      "name": "13mm绿松石桶珠",
+      "aliases": [],
+      "category": "绿松石",
+      "notes": "",
+      "tags": ["桶珠", "绿松石"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg3g8ak0032oq01pw87gg5k",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "162.5000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg462ib0049oq01l602ks55",
+      "materialId": "cmwg462i80047oq01899ruhhw",
+      "name": "7.8mm绿松石勒子",
+      "aliases": [],
+      "category": "绿松石",
+      "notes": "",
+      "tags": ["绿松石"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg3g8ak0032oq01pw87gg5k",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "110.0000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg4ekoh004foq01k1uo5kyt",
+      "materialId": "cmwg4ekob004doq0122uzteo5",
+      "name": "百香籽绿松石配饰",
+      "aliases": [],
+      "category": "绿松石",
+      "notes": "",
+      "tags": ["提溜", "绿松石", "配饰"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg3g8ak0032oq01pw87gg5k",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "17.6000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg4gc92004loq01w7elwpgm",
+      "materialId": "cmwg4gc8z004joq01mwra61gp",
+      "name": "羽毛绿松石提溜",
+      "aliases": [],
+      "category": "绿松石",
+      "notes": "",
+      "tags": ["提溜", "绿松石"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg3g8ak0032oq01pw87gg5k",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "22.0000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg4irgl004roq01ldythgge",
+      "materialId": "cmwg4irgg004poq01fz0k9ffi",
+      "name": "太阳绿松石提溜（大）",
+      "aliases": [],
+      "category": "绿松石",
+      "notes": "",
+      "tags": ["提溜", "绿松石"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg3g8ak0032oq01pw87gg5k",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "29.7000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg4l0yn004xoq01kdmkix3z",
+      "materialId": "cmwg4l0yi004voq017d2499gv",
+      "name": "太阳绿松石提溜",
+      "aliases": [],
+      "category": "绿松石",
+      "notes": "",
+      "tags": ["提溜", "绿松石"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg3g8ak0032oq01pw87gg5k",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "15.4000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg4od7j0053oq01d96hk3zn",
+      "materialId": "cmwg4od7h0051oq01rx3ps154",
+      "name": "藏扣绿松石",
+      "aliases": [],
+      "category": "绿松石",
+      "notes": "",
+      "tags": ["绿松石"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg3g8ak0032oq01pw87gg5k",
+      "area": "荔湾",
+      "quantity": "4.43",
+      "unit": "GRAM",
+      "amount": "180.00",
+      "remainingQuantity": "4.43"
+    },
+    {
+      "id": "cmwg5fuek005foq010y4jszjt",
+      "materialId": "cmwg5fueh005doq01nw24tj4y",
+      "name": "20mm晴水无事牌",
+      "aliases": [],
+      "category": "晴水",
+      "notes": "",
+      "tags": [],
+      "date": "2026-11-14",
+      "distributorId": "cmv60i7vq00043wapt6b5xvp9",
+      "area": "荔湾",
+      "quantity": "2.00",
+      "unit": "BEAD",
+      "amount": "120.0000",
+      "remainingQuantity": "2.00"
+    },
+    {
+      "id": "cmwg5jzo9005moq01y9d4q07v",
+      "materialId": "cmwg5jznx005koq01b5yqqvvq",
+      "name": "9.6mm晴水直切",
+      "aliases": ["晴水圆柱"],
+      "category": "晴水",
+      "notes": "",
+      "tags": ["和田玉", "晴水"],
+      "date": "2026-11-14",
+      "distributorId": "cmv60i7vq00043wapt6b5xvp9",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "23.0000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg5t23v005woq01u1qq95c0",
+      "materialId": "cmwg5t23p005uoq01i8osx2xz",
+      "name": "10mm且末方形",
+      "aliases": [],
+      "category": "且末",
+      "notes": "",
+      "tags": ["且末"],
+      "date": "2026-11-14",
+      "distributorId": "cmv60i7vq00043wapt6b5xvp9",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "35.0000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg62y0z0066oq01crq24mcy",
+      "materialId": "cmwg62y0v0064oq018j32l93v",
+      "name": "6mm碧玉直切",
+      "aliases": ["碧玉圆柱"],
+      "category": "碧玉",
+      "notes": "",
+      "tags": ["碧玉"],
+      "date": "2026-11-14",
+      "distributorId": "cmv60i7vq00043wapt6b5xvp9",
+      "area": "荔湾",
+      "quantity": "2.00",
+      "unit": "BEAD",
+      "amount": "54.0000",
+      "remainingQuantity": "2.00"
+    },
+    {
+      "id": "cmwg65503006coq016p0qbfgs",
+      "materialId": "cmwg65500006aoq01r2ugocml",
+      "name": "碧玉镶嵌48K金四叶草",
+      "aliases": [],
+      "category": "碧玉",
+      "notes": "",
+      "tags": ["碧玉"],
+      "date": "2026-11-14",
+      "distributorId": "cmv60i7vq00043wapt6b5xvp9",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "26.0000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg695kc006ioq016bxdz2rx",
+      "materialId": "cmwg695k8006goq01kb6pwyk8",
+      "name": "镀K48-S925银圆环",
+      "aliases": [],
+      "category": "S925银配饰",
+      "notes": "",
+      "tags": ["银配饰"],
+      "date": "2026-11-14",
+      "distributorId": "cmv60i7vq00043wapt6b5xvp9",
+      "area": "荔湾",
+      "quantity": "10.00",
+      "unit": "BEAD",
+      "amount": "35.0000",
+      "remainingQuantity": "10.00"
+    },
+    {
+      "id": "cmwg6kssl006ooq01j1e3go4p",
+      "materialId": "cmwg6kssg006moq01z3u3l03s",
+      "name": "12mm晴水圆珠吊坠",
+      "aliases": ["和田玉12m圆珠吊坠"],
+      "category": "晴水",
+      "notes": "",
+      "tags": ["提溜", "晴水"],
+      "date": "2026-11-14",
+      "distributorId": "cmv60i7vq00043wapt6b5xvp9",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "19.0000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg6q67j006uoq012detgflf",
+      "materialId": "cmv9c5epp000h3we8q5tlmyij",
+      "name": "碧玉老料通孔葫芦",
+      "aliases": [],
+      "category": "碧玉",
+      "notes": "",
+      "tags": ["和田玉"],
+      "date": "2026-11-14",
+      "distributorId": "cmv60i7vq00043wapt6b5xvp9",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "78.0000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg6sg3j006yoq017kkapoi8",
+      "materialId": "cmv6czxjh00013wwrw95r1hlf",
+      "name": "碧玉24K金蝴蝶小花配饰",
+      "aliases": [],
+      "category": "和田玉配饰",
+      "notes": "",
+      "tags": ["和田玉", "碧玉", "配饰"],
+      "date": "2026-11-14",
+      "distributorId": "cmv60i7vq00043wapt6b5xvp9",
+      "area": "荔湾",
+      "quantity": "4.00",
+      "unit": "BEAD",
+      "amount": "44.0000",
+      "remainingQuantity": "4.00"
+    },
+    {
+      "id": "cmwg6zmto0076oq01k1dobc3c",
+      "materialId": "cmwg6zmtj0074oq01ogtm3q3z",
+      "name": "绿松石羽毛提溜",
+      "aliases": [],
+      "category": "绿松石",
+      "notes": "",
+      "tags": ["提溜", "绿松石"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg6xshd0071oq01h776t219",
+      "area": "荔湾",
+      "quantity": "1.00",
+      "unit": "BEAD",
+      "amount": "86.0000",
+      "remainingQuantity": "1.00"
+    },
+    {
+      "id": "cmwg8cnak007loq01x206jc2g",
+      "materialId": "cmwg8cnag007joq01klk7e9a8",
+      "name": "4mmS925银配饰猫眼金珠",
+      "aliases": [],
+      "category": "S925银配饰",
+      "notes": "",
+      "tags": ["配饰", "银配饰"],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "28.00",
+      "unit": "BEAD",
+      "amount": "48.30",
+      "remainingQuantity": "28.00"
+    },
+    {
+      "id": "cmwg8hluu007toq01mh5jza4z",
+      "materialId": "cmwg8hlup007roq01ic1rtpkd",
+      "name": "2.5m18K镀金S925银圆珠配饰",
+      "aliases": [],
+      "category": "18K镀金-银配饰",
+      "notes": "",
+      "tags": ["18K镀金", "银配饰"],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "2.84",
+      "unit": "GRAM",
+      "amount": "56.80",
+      "remainingQuantity": "2.84"
+    },
+    {
+      "id": "cmwg8meyk0081oq016gt47ky6",
+      "materialId": "cmwg8meyi007zoq01cwfk1qsl",
+      "name": "18K镀金S925银车花直管配饰",
+      "aliases": [],
+      "category": "18K镀金-银配饰",
+      "notes": "",
+      "tags": ["配饰"],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "2.40",
+      "unit": "GRAM",
+      "amount": "48.00",
+      "remainingQuantity": "2.40"
+    },
+    {
+      "id": "cmwg8qfxe0089oq01qgahihor",
+      "materialId": "cmwg8qfxa0087oq01k5a40ff6",
+      "name": "2mm18K镀金S925银钉针",
+      "aliases": ["堵头"],
+      "category": "18K镀金-银配饰",
+      "notes": "",
+      "tags": ["18K镀金", "银配饰"],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "5.00",
+      "unit": "BEAD",
+      "amount": "7.5000",
+      "remainingQuantity": "5.00"
+    },
+    {
+      "id": "cmwg8ut8w008goq01ueld40kz",
+      "materialId": "cmwg8ut8u008eoq012d9j7l12",
+      "name": "30mm18K镀金S925银圆头针",
+      "aliases": [],
+      "category": "18K镀金-银配饰",
+      "notes": "",
+      "tags": [],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "5.00",
+      "unit": "BEAD",
+      "amount": "20.0000",
+      "remainingQuantity": "5.00"
+    },
+    {
+      "id": "cmwg9w65r008noq01ulq3otqm",
+      "materialId": "cmwg9w65m008loq01xvsp88og",
+      "name": "2mm18K镀金S925碎银方形",
+      "aliases": [],
+      "category": "18K镀金-银配饰",
+      "notes": "",
+      "tags": ["18K镀金", "银配饰"],
+      "date": "2026-11-14",
+      "distributorId": "cmvhsthsm00013w1j69j5vq5i",
+      "area": "荔湾",
+      "quantity": "2.27",
+      "unit": "GRAM",
+      "amount": "45.40",
+      "remainingQuantity": "2.27"
+    },
+    {
+      "id": "cmwgb71ox0090oq01gsqckvse",
+      "materialId": "cmwgb71ot008yoq01o5milsyi",
+      "name": "2m18K金亮面光珠",
+      "aliases": [],
+      "category": "18K金",
+      "notes": "",
+      "tags": ["18K金"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg9xsc6008roq01cds80ijb",
+      "area": "荔湾",
+      "quantity": "20.00",
+      "unit": "BEAD",
+      "amount": "120.00",
+      "remainingQuantity": "20.00"
+    },
+    {
+      "id": "cmwgbadiy0097oq01s67uj9yo",
+      "materialId": "cmwgbadiv0095oq01l5o0dsqx",
+      "name": "2.5mm18K金亮面光珠",
+      "aliases": [],
+      "category": "18K金",
+      "notes": "",
+      "tags": ["18K金"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg9xsc6008roq01cds80ijb",
+      "area": "荔湾",
+      "quantity": "20.00",
+      "unit": "BEAD",
+      "amount": "180.00",
+      "remainingQuantity": "20.00"
+    },
+    {
+      "id": "cmwhhwzpx00a1oq01epyun3py",
+      "materialId": "cmwhhwzpt009zoq01q2qx3jyj",
+      "name": "6mm18K金花车直管",
+      "aliases": [],
+      "category": "18K金",
+      "notes": "",
+      "tags": ["18K金"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg9xsc6008roq01cds80ijb",
+      "area": "荔湾",
+      "quantity": "10.00",
+      "unit": "BEAD",
+      "amount": "100.0000",
+      "remainingQuantity": "10.00"
+    },
+    {
+      "id": "cmwhi1vm800a9oq01675o73dw",
+      "materialId": "cmwhi1vm500a7oq0111yohtth",
+      "name": "3mm18K金橄榄光珠",
+      "aliases": [],
+      "category": "18K金",
+      "notes": "",
+      "tags": ["18K金"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg9xsc6008roq01cds80ijb",
+      "area": "荔湾",
+      "quantity": "5.00",
+      "unit": "BEAD",
+      "amount": "115.0000",
+      "remainingQuantity": "5.00"
+    },
+    {
+      "id": "cmwhi6lbu00ahoq01k63brjnz",
+      "materialId": "cmwhi6lbq00afoq01ipgxlaxl",
+      "name": "2m18K金橄榄光珠",
+      "aliases": [],
+      "category": "18K金",
+      "notes": "",
+      "tags": ["18K金"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg9xsc6008roq01cds80ijb",
+      "area": "荔湾",
+      "quantity": "5.00",
+      "unit": "BEAD",
+      "amount": "70.0000",
+      "remainingQuantity": "5.00"
+    },
+    {
+      "id": "cmwhiagbj00atoq01sms4uxt6",
+      "materialId": "cmwhiagbg00aroq01mwdd2uzx",
+      "name": "8mm18K金竹节骨头",
+      "aliases": [],
+      "category": "18K金",
+      "notes": "",
+      "tags": ["18K金"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg9xsc6008roq01cds80ijb",
+      "area": "荔湾",
+      "quantity": "5.00",
+      "unit": "BEAD",
+      "amount": "110.0000",
+      "remainingQuantity": "5.00"
+    },
+    {
+      "id": "cmwhid0ek00b1oq01irvvn3cm",
+      "materialId": "cmwhid0ei00azoq014888pmoe",
+      "name": "2.5mm18K金方糖",
+      "aliases": [],
+      "category": "18K金",
+      "notes": "",
+      "tags": ["18K金"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg9xsc6008roq01cds80ijb",
+      "area": "荔湾",
+      "quantity": "5.00",
+      "unit": "BEAD",
+      "amount": "65.0000",
+      "remainingQuantity": "5.00"
+    },
+    {
+      "id": "cmwhijons00b9oq01lxg5717t",
+      "materialId": "cmwhijono00b7oq01awsa6sbb",
+      "name": "4mm18K金麦粒",
+      "aliases": [],
+      "category": "18K金",
+      "notes": "",
+      "tags": ["18K金"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg9xsc6008roq01cds80ijb",
+      "area": "荔湾",
+      "quantity": "2.00",
+      "unit": "BEAD",
+      "amount": "150.0000",
+      "remainingQuantity": "2.00"
+    },
+    {
+      "id": "cmwhip6gi00bhoq01n4u1oiul",
+      "materialId": "cmwhip6gf00bfoq01tsr3e0oa",
+      "name": "18K金实心配件",
+      "aliases": [],
+      "category": "18K金",
+      "notes": "",
+      "tags": ["18K金"],
+      "date": "2026-11-14",
+      "distributorId": "cmwg9xsc6008roq01cds80ijb",
+      "area": "荔湾",
+      "quantity": "1.76",
+      "unit": "GRAM",
+      "amount": "1166.88",
+      "remainingQuantity": "1.76"
+    }
+  ],
+  "schemaVersion": 1,
+  "snapshotPurpose": "Stage 1 read-only development baseline, not an assistant run or production data.",
+  "sourceFields": "Only catalog, purchase and boolean location evidence; no credentials, accounts, contacts or full addresses.",
+  "scope": {
+    "referenceNow": "2026-11-16T12:00:00+08:00",
+    "timezone": "Asia/Shanghai",
+    "dateField": "MaterialBatch.receivedAt",
+    "dateFromInclusive": "2026-11-01",
+    "dateToExclusive": "2026-12-01",
+    "location": "Liwan Plaza",
+    "locationEvidence": "Distributor.address explicitly mentions Liwan Plaza; only boolean evidence retained.",
+    "distributorIds": [
+      "cmv60i7vq00043wapt6b5xvp9",
+      "cmv64dmbt00053wxk9l3jka4i",
+      "cmvgfk5mi000a3whwjdt6gd24",
+      "cmvhsthsm00013w1j69j5vq5i",
+      "cmwg3g8ak0032oq01pw87gg5k",
+      "cmwg6xshd0071oq01h776t219",
+      "cmwg9xsc6008roq01cds80ijb"
+    ],
+    "candidateType": "MaterialBatchEntry",
+    "candidateEntryCount": 44,
+    "candidateTraversalComplete": true,
+    "scopeDerivation": "All 7 address-confirmed distributors are in Liwan. All 44 November Liwan material purchase rows belong to these IDs, so the exact-place candidate set is identical in this snapshot."
+  },
+  "goldenCase": {
+    "id": "REAL-01",
+    "query": "帮我找下这个月我去荔湾广场买了哪些绿松石相关的配件。",
+    "expectedSource": "Manual review of catalog fields and making-supply context under semantic-rules.md v1; no model evaluation has run.",
+    "ruleVersion": "v1",
+    "includedEntryIds": [
+      "cmwg3jvn7003aoq01w2vzww8r",
+      "cmwg3tevc003loq01iq1raphc",
+      "cmwg3wwbs003uoq01fefb4uhm",
+      "cmwg41qd40042oq01bdr95r0f",
+      "cmwg462ib0049oq01l602ks55",
+      "cmwg4ekoh004foq01k1uo5kyt",
+      "cmwg4gc92004loq01w7elwpgm",
+      "cmwg4irgl004roq01ldythgge",
+      "cmwg4l0yn004xoq01kdmkix3z",
+      "cmwg4od7j0053oq01d96hk3zn",
+      "cmwg6zmto0076oq01k1dobc3c"
+    ],
+    "includedMaterialIds": [
+      "cmwg3jvmq0038oq017cf73132",
+      "cmwg3tev8003joq01zlvvug0k",
+      "cmwg3wwbn003soq01of24lsde",
+      "cmwg41qcz0040oq016l565fdh",
+      "cmwg462i80047oq01899ruhhw",
+      "cmwg4ekob004doq0122uzteo5",
+      "cmwg4gc8z004joq01mwra61gp",
+      "cmwg4irgg004poq01fz0k9ffi",
+      "cmwg4l0yi004voq017d2499gv",
+      "cmwg4od7h0051oq01rx3ps154",
+      "cmwg6zmtj0074oq01ogtm3q3z"
+    ],
+    "excludedEntryIds": [
+      "cmwg1nejj0019oq015v32pexs",
+      "cmwg1syez001ioq017yvh5wia",
+      "cmwg1ydwz001poq01zug4rson",
+      "cmwg1zuki001voq010pyvuif4",
+      "cmwg20yaw0021oq01s0tn7se9",
+      "cmwg272r80028oq01zqmqd4ez",
+      "cmwg2cnlq002goq01oth138kc",
+      "cmwg2h6d1002poq012l3enech",
+      "cmwg35d3k002yoq01jnveq4fu",
+      "cmwg5fuek005foq010y4jszjt",
+      "cmwg5jzo9005moq01y9d4q07v",
+      "cmwg5t23v005woq01u1qq95c0",
+      "cmwg62y0z0066oq01crq24mcy",
+      "cmwg65503006coq016p0qbfgs",
+      "cmwg695kc006ioq016bxdz2rx",
+      "cmwg6kssl006ooq01j1e3go4p",
+      "cmwg6q67j006uoq012detgflf",
+      "cmwg6sg3j006yoq017kkapoi8",
+      "cmwg8cnak007loq01x206jc2g",
+      "cmwg8hluu007toq01mh5jza4z",
+      "cmwg8meyk0081oq016gt47ky6",
+      "cmwg8qfxe0089oq01qgahihor",
+      "cmwg8ut8w008goq01ueld40kz",
+      "cmwg9w65r008noq01ulq3otqm",
+      "cmwgb71ox0090oq01gsqckvse",
+      "cmwgbadiy0097oq01s67uj9yo",
+      "cmwhhwzpx00a1oq01epyun3py",
+      "cmwhi1vm800a9oq01675o73dw",
+      "cmwhi6lbu00ahoq01k63brjnz",
+      "cmwhiagbj00atoq01sms4uxt6",
+      "cmwhid0ek00b1oq01irvvn3cm",
+      "cmwhijons00b9oq01lxg5717t",
+      "cmwhip6gi00bhoq01n4u1oiul"
+    ],
+    "uncertainEntryIds": [],
+    "notEvaluatedEntryIds": [],
+    "purchaseEntryCount": 11,
+    "materialCount": 11,
+    "currency": "CNY",
+    "knownAmount": "1897.60",
+    "unknownAmountEntryCount": 0,
+    "quantitiesByUnit": {
+      "BEAD": "7.00",
+      "GRAM": "4.43",
+      "STRAND": "3.00"
+    },
+    "distributorGroups": {
+      "cmwg3g8ak0032oq01pw87gg5k": {
+        "entryIds": [
+          "cmwg3jvn7003aoq01w2vzww8r",
+          "cmwg3tevc003loq01iq1raphc",
+          "cmwg3wwbs003uoq01fefb4uhm",
+          "cmwg41qd40042oq01bdr95r0f",
+          "cmwg462ib0049oq01l602ks55",
+          "cmwg4ekoh004foq01k1uo5kyt",
+          "cmwg4gc92004loq01w7elwpgm",
+          "cmwg4irgl004roq01ldythgge",
+          "cmwg4l0yn004xoq01kdmkix3z",
+          "cmwg4od7j0053oq01d96hk3zn"
+        ],
+        "amount": "1811.60"
+      },
+      "cmwg6xshd0071oq01h776t219": {
+        "entryIds": ["cmwg6zmto0076oq01k1dobc3c"],
+        "amount": "86.00"
+      }
+    },
+    "accessoryTagCount": 1,
+    "exactComponentTagCount": 0,
+    "notes": [
+      "Do not sum quantities across units.",
+      "Compare purchase row IDs, not display names.",
+      "Field evidence does not prove physical material authenticity, purchaser identity or an in-person visit.",
+      "Keep live development runs separate from this frozen baseline."
+    ]
+  }
+}

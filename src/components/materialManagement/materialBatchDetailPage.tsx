@@ -1,5 +1,7 @@
 'use client';
 
+import { RecordAuditPanel } from '@/components/audit-history';
+
 import { ArrowLeftOutlined, EditOutlined } from '@ant-design/icons';
 import { App, Button, Descriptions, Result, Segmented, Skeleton } from 'antd';
 import { useTranslations } from 'next-intl';
@@ -90,6 +92,7 @@ export function MaterialBatchDetailPage({ id, returnTo }: { id: string; returnTo
           </Button>
         </div>
       </div>
+      <RecordAuditPanel entityType="MaterialBatch" entityId={id} revision={JSON.stringify(batch)} />
       <Descriptions className="material-batch-summary" column={{ xs: 1, sm: 2, md: 3 }}>
         <Descriptions.Item label={t('date')}>{batch.receivedAt.slice(0, 10)}</Descriptions.Item>
         <Descriptions.Item label={t('notes')}>{batch.notes || '—'}</Descriptions.Item>

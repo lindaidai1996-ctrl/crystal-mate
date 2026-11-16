@@ -1,9 +1,10 @@
 'use client';
 
-import { App, AutoComplete, Button, Drawer, Form, Input, Space } from 'antd';
+import { App, AutoComplete, Button, Form, Input, Space } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { attachmentCoverKey } from '@/lib/attachments';
+import { ResponsiveDrawer as Drawer } from '@/components/responsive/responsiveDialog';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { Distributor, DistributorValues } from '@/lib/client-types';
 import { BatchAttachmentPicker } from './materialManagement/batchAttachmentPicker';

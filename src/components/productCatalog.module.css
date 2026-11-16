@@ -63,6 +63,8 @@
 .viewControls {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-inline-start: auto;
   gap: 16px;
   min-width: 0;
 }
@@ -105,10 +107,7 @@
 
 .gallery {
   display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(min(100%, max(280px, calc((100% - 60px) / 4))), 1fr)
-  );
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 20px;
   align-items: stretch;
 }
@@ -185,7 +184,7 @@
 .cardImage :global(.material-image-thumb-button) {
   position: absolute;
   inset: 0;
-  padding: 12px;
+  padding: 0;
 }
 
 .cardImage :global(.material-image-thumb-button),
@@ -196,7 +195,7 @@
   border: 0;
   border-radius: 0;
   background: transparent;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .cardImage :global(.material-image-thumb-button:focus-visible) {
@@ -494,5 +493,123 @@
     flex: 1 1 100%;
     width: 100%;
     min-width: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-items: start;
+  }
+  .card {
+    padding: 6px 6px 0;
+    border-radius: 8px;
+  }
+  .cardImage {
+    aspect-ratio: 1;
+  }
+  .cardImage :global(.material-image-thumb-button) {
+    padding: 0;
+  }
+  .cardBody {
+    padding: 10px 2px 0;
+  }
+  .cardHeading {
+    min-height: 0;
+  }
+  .cardHeading > a,
+  .cardHeading > button {
+    min-height: 44px;
+    line-height: 22px;
+  }
+  .cardSubheading {
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .cardMeta {
+    gap: 4px;
+    margin-block: 6px;
+  }
+  .cardBottom {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    padding: 8px;
+    margin-top: 8px;
+  }
+  .cardMetric {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .cardMetric dd {
+    margin-top: 0;
+  }
+  .money {
+    font-size: 16px;
+  }
+  .stock {
+    font-size: 14px;
+  }
+  .cardActions,
+  .cardFooter {
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+  .cardActions :global(.row-actions) {
+    display: flex;
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+  .cardActions :global(.cabochon-row-actions) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+  .cardActions :global(.ant-btn) {
+    min-height: 44px;
+    height: auto;
+    padding-inline: 6px;
+    white-space: normal;
+  }
+  .results {
+    gap: 8px;
+    padding: 0 0 16px;
+  }
+  .viewControls {
+    width: 100%;
+    gap: 8px;
+  }
+  .toolbar {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .pagination {
+    justify-content: center;
+    padding-block: 20px;
+  }
+}
+
+@media (max-width: 359px) {
+  .gallery {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cardImage {
+    max-height: 220px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .gallery {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) and (max-width: 959px) {
+  .gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

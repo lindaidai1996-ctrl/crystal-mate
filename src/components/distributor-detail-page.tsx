@@ -1,5 +1,7 @@
 'use client';
 
+import { RecordAuditPanel } from '@/components/audit-history';
+
 import {
   ArrowLeftOutlined,
   EditOutlined,
@@ -24,6 +26,9 @@ import { Sensitive } from '@/components/privacyMode';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { PaginatedTable } from '@/components/paginated-table';
+import { ListPageActions } from '@/components/responsive/listPageActions';
+import { SearchFilterRow } from '@/components/responsive/searchFilterRow';
+import { ResetFiltersButton } from '@/components/responsive/resetFiltersButton';
 import { CreatePurchaseButton } from '@/components/purchaseCreation/createPurchaseButton';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type {
@@ -409,8 +414,7 @@ export function DistributorDetailPage({ id }: { id: string }) {
           <h1 className="page-record-name">{distributor.name}</h1>
           <p>{t('count', { count: purchasePage?.total ?? 0 })}</p>
         </div>
-        <div className="page-heading-actions">
-          <CreatePurchaseButton distributorId={distributor.id} />
+        <ListPageActions primary={<CreatePurchaseButton distributorId={distributor.id} />}>
           <Button
             icon={<EditOutlined />}
             disabled={editingAttachment}
@@ -418,8 +422,9 @@ export function DistributorDetailPage({ id }: { id: string }) {
           >
             {common('edit')}
           </Button>
-        </div>
+        </ListPageActions>
       </div>
+      <RecordAuditPanel entityType="Distributor" entityId={id} revision={distributor.updatedAt} />
       <Descriptions
         className="material-batch-summary distributor-detail-summary"
         size="small"
@@ -464,22 +469,32 @@ export function DistributorDetailPage({ id }: { id: string }) {
           ]}
         />
         {!showAttachments && (
-          <Input.Search
-            className="filter-search"
-            aria-label={t('search')}
-            placeholder={t('search')}
-            value={query}
-            maxLength={200}
-            onChange={(event) => {
-              setPurchaseLoading(true);
-              setQuery(event.target.value);
-              setPage(1);
-              clearExpanded();
-            }}
-            allowClear
-          />
+          <SearchFilterRow>
+            <Input.Search
+              className="filter-search"
+              aria-label={t('search')}
+              placeholder={t('search')}
+              value={query}
+              maxLength={200}
+              onChange={(event) => {
+                setPurchaseLoading(true);
+                setQuery(event.target.value);
+                setPage(1);
+                clearExpanded();
+              }}
+              allowClear
+            />
+            <ResetFiltersButton
+              onReset={() => {
+                setQuery('');
+                resetList('all');
+                setPurchaseAttempt((attempt) => attempt + 1);
+              }}
+            />
+          </SearchFilterRow>
         )}
       </div>
+
       {showAttachments ? (
         <section aria-label={distributorT('attachments')}>
           <DistributorAttachmentGallery

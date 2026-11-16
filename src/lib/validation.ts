@@ -1,3 +1,4 @@
+import { imageFramingsSchema } from './image-framing';
 import { z } from 'zod';
 import { amountToCents, calculateCostTotal } from './cabochon-cost';
 import { productSaleRules } from './product-pricing';
@@ -180,6 +181,7 @@ const baseProductSchema = z.object({
     .extend({ expectedQuantity: stockQuantity })
     .optional(),
   published: z.boolean(),
+  imageFramings: imageFramingsSchema.optional(),
   imageKeys: z
     .array(z.string().min(1))
     .max(12)
@@ -268,6 +270,7 @@ export const materialSchema = z
     saleGramManual: z.boolean(),
     saleChildManual: z.boolean(),
     notes: z.string().trim().max(10000),
+    imageFramings: imageFramingsSchema.optional(),
     imageKeys: z
       .array(z.string().min(1))
       .max(12)

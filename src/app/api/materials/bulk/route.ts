@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/api';
 import { materialBulkDeleteSchema, materialBulkUpdateSchema } from '@/lib/material-bulk';
@@ -7,7 +8,7 @@ import {
   updateMaterialBulk,
 } from '@/lib/material-bulk-service';
 
-export async function PATCH(request: NextRequest) {
+async function handlePATCH(request: NextRequest) {
   try {
     await requireAdmin(request);
     return NextResponse.json(
@@ -18,7 +19,7 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-export async function DELETE(request: NextRequest) {
+async function handleDELETE(request: NextRequest) {
   try {
     await requireAdmin(request);
     const input = materialBulkDeleteSchema.parse(await request.json());
@@ -27,3 +28,6 @@ export async function DELETE(request: NextRequest) {
     return materialBulkError(error);
   }
 }
+
+export const PATCH = withAuditRoute(handlePATCH);
+export const DELETE = withAuditRoute(handleDELETE);

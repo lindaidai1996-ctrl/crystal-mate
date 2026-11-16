@@ -1,3 +1,4 @@
+import { sameOrderedRows } from './unchanged-relations';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { ApiError } from '@/lib/api';
@@ -25,6 +26,7 @@ async function replaceAttachments(
     attachments,
     existing,
   );
+  if (sameOrderedRows(existing, data)) return;
   await tx.distributorAttachment.deleteMany({ where: { distributorId } });
   if (data.length)
     await tx.distributorAttachment.createMany({

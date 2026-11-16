@@ -13,7 +13,7 @@ const context = { params: Promise.resolve({ id: 'batch' }) };
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
 });
 
 describe('material batch detail API', () => {

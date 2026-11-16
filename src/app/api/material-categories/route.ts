@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { apiError, ApiError, requireAdmin } from '@/lib/api';
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
   try {
     await requireAdmin(request);
     const data = materialCategorySchema.parse(await request.json());
@@ -28,3 +29,5 @@ export async function POST(request: NextRequest) {
     return apiError(error);
   }
 }
+
+export const POST = withAuditRoute(handlePOST);

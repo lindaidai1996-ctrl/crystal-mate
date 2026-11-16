@@ -12,6 +12,7 @@ vi.mock('@/lib/db', () => ({ db: { admin: { findUnique: mocks.findAdmin } } }));
 
 import '@/auth';
 
+const sessionCallback = mocks.nextAuth.mock.calls[0][0].callbacks.session;
 const jwt = mocks.nextAuth.mock.calls[0][0].callbacks.jwt as (args: {
   token: JWT;
   user?: { sessionVersion: number };
@@ -50,5 +51,21 @@ describe('account session invalidation', () => {
     expect(mocks.findAdmin).not.toHaveBeenCalled();
     mocks.findAdmin.mockResolvedValue(null);
     expect(await jwt({ token: { sub: 'deleted' } })).toBeNull();
+  });
+  it('refreshes the audit identity from the verified account and exposes its stable id in the session', async () => {
+    mocks.findAdmin.mockResolvedValue({
+      sessionVersion: 0,
+      username: 'admin2',
+      nickname: '呆呆管理员',
+    });
+    const token = await jwt({ token: { sub: 'stable-id' } });
+    expect(token).toMatchObject({
+      sub: 'stable-id',
+      actorUsername: 'admin2',
+      actorNickname: '呆呆管理员',
+    });
+    expect(await sessionCallback({ session: { user: { name: 'old-name' } }, token })).toEqual({
+      user: { id: 'stable-id', name: 'admin2', nickname: '呆呆管理员' },
+    });
   });
 });

@@ -6,6 +6,9 @@ import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from '@/i18n/navigation';
+import { SearchFilterRow } from '@/components/responsive/searchFilterRow';
+import { ResetFiltersButton } from '@/components/responsive/resetFiltersButton';
+import { ListPageActions } from '@/components/responsive/listPageActions';
 import { PaginatedTable } from '@/components/paginated-table';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { MaterialBatch } from '@/lib/client-types';
@@ -166,27 +169,41 @@ export function MaterialBatchesPage() {
           <h1>{t('manage')}</h1>
           <p>{t('count', { count: items.length })}</p>
         </div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          disabled={loading}
-          onClick={() => setEditing(null)}
-        >
-          {t('newBatch')}
-        </Button>
+        <ListPageActions
+          primary={
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              disabled={loading}
+              onClick={() => setEditing(null)}
+            >
+              {t('newBatch')}
+            </Button>
+          }
+        />
       </div>
       <div className="filter-bar">
-        <Input.Search
-          className="filter-search"
-          value={query}
-          onChange={(event) => {
-            setQuery(event.target.value);
-            setPage(1);
-          }}
-          placeholder={t('search')}
-          aria-label={t('search')}
-          allowClear
-        />
+        <SearchFilterRow>
+          <Input.Search
+            className="filter-search"
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setPage(1);
+            }}
+            placeholder={t('search')}
+            aria-label={t('search')}
+            allowClear
+          />
+          <ResetFiltersButton
+            onReset={() => {
+              setQuery('');
+              setReceivedRange(null);
+              setSort({ key: 'date', order: 'descend' });
+              setPage(1);
+            }}
+          />
+        </SearchFilterRow>
         <DateRangeFilter
           kind="received"
           value={receivedRange}
@@ -196,6 +213,7 @@ export function MaterialBatchesPage() {
           }}
         />
       </div>
+
       <div className="table-surface">
         <PaginatedTable
           rowKey="id"

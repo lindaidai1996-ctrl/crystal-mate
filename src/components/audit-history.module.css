@@ -1,0 +1,71 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.filter {
+  min-width: 150px;
+}
+.provenance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+.provenance button {
+  font-size: inherit;
+}
+.value {
+  margin: 0;
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+  text-wrap: pretty;
+}
+.changes {
+  display: grid;
+  gap: 12px;
+}
+.change {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+.changeValues {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 8px;
+}
+.label {
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+}
+.description {
+  color: var(--ant-color-text-secondary);
+}
+@media (max-width: 600px) {
+  .filter {
+    flex: 1 1 140px;
+    min-width: 0;
+  }
+  .changeValues {
+    grid-template-columns: 1fr;
+  }
+  .filters :global(.ant-picker) {
+    width: 100%;
+  }
+}
+
+.mobileHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  overflow-wrap: anywhere;
+}

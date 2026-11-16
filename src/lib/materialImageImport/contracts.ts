@@ -1,3 +1,4 @@
+import { imageFramingSchema } from '@/lib/image-framing';
 import { z } from 'zod';
 import { catalogAliasesSchema, materialSchema, materialPurchaseSchema } from '@/lib/validation';
 import {
@@ -23,7 +24,7 @@ export const importMoneySchema = z
 // Drafts allow incomplete names/categories; final submission uses materialCreateSchema.
 export const importMaterialDraftSchema = z.strictObject({
   values: z.strictObject({
-    ...z.strictObject(materialSchema.shape).omit({ imageKeys: true }).shape,
+    ...z.strictObject(materialSchema.shape).omit({ imageKeys: true, imageFramings: true }).shape,
     aliases: catalogAliasesSchema.default([]),
     name: z.string().max(120),
     categoryId: z.string().max(100),
@@ -38,6 +39,7 @@ export const importMaterialDraftSchema = z.strictObject({
         objectKey: z.string().regex(imageObjectKeyPattern).startsWith('images/'),
         url: z.string().min(1),
         position: z.number().int().nonnegative(),
+        framing: imageFramingSchema.nullable().optional(),
       }),
     )
     .max(11),

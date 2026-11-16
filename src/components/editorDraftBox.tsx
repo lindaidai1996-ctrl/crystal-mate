@@ -1,7 +1,7 @@
 'use client';
 
 import { DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
-import { App, Button, Drawer, Empty, List, Popconfirm, Space, Spin } from 'antd';
+import { Alert, App, Button, Drawer, Empty, List, Popconfirm, Segmented, Space, Spin } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -24,6 +24,8 @@ export function EditorDraftBox({ kind, returnTo }: { kind: EditorDraftKind; retu
   const common = useTranslations('common');
   const { message } = App.useApp();
   const [open, setOpen] = useState(false);
+  const [scope, setScope] = useState('mine');
+  const [claiming, setClaiming] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<DraftSummary[]>([]);
   const [removing, setRemoving] = useState<string | null>(null);
@@ -31,7 +33,7 @@ export function EditorDraftBox({ kind, returnTo }: { kind: EditorDraftKind; retu
   useEffect(() => {
     if (!open) return;
     let active = true;
-    apiFetch<DraftSummary[]>(`/api/editor-drafts?kind=${kind}`)
+    apiFetch<DraftSummary[]>(`/api/editor-drafts?kind=${kind}&scope=${scope}`)
       .then((drafts) => {
         if (active) setItems(drafts);
       })
@@ -49,7 +51,23 @@ export function EditorDraftBox({ kind, returnTo }: { kind: EditorDraftKind; retu
     return () => {
       active = false;
     };
-  }, [open, kind, message, common]);
+  }, [open, kind, scope, message, common]);
+
+  async function claim(id: string) {
+    setClaiming(id);
+    try {
+      await apiFetch(`/api/editor-drafts/${id}/claim`, { method: 'POST' });
+      setItems([]);
+      setLoading(true);
+      setScope('mine');
+    } catch (error) {
+      message.error(
+        common(`errors.${error instanceof ClientApiError ? error.code : 'SERVER_ERROR'}` as never),
+      );
+    } finally {
+      setClaiming(null);
+    }
+  }
 
   async function remove(id: string) {
     setRemoving(id);
@@ -78,6 +96,22 @@ export function EditorDraftBox({ kind, returnTo }: { kind: EditorDraftKind; retu
         {t('box')}
       </Button>
       <Drawer title={t('box')} open={open} onClose={() => setOpen(false)} width="min(480px, 100vw)">
+        <Segmented
+          block
+          value={scope}
+          options={[
+            { value: 'mine', label: t('mine') },
+            { value: 'legacy', label: t('legacy') },
+          ]}
+          onChange={(next) => {
+            setScope(next);
+            setLoading(true);
+            setItems([]);
+          }}
+        />
+        {scope === 'legacy' && (
+          <Alert type="info" message={t('legacyHint')} style={{ marginBlock: 16 }} />
+        )}
         {loading ? (
           <Spin />
         ) : items.length ? (
@@ -85,30 +119,44 @@ export function EditorDraftBox({ kind, returnTo }: { kind: EditorDraftKind; retu
             dataSource={items}
             renderItem={(item) => (
               <List.Item
-                actions={[
-                  <Link
-                    key="continue"
-                    href={withAdminReturnTo(
-                      `/admin/${kind === 'MATERIAL' ? 'materials' : 'products'}/new?draftId=${encodeURIComponent(item.id)}`,
-                      returnTo,
-                    )}
-                  >
-                    {t('continue')}
-                  </Link>,
-                  <Popconfirm
-                    key="delete"
-                    title={t('deleteConfirm')}
-                    onConfirm={() => void remove(item.id)}
-                  >
-                    <Button
-                      type="text"
-                      danger
-                      icon={<DeleteOutlined />}
-                      aria-label={common('delete')}
-                      loading={removing === item.id}
-                    />
-                  </Popconfirm>,
-                ]}
+                actions={
+                  scope === 'legacy'
+                    ? [
+                        <Popconfirm
+                          key="claim"
+                          title={t('claimConfirm')}
+                          onConfirm={() => claim(item.id)}
+                        >
+                          <Button type="link" loading={claiming === item.id}>
+                            {t('claim')}
+                          </Button>
+                        </Popconfirm>,
+                      ]
+                    : [
+                        <Link
+                          key="continue"
+                          href={withAdminReturnTo(
+                            `/admin/${kind === 'MATERIAL' ? 'materials' : 'products'}/new?draftId=${encodeURIComponent(item.id)}`,
+                            returnTo,
+                          )}
+                        >
+                          {t('continue')}
+                        </Link>,
+                        <Popconfirm
+                          key="delete"
+                          title={t('deleteConfirm')}
+                          onConfirm={() => void remove(item.id)}
+                        >
+                          <Button
+                            type="text"
+                            danger
+                            icon={<DeleteOutlined />}
+                            aria-label={common('delete')}
+                            loading={removing === item.id}
+                          />
+                        </Popconfirm>,
+                      ]
+                }
               >
                 <List.Item.Meta
                   title={item.title || t('untitled')}

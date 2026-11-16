@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiError, requireAdmin } from '@/lib/api';
 import { recognizeImportItemSchema } from '@/lib/materialImageImport/contracts';
@@ -5,7 +6,7 @@ import { recognizeImageImportItem } from '@/lib/materialImageImport/itemRecognit
 
 export const maxDuration = 120;
 
-export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+async function handlePOST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin(request);
     return NextResponse.json(
@@ -18,3 +19,5 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     return apiError(error);
   }
 }
+
+export const POST = withAuditRoute(handlePOST);

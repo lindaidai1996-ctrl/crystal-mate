@@ -40,7 +40,7 @@ const request = (suffix = '') =>
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
   mocks.summary.mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 20 });
   mocks.entries.mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 20 });
 });

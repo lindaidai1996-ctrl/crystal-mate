@@ -1,3 +1,5 @@
+import { sameOrderedRows } from './unchanged-relations';
+import { serializeImageFraming } from '@/lib/image-framing';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { ApiError } from '@/lib/api';
@@ -69,6 +71,11 @@ export function serializeProductSources(product: ProductSources) {
           ...line,
           materialBatchEntry: {
             ...line.materialBatchEntry,
+            images: line.materialBatchEntry.images.map(serializeImageFraming),
+            material: {
+              ...line.materialBatchEntry.material,
+              images: line.materialBatchEntry.material.images.map(serializeImageFraming),
+            },
             receivedQty: line.materialBatchEntry.receivedQty?.toNumber() ?? null,
             remainingQty: line.materialBatchEntry.remainingQty?.toNumber() ?? null,
           },
@@ -316,9 +323,21 @@ export async function updateProductSource(productId: string, sourceId: string, i
         });
         if (!current || current.productId !== productId) throw new ApiError(404, 'NOT_FOUND');
         const values = await diyValues(tx, productId, input, current);
-        await tx.productDiyMaterial.deleteMany({ where: { runId: sourceId } });
-        await tx.productDiyCabochon.deleteMany({ where: { runId: sourceId } });
-        await tx.productDiyRun.update({ where: { id: sourceId }, data: values });
+        const { materialLines, cabochonLines, ...runValues } = values;
+        const materialsChanged = !sameOrderedRows(current.materialLines, materialLines.create);
+        const cabochonsChanged = !sameOrderedRows(current.cabochonLines, cabochonLines.create);
+        if (materialsChanged)
+          await tx.productDiyMaterial.deleteMany({ where: { runId: sourceId } });
+        if (cabochonsChanged)
+          await tx.productDiyCabochon.deleteMany({ where: { runId: sourceId } });
+        await tx.productDiyRun.update({
+          where: { id: sourceId },
+          data: {
+            ...runValues,
+            ...(materialsChanged ? { materialLines } : {}),
+            ...(cabochonsChanged ? { cabochonLines } : {}),
+          },
+        });
         await changeProductStock(tx, productId, input.quantity - current.quantity);
       }
       return tx.product.findUniqueOrThrow({

@@ -1,4 +1,9 @@
 'use client';
+
+import {
+  ResponsiveModal as Modal,
+  ResponsiveDrawer as Drawer,
+} from '@/components/responsive/responsiveDialog';
 import { Sensitive } from '@/components/privacyMode';
 
 import { InfoCircleOutlined } from '@ant-design/icons';
@@ -7,11 +12,9 @@ import {
   Button,
   Cascader,
   Checkbox,
-  Drawer,
   Form,
   Input,
   InputNumber,
-  Modal,
   Select,
   Skeleton,
   Space,

@@ -1,5 +1,7 @@
 'use client';
 
+import { RecordAuditPanel } from '@/components/audit-history';
+
 import { Sensitive } from '@/components/privacyMode';
 
 import { LazyPreviewImage } from '@/components/loadingImage';
@@ -236,6 +238,13 @@ export function ExcelImportPage({ initialId }: { initialId?: string }) {
           </Button>
         </Link>
       </div>
+      {job && (
+        <RecordAuditPanel
+          entityType="CabochonExcelImport"
+          entityId={job.id}
+          revision={String(job.version)}
+        />
+      )}
       <Steps
         size="small"
         current={done === rows.length && rows.length ? 2 : rows.length ? 1 : 0}

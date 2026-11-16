@@ -17,7 +17,7 @@ const request = (query = '') => new NextRequest(`http://localhost/api/candidates
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
   mocks.candidates.mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 20 });
 });
 

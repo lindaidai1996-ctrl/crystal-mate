@@ -1,5 +1,7 @@
 'use client';
 
+import { RecordAuditPanel } from '@/components/audit-history';
+
 import {
   ArrowLeftOutlined,
   DeleteOutlined,
@@ -207,6 +209,13 @@ export function ImageImportPage({ initialId }: { initialId?: string }) {
           </Popconfirm>
         </Space>
       </div>
+      {job && (
+        <RecordAuditPanel
+          entityType="MaterialImageImport"
+          entityId={job.id}
+          revision={String(job.version)}
+        />
+      )}
       {state.error && (
         <Alert type="error" showIcon message={state.error} className={importStyles.notice} />
       )}

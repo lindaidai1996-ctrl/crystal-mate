@@ -1,8 +1,9 @@
 'use client';
 
-import { Alert, App, Button, Drawer, Form, Input, InputNumber, Skeleton } from 'antd';
+import { Alert, App, Button, Form, Input, InputNumber, Skeleton } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
+import { ResponsiveDrawer as Drawer } from '@/components/responsive/responsiveDialog';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { ProductStockAdjustment, StockAdjustment } from '@/lib/client-types';
 import { MAX_STOCK, validMaterialQuantity } from '@/lib/inventory';

@@ -1,5 +1,10 @@
 'use client';
 
+import { SearchFilterRow } from '@/components/responsive/searchFilterRow';
+import { ResetFiltersButton } from '@/components/responsive/resetFiltersButton';
+
+import { RecordAuditSummary, useRecordProvenance } from './audit-history';
+
 import {
   DeleteOutlined,
   EditOutlined,
@@ -22,7 +27,6 @@ import {
   Result,
   Segmented,
   Select,
-  Space,
   Skeleton,
   Tag,
   Tooltip,
@@ -63,6 +67,9 @@ import catalogStyles from './productCatalog.module.css';
 import { ProductGallery } from './productGallery';
 import { CatalogNote } from './catalogNote';
 import { underlinedTheme } from '@/lib/ui-theme';
+import { ProductListFilters } from './responsive/productListFilters';
+import { ListPageActions } from './responsive/listPageActions';
+import { MobileDetails } from './responsive/mobileDetails';
 
 type MarketingFilterValue = '' | 'true' | 'false';
 type MarketingFilterField = CabochonMarketingField;
@@ -422,6 +429,10 @@ export function ProductsPage({
     </span>
   );
 
+  const { records: provenance, failed: auditFailed } = useRecordProvenance(
+    'Product',
+    view === 'table' ? data.items : [],
+  );
   const columns: ColumnsType<Product> = [
     {
       title: t('name'),
@@ -571,12 +582,23 @@ export function ProductsPage({
       dataIndex: 'updatedAt',
       key: 'updated',
       width: isCabochon ? 210 : 150,
-      render: (value: string) =>
-        isCabochon
-          ? formatCabochonUpdatedAt(value)
-          : new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'zh-CN', {
-              dateStyle: 'medium',
-            }).format(new Date(value)),
+      render: (value: string, item) => (
+        <>
+          <div>
+            {isCabochon
+              ? formatCabochonUpdatedAt(value)
+              : new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'zh-CN', {
+                  dateStyle: 'medium',
+                }).format(new Date(value))}
+          </div>
+          <RecordAuditSummary
+            entityType="Product"
+            entityId={item.id}
+            record={provenance[item.id]}
+            failed={auditFailed}
+          />
+        </>
+      ),
     },
     {
       title: t('actions'),
@@ -625,6 +647,53 @@ export function ProductsPage({
       />
     );
 
+  const listFilters = {
+    categoryId,
+    tagId,
+    settingStyleId,
+    published,
+    origin,
+    stock,
+    marketingFilters,
+    createdRange,
+    priceSort,
+  };
+
+  const searchInput = (
+    <SearchFilterRow>
+      <Input
+        className="filter-search"
+        value={query}
+        onChange={(event) => {
+          setLoading(true);
+          setQuery(event.target.value);
+          setPage(1);
+        }}
+        prefix={<SearchOutlined />}
+        aria-label={t('search')}
+        placeholder={t('search')}
+        allowClear
+      />
+      <ResetFiltersButton
+        onReset={() => {
+          setQuery('');
+          setCategoryId(undefined);
+          setTagId(undefined);
+          setSettingStyleId(undefined);
+          setPublished(undefined);
+          setOrigin('all');
+          setStock(undefined);
+          setMarketingFilters(emptyMarketingFilters);
+          setCreatedRange(null);
+          setPriceSort(null);
+          setPage(1);
+          setLoading(true);
+          setRevision((current) => current + 1);
+        }}
+      />
+    </SearchFilterRow>
+  );
+
   return (
     <ConfigProvider
       variant={isFinishedStrands ? 'underlined' : undefined}
@@ -636,208 +705,224 @@ export function ProductsPage({
             <h1>{scope ? common(scope.titleKey) : t('title')}</h1>
             <p>{t('count', { count: data.total })}</p>
           </div>
-          <Space wrap>
+          <ListPageActions
+            primary={
+              <Link href={`${listPath}/new`}>
+                <Button type="primary" icon={<PlusOutlined />}>
+                  {t('new')}
+                </Button>
+              </Link>
+            }
+          >
             <EditorDraftBox kind="PRODUCT" returnTo={listPath} />
             {isCabochon && (
               <Link href={`${listPath}/excel-import`}>
                 <Button icon={<FileExcelOutlined />}>{excelImport('entry')}</Button>
               </Link>
             )}
-            {!isCabochon && (
+            {process.env.NODE_ENV !== 'production' && !isCabochon && (
               <Link href={withAdminReturnTo('/admin/products/diy-image-import', listPath)}>
                 <Button icon={<ScanOutlined />}>{diyImport('entry')}</Button>
               </Link>
             )}
-            <Link href={`${listPath}/new`}>
-              <Button type="primary" icon={<PlusOutlined />}>
-                {t('new')}
-              </Button>
-            </Link>
-          </Space>
+          </ListPageActions>
         </div>
-        <div
-          className={
-            isFinishedStrands
-              ? 'filter-bar filter-bar--finished'
-              : !scope
-                ? `filter-bar ${catalogStyles.filters}`
-                : 'filter-bar'
-          }
+        <ProductListFilters
+          value={listFilters}
+          categories={availableCategories}
+          tags={tags}
+          settingStyles={settingStyles}
+          isCabochon={isCabochon}
+          isFinishedStrands={isFinishedStrands}
+          search={searchInput}
+          onApply={(next) => {
+            if (JSON.stringify(next) === JSON.stringify(listFilters)) return;
+            setCategoryId(next.categoryId);
+            setTagId(next.tagId);
+            setSettingStyleId(next.settingStyleId);
+            setPublished(next.published);
+            setOrigin(next.origin);
+            setStock(next.stock);
+            setMarketingFilters(next.marketingFilters);
+            setCreatedRange(next.createdRange);
+            setPriceSort(next.priceSort);
+            setPage(1);
+            setLoading(true);
+          }}
         >
-          <div className="product-filter-primary">
-            <Input
-              className="filter-search"
-              value={query}
-              onChange={(event) => {
-                setLoading(true);
-                setQuery(event.target.value);
-                setPage(1);
-              }}
-              prefix={<SearchOutlined />}
-              aria-label={t('search')}
-              placeholder={t('search')}
-              allowClear
-            />
-            {isFinishedStrands && (
-              <div className="product-origin-filter">
-                <span className="product-origin-label">{t('originFilter')}</span>
-                <Segmented<'all' | 'PURCHASED' | 'DIY'>
-                  size="small"
-                  aria-label={t('originFilter')}
-                  value={origin}
-                  options={[
-                    { value: 'all', label: t('all') },
-                    { value: 'PURCHASED', label: t('purchased') },
-                    { value: 'DIY', label: t('diy') },
-                  ]}
-                  onChange={(value) => {
-                    setLoading(true);
-                    setOrigin(value);
-                    setPage(1);
-                  }}
-                />
-              </div>
+          <div
+            className={
+              isFinishedStrands
+                ? 'filter-bar filter-bar--finished'
+                : !scope
+                  ? `filter-bar ${catalogStyles.filters}`
+                  : 'filter-bar'
+            }
+          >
+            <div className="product-filter-primary">
+              {searchInput}
+              {isFinishedStrands && (
+                <div className="product-origin-filter">
+                  <span className="product-origin-label">{t('originFilter')}</span>
+                  <Segmented<'all' | 'PURCHASED' | 'DIY'>
+                    size="small"
+                    aria-label={t('originFilter')}
+                    value={origin}
+                    options={[
+                      { value: 'all', label: t('all') },
+                      { value: 'PURCHASED', label: t('purchased') },
+                      { value: 'DIY', label: t('diy') },
+                    ]}
+                    onChange={(value) => {
+                      setLoading(true);
+                      setOrigin(value);
+                      setPage(1);
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+            {isCabochon && (
+              <Select
+                className="filter-select"
+                value={settingStyleId}
+                onChange={(value) => {
+                  setLoading(true);
+                  setSettingStyleId(value);
+                  setPage(1);
+                }}
+                placeholder={t('setting')}
+                aria-label={t('setting')}
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                options={[
+                  ...settingStyles.map((item) => ({ value: item.id, label: item.magicBoxStyle })),
+                  { value: 'unset', label: t('unsetSetting') },
+                ]}
+              />
             )}
-          </div>
-          {isCabochon && (
             <Select
               className="filter-select"
-              value={settingStyleId}
+              value={tagId}
               onChange={(value) => {
                 setLoading(true);
-                setSettingStyleId(value);
+                setTagId(value);
                 setPage(1);
               }}
-              placeholder={t('setting')}
-              aria-label={t('setting')}
+              aria-label={t('tags')}
+              placeholder={t('tags')}
               allowClear
               showSearch
               optionFilterProp="label"
-              options={[
-                ...settingStyles.map((item) => ({ value: item.id, label: item.magicBoxStyle })),
-                { value: 'unset', label: t('unsetSetting') },
-              ]}
+              options={tags.map((item) => ({ value: item.id, label: item.name }))}
             />
-          )}
-          <Select
-            className="filter-select"
-            value={tagId}
-            onChange={(value) => {
-              setLoading(true);
-              setTagId(value);
-              setPage(1);
-            }}
-            aria-label={t('tags')}
-            placeholder={t('tags')}
-            allowClear
-            showSearch
-            optionFilterProp="label"
-            options={tags.map((item) => ({ value: item.id, label: item.name }))}
-          />
-          {!isCabochon && (
-            <Select
-              className="filter-select"
-              value={published}
-              onChange={(value) => {
+            {!isCabochon && (
+              <Select
+                className="filter-select"
+                value={published}
+                onChange={(value) => {
+                  setLoading(true);
+                  setPublished(value);
+                  setPage(1);
+                }}
+                aria-label={t('publication')}
+                placeholder={t('publication')}
+                allowClear
+                options={[
+                  { value: 'true', label: t('published') },
+                  { value: 'false', label: t('unpublished') },
+                ]}
+              />
+            )}
+            {!isCabochon && (
+              <Select
+                className="filter-select"
+                value={stock}
+                onChange={(value) => {
+                  setLoading(true);
+                  setStock(value);
+                  setPage(1);
+                }}
+                aria-label={t('inventory')}
+                placeholder={t('inventory')}
+                allowClear
+                options={[
+                  { value: '1', label: t('inStock') },
+                  { value: '0', label: t('soldOut') },
+                ]}
+              />
+            )}
+            <DateRangeFilter
+              kind="created"
+              value={createdRange}
+              onChange={(range) => {
                 setLoading(true);
-                setPublished(value);
-                setPage(1);
-              }}
-              aria-label={t('publication')}
-              placeholder={t('publication')}
-              allowClear
-              options={[
-                { value: 'true', label: t('published') },
-                { value: 'false', label: t('unpublished') },
-              ]}
-            />
-          )}
-          {!isCabochon && (
-            <Select
-              className="filter-select"
-              value={stock}
-              onChange={(value) => {
-                setLoading(true);
-                setStock(value);
-                setPage(1);
-              }}
-              aria-label={t('inventory')}
-              placeholder={t('inventory')}
-              allowClear
-              options={[
-                { value: '1', label: t('inStock') },
-                { value: '0', label: t('soldOut') },
-              ]}
-            />
-          )}
-          <DateRangeFilter
-            kind="created"
-            value={createdRange}
-            onChange={(range) => {
-              setLoading(true);
-              setCreatedRange(range);
-              setPage(1);
-            }}
-          />
-        </div>
-        {!isCabochon && (
-          <div className={categoryStyles.filters}>
-            <CategoryFilterRow
-              label={t('category')}
-              options={availableCategories.map((item) => ({ value: item.id, label: item.name }))}
-              selectedId={categoryId}
-              counts={categoryCounts}
-              onChange={(value) => {
-                if (value === categoryId) return;
-                setLoading(true);
-                setCategoryId(value);
+                setCreatedRange(range);
                 setPage(1);
               }}
             />
           </div>
-        )}
-        {isCabochon && (
-          <div className="cabochon-filter-row">
-            <div className="cabochon-filter-group">
-              <span className="cabochon-filter-label">{t('stockFilter')}</span>
-              <Segmented
-                aria-label={t('stockFilter')}
-                value={stock ?? ''}
-                options={[
-                  { value: '', label: t('all') },
-                  { value: '1', label: t('inStock') },
-                  { value: '0', label: t('soldOut') },
-                ]}
+          {!isCabochon && (
+            <div className={categoryStyles.filters}>
+              <CategoryFilterRow
+                label={t('category')}
+                options={availableCategories.map((item) => ({ value: item.id, label: item.name }))}
+                selectedId={categoryId}
+                counts={categoryCounts}
                 onChange={(value) => {
+                  if (value === categoryId) return;
                   setLoading(true);
-                  setStock(value || undefined);
+                  setCategoryId(value);
                   setPage(1);
                 }}
               />
             </div>
-            {marketingFilterFields.map((field) => (
-              <div className="cabochon-filter-group" key={field}>
-                <span className="cabochon-filter-label">{editor(field)}</span>
-                <Segmented<MarketingFilterValue>
-                  aria-label={editor(field)}
-                  value={marketingFilters[field]}
+          )}
+          {isCabochon && (
+            <div className="cabochon-filter-row">
+              <div className="cabochon-filter-group">
+                <span className="cabochon-filter-label">{t('stockFilter')}</span>
+                <Segmented
+                  aria-label={t('stockFilter')}
+                  value={stock ?? ''}
                   options={[
                     { value: '', label: t('all') },
-                    { value: 'true', label: t('completed') },
-                    { value: 'false', label: t('incomplete') },
+                    { value: '1', label: t('inStock') },
+                    { value: '0', label: t('soldOut') },
                   ]}
                   onChange={(value) => {
                     setLoading(true);
-                    setMarketingFilters((current) => ({ ...current, [field]: value }));
+                    setStock(value || undefined);
                     setPage(1);
                   }}
                 />
               </div>
-            ))}
-          </div>
-        )}
+              {marketingFilterFields.map((field) => (
+                <div className="cabochon-filter-group" key={field}>
+                  <span className="cabochon-filter-label">{editor(field)}</span>
+                  <Segmented<MarketingFilterValue>
+                    aria-label={editor(field)}
+                    value={marketingFilters[field]}
+                    options={[
+                      { value: '', label: t('all') },
+                      { value: 'true', label: t('completed') },
+                      { value: 'false', label: t('incomplete') },
+                    ]}
+                    onChange={(value) => {
+                      setLoading(true);
+                      setMarketingFilters((current) => ({ ...current, [field]: value }));
+                      setPage(1);
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </ProductListFilters>
         <div className={catalogStyles.results}>
           <Select<'default' | 'ascend' | 'descend'>
+            className="desktop-only"
             aria-label={t('sort')}
             value={priceSort ?? 'default'}
             options={[
@@ -854,6 +939,7 @@ export function ProductsPage({
           <div className={catalogStyles.viewControls}>
             {isFinishedStrands && (
               <Segmented
+                className="desktop-only"
                 aria-label={t('density')}
                 value={density}
                 options={[
@@ -947,6 +1033,103 @@ export function ProductsPage({
           >
             <PaginatedTable
               rowKey="id"
+              mobileRender={(item) => (
+                <>
+                  <div className="product-cell">
+                    <ImageHoverPreview images={item.images} name={item.name} hoverPreview={false} />
+                    <div className={catalogStyles.identity}>
+                      <Link className="product-name" href={`${listPath}/${item.id}`}>
+                        {item.name}
+                      </Link>
+                      <div className="product-code">{item.code}</div>
+                      <div className="mobile-record-meta">
+                        {item.category.name}
+                        {item.origin ? ` · ${productSources(item.origin)}` : ''}
+                      </div>
+                    </div>
+                  </div>
+                  <dl className="mobile-record-metrics">
+                    <div>
+                      <dt>{t('price')}</dt>
+                      <dd>
+                        <ProductInlineEdit
+                          product={item}
+                          field="price"
+                          onSave={(change) => saveQuickEdit(item, change)}
+                        >
+                          {new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'zh-CN', {
+                            style: 'currency',
+                            currency: 'CNY',
+                          }).format(item.priceCents / 100)}
+                        </ProductInlineEdit>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>{t('stockQuantity')}</dt>
+                      <dd>
+                        <ProductInlineEdit
+                          product={item}
+                          field="stock"
+                          onSave={(change) => saveQuickEdit(item, change)}
+                        >
+                          {item.stock}
+                        </ProductInlineEdit>
+                      </dd>
+                    </div>
+                  </dl>
+                  <MobileDetails>
+                    <div className="product-tags">
+                      {item.tags.map((tag) => (
+                        <TextTag key={tag.id} text={tag.name} />
+                      ))}
+                    </div>
+                    <CatalogNote text={item.description} />
+                    <p>{item.published ? t('published') : t('unpublished')}</p>
+                    <p>
+                      {t('updated')}:{' '}
+                      {isCabochon
+                        ? formatCabochonUpdatedAt(item.updatedAt)
+                        : new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'zh-CN', {
+                            dateStyle: 'medium',
+                          }).format(new Date(item.updatedAt))}
+                    </p>
+                    {isCabochon && (
+                      <>
+                        <p>
+                          {t('setting')}:{' '}
+                          {item.extraInfo?.settingStyle?.magicBoxStyle ||
+                            editor('unknownSettingStyle')}
+                        </p>
+                        <p>
+                          {t('dimensions')}:{' '}
+                          <ProductInlineEdit
+                            product={item}
+                            field="measurement"
+                            onSave={(change) => saveQuickEdit(item, change)}
+                          >
+                            {formatCabochonMeasurement(
+                              item.measurement,
+                              marketingConfig('missingDimension'),
+                            )}
+                          </ProductInlineEdit>
+                        </p>
+                        <CabochonMarketingStatus
+                          product={item}
+                          pending={pendingMarketing}
+                          onChange={updateMarketing}
+                        />
+                      </>
+                    )}
+                  </MobileDetails>
+                  <RecordAuditSummary
+                    entityType="Product"
+                    entityId={item.id}
+                    record={provenance[item.id]}
+                    failed={auditFailed}
+                  />
+                  <div className="mobile-record-actions">{renderActions(item)}</div>
+                </>
+              )}
               dataSource={data.items}
               columns={columns}
               scroll={

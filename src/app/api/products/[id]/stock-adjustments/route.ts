@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiError, requireAdmin } from '@/lib/api';
 import { productStockAdjustmentSchema } from '@/lib/validation';
@@ -5,7 +6,7 @@ import { adjustProductStock, serializeProductSources } from '@/lib/product-sourc
 
 type Context = { params: Promise<{ id: string }> };
 
-export async function POST(request: NextRequest, { params }: Context) {
+async function handlePOST(request: NextRequest, { params }: Context) {
   try {
     await requireAdmin(request);
     const input = productStockAdjustmentSchema.parse(await request.json());
@@ -18,3 +19,5 @@ export async function POST(request: NextRequest, { params }: Context) {
     return apiError(error);
   }
 }
+
+export const POST = withAuditRoute(handlePOST);

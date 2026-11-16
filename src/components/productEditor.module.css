@@ -54,7 +54,7 @@
 }
 
 .leadImage {
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1;
   margin-bottom: 20px;
   background: #eaeef1;
   color: #626d79;
@@ -83,7 +83,7 @@
   border-radius: 0;
 }
 
-.editor > :global(.editor-actions) {
+.editor > :global([data-editor-actions]) > :global(.editor-actions) {
   grid-column: 1 / -1;
   flex-wrap: wrap;
   padding-block: 28px 12px;
@@ -126,5 +126,46 @@
 
   .editor :global(.editor-field-stock) {
     grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 767px) {
+  .editor :global(.editor-fields) {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+  }
+  .editor > .details {
+    grid-row: 1;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .editor > .images {
+    grid-row: 2;
+    padding-top: 20px;
+    border-top: 1px solid var(--ant-color-border-secondary);
+  }
+  .editor > :global(.editor-block) {
+    padding-block: 20px;
+  }
+  .editor > :global(.editor-block) > h2 {
+    margin-bottom: 16px;
+  }
+  .editor :global(.editor-fields > .ant-form-item) {
+    margin-bottom: 20px;
+    grid-column: 1 / -1;
+  }
+  .editor :global(.editor-field-stock) {
+    grid-column: 1 / -1;
+  }
+  .leadImage {
+    width: 88px;
+    height: 88px;
+    aspect-ratio: 1;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .editor > :global([data-editor-actions]) > :global(.editor-actions) {
+    padding: 12px 16px max(12px, env(safe-area-inset-bottom));
   }
 }

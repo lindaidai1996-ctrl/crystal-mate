@@ -1,6 +1,7 @@
 'use client';
 import type { ReactNode } from 'react';
 import { Button, Form, Input, InputNumber } from 'antd';
+import { CompactFields } from '@/components/responsive/compactFields';
 import { useTranslations } from 'next-intl';
 import type {
   MaterialAmount,
@@ -109,7 +110,7 @@ export function MaterialDetailFields({
       {showDetails && (!sections || sections.includes('strand')) && draft.unit === 'STRAND' && (
         <section className="editor-block">
           <h2>{t('purchaseDetails')}</h2>
-          <div className="material-field-grid material-three-columns">
+          <CompactFields className="material-field-grid material-three-columns">
             <Form.Item label={t('childCount')}>
               <InputNumber<number>
                 value={draft.childCount}
@@ -193,7 +194,7 @@ export function MaterialDetailFields({
                 </div>
               </Form.Item>
             )}
-          </div>
+          </CompactFields>
         </section>
       )}
       {showDetails && (!sections || sections.includes('sale')) && (

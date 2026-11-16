@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiError, requireAdmin } from '@/lib/api';
 import { db } from '@/lib/db';
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
     return apiError(error);
   }
 }
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
   try {
     await requireAdmin(request);
     return NextResponse.json(await createDiyImport(diyCreateSchema.parse(await request.json())), {
@@ -34,3 +35,5 @@ export async function POST(request: NextRequest) {
     return apiError(error);
   }
 }
+
+export const POST = withAuditRoute(handlePOST);

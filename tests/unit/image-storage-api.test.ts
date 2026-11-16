@@ -54,7 +54,7 @@ beforeEach(async () => {
   cacheDirectory = await mkdtemp(join(tmpdir(), 'crystal-image-api-'));
   vi.stubEnv('MEDIA_CACHE_DIR', cacheDirectory);
   vi.clearAllMocks();
-  mocks.auth.mockResolvedValue({ user: { name: 'admin' } });
+  mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
   mocks.mode.mockReturnValue('cos');
   mocks.createGrant.mockResolvedValue({ id: 'grant' });
   mocks.sign.mockReturnValue('https://cos.example/signed');

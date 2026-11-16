@@ -1,3 +1,4 @@
+import { sameOrderedRows } from './unchanged-relations';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { ApiError } from '@/lib/api';
@@ -16,6 +17,7 @@ export const batchInclude = {
 async function replaceAttachments(tx: Tx, batchId: string, attachments: BatchInput['attachments']) {
   const existing = await tx.materialBatchAttachment.findMany({ where: { batchId } });
   const data = await prepareAttachments(tx, { type: 'batch', id: batchId }, attachments, existing);
+  if (sameOrderedRows(existing, data)) return;
   await tx.materialBatchAttachment.deleteMany({ where: { batchId } });
   if (data.length)
     await tx.materialBatchAttachment.createMany({

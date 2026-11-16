@@ -1,5 +1,11 @@
 'use client';
 
+import { imageFramings } from '@/lib/image-framing';
+
+import { RecordAuditPanel } from '@/components/audit-history';
+
+import { EditorActions } from '@/components/responsive/editorActions';
+
 import { ArrowLeftOutlined, FileTextOutlined, SaveOutlined } from '@ant-design/icons';
 import { App, Button, Form, Result, Skeleton, Space } from 'antd';
 import { useTranslations } from 'next-intl';
@@ -410,6 +416,7 @@ export function MaterialEditor({
         name: draft.name.trim(),
         notes: draft.notes.trim(),
         imageKeys: images.map((image) => image.objectKey),
+        imageFramings: imageFramings(images),
       };
       if (isMasterEdit) {
         await apiFetch(`/api/materials/${id}`, {
@@ -589,6 +596,7 @@ export function MaterialEditor({
           </h1>
         </div>
       </div>
+      {!isNew && <RecordAuditPanel entityType="Material" entityId={id} />}
       <Form layout="vertical" onFinish={save}>
         <div className="editor-surface material-editor">
           <MaterialBasicFields
@@ -658,7 +666,7 @@ export function MaterialEditor({
             showDetails={!isMasterEdit}
             showNotes={!entryId}
           />
-          <div className="editor-actions">
+          <EditorActions>
             <Link href={returnPath} replace>
               <Button>{common('cancel')}</Button>
             </Link>
@@ -681,7 +689,7 @@ export function MaterialEditor({
             >
               {common('save')}
             </Button>
-          </div>
+          </EditorActions>
         </div>
       </Form>
     </>

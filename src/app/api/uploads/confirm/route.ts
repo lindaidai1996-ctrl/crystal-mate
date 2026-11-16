@@ -1,10 +1,11 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { apiError, ApiError, requireAdmin } from '@/lib/api';
 import { db } from '@/lib/db';
 import { cosConfig, MAX_IMAGE_BYTES, storageMode } from '@/lib/media';
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
   try {
     await requireAdmin(request);
     if (storageMode() !== 'cos') throw new ApiError(404, 'NOT_FOUND');
@@ -27,3 +28,5 @@ export async function POST(request: NextRequest) {
     return apiError(error);
   }
 }
+
+export const POST = withAuditRoute(handlePOST);

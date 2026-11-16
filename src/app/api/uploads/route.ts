@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { randomUUID } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -12,7 +13,7 @@ const inputSchema = z.object({
   purpose: z.enum(imageUploadPurposes).default('catalog'),
 });
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
   try {
     await requireAdmin(request);
     const input = inputSchema.parse(await request.json());
@@ -41,3 +42,5 @@ export async function POST(request: NextRequest) {
     return apiError(error);
   }
 }
+
+export const POST = withAuditRoute(handlePOST);

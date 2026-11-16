@@ -1,6 +1,7 @@
 'use client';
 
 import { Button, Form, Radio } from 'antd';
+import { CompactFields } from '@/components/responsive/compactFields';
 import { useTranslations } from 'next-intl';
 import type { MaterialSaleRule, MaterialValues } from '@/lib/client-types';
 import {
@@ -98,11 +99,11 @@ export function MaterialSaleFields({
       )}
       {(values.saleRule === 'FIXED_AMOUNT' || values.saleRule === 'CUSTOM_PERCENT') &&
         !privacyMode && (
-          <Form.Item label={t(ruleValueLabel)}>
+          <Form.Item className="mobile-short-field" label={t(ruleValueLabel)}>
             {amount('saleRuleValue', ruleValueSuffix)}
           </Form.Item>
         )}
-      <div className="material-field-grid material-three-columns">
+      <CompactFields className="material-field-grid material-three-columns">
         {values.unit !== 'GRAM' && (
           <Form.Item label={t('saleUnitPrice')}>
             {amount('saleUnitPrice', unitSuffix)}
@@ -181,7 +182,7 @@ export function MaterialSaleFields({
             />
           </Form.Item>
         )}
-      </div>
+      </CompactFields>
     </section>
   );
 }

@@ -1,3 +1,4 @@
+import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiError, requireAdmin } from '@/lib/api';
 import { deleteImportSchema, importDraftSchema } from '@/lib/materialImageImport/contracts';
@@ -8,7 +9,7 @@ import {
 } from '@/lib/materialImageImport/store';
 
 type Context = { params: Promise<{ id: string }> };
-export async function DELETE(request: NextRequest, context: Context) {
+async function handleDELETE(request: NextRequest, context: Context) {
   try {
     await requireAdmin(request);
     const { version } = deleteImportSchema.parse(await request.json());
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest, context: Context) {
     return apiError(error);
   }
 }
-export async function PATCH(request: NextRequest, context: Context) {
+async function handlePATCH(request: NextRequest, context: Context) {
   try {
     await requireAdmin(request);
     return NextResponse.json(
@@ -40,3 +41,6 @@ export async function PATCH(request: NextRequest, context: Context) {
     return apiError(error);
   }
 }
+
+export const DELETE = withAuditRoute(handleDELETE);
+export const PATCH = withAuditRoute(handlePATCH);
