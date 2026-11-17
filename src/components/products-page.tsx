@@ -1,5 +1,7 @@
 'use client';
 
+import { formatCurrency } from '@/lib/format-money';
+
 import { SearchFilterRow } from '@/components/responsive/searchFilterRow';
 import { ResetFiltersButton } from '@/components/responsive/resetFiltersButton';
 
@@ -70,6 +72,8 @@ import { underlinedTheme } from '@/lib/ui-theme';
 import { ProductListFilters } from './responsive/productListFilters';
 import { ListPageActions } from './responsive/listPageActions';
 import { MobileDetails } from './responsive/mobileDetails';
+import { ProductDiyEntry } from './productDiyEntry';
+import { initialSource, ProductSourceSection } from './product-source-section';
 
 type MarketingFilterValue = '' | 'true' | 'false';
 type MarketingFilterField = CabochonMarketingField;
@@ -191,6 +195,7 @@ export function ProductsPage({
     pageSize: 20,
   });
   const [loading, setLoading] = useState(true);
+  const [diyProduct, setDiyProduct] = useState<Product | null>(null);
   const [pendingMarketing, setPendingMarketing] = useState<Record<string, boolean>>({});
   const scopedCategory =
     scope?.key === 'cabochons'
@@ -401,6 +406,13 @@ export function ProductsPage({
           : `row-actions ${catalogStyles.standardActions}`
       }
     >
+      {item.origin === 'DIY' && (
+        <Link href={`/admin/products/${item.id}/cards?returnTo=${encodeURIComponent(listPath)}`}>
+          <Button type="text" icon={<FileTextOutlined />}>
+            商品名片
+          </Button>
+        </Link>
+      )}
       {!isCabochon && (
         <Link href={`${listPath}/${item.id}`}>
           <Tooltip title={common('edit')}>
@@ -461,21 +473,10 @@ export function ProductsPage({
               <Link className="product-name" href={`${listPath}/${item.id}`}>
                 {item.name}
               </Link>
-              {isFinishedStrands && item.origin === 'DIY' && (
-                <Tooltip title={productSources('DIY')}>
-                  <span
-                    className="product-diy-mark"
-                    role="img"
-                    aria-label={productSources('DIY')}
-                    tabIndex={0}
-                  >
-                    {t('diy')}
-                  </span>
-                </Tooltip>
-              )}
             </div>
             <div className="product-code">{item.code}</div>
             <CatalogNote text={item.description} />
+            <ProductDiyEntry product={item} onOpen={setDiyProduct} />
           </div>
         </div>
       ),
@@ -534,10 +535,7 @@ export function ProductsPage({
           field="price"
           onSave={(change) => saveQuickEdit(item, change)}
         >
-          {new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'zh-CN', {
-            style: 'currency',
-            currency: 'CNY',
-          }).format(value / 100)}
+          {formatCurrency(value / 100, locale)}
         </ProductInlineEdit>
       ),
     },
@@ -1036,6 +1034,7 @@ export function ProductsPage({
                 : undefined
             }
             onQuickEdit={saveQuickEdit}
+            onOpenDiy={setDiyProduct}
           />
         ) : (
           <div
@@ -1067,10 +1066,7 @@ export function ProductsPage({
                           field="price"
                           onSave={(change) => saveQuickEdit(item, change)}
                         >
-                          {new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'zh-CN', {
-                            style: 'currency',
-                            currency: 'CNY',
-                          }).format(item.priceCents / 100)}
+                          {formatCurrency(item.priceCents / 100, locale)}
                         </ProductInlineEdit>
                       </dd>
                     </div>
@@ -1087,6 +1083,7 @@ export function ProductsPage({
                       </dd>
                     </div>
                   </dl>
+                  <ProductDiyEntry product={item} onOpen={setDiyProduct} />
                   <MobileDetails>
                     <div className="product-tags">
                       {item.tags.map((tag) => (
@@ -1161,6 +1158,21 @@ export function ProductsPage({
               pagination={pagination}
             />
           </div>
+        )}
+        {diyProduct && (
+          <ProductSourceSection
+            key={diyProduct.id}
+            product={diyProduct}
+            value={initialSource('DIY')}
+            onChange={() => {}}
+            categories={categories}
+            quickEdit
+            onEditorClose={() => setDiyProduct(null)}
+            onProductChanged={() => {
+              setLoading(true);
+              setRevision((value) => value + 1);
+            }}
+          />
         )}
       </div>
     </ConfigProvider>

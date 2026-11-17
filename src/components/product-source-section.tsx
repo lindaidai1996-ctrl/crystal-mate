@@ -1,5 +1,11 @@
 'use client';
 
+import { DiyPicker, type PickerPreferences } from '@/components/diyPicker/diyPicker';
+import { applyPickerSelection, preferredMaterialUsageUnit } from '@/lib/diy-picker/draft';
+import type { PickerKind, PickerSelection } from '@/lib/diy-picker/contracts';
+
+import { formatAmount } from '@/lib/format-money';
+
 import { Sensitive } from '@/components/privacyMode';
 
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
@@ -50,6 +56,7 @@ import {
   emptyCraftDesignFee,
 } from '@/lib/product-diy-cost';
 import { todayInChina } from './materialManagement/batchSelector';
+import diyStyles from './productDiyEntry.module.css';
 import {
   MaterialSourceSelect,
   MaterialSourceSummary,
@@ -163,7 +170,7 @@ function CraftDesignFeeInput({
           aria-label={t('craftDesignFee')}
           value={showManual ? 'manual' : preset}
           options={[
-            ...presets.map((amount) => ({ value: amount, label: `¥${amount}` })),
+            ...presets.map((amount) => ({ value: amount, label: `¥${formatAmount(amount)}` })),
             { value: 'manual', label: t('manualCraftDesignFee') },
           ]}
           onChange={(event) => {
@@ -201,6 +208,8 @@ function SourceFields({
   onMaterialSearch,
   onCabochonSearch,
   allowOriginChange,
+  excludeProductId,
+  onPickerOptions,
 }: {
   value: ProductSourceInput;
   onChange: (value: ProductSourceInput) => void;
@@ -213,7 +222,14 @@ function SourceFields({
   onMaterialSearch: (query: string) => void;
   onCabochonSearch: (query: string) => void;
   allowOriginChange: boolean;
+  excludeProductId?: string;
+  onPickerOptions: (selections: PickerSelection[]) => void;
 }) {
+  const [picker, setPicker] = useState<{ kind: PickerKind; index?: number } | null>(null);
+  const [cabochonOpen, setCabochonOpen] = useState<number | null>(null);
+  const [pickerPreferences, setPickerPreferences] = useState<Record<PickerKind, PickerPreferences>>(
+    { materials: {}, cabochons: {} },
+  );
   const t = useTranslations('productSources');
   const update = (fields: Partial<ProductSourceInput>) =>
     onChange({ ...value, ...fields } as ProductSourceInput);
@@ -232,6 +248,30 @@ function SourceFields({
 
   return (
     <div className="product-source-fields">
+      {picker && value.origin === 'DIY' && (
+        <DiyPicker
+          kind={picker.kind}
+          single={picker.index !== undefined}
+          preferences={pickerPreferences[picker.kind]}
+          onPreferences={(next) =>
+            setPickerPreferences((current) => ({ ...current, [picker.kind]: next }))
+          }
+          existingIds={
+            picker.kind === 'materials'
+              ? value.materials.map((line) => line.materialBatchEntryId)
+              : value.cabochons.map((line) => line.productId)
+          }
+          excludeProductId={excludeProductId}
+          distributors={distributors}
+          onClose={() => setPicker(null)}
+          onConfirm={(selections) => {
+            onPickerOptions(selections);
+            onChange(applyPickerSelection(value, selections, picker.index));
+            setPicker(null);
+          }}
+        />
+      )}
+
       <CompactFields className="product-source-grid">
         <label className="source-field">
           <span>{t('origin')}</span>
@@ -337,23 +377,7 @@ function SourceFields({
         <>
           <div className="product-source-subheading">
             <strong>{t('materials')}</strong>
-            <Button
-              icon={<PlusOutlined />}
-              onClick={() =>
-                update({
-                  materials: [
-                    ...value.materials,
-                    {
-                      materialBatchEntryId: '',
-                      usageUnit: 'BEAD',
-                      quantity: '1',
-                      unitCost: '',
-                      quoteUnitPrice: null,
-                    },
-                  ],
-                })
-              }
-            >
+            <Button icon={<PlusOutlined />} onClick={() => setPicker({ kind: 'materials' })}>
               {t('addMaterial')}
             </Button>
           </div>
@@ -379,10 +403,12 @@ function SourceFields({
                         value={line.materialBatchEntryId}
                         onSearch={onMaterialSearch}
                         preview={materialPreview}
+                        onBrowse={() => setPicker({ kind: 'materials', index })}
                         onChange={(id) => {
                           const option = materials.find((item) => item.entry.id === id);
-                          const usageUnit =
-                            option?.material.unit === 'GRAM' ? 'GRAM' : line.usageUnit;
+                          const usageUnit = option
+                            ? preferredMaterialUsageUnit(option, line.usageUnit)
+                            : line.usageUnit;
                           change({
                             usageUnit,
                             materialBatchEntryId: id,
@@ -395,6 +421,13 @@ function SourceFields({
                           });
                         }}
                       />
+                      <Button
+                        type="link"
+                        size="small"
+                        onClick={() => setPicker({ kind: 'materials', index })}
+                      >
+                        {t('browseAll')}
+                      </Button>
                     </div>
                     <div className="source-field source-material-unit-field">
                       <span>{t('usageUnit')}</span>
@@ -491,17 +524,7 @@ function SourceFields({
           />
           <div className="product-source-subheading">
             <strong>{t('cabochons')}</strong>
-            <Button
-              icon={<PlusOutlined />}
-              onClick={() =>
-                update({
-                  cabochons: [
-                    ...value.cabochons,
-                    { productId: '', quantity: 1, unitCost: '', quoteUnitPrice: null },
-                  ],
-                })
-              }
-            >
+            <Button icon={<PlusOutlined />} onClick={() => setPicker({ kind: 'cabochons' })}>
               {t('addCabochon')}
             </Button>
           </div>
@@ -514,9 +537,28 @@ function SourceFields({
               });
             return (
               <div className="product-source-line" key={`cabochon-${index}`}>
-                <label className="source-field source-field-wide">
+                <div className="source-field source-field-wide">
                   <span>{t('cabochon')}</span>
                   <Select
+                    aria-label={t('cabochon')}
+                    open={cabochonOpen === index}
+                    onOpenChange={(open) => setCabochonOpen(open ? index : null)}
+                    popupRender={(menu) => (
+                      <>
+                        {menu}
+                        <Button
+                          block
+                          type="link"
+                          onMouseDown={(event) => event.preventDefault()}
+                          onClick={() => {
+                            setCabochonOpen(null);
+                            setPicker({ kind: 'cabochons', index });
+                          }}
+                        >
+                          {t('browseAll')}
+                        </Button>
+                      </>
+                    )}
                     showSearch
                     filterOption={false}
                     onSearch={onCabochonSearch}
@@ -536,7 +578,17 @@ function SourceFields({
                       label: option.label,
                     }))}
                   />
-                </label>
+                  <Button
+                    type="link"
+                    size="small"
+                    onClick={() => {
+                      setCabochonOpen(null);
+                      setPicker({ kind: 'cabochons', index });
+                    }}
+                  >
+                    {t('browseAll')}
+                  </Button>
+                </div>
                 <label className="source-field">
                   <span>{t('usageQuantity')}</span>
                   <InputNumber
@@ -690,31 +742,121 @@ function SourceFields({
   );
 }
 
+function diySourceDraft(run: Product['diyRuns'][number]): ProductSourceInput {
+  return {
+    origin: 'DIY',
+    quantity: run.quantity,
+    notes: run.notes,
+    materials: run.materialLines.map((line) => ({
+      materialBatchEntryId: line.materialBatchEntryId,
+      usageUnit: line.usageUnit,
+      quantity: line.quantity,
+      unitCost: line.unitCost,
+      quoteUnitPrice: line.quoteUnitPrice,
+    })),
+    cabochons: run.cabochonLines.map((line) => ({
+      productId: line.productId,
+      quantity: line.quantity,
+      unitCost: line.unitCost,
+      quoteUnitPrice: line.quoteUnitPrice,
+    })),
+    extraCosts: run.extraCosts,
+    silverCost: run.silverCost ?? { weightGrams: '0', ...DEFAULT_SILVER_PRICING },
+    craftDesignFee: run.craftDesignFee ?? emptyCraftDesignFee(),
+  };
+}
+
+function diyMaterialOptions(run: Product['diyRuns'][number]): MaterialOption[] {
+  return run.materialLines.map((line) => ({
+    entry: line.materialBatchEntry,
+    material: {
+      ...line.materialBatchEntry.material,
+      unit: line.materialBatchEntry.material.unit,
+    } as Material,
+    label: `${line.materialBatchEntry.material.name} · ${line.materialBatchEntry.batch.name}`,
+  }));
+}
+
+function diyCabochonOptions(run: Product['diyRuns'][number]): CabochonOption[] {
+  return run.cabochonLines.map((line) => ({
+    product: { ...line.product, cost: null } as Product,
+    label: `${line.product.name} · ${line.product.code}`,
+  }));
+}
+
 export function ProductSourceSection({
   product,
   value,
   onChange,
   categories,
   onProductChanged,
+  quickEdit = false,
+  onEditorClose,
 }: {
   product: Product | null;
   value: ProductSourceInput;
   onChange: (value: ProductSourceInput) => void;
   categories: Category[];
   onProductChanged: (product: Product) => void;
+  quickEdit?: boolean;
+  onEditorClose?: () => void;
 }) {
   const t = useTranslations('productSources');
   const common = useTranslations('common');
   const { message } = App.useApp();
   const [batches, setBatches] = useState<MaterialBatch[]>([]);
   const [distributors, setDistributors] = useState<DistributorPage['items']>([]);
-  const [materials, setMaterials] = useState<MaterialOption[]>([]);
+  const initialRun = quickEdit ? product?.diyRuns[0] : undefined;
+  const [materials, setMaterials] = useState<MaterialOption[]>(() =>
+    initialRun ? diyMaterialOptions(initialRun) : [],
+  );
   const [materialOptions, setMaterialOptions] = useState<MaterialOption[]>([]);
   const materialPreview = useMaterialImagePreview();
-  const [cabochons, setCabochons] = useState<CabochonOption[]>([]);
-  const [mode, setMode] = useState<EditorMode | null>(null);
-  const [sourceId, setSourceId] = useState<string | null>(null);
-  const [draft, setDraft] = useState<ProductSourceInput>(initialSource());
+  const [cabochons, setCabochons] = useState<CabochonOption[]>(() =>
+    initialRun ? diyCabochonOptions(initialRun) : [],
+  );
+  function rememberPickerOptions(selections: PickerSelection[]) {
+    const materialSelections = selections.flatMap((selection) =>
+      selection.kind === 'materials'
+        ? [{ ...selection, label: `${selection.material.name} · ${selection.entry.batch.name}` }]
+        : [],
+    );
+    const productSelections = selections.flatMap((selection) =>
+      selection.kind === 'cabochons'
+        ? [
+            {
+              product: selection.product,
+              label: `${selection.product.name} · ${selection.product.code}`,
+            },
+          ]
+        : [],
+    );
+    setMaterials((current) => [
+      ...materialSelections,
+      ...current.filter(
+        (item) => !materialSelections.some((selection) => selection.entry.id === item.entry.id),
+      ),
+    ]);
+    setMaterialOptions((current) => [
+      ...materialSelections,
+      ...current.filter(
+        (item) => !materialSelections.some((selection) => selection.entry.id === item.entry.id),
+      ),
+    ]);
+    setCabochons((current) => [
+      ...productSelections,
+      ...current.filter(
+        (item) => !productSelections.some((selection) => selection.product.id === item.product.id),
+      ),
+    ]);
+  }
+  const [mode, setMode] = useState<EditorMode | null>(
+    quickEdit ? (initialRun ? 'edit' : 'add') : null,
+  );
+  const [sourceId, setSourceId] = useState<string | null>(initialRun?.id ?? null);
+  const [draft, setDraft] = useState<ProductSourceInput>(() =>
+    initialRun ? diySourceDraft(initialRun) : initialSource(quickEdit ? 'DIY' : 'PURCHASED'),
+  );
   const [saving, setSaving] = useState(false);
   const [adjustOpen, setAdjustOpen] = useState(false);
   const materialRequest = useRef(0);
@@ -757,13 +899,22 @@ export function ProductSourceSection({
       )
         .then((page) => {
           if (request !== cabochonRequest.current) return;
-          setCabochons(
-            page.items.map((item) => ({ product: item, label: `${item.name} · ${item.code}` })),
-          );
+          const options = page.items
+            .filter((item) => item.id !== product?.id)
+            .map((item) => ({
+              product: item,
+              label: `${item.name} · ${item.code}`,
+            }));
+          setCabochons((current) => [
+            ...options,
+            ...current.filter(
+              (option) => !options.some((item) => item.product.id === option.product.id),
+            ),
+          ]);
         })
         .catch(() => message.error(t('invalid')));
     },
-    [cabochonCategoryId, message, t],
+    [cabochonCategoryId, message, t, product?.id],
   );
 
   useEffect(() => {
@@ -808,46 +959,16 @@ export function ProductSourceSection({
           notes: purchase.notes,
         });
       } else if (run) {
-        setDraft({
-          origin: 'DIY',
-          quantity: run.quantity,
-          notes: run.notes,
-          materials: run.materialLines.map((line) => ({
-            materialBatchEntryId: line.materialBatchEntryId,
-            usageUnit: line.usageUnit,
-            quantity: line.quantity,
-            unitCost: line.unitCost,
-            quoteUnitPrice: line.quoteUnitPrice,
-          })),
-          cabochons: run.cabochonLines.map((line) => ({
-            productId: line.productId,
-            quantity: line.quantity,
-            unitCost: line.unitCost,
-            quoteUnitPrice: line.quoteUnitPrice,
-          })),
-          extraCosts: run.extraCosts,
-          silverCost: run.silverCost ?? { weightGrams: '0', ...DEFAULT_SILVER_PRICING },
-          craftDesignFee: run.craftDesignFee ?? emptyCraftDesignFee(),
-        });
+        setDraft(diySourceDraft(run));
         setMaterials((current) => [
-          ...run.materialLines.map((line) => ({
-            entry: line.materialBatchEntry,
-            material: {
-              ...line.materialBatchEntry.material,
-              unit: line.materialBatchEntry.material.unit,
-            } as Material,
-            label: `${line.materialBatchEntry.material.name} · ${line.materialBatchEntry.batch.name}`,
-          })),
+          ...diyMaterialOptions(run),
           ...current.filter(
             (option) =>
               !run.materialLines.some((line) => line.materialBatchEntryId === option.entry.id),
           ),
         ]);
         setCabochons((current) => [
-          ...run.cabochonLines.map((line) => ({
-            product: { ...line.product, cost: null } as Product,
-            label: `${line.product.name} · ${line.product.code}`,
-          })),
+          ...diyCabochonOptions(run),
           ...current.filter(
             (option) => !run.cabochonLines.some((line) => line.productId === option.product.id),
           ),
@@ -864,6 +985,12 @@ export function ProductSourceSection({
     }
     setSourceId(id ?? null);
     setMode(mode);
+  }
+
+  function closeEditor() {
+    if (saving) return;
+    setMode(null);
+    onEditorClose?.();
   }
 
   async function refreshProduct() {
@@ -887,6 +1014,7 @@ export function ProductSourceSection({
       await apiFetch(url, { method: mode === 'add' ? 'POST' : 'PUT', body: JSON.stringify(draft) });
       await refreshProduct();
       setMode(null);
+      onEditorClose?.();
       message.success(common('saved'));
     } catch (error) {
       message.error(
@@ -938,117 +1066,124 @@ export function ProductSourceSection({
     : [];
 
   return (
-    <section className="editor-block">
-      <div className="product-source-heading">
-        <h2>{t('title')}</h2>
-        {product && <Tag>{product.origin ? t(product.origin) : t('legacy')}</Tag>}
-      </div>
-      {!product ? (
-        <SourceFields
-          value={value}
-          onChange={onChange}
-          batches={batches}
-          distributors={distributors}
-          materials={materials}
-          materialOptions={materialOptions}
-          materialPreview={materialPreview}
-          cabochons={cabochons}
-          onMaterialSearch={searchMaterials}
-          onCabochonSearch={searchCabochons}
-          allowOriginChange
-        />
-      ) : (
+    <section className={quickEdit ? undefined : 'editor-block'}>
+      {!quickEdit && (
         <>
-          <div className="product-source-actions">
-            <span>{t('currentStock', { count: product.stock })}</span>
-            <Button icon={<PlusOutlined />} onClick={() => open('add')}>
-              {t('addRecord')}
-            </Button>
-            <Button
-              onClick={() => {
-                setAdjustOpen(true);
-              }}
-            >
-              {t('adjustStock')}
-            </Button>
-            <Button onClick={() => open('correct')}>{t('correctOrigin')}</Button>
+          <div className="product-source-heading">
+            <h2>{t('title')}</h2>
+            {product && <Tag>{product.origin ? t(product.origin) : t('legacy')}</Tag>}
           </div>
-          <PaginatedTable
-            rowKey="id"
-            size="small"
-            pagination={CLIENT_TABLE_PAGINATION}
-            scroll={{ x: 670 }}
-            dataSource={records}
-            locale={{ emptyText: t('empty') }}
-            columns={[
-              {
-                title: t('origin'),
-                dataIndex: 'type',
-                render: (type: 'PURCHASED' | 'DIY') => t(type),
-              },
-              { title: t('batch'), dataIndex: 'detail' },
-              { title: t('quantity'), dataIndex: 'quantity' },
-              {
-                title: t('unitCost'),
-                dataIndex: 'unitCost',
-                render: (amount: string) => <Sensitive>{`¥${amount}`}</Sensitive>,
-              },
-              {
-                title: t('customerQuote'),
-                dataIndex: 'quote',
-                render: (amount: string | null, row) =>
-                  row.type === 'DIY'
-                    ? amount === null
-                      ? t('quoteIncomplete')
-                      : `¥${amount}`
-                    : '—',
-              },
-              {
-                title: t('recordDate'),
-                dataIndex: 'createdAt',
-                render: (date: string) => date.slice(0, 10),
-              },
-              {
-                title: '',
-                key: 'actions',
-                render: (_, row) => (
-                  <div className="product-source-row-actions">
-                    <Tooltip title={t('editRecord')}>
-                      <Button
-                        icon={<EditOutlined />}
-                        size="small"
-                        aria-label={t('editRecord')}
-                        onClick={() => open('edit', row.id)}
-                      />
-                    </Tooltip>
-                    <Popconfirm title={t('deleteRecord')} onConfirm={() => void remove(row.id)}>
-                      <Tooltip title={t('deleteRecord')}>
-                        <Button
-                          icon={<DeleteOutlined />}
-                          size="small"
-                          danger
-                          aria-label={t('deleteRecord')}
-                        />
-                      </Tooltip>
-                    </Popconfirm>
-                  </div>
-                ),
-              },
-            ]}
-          />
-          <StockHistory records={product.stockAdjustments} />
+          {!product ? (
+            <SourceFields
+              value={value}
+              onChange={onChange}
+              batches={batches}
+              distributors={distributors}
+              materials={materials}
+              materialOptions={materialOptions}
+              materialPreview={materialPreview}
+              cabochons={cabochons}
+              onPickerOptions={rememberPickerOptions}
+              onMaterialSearch={searchMaterials}
+              onCabochonSearch={searchCabochons}
+              allowOriginChange
+            />
+          ) : (
+            <>
+              <div className="product-source-actions">
+                <span>{t('currentStock', { count: product.stock })}</span>
+                <Button icon={<PlusOutlined />} onClick={() => open('add')}>
+                  {t('addRecord')}
+                </Button>
+                <Button
+                  onClick={() => {
+                    setAdjustOpen(true);
+                  }}
+                >
+                  {t('adjustStock')}
+                </Button>
+                <Button onClick={() => open('correct')}>{t('correctOrigin')}</Button>
+              </div>
+              <PaginatedTable
+                rowKey="id"
+                size="small"
+                pagination={CLIENT_TABLE_PAGINATION}
+                scroll={{ x: 670 }}
+                dataSource={records}
+                locale={{ emptyText: t('empty') }}
+                columns={[
+                  {
+                    title: t('origin'),
+                    dataIndex: 'type',
+                    render: (type: 'PURCHASED' | 'DIY') => t(type),
+                  },
+                  { title: t('batch'), dataIndex: 'detail' },
+                  { title: t('quantity'), dataIndex: 'quantity' },
+                  {
+                    title: t('unitCost'),
+                    dataIndex: 'unitCost',
+                    render: (amount: string) => <Sensitive>{`¥${formatAmount(amount)}`}</Sensitive>,
+                  },
+                  {
+                    title: t('customerQuote'),
+                    dataIndex: 'quote',
+                    render: (amount: string | null, row) =>
+                      row.type === 'DIY'
+                        ? amount === null
+                          ? t('quoteIncomplete')
+                          : `¥${formatAmount(amount)}`
+                        : '—',
+                  },
+                  {
+                    title: t('recordDate'),
+                    dataIndex: 'createdAt',
+                    render: (date: string) => date.slice(0, 10),
+                  },
+                  {
+                    title: '',
+                    key: 'actions',
+                    render: (_, row) => (
+                      <div className="product-source-row-actions">
+                        <Tooltip title={t('editRecord')}>
+                          <Button
+                            icon={<EditOutlined />}
+                            size="small"
+                            aria-label={t('editRecord')}
+                            onClick={() => open('edit', row.id)}
+                          />
+                        </Tooltip>
+                        <Popconfirm title={t('deleteRecord')} onConfirm={() => void remove(row.id)}>
+                          <Tooltip title={t('deleteRecord')}>
+                            <Button
+                              icon={<DeleteOutlined />}
+                              size="small"
+                              danger
+                              aria-label={t('deleteRecord')}
+                            />
+                          </Tooltip>
+                        </Popconfirm>
+                      </div>
+                    ),
+                  },
+                ]}
+              />
+              <StockHistory records={product.stockAdjustments} />
+            </>
+          )}
         </>
       )}
       <Drawer
         title={
-          mode === 'correct'
-            ? t('correctOrigin')
-            : mode === 'edit'
-              ? t('editRecord')
-              : t('addRecord')
+          quickEdit
+            ? `${t('diyConfiguration')} · ${product?.name ?? ''}`
+            : mode === 'correct'
+              ? t('correctOrigin')
+              : mode === 'edit'
+                ? t('editRecord')
+                : t('addRecord')
         }
         open={mode !== null}
-        onClose={() => setMode(null)}
+        onClose={closeEditor}
         width="min(1280px, 100vw)"
         extra={
           <Button type="primary" loading={saving} onClick={() => void saveSource()}>
@@ -1056,6 +1191,24 @@ export function ProductSourceSection({
           </Button>
         }
       >
+        {quickEdit && product && product.diyRuns.length > 1 && (
+          <label className={diyStyles.recordPicker}>
+            <span>{t('diyRecord')}</span>
+            <Select
+              value={sourceId}
+              disabled={saving}
+              onChange={(id: string) => open('edit', id)}
+              options={product.diyRuns.map((run, index) => ({
+                value: run.id,
+                label: t('diyRecordOption', {
+                  date: run.createdAt.slice(0, 10),
+                  quantity: run.quantity,
+                  number: product.diyRuns.length - index,
+                }),
+              }))}
+            />
+          </label>
+        )}
         {mode === 'correct' && (
           <Alert
             type="warning"
@@ -1074,6 +1227,8 @@ export function ProductSourceSection({
           materialOptions={materialOptions}
           materialPreview={materialPreview}
           cabochons={cabochons}
+          excludeProductId={product?.id}
+          onPickerOptions={rememberPickerOptions}
           onMaterialSearch={searchMaterials}
           onCabochonSearch={searchCabochons}
           allowOriginChange={mode === 'correct'}

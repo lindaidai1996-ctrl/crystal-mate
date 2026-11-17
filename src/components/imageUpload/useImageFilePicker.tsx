@@ -38,6 +38,7 @@ export function useImageFilePicker({
       <input
         ref={library}
         hidden
+        style={{ display: 'none' }}
         type="file"
         aria-label={t('chooseFromLibrary')}
         accept="image/jpeg,image/png,image/webp"
@@ -48,6 +49,7 @@ export function useImageFilePicker({
       <input
         ref={camera}
         hidden
+        style={{ display: 'none' }}
         type="file"
         aria-label={t('takePhoto')}
         accept="image/*"

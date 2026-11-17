@@ -1,0 +1,9 @@
+{
+  "source": "docs/plans/ai-assistant/verification/2026-11-17T06-09-43-306Z-p6-browser-real.json",
+  "passed": false,
+  "failure": "Browser harness used incorrect button text; action timeout followed by unhandled response-wait rejection",
+  "modelCallsKnown": true,
+  "cleanedAssistantSessions": 1,
+  "matchedExactPersistedExecution": true,
+  "businessWrites": false
+}

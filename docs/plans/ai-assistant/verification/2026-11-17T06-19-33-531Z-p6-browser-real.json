@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-11-17T06:19:33.531Z",
+  "environment": "isolated-development",
+  "realModel": true,
+  "authentication": "short-lived signed test JWT through actual callback; password login not tested",
+  "steps": [],
+  "checks": [
+    "desktop natural main entered in real UI; real model/default budget/explicit continue; exact live P2 rows and amount; no horizontal overflow"
+  ],
+  "errors": [],
+  "businessWrites": false,
+  "verificationSessionId": "9495074d-794b-4d62-af69-0890c1a75e24",
+  "mainSource": "docs/plans/ai-assistant/verification/2026-11-17T06-13-22-549Z-p6-browser-real.json",
+  "seededMain": true,
+  "stage": "mobile-followup",
+  "passed": false,
+  "failure": {
+    "name": "Error",
+    "code": "BROWSER_FLOW_FAILED",
+    "detail": "locator.evaluate: Error: strict mode violation: locator('form') resolved to 2 elements:\n    1) <form>…</form> aka getByText('反馈类型理解错了补充说明（理解错了时必填）保存反馈')\n    2) <form class=\"assistantPage-module__9bffjG__composer\">…</form> aka getByText('只看圆珠结果完成后统一返回，执行期间显示阶段进度。发送')\n\nCall log:\n\u001b[2m  - waiting for locator('form')\u001b[22m\n"
+  },
+  "cleanedAssistantSessions": 1
+}

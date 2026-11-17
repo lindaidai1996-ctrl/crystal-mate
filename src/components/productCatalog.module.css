@@ -334,6 +334,7 @@
 }
 
 .money {
+  white-space: nowrap;
   color: var(--ant-color-primary);
   font-size: 22px;
   font-weight: 600;
@@ -371,6 +372,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  flex-wrap: wrap;
+  white-space: normal;
 }
 
 .cardBody > .cardActions {
@@ -506,7 +509,6 @@
   .gallery {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
-    align-items: start;
   }
   .card {
     padding: 6px 6px 0;

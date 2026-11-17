@@ -1,0 +1,20 @@
+{
+  "checkedAt": "2026-11-17T08:39:15.108Z",
+  "environment": "isolated-development",
+  "realModel": false,
+  "migrationApplied": false,
+  "checks": [
+    "empty-conversations-have-owner-scoped-numbers-without-hashes",
+    "first-question-preserves-a-manual-title",
+    "first-question-title-persists-and-followups-do-not-overwrite-it",
+    "legacy-conversations-use-first-question-without-exposing-message-content",
+    "rename-persists-without-interrupting-active-execution",
+    "cross-account-rename-and-delete-rejected",
+    "conversation-title-uses-existing-text-minimization",
+    "delete-cascades-to-messages-executions-and-feedback",
+    "deleted-conversation-rejects-late-writes-and-reads",
+    "numbered-default-names-continue-across-list-pages",
+    "generated-title-is-short-unicode-safe-and-minimizes-sensitive-patterns"
+  ],
+  "passed": true
+}

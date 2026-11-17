@@ -1,27 +1,39 @@
 'use client';
 
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import {
+  CalendarOutlined,
+  ClockCircleOutlined,
+  LeftOutlined,
+  RightOutlined,
+} from '@ant-design/icons';
+import { Button, Select } from 'antd';
 import dayjs from 'dayjs';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import type { DateRange } from '@/lib/date-range';
-import mobileStyles from './responsive.module.css';
+import dateStyles from './mobileDateRange.module.css';
 
 export function validMobileDateRange(value: DateRange) {
   return !value || Boolean(value[0] && value[1] && value[0] <= value[1]);
 }
 
 export function MobileDateRange({
+  kind = 'created',
+  label,
+  hideLabel = false,
   value,
   onChange,
 }: {
+  kind?: 'created' | 'received';
+  label?: string;
+  hideLabel?: boolean;
   value: DateRange;
   onChange: (value: DateRange) => void;
 }) {
   const t = useTranslations('mobile');
   const dateText = useTranslations('dateRangeFilter');
   const locale = useLocale() === 'en' ? 'en-US' : 'zh-CN';
+  const withTime = kind === 'created';
   // Creation filters use Beijing wall time even if the browser is in another timezone.
   const [today] = useState(() =>
     dayjs(new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().slice(0, 10)),
@@ -45,13 +57,18 @@ export function MobileDateRange({
     index < firstDayOffset ? null : month.date(index - firstDayOffset + 1),
   );
   const weekdayFormatter = new Intl.DateTimeFormat(locale, { weekday: 'narrow', timeZone: 'UTC' });
+  const endpointLabel = (index: 0 | 1) =>
+    withTime
+      ? t(index === 0 ? 'start' : 'end')
+      : dateText(`${kind}${index === 0 ? 'Start' : 'End'}`);
+  const dateValue = (date: string, index: 0 | 1) => (withTime ? `${date}T${timeAt(index)}` : date);
 
   function selectDate(date: string) {
     if (active === 0 || !start || date < start) {
-      onChange([`${date}T${timeAt(0)}`, end && date <= end ? value![1] : '']);
+      onChange([dateValue(date, 0), end && date <= end ? value![1] : '']);
       setActive(1);
     } else {
-      onChange([value![0], `${date}T${timeAt(1)}`]);
+      onChange([value![0], dateValue(date, 1)]);
     }
   }
 
@@ -65,13 +82,15 @@ export function MobileDateRange({
   }
 
   return (
-    <fieldset className={mobileStyles.choiceGroup}>
-      <legend>{dateText('created')}</legend>
-      <div className={mobileStyles.datePresets}>
+    <fieldset className={dateStyles.root}>
+      <legend className={hideLabel ? dateStyles.legendHidden : undefined}>
+        {label ?? dateText(kind)}
+      </legend>
+      <div className={dateStyles.datePresets}>
         {presets.map((preset) => {
           const range: [string, string] = [
-            `${preset.start.format('YYYY-MM-DD')}T00:00`,
-            `${today.format('YYYY-MM-DD')}T23:59`,
+            `${preset.start.format('YYYY-MM-DD')}${withTime ? 'T00:00' : ''}`,
+            `${today.format('YYYY-MM-DD')}${withTime ? 'T23:59' : ''}`,
           ];
           const selected = value?.[0] === range[0] && value?.[1] === range[1];
           return (
@@ -92,118 +111,135 @@ export function MobileDateRange({
           );
         })}
       </div>
-      <div className={mobileStyles.dateEndpoints}>
+      <div className={dateStyles.dateEndpoints}>
         {([0, 1] as const).map((index) => (
           <Button
             key={index}
             autoInsertSpace={false}
-            className={active === index ? mobileStyles.dateEndpointActive : undefined}
+            className={active === index ? dateStyles.dateEndpointActive : undefined}
             aria-pressed={active === index}
             onClick={() => {
               setActive(index);
               setMonth(dayjs(value?.[index] || today.format('YYYY-MM-DD')).startOf('month'));
             }}
           >
-            <span>{t(index === 0 ? 'start' : 'end')}</span>
-            <strong>{value?.[index] ? value[index].slice(0, 10) : t('selectDate')}</strong>
+            <span>
+              <CalendarOutlined /> {endpointLabel(index)}
+            </span>
+            <strong>
+              {value?.[index] ? dayjs(value[index]).format('YYYY / MM / DD') : t('selectDate')}
+            </strong>
+            {withTime && <small>{timeAt(index)}</small>}
           </Button>
         ))}
       </div>
-      <p className={mobileStyles.dateHint} aria-live="polite">
+      <p className={dateStyles.dateHint} aria-live="polite">
         {t(active === 0 ? 'pickStart' : 'pickEnd')}
       </p>
-      <div className={mobileStyles.calendarHeader}>
-        <Button
-          icon={<LeftOutlined />}
-          aria-label={t('previousMonth')}
-          onClick={() => setMonth(month.subtract(1, 'month'))}
-        />
-        <select
-          className={mobileStyles.calendarSelect}
-          aria-label={t('year')}
-          value={month.year()}
-          onChange={(event) => setMonth(month.year(Number(event.target.value)))}
-        >
-          {Array.from({ length: Math.max(today.year(), month.year()) + 11 - 1900 }, (_, index) => (
-            <option key={index} value={1900 + index}>
-              {1900 + index}
-            </option>
+      <div className={dateStyles.calendarCard}>
+        <div className={dateStyles.calendarHeader}>
+          <Button
+            icon={<LeftOutlined />}
+            aria-label={t('previousMonth')}
+            onClick={() => setMonth(month.subtract(1, 'month'))}
+          />
+          <Select
+            className={dateStyles.calendarSelect}
+            aria-label={t('year')}
+            value={month.year()}
+            variant="borderless"
+            showSearch
+            optionFilterProp="label"
+            onChange={(year) => setMonth(month.year(year))}
+            options={Array.from(
+              { length: Math.max(today.year(), month.year()) + 11 - 1900 },
+              (_, index) => ({ value: 1900 + index, label: String(1900 + index) }),
+            )}
+            classNames={{ popup: { root: dateStyles.selectPopup } }}
+          />
+          <Select
+            className={dateStyles.calendarSelect}
+            aria-label={t('month')}
+            value={month.month()}
+            variant="borderless"
+            onChange={(nextMonth) => setMonth(month.month(nextMonth))}
+            options={Array.from({ length: 12 }, (_, index) => ({
+              value: index,
+              label: new Intl.DateTimeFormat(locale, { month: 'short' }).format(
+                new Date(2026, index, 1),
+              ),
+            }))}
+            classNames={{ popup: { root: dateStyles.selectPopup } }}
+          />
+          <Button
+            icon={<RightOutlined />}
+            aria-label={t('nextMonth')}
+            onClick={() => setMonth(month.add(1, 'month'))}
+          />
+        </div>
+        <div className={dateStyles.calendar} role="group" aria-label={month.format('YYYY-MM')}>
+          {Array.from({ length: 7 }, (_, index) => (
+            <span key={`weekday-${index}`} className={dateStyles.weekday} aria-hidden>
+              {weekdayFormatter.format(new Date(Date.UTC(2026, 0, 5 + index)))}
+            </span>
           ))}
-        </select>
-        <select
-          className={mobileStyles.calendarSelect}
-          aria-label={t('month')}
-          value={month.month()}
-          onChange={(event) => setMonth(month.month(Number(event.target.value)))}
-        >
-          {Array.from({ length: 12 }, (_, index) => (
-            <option key={index} value={index}>
-              {new Intl.DateTimeFormat(locale, { month: 'short' }).format(new Date(2026, index, 1))}
-            </option>
-          ))}
-        </select>
-        <Button
-          icon={<RightOutlined />}
-          aria-label={t('nextMonth')}
-          onClick={() => setMonth(month.add(1, 'month'))}
-        />
-      </div>
-      <div className={mobileStyles.calendar} role="group" aria-label={month.format('YYYY-MM')}>
-        {Array.from({ length: 7 }, (_, index) => (
-          <span key={`weekday-${index}`} className={mobileStyles.weekday} aria-hidden>
-            {weekdayFormatter.format(new Date(Date.UTC(2026, 0, 5 + index)))}
-          </span>
-        ))}
-        {days.map((day, index) => {
-          if (!day) return <span key={`blank-${index}`} />;
-          const date = day.format('YYYY-MM-DD');
-          const endpoint = date === start || date === end;
-          const inRange = Boolean(start && end && date >= start && date <= end);
-          return (
-            <button
-              key={date}
-              type="button"
-              className={[
-                mobileStyles.calendarDay,
-                endpoint && mobileStyles.calendarEndpoint,
-                inRange && mobileStyles.calendarInRange,
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              aria-label={date}
-              aria-pressed={endpoint}
-              aria-current={date === today.format('YYYY-MM-DD') ? 'date' : undefined}
-              onClick={() => selectDate(date)}
-            >
-              {day.date()}
-            </button>
-          );
-        })}
-      </div>
-      <details className={mobileStyles.preciseTime}>
-        <summary>{t('preciseTime')}</summary>
-        {([0, 1] as const).map((index) => (
-          <div key={index} className={mobileStyles.timeRow}>
-            <span>{t(index === 0 ? 'start' : 'end')}</span>
-            {([0, 1] as const).map((part) => (
-              <select
-                key={part}
-                className={mobileStyles.calendarSelect}
-                aria-label={`${t(index === 0 ? 'start' : 'end')} ${t(part === 0 ? 'hour' : 'minute')}`}
-                disabled={!value?.[index]}
-                value={timeAt(index).split(':')[part]}
-                onChange={(event) => changeTime(index, part, event.target.value)}
+          {days.map((day, index) => {
+            if (!day) return <span key={`blank-${index}`} />;
+            const date = day.format('YYYY-MM-DD');
+            const endpoint = date === start || date === end;
+            const inRange = Boolean(start && end && date >= start && date <= end);
+            return (
+              <button
+                key={date}
+                type="button"
+                className={[
+                  dateStyles.calendarDay,
+                  inRange && dateStyles.calendarInRange,
+                  date === start && dateStyles.rangeStart,
+                  date === end && dateStyles.rangeEnd,
+                  endpoint && dateStyles.calendarEndpoint,
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                aria-label={date}
+                aria-pressed={endpoint}
+                aria-current={date === today.format('YYYY-MM-DD') ? 'date' : undefined}
+                onClick={() => selectDate(date)}
               >
-                {Array.from({ length: part === 0 ? 24 : 60 }, (_, number) => (
-                  <option key={number} value={String(number).padStart(2, '0')}>
-                    {String(number).padStart(2, '0')}
-                  </option>
-                ))}
-              </select>
-            ))}
-          </div>
-        ))}
-      </details>
+                <span>{day.date()}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      {withTime && (
+        <details className={dateStyles.preciseTime}>
+          <summary>
+            <ClockCircleOutlined />
+            {t('preciseTime')}
+          </summary>
+          {([0, 1] as const).map((index) => (
+            <div key={index} className={dateStyles.timeRow}>
+              <span>{t(index === 0 ? 'start' : 'end')}</span>
+              {([0, 1] as const).map((part) => (
+                <Select
+                  key={part}
+                  className={dateStyles.timeSelect}
+                  aria-label={`${t(index === 0 ? 'start' : 'end')} ${t(part === 0 ? 'hour' : 'minute')}`}
+                  disabled={!value?.[index]}
+                  value={timeAt(index).split(':')[part]}
+                  onChange={(next) => changeTime(index, part, next)}
+                  options={Array.from({ length: part === 0 ? 24 : 60 }, (_, number) => ({
+                    value: String(number).padStart(2, '0'),
+                    label: `${String(number).padStart(2, '0')} ${t(part === 0 ? 'hour' : 'minute')}`,
+                  }))}
+                  classNames={{ popup: { root: dateStyles.selectPopup } }}
+                />
+              ))}
+            </div>
+          ))}
+        </details>
+      )}
       {value && (
         <Button
           type="link"
@@ -216,7 +252,11 @@ export function MobileDateRange({
           {t('clearDates')}
         </Button>
       )}
-      {value?.[0] && value[1] && value[0] > value[1] && <p role="alert">{t('invalidRange')}</p>}
+      {value?.[0] && value[1] && value[0] > value[1] && (
+        <p className={dateStyles.error} role="alert">
+          {t('invalidRange')}
+        </p>
+      )}
     </fieldset>
   );
 }

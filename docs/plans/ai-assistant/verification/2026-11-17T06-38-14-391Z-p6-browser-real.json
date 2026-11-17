@@ -1,0 +1,312 @@
+{
+  "checkedAt": "2026-11-17T06:38:14.391Z",
+  "environment": "isolated-development",
+  "realModel": true,
+  "authentication": "short-lived signed test JWT through actual callback; password login not tested",
+  "steps": [
+    {
+      "label": "desktop-current-stock",
+      "durationMs": 6510,
+      "status": "completed",
+      "progress": {
+        "countBasis": "catalog",
+        "totalCandidates": 1,
+        "readCandidates": 1,
+        "evaluatedCandidates": 1,
+        "included": 1,
+        "excluded": 0,
+        "uncertain": 0,
+        "notEvaluated": 0,
+        "unreadCandidates": 0,
+        "traversal": "complete",
+        "evaluation": "not_required",
+        "decisions": [],
+        "calls": 3,
+        "reservedTokens": 21297,
+        "relevanceCalls": 0,
+        "relevanceReservedTokens": 0
+      },
+      "execution": {
+        "calls": 3,
+        "phase": "finish",
+        "state": {
+          "view": "stock",
+          "query": {
+            "hard": {
+              "items": [
+                {
+                  "id": "cmv60up0h000f3waphoww18ur",
+                  "type": "MATERIAL"
+                }
+              ]
+            },
+            "subject": "catalog",
+            "version": "v1",
+            "semantic": [],
+            "itemTypes": ["MATERIAL"],
+            "pagination": {
+              "limit": 100
+            },
+            "ruleVersion": "v1"
+          }
+        },
+        "trace": [
+          {
+            "code": null,
+            "model": "deepseek-flash",
+            "stage": "parse",
+            "usage": {
+              "promptTokens": 2754,
+              "completionTokens": 148
+            },
+            "outcome": "success",
+            "durationMs": 1288,
+            "completeness": null
+          },
+          {
+            "code": null,
+            "model": "deepseek-flash",
+            "stage": "facts",
+            "usage": {
+              "promptTokens": 921,
+              "completionTokens": 17
+            },
+            "outcome": "success",
+            "durationMs": 2305,
+            "completeness": null
+          },
+          {
+            "code": null,
+            "model": null,
+            "stage": "candidate",
+            "usage": null,
+            "outcome": "success",
+            "durationMs": 440,
+            "completeness": {
+              "traversal": "complete",
+              "readCandidates": 1,
+              "totalCandidates": 1,
+              "semanticEvaluation": "not_performed"
+            }
+          },
+          {
+            "code": null,
+            "model": null,
+            "stage": "facts",
+            "usage": null,
+            "outcome": "success",
+            "durationMs": 790,
+            "completeness": null
+          },
+          {
+            "code": null,
+            "model": "deepseek-flash",
+            "stage": "finish",
+            "usage": {
+              "promptTokens": 963,
+              "completionTokens": 16
+            },
+            "outcome": "success",
+            "durationMs": 662,
+            "completeness": null
+          }
+        ],
+        "result": {
+          "facts": {
+            "catalog": [
+              {
+                "code": null,
+                "item": {
+                  "id": "cmv60up0h000f3waphoww18ur",
+                  "type": "MATERIAL"
+                },
+                "name": "6m新黄口链条108",
+                "widthMm": null,
+                "heightMm": null,
+                "imageKey": "images/6e026654-8399-4376-bbaf-2511f26f8f81.jpg",
+                "lengthMm": null,
+                "purchase": null
+              }
+            ],
+            "request": {
+              "mode": "catalog_current",
+              "query": {
+                "hard": {
+                  "items": [
+                    {
+                      "id": "cmv60up0h000f3waphoww18ur",
+                      "type": "MATERIAL"
+                    }
+                  ]
+                },
+                "subject": "catalog",
+                "version": "v1",
+                "semantic": [],
+                "itemTypes": ["MATERIAL"],
+                "pagination": {
+                  "limit": 100
+                },
+                "ruleVersion": "v1"
+              },
+              "selectedItems": [
+                {
+                  "id": "cmv60up0h000f3waphoww18ur",
+                  "type": "MATERIAL"
+                }
+              ]
+            },
+            "version": "v1",
+            "queriedAt": "2026-11-17T06:38:22.652Z",
+            "traversal": "complete",
+            "quantities": [
+              {
+                "unit": "STRAND",
+                "knownStock": "1.00",
+                "unknownStockBatchCount": 0,
+                "unknownStockObjectCount": 0
+              }
+            ],
+            "sourceStock": [],
+            "catalogStock": [
+              {
+                "item": {
+                  "id": "cmv60up0h000f3waphoww18ur",
+                  "type": "MATERIAL"
+                },
+                "name": "6m新黄口链条108",
+                "unit": "STRAND",
+                "knownStock": "1.00",
+                "stockBatchCount": 1,
+                "unknownStockBatchCount": 0
+              }
+            ],
+            "catalogItemCount": 1,
+            "semanticEvaluation": "not_performed",
+            "scopeCandidateCount": 1,
+            "selectedCandidateCount": 1
+          },
+          "relevance": null
+        },
+        "status": "completed",
+        "version": "orchestration-v3",
+        "metadata": {
+          "transport": "native-fetch",
+          "ruleVersion": "v1",
+          "promptVersion": "orchestration-v3",
+          "requestedModel": "deepseek-flash",
+          "contractVersion": "v1",
+          "relevancePromptVersion": "relevance-v3",
+          "requestedRelevanceModel": "deepseek-flash"
+        },
+        "errorCode": null,
+        "checkpoint": null,
+        "pendingPlan": null,
+        "clarification": null,
+        "reservedTokens": 21297,
+        "clarificationContext": null
+      }
+    },
+    {
+      "label": "phone-selected-purchase-remaining",
+      "durationMs": 3584,
+      "status": "needs_confirmation",
+      "progress": {
+        "countBasis": "catalog",
+        "totalCandidates": null,
+        "readCandidates": null,
+        "evaluatedCandidates": null,
+        "included": null,
+        "excluded": null,
+        "uncertain": null,
+        "notEvaluated": null,
+        "unreadCandidates": null,
+        "traversal": "not_started",
+        "evaluation": "not_required",
+        "decisions": [],
+        "calls": 2,
+        "reservedTokens": 15596,
+        "relevanceCalls": 0,
+        "relevanceReservedTokens": 0
+      },
+      "execution": {
+        "calls": 2,
+        "phase": "query_facts",
+        "state": {
+          "view": "purchase_remaining",
+          "query": {
+            "hard": {
+              "items": [
+                {
+                  "id": "cmv60up0h000f3waphoww18ur",
+                  "type": "MATERIAL"
+                }
+              ]
+            },
+            "subject": "catalog",
+            "version": "v1",
+            "semantic": [],
+            "itemTypes": ["MATERIAL"],
+            "pagination": {
+              "limit": 100
+            },
+            "ruleVersion": "v1"
+          }
+        },
+        "trace": [
+          {
+            "code": null,
+            "model": "deepseek-flash",
+            "stage": "parse",
+            "usage": {
+              "promptTokens": 2779,
+              "completionTokens": 151
+            },
+            "outcome": "success",
+            "durationMs": 1147,
+            "completeness": null
+          },
+          {
+            "code": null,
+            "model": "deepseek-flash",
+            "stage": "facts",
+            "usage": {
+              "promptTokens": 952,
+              "completionTokens": 17
+            },
+            "outcome": "success",
+            "durationMs": 1151,
+            "completeness": null
+          }
+        ],
+        "result": null,
+        "status": "needs_confirmation",
+        "version": "orchestration-v3",
+        "metadata": {
+          "transport": "native-fetch",
+          "ruleVersion": "v1",
+          "promptVersion": "orchestration-v3",
+          "requestedModel": "deepseek-flash",
+          "contractVersion": "v1",
+          "relevancePromptVersion": "relevance-v3",
+          "requestedRelevanceModel": "deepseek-flash"
+        },
+        "errorCode": null,
+        "checkpoint": null,
+        "pendingPlan": null,
+        "clarification": "采购来源余量仅支持物料采购行；商品没有该字段，不能以当前总库存代替。",
+        "reservedTokens": 15596,
+        "clarificationContext": null
+      }
+    }
+  ],
+  "checks": [],
+  "errors": [],
+  "businessWrites": false,
+  "verificationSessionId": "ba22d095-99b0-427f-8a3e-0f8afa7600f8",
+  "passed": false,
+  "failure": {
+    "actual": "needs_confirmation",
+    "expected": "completed"
+  },
+  "cleanedAssistantSessions": 1
+}

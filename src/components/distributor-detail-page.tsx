@@ -1,5 +1,7 @@
 'use client';
 
+import { formatAmount } from '@/lib/format-money';
+
 import { RecordAuditPanel } from '@/components/audit-history';
 
 import {
@@ -217,13 +219,15 @@ export function DistributorDetailPage({ id }: { id: string }) {
       {
         title: t('unitPrice'),
         dataIndex: 'unitPrice',
-        render: (value: string | null) => <Sensitive>{value ?? '—'}</Sensitive>,
+        render: (value: string | null) => <Sensitive>{formatAmount(value)}</Sensitive>,
       },
       ...distributorPurchasePriceColumns<DistributorPurchaseEntry>(t),
       {
         title: t('amount'),
         dataIndex: 'amount',
-        render: (value: string | null) => <Sensitive>{value ?? t('unknownValue')}</Sensitive>,
+        render: (value: string | null) => (
+          <Sensitive>{formatAmount(value, t('unknownValue'))}</Sensitive>
+        ),
       },
       ...(row.type === 'MATERIAL'
         ? ([
@@ -235,7 +239,7 @@ export function DistributorDetailPage({ id }: { id: string }) {
             {
               title: t('gramPrice'),
               dataIndex: 'gramPrice',
-              render: (value: string | null) => value ?? t('unknownValue'),
+              render: (value: string | null) => formatAmount(value, t('unknownValue')),
             },
             {
               title: t('priceSource'),
@@ -362,7 +366,7 @@ export function DistributorDetailPage({ id }: { id: string }) {
       render: (_, row) => (
         <Sensitive>
           {row.totalAmount
-            ? `${row.totalAmount}${row.hasUnknownAmount ? ` · ${t('knownSubtotal')}` : ''}`
+            ? `${formatAmount(row.totalAmount)}${row.hasUnknownAmount ? ` · ${t('knownSubtotal')}` : ''}`
             : t('unknownValue')}
         </Sensitive>
       ),

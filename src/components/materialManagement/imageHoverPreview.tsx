@@ -1,7 +1,9 @@
 'use client';
 
+import { ImagePreviewGroup } from '@/components/imagePreviewGroup';
+
 import { LeftOutlined, PictureOutlined, RightOutlined } from '@ant-design/icons';
-import { Button, Image, Popover } from 'antd';
+import { Button, Popover } from 'antd';
 import { LoadingImage } from '@/components/loadingImage';
 import { FramedImage } from '@/components/framedImage';
 import type { FramedImage as ImageFramingFields } from '@/lib/image-framing';
@@ -62,7 +64,7 @@ export function ImageHoverPreview({
   );
 
   return (
-    <Image.PreviewGroup
+    <ImagePreviewGroup
       items={images.map((item) => ({ src: item.url, alt: item.fileName || name }))}
       preview={{
         visible: previewOpen,
@@ -119,6 +121,6 @@ export function ImageHoverPreview({
       ) : (
         thumbnailButton
       )}
-    </Image.PreviewGroup>
+    </ImagePreviewGroup>
   );
 }

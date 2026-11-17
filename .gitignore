@@ -1,5 +1,6 @@
 node_modules
 .cache/
+.data/
 .DS_Store
 .next
 .next-drafts
@@ -18,3 +19,4 @@ public/uploads
 *.tsbuildinfo
 
 .next-audit-check
+.next-product-cards-check

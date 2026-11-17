@@ -1,5 +1,7 @@
 'use client';
 
+import { formatAmount } from '@/lib/format-money';
+
 import { SearchFilterRow } from '@/components/responsive/searchFilterRow';
 import { ResetFiltersButton } from '@/components/responsive/resetFiltersButton';
 
@@ -87,7 +89,7 @@ function BatchPrices({ item, card = false }: { item: Material; card?: boolean })
     item.unit === 'GRAM' ? 'yuanPerGram' : item.unit === 'STRAND' ? 'yuanPerStrand' : 'yuanPerBead',
   );
   const price = (value: string | null, suffix: string) =>
-    value === null ? '—' : `${value} ${suffix}`;
+    value === null ? '—' : `${formatAmount(value)} ${suffix}`;
   const priceRows = (
     value: Pick<
       Material,
@@ -197,7 +199,7 @@ function BatchPrices({ item, card = false }: { item: Material; card?: boolean })
               <div className={materialStyles.priceCell} data-sale={field.sale} key={field.label}>
                 <dt>{field.label}</dt>
                 <dd>
-                  <strong>{field.value ?? '—'}</strong>
+                  <strong>{formatAmount(field.value)}</strong>
                   {field.value !== null && <span>{field.suffix}</span>}
                 </dd>
                 {'source' in field && field.source && <small>{field.source}</small>}
@@ -590,9 +592,11 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
           }
         >
           <EditorDraftBox kind="MATERIAL" returnTo="/admin/materials" />
-          <Link href="/admin/materials/image-import">
-            <Button icon={<ScanOutlined />}>{t('imageImport')}</Button>
-          </Link>
+          {process.env.NODE_ENV !== 'production' && (
+            <Link href="/admin/materials/image-import">
+              <Button icon={<ScanOutlined />}>{t('imageImport')}</Button>
+            </Link>
+          )}
           <Link href="/admin/materials/categories">
             <Button icon={<FolderOutlined />}>{t('manageCategories')}</Button>
           </Link>

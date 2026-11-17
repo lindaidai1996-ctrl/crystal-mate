@@ -1,10 +1,14 @@
 'use client';
 
+import { ImagePreviewGroup } from '@/components/imagePreviewGroup';
+
+import { formatAmount } from '@/lib/format-money';
+
 import { imageThumbnailUrl } from '@/lib/image-storage';
 
 import { useEffect, useState } from 'react';
 import { PictureOutlined } from '@ant-design/icons';
-import { Button, Empty, Form, Image, Select, Spin } from 'antd';
+import { Button, Empty, Form, Select, Spin } from 'antd';
 import { LoadingImage } from '@/components/loadingImage';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/client-api';
@@ -174,12 +178,12 @@ export function ExistingMaterialSelect({
                     {batchT('purchaseUnitPrice')}:{' '}
                     {prices.purchaseUnitPrice == null
                       ? '—'
-                      : `¥${prices.purchaseUnitPrice}/${editor(material.unit)}`}
+                      : `¥${formatAmount(prices.purchaseUnitPrice)}/${editor(material.unit)}`}
                     {' · '}
                     {batchT('gramPrice')}:{' '}
                     {prices.purchaseGramPrice == null
                       ? '—'
-                      : `¥${prices.purchaseGramPrice}/${editor('GRAM')}`}
+                      : `¥${formatAmount(prices.purchaseGramPrice)}/${editor('GRAM')}`}
                   </span>
                 </Sensitive>
               </div>
@@ -191,7 +195,7 @@ export function ExistingMaterialSelect({
           onChange(materials.find((material) => material.id === id) ?? null);
         }}
       />
-      <Image.PreviewGroup
+      <ImagePreviewGroup
         items={preview?.images.map((image) => ({ src: image.url, alt: preview.name })) ?? []}
         preview={{
           visible: preview !== null,

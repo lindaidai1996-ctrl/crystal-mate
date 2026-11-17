@@ -1,5 +1,7 @@
 'use client';
 
+import { ImagePreviewGroup } from '@/components/imagePreviewGroup';
+
 import {
   BorderOuterOutlined,
   DeleteOutlined,
@@ -8,7 +10,7 @@ import {
   PlusOutlined,
   ZoomInOutlined,
 } from '@ant-design/icons';
-import { App, Button, Image, Spin, Upload, type UploadFile, Tooltip, theme } from 'antd';
+import { App, Button, Spin, Upload, type UploadFile, Tooltip, theme } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import type { PointerEvent } from 'react';
@@ -390,7 +392,7 @@ export function ImagePicker({
           </div>,
           document.body,
         )}
-      <Image.PreviewGroup
+      <ImagePreviewGroup
         items={images.map((image) => image.url)}
         preview={{
           visible: previewIndex !== null,

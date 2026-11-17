@@ -15,11 +15,23 @@ export function ImageFramingDialog({
   framing,
   onCancel,
   onConfirm,
+  aspect = 1,
+  title,
+  helpText,
+  saveHelpText,
+  fillLabel,
+  confirmText,
 }: {
   url: string;
   framing?: ImageFraming | null;
   onCancel: () => void;
   onConfirm: (framing: ImageFraming) => void;
+  aspect?: number;
+  title?: string;
+  helpText?: string;
+  saveHelpText?: string;
+  fillLabel?: string;
+  confirmText?: string;
 }) {
   const t = useTranslations('imageUpload');
   const common = useTranslations('common');
@@ -39,7 +51,7 @@ export function ImageFramingDialog({
 
   return (
     <ResponsiveModal
-      title={t('adjustCover')}
+      title={title ?? t('adjustCover')}
       open
       width={520}
       style={{ top: 24 }}
@@ -50,17 +62,17 @@ export function ImageFramingDialog({
         else if (area) onConfirm({ mode, crop: area });
       }}
       okButtonProps={{ disabled: failed || !loaded || (mode === 'cover' && !area) }}
-      okText={t('applyCover')}
+      okText={confirmText ?? t('applyCover')}
       cancelText={common('cancel')}
     >
-      <p className="helper-text">{t('coverHelp')}</p>
+      <p className="helper-text">{helpText ?? t('coverHelp')}</p>
       <Segmented
         block
         className={framingStyles.modes}
         value={mode}
         aria-label={t('coverMode')}
         options={[
-          { value: 'cover', label: t('coverFill') },
+          { value: 'cover', label: fillLabel ?? t('coverFill') },
           { value: 'contain', label: t('coverWhole') },
         ]}
         onChange={(value) => setMode(value as 'cover' | 'contain')}
@@ -74,7 +86,7 @@ export function ImageFramingDialog({
             <Cropper
               key={resetKey}
               image={url}
-              aspect={1}
+              aspect={aspect}
               crop={crop}
               zoom={zoom}
               maxZoom={3}
@@ -117,7 +129,7 @@ export function ImageFramingDialog({
           </Button>
         </div>
       )}
-      <p className="helper-text">{t('coverSaveHelp')}</p>
+      <p className="helper-text">{saveHelpText ?? t('coverSaveHelp')}</p>
     </ResponsiveModal>
   );
 }

@@ -1,0 +1,178 @@
+{
+  "checkedAt": "2026-11-17T02:36:34.337Z",
+  "kind": "real-model-synthetic-followup-conditions-only",
+  "results": [
+    {
+      "text": "只看圆珠",
+      "plan": {
+        "hard": {},
+        "semantic": {
+          "form": [
+            {
+              "concept": "form",
+              "text": "圆珠",
+              "relation": "is"
+            }
+          ]
+        },
+        "view": "details",
+        "clarification": null
+      },
+      "state": {
+        "query": {
+          "version": "v1",
+          "subject": "purchases",
+          "itemTypes": ["MATERIAL"],
+          "hard": {
+            "purchaseDate": {
+              "from": "2026-11-01",
+              "to": "2026-12-01"
+            },
+            "location": {
+              "text": "荔湾广场",
+              "kind": "exact_place"
+            }
+          },
+          "semantic": [
+            {
+              "concept": "material",
+              "text": "绿松石",
+              "relation": "is"
+            },
+            {
+              "concept": "purpose",
+              "text": "配件",
+              "relation": "is"
+            },
+            {
+              "concept": "form",
+              "text": "圆珠",
+              "relation": "is"
+            }
+          ],
+          "ruleVersion": "v1",
+          "pagination": {
+            "limit": 100
+          }
+        },
+        "view": "details"
+      },
+      "model": "deepseek-flash",
+      "usage": {
+        "promptTokens": 2660,
+        "completionTokens": 105
+      },
+      "durationMs": 991
+    },
+    {
+      "text": "按供应商汇总",
+      "plan": {
+        "hard": {},
+        "semantic": {},
+        "view": "by_distributor",
+        "clarification": null
+      },
+      "state": {
+        "query": {
+          "version": "v1",
+          "subject": "purchases",
+          "itemTypes": ["MATERIAL"],
+          "hard": {
+            "purchaseDate": {
+              "from": "2026-11-01",
+              "to": "2026-12-01"
+            },
+            "location": {
+              "text": "荔湾广场",
+              "kind": "exact_place"
+            }
+          },
+          "semantic": [
+            {
+              "concept": "material",
+              "text": "绿松石",
+              "relation": "is"
+            },
+            {
+              "concept": "purpose",
+              "text": "配件",
+              "relation": "is"
+            },
+            {
+              "concept": "form",
+              "text": "圆珠",
+              "relation": "is"
+            }
+          ],
+          "ruleVersion": "v1",
+          "pagination": {
+            "limit": 100
+          }
+        },
+        "view": "by_distributor"
+      },
+      "model": "deepseek-flash",
+      "usage": {
+        "promptTokens": 2675,
+        "completionTokens": 83
+      },
+      "durationMs": 1253
+    },
+    {
+      "text": "改为上个月",
+      "plan": {
+        "hard": {},
+        "semantic": {},
+        "month": "previous_month",
+        "clarification": null
+      },
+      "state": {
+        "query": {
+          "version": "v1",
+          "subject": "purchases",
+          "itemTypes": ["MATERIAL"],
+          "hard": {
+            "purchaseDate": {
+              "from": "2026-10-01",
+              "to": "2026-11-01"
+            },
+            "location": {
+              "text": "荔湾广场",
+              "kind": "exact_place"
+            }
+          },
+          "semantic": [
+            {
+              "concept": "material",
+              "text": "绿松石",
+              "relation": "is"
+            },
+            {
+              "concept": "purpose",
+              "text": "配件",
+              "relation": "is"
+            },
+            {
+              "concept": "form",
+              "text": "圆珠",
+              "relation": "is"
+            }
+          ],
+          "ruleVersion": "v1",
+          "pagination": {
+            "limit": 100
+          }
+        },
+        "view": "by_distributor"
+      },
+      "model": "deepseek-flash",
+      "usage": {
+        "promptTokens": 2678,
+        "completionTokens": 81
+      },
+      "durationMs": 1116
+    }
+  ],
+  "businessDataSent": false,
+  "passed": true
+}

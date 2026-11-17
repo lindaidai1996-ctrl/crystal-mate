@@ -1,0 +1,56 @@
+{
+  "checkedAt": "2026-11-17T04:23:22.862Z",
+  "environment": "isolated-development",
+  "realModel": {
+    "input": "one necessary catalog ID plus synthetic query instructions; no names/prices/contacts/account IDs",
+    "status": "completed",
+    "calls": 3,
+    "requestedModel": "deepseek-flash",
+    "responses": [
+      {
+        "stage": "parse",
+        "model": "deepseek-flash",
+        "usage": {
+          "promptTokens": 2606,
+          "completionTokens": 148
+        }
+      },
+      {
+        "stage": "facts",
+        "model": "deepseek-flash",
+        "usage": {
+          "promptTokens": 784,
+          "completionTokens": 17
+        }
+      },
+      {
+        "stage": "finish",
+        "model": "deepseek-flash",
+        "usage": {
+          "promptTokens": 826,
+          "completionTokens": 16
+        }
+      }
+    ]
+  },
+  "facts": "real P2 purchase/stock + read-only display; frozen selection supplied, not model-selected",
+  "authentication": "short-lived signed test session through real auth; not password login",
+  "checks": [
+    "real read-only 11 purchase rows, exact amount, display metadata and catalog stock",
+    "authenticated whitelisted result HTTP DTO",
+    "default HTTP privacy removes all amount summaries and free text",
+    "desktop structured results, no horizontal overflow",
+    "5/5/1 pagination leaves exact all-result summary unchanged",
+    "real purchase detail link opens read-only page",
+    "mobile card results, no horizontal overflow",
+    "privacy toggle removes rendered amounts immediately",
+    "three feedback types saved through mobile UI, survive refresh, retain question/version, hide notes, no revision/rule mutation",
+    "eight terminal states remain distinct; failures have no zero/empty facts",
+    "real HTTP message/budget/cancel/continue/retry/CAS/origin checks with zero model calls",
+    "real HTTP foreign-conversation read rejected",
+    "real model + authenticated HTTP + live read-only facts/display/stock, exact backend selection"
+  ],
+  "realHttpStatus": "completed",
+  "passed": true,
+  "browserErrors": []
+}

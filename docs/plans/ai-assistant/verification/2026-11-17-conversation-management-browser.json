@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-11-17T08:08:54.737Z",
+  "environment": "local-development-ui-with-http-fixtures",
+  "realModel": false,
+  "businessWrites": false,
+  "checks": [
+    "desktop-and-mobile-loading-skeleton",
+    "rename-dialog-submits-and-updates-session-title",
+    "mobile-delete-confirmation-and-selected-conversation-reset",
+    "no-mobile-horizontal-overflow",
+    "no-browser-page-errors"
+  ],
+  "passed": true
+}

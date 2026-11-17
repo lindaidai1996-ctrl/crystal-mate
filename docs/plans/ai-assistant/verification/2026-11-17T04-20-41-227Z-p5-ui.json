@@ -1,0 +1,20 @@
+{
+  "checkedAt": "2026-11-17T04:19:40.581Z",
+  "environment": "isolated-development",
+  "realModel": true,
+  "facts": "real P2 purchase/stock + read-only display; frozen selection supplied, not model-selected",
+  "authentication": "short-lived signed test session through real auth; not password login",
+  "checks": [
+    "real read-only 11 purchase rows, exact amount, display metadata and catalog stock",
+    "authenticated whitelisted result HTTP DTO",
+    "default HTTP privacy removes all amount summaries and free text",
+    "desktop structured results, no horizontal overflow",
+    "5/5/1 pagination leaves exact all-result summary unchanged",
+    "real purchase detail link opens read-only page",
+    "mobile card results, no horizontal overflow",
+    "privacy toggle removes rendered amounts immediately"
+  ],
+  "passed": false,
+  "failure": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('combobox', { name: '反馈类型' })\u001b[22m\n\u001b[2m    - locator resolved to <input readonly value=\"\" type=\"search\" role=\"combobox\" id=\"rc_select_5\" aria-label=\"反馈类型\" unselectable=\"on\" autocomplete=\"off\" aria-expanded=\"false\" aria-haspopup=\"listbox\" aria-autocomplete=\"list\" aria-owns=\"rc_select_5_list\" aria-controls=\"rc_select_5_list\" class=\"ant-select-selection-search-input\"/>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    ",
+  "browserErrors": []
+}

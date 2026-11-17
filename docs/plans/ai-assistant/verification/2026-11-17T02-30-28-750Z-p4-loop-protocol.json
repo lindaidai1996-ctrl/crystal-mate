@@ -1,0 +1,72 @@
+{
+  "checkedAt": "2026-11-17T02:30:28.750Z",
+  "kind": "real-model-synthetic-tools-no-database",
+  "protocol": "forced-single-tool-sequential-non-streaming",
+  "status": "no_results",
+  "calls": 3,
+  "reservedTokens": 18988,
+  "state": {
+    "query": {
+      "version": "v1",
+      "subject": "purchases",
+      "itemTypes": ["PRODUCT"],
+      "hard": {
+        "purchaseDate": {
+          "from": "2026-11-01",
+          "to": "2026-12-01"
+        }
+      },
+      "semantic": [],
+      "ruleVersion": "v1",
+      "pagination": {
+        "limit": 100
+      }
+    },
+    "view": "details"
+  },
+  "trace": [
+    {
+      "stage": "parse",
+      "outcome": "success",
+      "durationMs": 1160,
+      "code": null,
+      "model": "deepseek-flash",
+      "usage": {
+        "promptTokens": 2561,
+        "completionTokens": 135
+      },
+      "completeness": null
+    },
+    {
+      "stage": "facts",
+      "outcome": "success",
+      "durationMs": 592,
+      "code": null,
+      "model": "deepseek-flash",
+      "usage": {
+        "promptTokens": 723,
+        "completionTokens": 17
+      },
+      "completeness": null
+    },
+    {
+      "stage": "finish",
+      "outcome": "success",
+      "durationMs": 672,
+      "code": null,
+      "model": "deepseek-flash",
+      "usage": {
+        "promptTokens": 766,
+        "completionTokens": 16
+      },
+      "completeness": null
+    }
+  ],
+  "errorCode": null,
+  "passed": true,
+  "limitations": [
+    "No auto/parallel/streaming tools",
+    "No business query or real account/HTTP verification",
+    "Synthetic tool result only"
+  ]
+}

@@ -7,5 +7,8 @@ export default withNextIntl({
   reactStrictMode: true,
   devIndicators: false,
   distDir: process.env.E2E_DIST_DIR ?? '.next',
-  serverExternalPackages: ['@prisma/client', 'cos-nodejs-sdk-v5'],
+  serverExternalPackages: ['@prisma/client', 'cos-nodejs-sdk-v5', '@resvg/resvg-js'],
+  outputFileTracingIncludes: {
+    '/api/product-cards/**': ['./assets/product-card-fonts/**/*'],
+  },
 });

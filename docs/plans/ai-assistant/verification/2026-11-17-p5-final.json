@@ -1,0 +1,66 @@
+{
+  "checkedAt": "2026-11-17T04:36:34.375856+00:00",
+  "tasks": {
+    "P5-01": "completed_released",
+    "P5-02": "completed_released",
+    "P5-03": "completed_released",
+    "P5-04": "completed_released"
+  },
+  "checks": {
+    "assistantUnitTests": {
+      "files": 21,
+      "passed": 370,
+      "exitCode": 0
+    },
+    "typecheck": {
+      "exitCode": 0
+    },
+    "lint": {
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 2,
+      "unrelatedWarningFile": ".cache/product-card-qa/smoke.mjs"
+    },
+    "formatCheck": {
+      "exitCode": 0
+    },
+    "diffCheck": {
+      "exitCode": 0
+    },
+    "developmentFeedback": "2026-11-17T04-13-50-579Z-p5-feedback.json",
+    "realModelHttp": "2026-11-17T04-24-03-151Z-p5-ui.json",
+    "lateResponsesHttpMock": "2026-11-17T04-31-52-096Z-p5-ui.json",
+    "currentSourceBrowser": "2026-11-17T04-33-57-686Z-p5-ui.json"
+  },
+  "realModel": {
+    "calls": 3,
+    "inputTokens": 4216,
+    "outputTokens": 181,
+    "scope": "one necessary material ID, no soft semantic filtering"
+  },
+  "developmentMigration": "20261117020000_assistant_feedback",
+  "businessWrites": false,
+  "frozenBaselineChanged": false,
+  "productionAccess": false,
+  "deployment": false,
+  "gitCommitOrPush": false,
+  "aiAssistantImpact": "synchronized",
+  "notVerified": [
+    "P6 full REAL/FLOW regression",
+    "password login",
+    "real provider faults/rate limits/timeouts",
+    "multi-instance load",
+    "E2E suite",
+    "production build",
+    "voice",
+    "production"
+  ],
+  "nextTask": "P6-01",
+  "failuresRetained": true,
+  "notes": [
+    "Main 11-row UI dataset uses frozen selection and deterministic evidence, not model selection.",
+    "Delayed response browser checks use HTTP mocks.",
+    "Authentication uses short-lived signed test JWT through actual callback, not password login.",
+    "Only assistant records written and cleaned; business records read-only."
+  ]
+}

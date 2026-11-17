@@ -1,5 +1,7 @@
 'use client';
 
+import { formatAmount } from '@/lib/format-money';
+
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Button, Empty, Popconfirm, Tag, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -43,7 +45,7 @@ export function BatchDetailEntriesTable({
     20,
   );
   const price = (value: string | null, suffix: string) =>
-    value === null ? '—' : `${value} ${suffix}`;
+    value === null ? '—' : `${formatAmount(value)} ${suffix}`;
   const unitSuffix = (row: BatchEntryRow) =>
     row.type === 'product'
       ? `${editor('yuan')}/${t('PIECE')}`

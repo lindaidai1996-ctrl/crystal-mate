@@ -1,5 +1,7 @@
 'use client';
 
+import { formatAmount } from '@/lib/format-money';
+
 import { Checkbox, Empty, Tag } from 'antd';
 import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
@@ -99,14 +101,14 @@ export function ImportCandidates({
                     {!privacyMode && (
                       <span>
                         {t('candidatePurchasePrice', {
-                          price: purchasePrice === null ? '—' : Number(purchasePrice).toFixed(2),
+                          price: formatAmount(purchasePrice),
                           unit,
                         })}
                       </span>
                     )}
                     <span>
                       {t('candidateSalePrice', {
-                        price: salePrice === null ? '—' : Number(salePrice).toFixed(2),
+                        price: formatAmount(salePrice),
                         unit,
                       })}
                     </span>
@@ -114,7 +116,7 @@ export function ImportCandidates({
                   {priceAdjusted && (!privacyMode || item.data.priceKind === 'SALE') && (
                     <span className={importStyles.candidateRecognition}>
                       {t('recognizedPriceAdjusted', {
-                        price: Number(item.data.price).toFixed(2),
+                        price: formatAmount(item.data.price),
                       })}
                     </span>
                   )}

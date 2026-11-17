@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-11-17T02:48:42.897Z",
+  "kind": "mock-model-development-read-only-business",
+  "assistantOnlyWrites": true,
+  "realLoginOrHTTP": false,
+  "safeCode": "STALE_EXECUTION",
+  "failureType": "Error",
+  "passed": false,
+  "failureCode": "DEVELOPMENT_EXECUTION_CHECK_FAILED"
+}

@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-11-17T04:13:46.563Z",
+  "environment": "isolated-development",
+  "realModel": false,
+  "checks": [
+    "durable feedback, original question/execution/version, idempotency, minimized note, no execution/rule mutation",
+    "cross-account feedback rejected; reused id with changed payload rejected",
+    "real target identity verified read-only; fabricated purchase identity rejected"
+  ],
+  "migration": {
+    "name": "20261117020000_assistant_feedback",
+    "sha256": "de16209425904bae6ee8ed0cb21678a2caf103465c5679344e6e068b4618c71f",
+    "method": "execute selected assistant SQL transaction and register only this migration",
+    "unrelatedMigrationsExecuted": false
+  },
+  "passed": true
+}

@@ -1,0 +1,1326 @@
+{
+  "checkedAt": "2026-11-17T06:36:21.121Z",
+  "environment": "isolated-development",
+  "realModel": true,
+  "authentication": "short-lived signed test JWT through actual callback; password login not tested",
+  "steps": [
+    {
+      "label": "desktop-current-stock",
+      "durationMs": 7121,
+      "status": "completed",
+      "progress": {
+        "countBasis": "purchase_entry",
+        "totalCandidates": 1,
+        "readCandidates": 1,
+        "evaluatedCandidates": 1,
+        "included": 1,
+        "excluded": 0,
+        "uncertain": 0,
+        "notEvaluated": 0,
+        "unreadCandidates": 0,
+        "traversal": "complete",
+        "evaluation": "not_required",
+        "decisions": [],
+        "calls": 3,
+        "reservedTokens": 20531,
+        "relevanceCalls": 0,
+        "relevanceReservedTokens": 0
+      },
+      "execution": {
+        "calls": 3,
+        "phase": "finish",
+        "state": {
+          "view": "stock",
+          "query": {
+            "hard": {
+              "items": [
+                {
+                  "id": "cmv60up0h000f3waphoww18ur",
+                  "type": "MATERIAL"
+                }
+              ]
+            },
+            "subject": "purchases",
+            "version": "v1",
+            "semantic": [],
+            "itemTypes": ["MATERIAL"],
+            "pagination": {
+              "limit": 100
+            },
+            "ruleVersion": "v1"
+          }
+        },
+        "trace": [
+          {
+            "code": null,
+            "model": "deepseek-flash",
+            "stage": "parse",
+            "usage": {
+              "promptTokens": 2686,
+              "completionTokens": 149
+            },
+            "outcome": "success",
+            "durationMs": 1447,
+            "completeness": null
+          },
+          {
+            "code": null,
+            "model": "deepseek-flash",
+            "stage": "facts",
+            "usage": {
+              "promptTokens": 855,
+              "completionTokens": 17
+            },
+            "outcome": "success",
+            "durationMs": 2546,
+            "completeness": null
+          },
+          {
+            "code": null,
+            "model": null,
+            "stage": "candidate",
+            "usage": null,
+            "outcome": "success",
+            "durationMs": 706,
+            "completeness": {
+              "traversal": "complete",
+              "readCandidates": 1,
+              "totalCandidates": 1,
+              "semanticEvaluation": "not_performed"
+            }
+          },
+          {
+            "code": null,
+            "model": null,
+            "stage": "facts",
+            "usage": null,
+            "outcome": "success",
+            "durationMs": 906,
+            "completeness": null
+          },
+          {
+            "code": null,
+            "model": "deepseek-flash",
+            "stage": "finish",
+            "usage": {
+              "promptTokens": 897,
+              "completionTokens": 16
+            },
+            "outcome": "success",
+            "durationMs": 880,
+            "completeness": null
+          }
+        ],
+        "result": {
+          "facts": {
+            "catalog": [
+              {
+                "code": null,
+                "item": {
+                  "id": "cmv60up0h000f3waphoww18ur",
+                  "type": "MATERIAL"
+                },
+                "name": "6m新黄口链条108",
+                "widthMm": "6",
+                "heightMm": "6",
+                "imageKey": "images/6e026654-8399-4376-bbaf-2511f26f8f81.jpg",
+                "lengthMm": "6",
+                "purchase": {
+                  "id": "cmv60up0l000h3wapjew22ygw",
+                  "type": "MATERIAL_PURCHASE"
+                }
+              }
+            ],
+            "request": {
+              "mode": "catalog_current",
+              "query": {
+                "hard": {
+                  "items": [
+                    {
+                      "id": "cmv60up0h000f3waphoww18ur",
+                      "type": "MATERIAL"
+                    }
+                  ]
+                },
+                "subject": "purchases",
+                "version": "v1",
+                "semantic": [],
+                "itemTypes": ["MATERIAL"],
+                "pagination": {
+                  "limit": 100
+                },
+                "ruleVersion": "v1"
+              },
+              "selectedPurchases": [
+                {
+                  "id": "cmv60up0l000h3wapjew22ygw",
+                  "type": "MATERIAL_PURCHASE"
+                }
+              ]
+            },
+            "version": "v1",
+            "queriedAt": "2026-11-17T06:36:30.847Z",
+            "traversal": "complete",
+            "quantities": [
+              {
+                "unit": "STRAND",
+                "knownStock": "1.00",
+                "unknownStockBatchCount": 0,
+                "unknownStockObjectCount": 0
+              }
+            ],
+            "sourceStock": [],
+            "catalogStock": [
+              {
+                "item": {
+                  "id": "cmv60up0h000f3waphoww18ur",
+                  "type": "MATERIAL"
+                },
+                "name": "6m新黄口链条108",
+                "unit": "STRAND",
+                "knownStock": "1.00",
+                "stockBatchCount": 1,
+                "unknownStockBatchCount": 0
+              }
+            ],
+            "catalogItemCount": 1,
+            "semanticEvaluation": "not_performed",
+            "scopeCandidateCount": 1,
+            "selectedCandidateCount": 1
+          },
+          "relevance": null
+        },
+        "status": "completed",
+        "version": "orchestration-v2",
+        "metadata": {
+          "transport": "native-fetch",
+          "ruleVersion": "v1",
+          "promptVersion": "orchestration-v2",
+          "requestedModel": "deepseek-flash",
+          "contractVersion": "v1",
+          "relevancePromptVersion": "relevance-v3",
+          "requestedRelevanceModel": "deepseek-flash"
+        },
+        "errorCode": null,
+        "checkpoint": null,
+        "pendingPlan": null,
+        "clarification": null,
+        "reservedTokens": 20531,
+        "clarificationContext": null
+      }
+    },
+    {
+      "label": "phone-selected-purchase-remaining",
+      "durationMs": 5861,
+      "status": "completed",
+      "progress": {
+        "countBasis": "purchase_entry",
+        "totalCandidates": 1,
+        "readCandidates": 1,
+        "evaluatedCandidates": 1,
+        "included": 1,
+        "excluded": 0,
+        "uncertain": 0,
+        "notEvaluated": 0,
+        "unreadCandidates": 0,
+        "traversal": "complete",
+        "evaluation": "not_required",
+        "decisions": [],
+        "calls": 3,
+        "reservedTokens": 20610,
+        "relevanceCalls": 0,
+        "relevanceReservedTokens": 0
+      },
+      "execution": {
+        "calls": 3,
+        "phase": "finish",
+        "state": {
+          "view": "purchase_remaining",
+          "query": {
+            "hard": {
+              "items": [
+                {
+                  "id": "cmv60up0h000f3waphoww18ur",
+                  "type": "MATERIAL"
+                }
+              ]
+            },
+            "subject": "purchases",
+            "version": "v1",
+            "semantic": [],
+            "itemTypes": ["MATERIAL"],
+            "pagination": {
+              "limit": 100
+            },
+            "ruleVersion": "v1"
+          }
+        },
+        "trace": [
+          {
+            "code": null,
+            "model": "deepseek-flash",
+            "stage": "parse",
+            "usage": {
+              "promptTokens": 2712,
+              "completionTokens": 83
+            },
+            "outcome": "success",
+            "durationMs": 894,
+            "completeness": null
+          },
+          {
+            "code": null,
+            "model": "deepseek-flash",
+            "stage": "facts",
+            "usage": {
+              "promptTokens": 818,
+              "completionTokens": 17
+            },
+            "outcome": "success",
+            "durationMs": 2978,
+            "completeness": null
+          },
+          {
+            "code": null,
+            "model": null,
+            "stage": "candidate",
+            "usage": null,
+            "outcome": "success",
+            "durationMs": 681,
+            "completeness": {
+              "traversal": "complete",
+              "readCandidates": 1,
+              "totalCandidates": 1,
+              "semanticEvaluation": "not_performed"
+            }
+          },
+          {
+            "code": null,
+            "model": null,
+            "stage": "facts",
+            "usage": null,
+            "outcome": "success",
+            "durationMs": 1222,
+            "completeness": null
+          },
+          {
+            "code": null,
+            "model": "deepseek-flash",
+            "stage": "finish",
+            "usage": {
+              "promptTokens": 860,
+              "completionTokens": 16
+            },
+            "outcome": "success",
+            "durationMs": 414,
+            "completeness": null
+          }
+        ],
+        "result": {
+          "facts": {
+            "catalog": [
+              {
+                "code": null,
+                "item": {
+                  "id": "cmv60up0h000f3waphoww18ur",
+                  "type": "MATERIAL"
+                },
+                "name": "6m新黄口链条108",
+                "widthMm": "6",
+                "heightMm": "6",
+                "imageKey": "images/6e026654-8399-4376-bbaf-2511f26f8f81.jpg",
+                "lengthMm": "6",
+                "purchase": {
+                  "id": "cmv60up0l000h3wapjew22ygw",
+                  "type": "MATERIAL_PURCHASE"
+                }
+              }
+            ],
+            "request": {
+              "mode": "purchase_remaining",
+              "query": {
+                "hard": {
+                  "items": [
+                    {
+                      "id": "cmv60up0h000f3waphoww18ur",
+                      "type": "MATERIAL"
+                    }
+                  ]
+                },
+                "subject": "purchases",
+                "version": "v1",
+                "semantic": [],
+                "itemTypes": ["MATERIAL"],
+                "pagination": {
+                  "limit": 100
+                },
+                "ruleVersion": "v1"
+              },
+              "selectedPurchases": [
+                {
+                  "id": "cmv60up0l000h3wapjew22ygw",
+                  "type": "MATERIAL_PURCHASE"
+                }
+              ]
+            },
+            "version": "v1",
+            "queriedAt": "2026-11-17T06:36:37.839Z",
+            "traversal": "complete",
+            "quantities": [
+              {
+                "unit": "STRAND",
+                "knownStock": "1.00",
+                "unknownStockBatchCount": 0,
+                "unknownStockObjectCount": 0
+              }
+            ],
+            "sourceStock": [
+              {
+                "item": {
+                  "id": "cmv60up0h000f3waphoww18ur",
+                  "type": "MATERIAL"
+                },
+                "name": "6m新黄口链条108",
+                "unit": "STRAND",
+                "batch": {
+                  "id": "cmv60up00000d3wapqxwxjfo7",
+                  "type": "BATCH"
+                },
+                "purchase": {
+                  "id": "cmv60up0l000h3wapjew22ygw",
+                  "type": "MATERIAL_PURCHASE"
+                },
+                "purchasedQuantity": "1.00",
+                "remainingQuantity": "1.00"
+              }
+            ],
+            "catalogStock": [],
+            "catalogItemCount": 1,
+            "semanticEvaluation": "not_performed",
+            "scopeCandidateCount": 1,
+            "selectedCandidateCount": 1
+          },
+          "relevance": null
+        },
+        "status": "completed",
+        "version": "orchestration-v2",
+        "metadata": {
+          "transport": "native-fetch",
+          "ruleVersion": "v1",
+          "promptVersion": "orchestration-v2",
+          "requestedModel": "deepseek-flash",
+          "contractVersion": "v1",
+          "relevancePromptVersion": "relevance-v3",
+          "requestedRelevanceModel": "deepseek-flash"
+        },
+        "errorCode": null,
+        "checkpoint": null,
+        "pendingPlan": null,
+        "clarification": null,
+        "reservedTokens": 20610,
+        "clarificationContext": null
+      }
+    },
+    {
+      "label": "phone-location-distributors",
+      "durationMs": 3929,
+      "status": "needs_confirmation",
+      "progress": {
+        "countBasis": "purchase_entry",
+        "totalCandidates": null,
+        "readCandidates": null,
+        "evaluatedCandidates": null,
+        "included": null,
+        "excluded": null,
+        "uncertain": null,
+        "notEvaluated": null,
+        "unreadCandidates": null,
+        "traversal": "not_started",
+        "evaluation": "not_required",
+        "decisions": [],
+        "calls": 2,
+        "reservedTokens": 15243,
+        "relevanceCalls": 0,
+        "relevanceReservedTokens": 0
+      },
+      "execution": {
+        "calls": 2,
+        "phase": "query_facts",
+        "state": {
+          "view": "distributors",
+          "query": {
+            "hard": {
+              "location": {
+                "kind": "exact_place",
+                "text": "荔湾广场"
+              }
+            },
+            "subject": "purchases",
+            "version": "v1",
+            "semantic": [],
+            "itemTypes": ["MATERIAL"],
+            "pagination": {
+              "limit": 100
+            },
+            "ruleVersion": "v1"
+          }
+        },
+        "trace": [
+          {
+            "code": null,
+            "model": "deepseek-flash",
+            "stage": "parse",
+            "usage": {
+              "promptTokens": 2730,
+              "completionTokens": 152
+            },
+            "outcome": "success",
+            "durationMs": 1367,
+            "completeness": null
+          },
+          {
+            "code": null,
+            "model": "deepseek-flash",
+            "stage": "facts",
+            "usage": {
+              "promptTokens": 893,
+              "completionTokens": 17
+            },
+            "outcome": "success",
+            "durationMs": 1416,
+            "completeness": null
+          },
+          {
+            "code": null,
+            "model": null,
+            "stage": "candidate",
+            "usage": null,
+            "outcome": "success",
+            "durationMs": 255,
+            "completeness": null
+          }
+        ],
+        "result": {
+          "facts": {
+            "kind": "distributors",
+            "queriedAt": "2026-11-17T06:36:45.760Z",
+            "resolution": {
+              "query": {
+                "kind": "exact_place",
+                "text": "荔湾广场"
+              },
+              "status": "resolved",
+              "version": "v1",
+              "confirmed": [
+                {
+                  "area": "荔湾",
+                  "name": "晶钰鑫珠宝",
+                  "reason": "explicit_place",
+                  "evidence": [
+                    {
+                      "end": 10,
+                      "field": "address",
+                      "start": 6,
+                      "matchedText": "荔湾广场"
+                    }
+                  ],
+                  "distributor": {
+                    "id": "cmv60i7vq00043wapt6b5xvp9",
+                    "type": "DISTRIBUTOR"
+                  }
+                },
+                {
+                  "area": "荔湾",
+                  "name": "润和玉珠宝",
+                  "reason": "explicit_place",
+                  "evidence": [
+                    {
+                      "end": 10,
+                      "field": "address",
+                      "start": 6,
+                      "matchedText": "荔湾广场"
+                    }
+                  ],
+                  "distributor": {
+                    "id": "cmv64dmbt00053wxk9l3jka4i",
+                    "type": "DISTRIBUTOR"
+                  }
+                },
+                {
+                  "area": "荔湾",
+                  "name": "珍敏水晶行",
+                  "reason": "explicit_place",
+                  "evidence": [
+                    {
+                      "end": 10,
+                      "field": "address",
+                      "start": 6,
+                      "matchedText": "荔湾广场"
+                    }
+                  ],
+                  "distributor": {
+                    "id": "cmvgfk5mi000a3whwjdt6gd24",
+                    "type": "DISTRIBUTOR"
+                  }
+                },
+                {
+                  "area": "荔湾",
+                  "name": "明发银配饰",
+                  "reason": "explicit_place",
+                  "evidence": [
+                    {
+                      "end": 10,
+                      "field": "address",
+                      "start": 6,
+                      "matchedText": "荔湾广场"
+                    }
+                  ],
+                  "distributor": {
+                    "id": "cmvhsthsm00013w1j69j5vq5i",
+                    "type": "DISTRIBUTOR"
+                  }
+                },
+                {
+                  "area": "荔湾",
+                  "name": "晶缘珠宝",
+                  "reason": "explicit_place",
+                  "evidence": [
+                    {
+                      "end": 10,
+                      "field": "address",
+                      "start": 6,
+                      "matchedText": "荔湾广场"
+                    }
+                  ],
+                  "distributor": {
+                    "id": "cmwg3g8ak0032oq01pw87gg5k",
+                    "type": "DISTRIBUTOR"
+                  }
+                },
+                {
+                  "area": "荔湾",
+                  "name": "曦雅尼珠宝精品绿松石馆",
+                  "reason": "explicit_place",
+                  "evidence": [
+                    {
+                      "end": 10,
+                      "field": "address",
+                      "start": 6,
+                      "matchedText": "荔湾广场"
+                    }
+                  ],
+                  "distributor": {
+                    "id": "cmwg6xshd0071oq01h776t219",
+                    "type": "DISTRIBUTOR"
+                  }
+                },
+                {
+                  "area": "荔湾",
+                  "name": "禧至尊18K金",
+                  "reason": "explicit_place",
+                  "evidence": [
+                    {
+                      "end": 10,
+                      "field": "address",
+                      "start": 6,
+                      "matchedText": "荔湾广场"
+                    }
+                  ],
+                  "distributor": {
+                    "id": "cmwg9xsc6008roq01cds80ijb",
+                    "type": "DISTRIBUTOR"
+                  }
+                }
+              ],
+              "uncertain": [
+                {
+                  "area": "荔湾",
+                  "name": "金中佛教珠宝",
+                  "reason": "area_only",
+                  "evidence": [
+                    {
+                      "end": 2,
+                      "field": "area",
+                      "start": 0,
+                      "matchedText": "荔湾"
+                    }
+                  ],
+                  "distributor": {
+                    "id": "cmv60jdt100063wap7d1npw7r",
+                    "type": "DISTRIBUTOR"
+                  }
+                },
+                {
+                  "area": "荔湾",
+                  "name": "荔湾",
+                  "reason": "area_only",
+                  "evidence": [
+                    {
+                      "end": 2,
+                      "field": "area",
+                      "start": 0,
+                      "matchedText": "荔湾"
+                    }
+                  ],
+                  "distributor": {
+                    "id": "cmv6bdhkj001j3wkqric322h3",
+                    "type": "DISTRIBUTOR"
+                  }
+                }
+              ],
+              "scanComplete": true,
+              "scannedCount": 16
+            }
+          }
+        },
+        "status": "needs_confirmation",
+        "version": "orchestration-v2",
+        "metadata": {
+          "transport": "native-fetch",
+          "ruleVersion": "v1",
+          "promptVersion": "orchestration-v2",
+          "requestedModel": "deepseek-flash",
+          "contractVersion": "v1",
+          "relevancePromptVersion": "relevance-v3",
+          "requestedRelevanceModel": "deepseek-flash"
+        },
+        "errorCode": null,
+        "checkpoint": null,
+        "pendingPlan": null,
+        "clarification": "另有渠道商仅能证实较大区域或地点存在歧义，未纳入确定集合。",
+        "reservedTokens": 15243,
+        "clarificationContext": null
+      }
+    }
+  ],
+  "checks": [
+    "current total vs selected source remaining: real model HTTP/live independent P2 read, source identities and batch links, desktop/mobile labels and no overflow",
+    "location confirmed/uncertain match live resolver; new query clears previous item scope; real links, privacy projection and desktop/mobile no overflow"
+  ],
+  "errors": [],
+  "businessWrites": false,
+  "verificationSessionId": "a905568a-0ffb-4427-97fe-4b944b480644",
+  "persistedExecutions": [
+    {
+      "calls": 3,
+      "phase": "finish",
+      "state": {
+        "view": "stock",
+        "query": {
+          "hard": {
+            "items": [
+              {
+                "id": "cmv60up0h000f3waphoww18ur",
+                "type": "MATERIAL"
+              }
+            ]
+          },
+          "subject": "purchases",
+          "version": "v1",
+          "semantic": [],
+          "itemTypes": ["MATERIAL"],
+          "pagination": {
+            "limit": 100
+          },
+          "ruleVersion": "v1"
+        }
+      },
+      "trace": [
+        {
+          "code": null,
+          "model": "deepseek-flash",
+          "stage": "parse",
+          "usage": {
+            "promptTokens": 2686,
+            "completionTokens": 149
+          },
+          "outcome": "success",
+          "durationMs": 1447,
+          "completeness": null
+        },
+        {
+          "code": null,
+          "model": "deepseek-flash",
+          "stage": "facts",
+          "usage": {
+            "promptTokens": 855,
+            "completionTokens": 17
+          },
+          "outcome": "success",
+          "durationMs": 2546,
+          "completeness": null
+        },
+        {
+          "code": null,
+          "model": null,
+          "stage": "candidate",
+          "usage": null,
+          "outcome": "success",
+          "durationMs": 706,
+          "completeness": {
+            "traversal": "complete",
+            "readCandidates": 1,
+            "totalCandidates": 1,
+            "semanticEvaluation": "not_performed"
+          }
+        },
+        {
+          "code": null,
+          "model": null,
+          "stage": "facts",
+          "usage": null,
+          "outcome": "success",
+          "durationMs": 906,
+          "completeness": null
+        },
+        {
+          "code": null,
+          "model": "deepseek-flash",
+          "stage": "finish",
+          "usage": {
+            "promptTokens": 897,
+            "completionTokens": 16
+          },
+          "outcome": "success",
+          "durationMs": 880,
+          "completeness": null
+        }
+      ],
+      "result": {
+        "facts": {
+          "catalog": [
+            {
+              "code": null,
+              "item": {
+                "id": "cmv60up0h000f3waphoww18ur",
+                "type": "MATERIAL"
+              },
+              "name": "6m新黄口链条108",
+              "widthMm": "6",
+              "heightMm": "6",
+              "imageKey": "images/6e026654-8399-4376-bbaf-2511f26f8f81.jpg",
+              "lengthMm": "6",
+              "purchase": {
+                "id": "cmv60up0l000h3wapjew22ygw",
+                "type": "MATERIAL_PURCHASE"
+              }
+            }
+          ],
+          "request": {
+            "mode": "catalog_current",
+            "query": {
+              "hard": {
+                "items": [
+                  {
+                    "id": "cmv60up0h000f3waphoww18ur",
+                    "type": "MATERIAL"
+                  }
+                ]
+              },
+              "subject": "purchases",
+              "version": "v1",
+              "semantic": [],
+              "itemTypes": ["MATERIAL"],
+              "pagination": {
+                "limit": 100
+              },
+              "ruleVersion": "v1"
+            },
+            "selectedPurchases": [
+              {
+                "id": "cmv60up0l000h3wapjew22ygw",
+                "type": "MATERIAL_PURCHASE"
+              }
+            ]
+          },
+          "version": "v1",
+          "queriedAt": "2026-11-17T06:36:30.847Z",
+          "traversal": "complete",
+          "quantities": [
+            {
+              "unit": "STRAND",
+              "knownStock": "1.00",
+              "unknownStockBatchCount": 0,
+              "unknownStockObjectCount": 0
+            }
+          ],
+          "sourceStock": [],
+          "catalogStock": [
+            {
+              "item": {
+                "id": "cmv60up0h000f3waphoww18ur",
+                "type": "MATERIAL"
+              },
+              "name": "6m新黄口链条108",
+              "unit": "STRAND",
+              "knownStock": "1.00",
+              "stockBatchCount": 1,
+              "unknownStockBatchCount": 0
+            }
+          ],
+          "catalogItemCount": 1,
+          "semanticEvaluation": "not_performed",
+          "scopeCandidateCount": 1,
+          "selectedCandidateCount": 1
+        },
+        "relevance": null
+      },
+      "status": "completed",
+      "version": "orchestration-v2",
+      "metadata": {
+        "transport": "native-fetch",
+        "ruleVersion": "v1",
+        "promptVersion": "orchestration-v2",
+        "requestedModel": "deepseek-flash",
+        "contractVersion": "v1",
+        "relevancePromptVersion": "relevance-v3",
+        "requestedRelevanceModel": "deepseek-flash"
+      },
+      "errorCode": null,
+      "checkpoint": null,
+      "pendingPlan": null,
+      "clarification": null,
+      "reservedTokens": 20531,
+      "clarificationContext": null
+    },
+    {
+      "calls": 3,
+      "phase": "finish",
+      "state": {
+        "view": "purchase_remaining",
+        "query": {
+          "hard": {
+            "items": [
+              {
+                "id": "cmv60up0h000f3waphoww18ur",
+                "type": "MATERIAL"
+              }
+            ]
+          },
+          "subject": "purchases",
+          "version": "v1",
+          "semantic": [],
+          "itemTypes": ["MATERIAL"],
+          "pagination": {
+            "limit": 100
+          },
+          "ruleVersion": "v1"
+        }
+      },
+      "trace": [
+        {
+          "code": null,
+          "model": "deepseek-flash",
+          "stage": "parse",
+          "usage": {
+            "promptTokens": 2712,
+            "completionTokens": 83
+          },
+          "outcome": "success",
+          "durationMs": 894,
+          "completeness": null
+        },
+        {
+          "code": null,
+          "model": "deepseek-flash",
+          "stage": "facts",
+          "usage": {
+            "promptTokens": 818,
+            "completionTokens": 17
+          },
+          "outcome": "success",
+          "durationMs": 2978,
+          "completeness": null
+        },
+        {
+          "code": null,
+          "model": null,
+          "stage": "candidate",
+          "usage": null,
+          "outcome": "success",
+          "durationMs": 681,
+          "completeness": {
+            "traversal": "complete",
+            "readCandidates": 1,
+            "totalCandidates": 1,
+            "semanticEvaluation": "not_performed"
+          }
+        },
+        {
+          "code": null,
+          "model": null,
+          "stage": "facts",
+          "usage": null,
+          "outcome": "success",
+          "durationMs": 1222,
+          "completeness": null
+        },
+        {
+          "code": null,
+          "model": "deepseek-flash",
+          "stage": "finish",
+          "usage": {
+            "promptTokens": 860,
+            "completionTokens": 16
+          },
+          "outcome": "success",
+          "durationMs": 414,
+          "completeness": null
+        }
+      ],
+      "result": {
+        "facts": {
+          "catalog": [
+            {
+              "code": null,
+              "item": {
+                "id": "cmv60up0h000f3waphoww18ur",
+                "type": "MATERIAL"
+              },
+              "name": "6m新黄口链条108",
+              "widthMm": "6",
+              "heightMm": "6",
+              "imageKey": "images/6e026654-8399-4376-bbaf-2511f26f8f81.jpg",
+              "lengthMm": "6",
+              "purchase": {
+                "id": "cmv60up0l000h3wapjew22ygw",
+                "type": "MATERIAL_PURCHASE"
+              }
+            }
+          ],
+          "request": {
+            "mode": "purchase_remaining",
+            "query": {
+              "hard": {
+                "items": [
+                  {
+                    "id": "cmv60up0h000f3waphoww18ur",
+                    "type": "MATERIAL"
+                  }
+                ]
+              },
+              "subject": "purchases",
+              "version": "v1",
+              "semantic": [],
+              "itemTypes": ["MATERIAL"],
+              "pagination": {
+                "limit": 100
+              },
+              "ruleVersion": "v1"
+            },
+            "selectedPurchases": [
+              {
+                "id": "cmv60up0l000h3wapjew22ygw",
+                "type": "MATERIAL_PURCHASE"
+              }
+            ]
+          },
+          "version": "v1",
+          "queriedAt": "2026-11-17T06:36:37.839Z",
+          "traversal": "complete",
+          "quantities": [
+            {
+              "unit": "STRAND",
+              "knownStock": "1.00",
+              "unknownStockBatchCount": 0,
+              "unknownStockObjectCount": 0
+            }
+          ],
+          "sourceStock": [
+            {
+              "item": {
+                "id": "cmv60up0h000f3waphoww18ur",
+                "type": "MATERIAL"
+              },
+              "name": "6m新黄口链条108",
+              "unit": "STRAND",
+              "batch": {
+                "id": "cmv60up00000d3wapqxwxjfo7",
+                "type": "BATCH"
+              },
+              "purchase": {
+                "id": "cmv60up0l000h3wapjew22ygw",
+                "type": "MATERIAL_PURCHASE"
+              },
+              "purchasedQuantity": "1.00",
+              "remainingQuantity": "1.00"
+            }
+          ],
+          "catalogStock": [],
+          "catalogItemCount": 1,
+          "semanticEvaluation": "not_performed",
+          "scopeCandidateCount": 1,
+          "selectedCandidateCount": 1
+        },
+        "relevance": null
+      },
+      "status": "completed",
+      "version": "orchestration-v2",
+      "metadata": {
+        "transport": "native-fetch",
+        "ruleVersion": "v1",
+        "promptVersion": "orchestration-v2",
+        "requestedModel": "deepseek-flash",
+        "contractVersion": "v1",
+        "relevancePromptVersion": "relevance-v3",
+        "requestedRelevanceModel": "deepseek-flash"
+      },
+      "errorCode": null,
+      "checkpoint": null,
+      "pendingPlan": null,
+      "clarification": null,
+      "reservedTokens": 20610,
+      "clarificationContext": null
+    },
+    {
+      "calls": 2,
+      "phase": "query_facts",
+      "state": {
+        "view": "distributors",
+        "query": {
+          "hard": {
+            "location": {
+              "kind": "exact_place",
+              "text": "荔湾广场"
+            }
+          },
+          "subject": "purchases",
+          "version": "v1",
+          "semantic": [],
+          "itemTypes": ["MATERIAL"],
+          "pagination": {
+            "limit": 100
+          },
+          "ruleVersion": "v1"
+        }
+      },
+      "trace": [
+        {
+          "code": null,
+          "model": "deepseek-flash",
+          "stage": "parse",
+          "usage": {
+            "promptTokens": 2730,
+            "completionTokens": 152
+          },
+          "outcome": "success",
+          "durationMs": 1367,
+          "completeness": null
+        },
+        {
+          "code": null,
+          "model": "deepseek-flash",
+          "stage": "facts",
+          "usage": {
+            "promptTokens": 893,
+            "completionTokens": 17
+          },
+          "outcome": "success",
+          "durationMs": 1416,
+          "completeness": null
+        },
+        {
+          "code": null,
+          "model": null,
+          "stage": "candidate",
+          "usage": null,
+          "outcome": "success",
+          "durationMs": 255,
+          "completeness": null
+        }
+      ],
+      "result": {
+        "facts": {
+          "kind": "distributors",
+          "queriedAt": "2026-11-17T06:36:45.760Z",
+          "resolution": {
+            "query": {
+              "kind": "exact_place",
+              "text": "荔湾广场"
+            },
+            "status": "resolved",
+            "version": "v1",
+            "confirmed": [
+              {
+                "area": "荔湾",
+                "name": "晶钰鑫珠宝",
+                "reason": "explicit_place",
+                "evidence": [
+                  {
+                    "end": 10,
+                    "field": "address",
+                    "start": 6,
+                    "matchedText": "荔湾广场"
+                  }
+                ],
+                "distributor": {
+                  "id": "cmv60i7vq00043wapt6b5xvp9",
+                  "type": "DISTRIBUTOR"
+                }
+              },
+              {
+                "area": "荔湾",
+                "name": "润和玉珠宝",
+                "reason": "explicit_place",
+                "evidence": [
+                  {
+                    "end": 10,
+                    "field": "address",
+                    "start": 6,
+                    "matchedText": "荔湾广场"
+                  }
+                ],
+                "distributor": {
+                  "id": "cmv64dmbt00053wxk9l3jka4i",
+                  "type": "DISTRIBUTOR"
+                }
+              },
+              {
+                "area": "荔湾",
+                "name": "珍敏水晶行",
+                "reason": "explicit_place",
+                "evidence": [
+                  {
+                    "end": 10,
+                    "field": "address",
+                    "start": 6,
+                    "matchedText": "荔湾广场"
+                  }
+                ],
+                "distributor": {
+                  "id": "cmvgfk5mi000a3whwjdt6gd24",
+                  "type": "DISTRIBUTOR"
+                }
+              },
+              {
+                "area": "荔湾",
+                "name": "明发银配饰",
+                "reason": "explicit_place",
+                "evidence": [
+                  {
+                    "end": 10,
+                    "field": "address",
+                    "start": 6,
+                    "matchedText": "荔湾广场"
+                  }
+                ],
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "type": "DISTRIBUTOR"
+                }
+              },
+              {
+                "area": "荔湾",
+                "name": "晶缘珠宝",
+                "reason": "explicit_place",
+                "evidence": [
+                  {
+                    "end": 10,
+                    "field": "address",
+                    "start": 6,
+                    "matchedText": "荔湾广场"
+                  }
+                ],
+                "distributor": {
+                  "id": "cmwg3g8ak0032oq01pw87gg5k",
+                  "type": "DISTRIBUTOR"
+                }
+              },
+              {
+                "area": "荔湾",
+                "name": "曦雅尼珠宝精品绿松石馆",
+                "reason": "explicit_place",
+                "evidence": [
+                  {
+                    "end": 10,
+                    "field": "address",
+                    "start": 6,
+                    "matchedText": "荔湾广场"
+                  }
+                ],
+                "distributor": {
+                  "id": "cmwg6xshd0071oq01h776t219",
+                  "type": "DISTRIBUTOR"
+                }
+              },
+              {
+                "area": "荔湾",
+                "name": "禧至尊18K金",
+                "reason": "explicit_place",
+                "evidence": [
+                  {
+                    "end": 10,
+                    "field": "address",
+                    "start": 6,
+                    "matchedText": "荔湾广场"
+                  }
+                ],
+                "distributor": {
+                  "id": "cmwg9xsc6008roq01cds80ijb",
+                  "type": "DISTRIBUTOR"
+                }
+              }
+            ],
+            "uncertain": [
+              {
+                "area": "荔湾",
+                "name": "金中佛教珠宝",
+                "reason": "area_only",
+                "evidence": [
+                  {
+                    "end": 2,
+                    "field": "area",
+                    "start": 0,
+                    "matchedText": "荔湾"
+                  }
+                ],
+                "distributor": {
+                  "id": "cmv60jdt100063wap7d1npw7r",
+                  "type": "DISTRIBUTOR"
+                }
+              },
+              {
+                "area": "荔湾",
+                "name": "荔湾",
+                "reason": "area_only",
+                "evidence": [
+                  {
+                    "end": 2,
+                    "field": "area",
+                    "start": 0,
+                    "matchedText": "荔湾"
+                  }
+                ],
+                "distributor": {
+                  "id": "cmv6bdhkj001j3wkqric322h3",
+                  "type": "DISTRIBUTOR"
+                }
+              }
+            ],
+            "scanComplete": true,
+            "scannedCount": 16
+          }
+        }
+      },
+      "status": "needs_confirmation",
+      "version": "orchestration-v2",
+      "metadata": {
+        "transport": "native-fetch",
+        "ruleVersion": "v1",
+        "promptVersion": "orchestration-v2",
+        "requestedModel": "deepseek-flash",
+        "contractVersion": "v1",
+        "relevancePromptVersion": "relevance-v3",
+        "requestedRelevanceModel": "deepseek-flash"
+      },
+      "errorCode": null,
+      "checkpoint": null,
+      "pendingPlan": null,
+      "clarification": "另有渠道商仅能证实较大区域或地点存在歧义，未纳入确定集合。",
+      "reservedTokens": 15243,
+      "clarificationContext": null
+    }
+  ],
+  "passed": true,
+  "cleanedAssistantSessions": 1
+}

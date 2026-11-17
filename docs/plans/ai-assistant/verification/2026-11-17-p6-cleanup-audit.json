@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-11-17T06:54:33.569Z",
+  "environment": "isolated-development",
+  "businessWrites": false,
+  "assistantWrites": false,
+  "browserIdsChecked": 7,
+  "remainingBrowserSessions": 0,
+  "remainingServiceVerificationSessions": 0,
+  "passed": true
+}

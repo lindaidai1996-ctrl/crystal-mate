@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-11-17T04:31:20.601Z",
+  "environment": "isolated-development",
+  "realModel": false,
+  "requestedRealModel": false,
+  "facts": "real P2 purchase/stock + read-only display; frozen selection supplied, not model-selected",
+  "authentication": "short-lived signed test session through real auth; not password login",
+  "checks": [
+    "real read-only 11 purchase rows, exact amount, display metadata and catalog stock",
+    "authenticated whitelisted result HTTP DTO",
+    "default HTTP privacy removes all amount summaries and free text",
+    "desktop structured results, no horizontal overflow",
+    "5/5/1 pagination leaves exact all-result summary unchanged",
+    "real purchase detail link opens read-only page",
+    "mobile card results, no horizontal overflow",
+    "privacy toggle removes rendered amounts immediately",
+    "three feedback types saved through mobile UI, survive refresh, retain question/version, hide notes, no revision/rule mutation",
+    "eight terminal states remain distinct; failures have no zero/empty facts",
+    "real HTTP message/budget/cancel/continue/retry/CAS/origin checks with zero model calls",
+    "real HTTP foreign-conversation read rejected",
+    "browser session switch rejects a delayed old read response (HTTP mock)",
+    "browser cancel retains cancelled generation after a delayed command response (HTTP mock)"
+  ],
+  "passed": true,
+  "browserErrors": []
+}

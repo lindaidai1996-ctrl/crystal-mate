@@ -1,5 +1,7 @@
 'use client';
 
+import { formatAmount } from '@/lib/format-money';
+
 import { ExportOutlined, LeftOutlined, PictureOutlined, RightOutlined } from '@ant-design/icons';
 import { Alert, Button, Popover, Select } from 'antd';
 import { LoadingImage, ImageSkeleton } from '@/components/loadingImage';
@@ -7,17 +9,12 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { ResponsiveModal as Modal } from '@/components/responsive/responsiveDialog';
-import type { Material, MaterialBatchEntry, ProductSourceInput } from '@/lib/client-types';
+import type { Material, MaterialBatchEntry } from '@/lib/client-types';
 import { Sensitive } from '@/components/privacyMode';
 
 export type MaterialOption = { entry: MaterialBatchEntry; material: Material; label: string };
-type UsageUnit = Extract<ProductSourceInput, { origin: 'DIY' }>['materials'][number]['usageUnit'];
 
-export function suggestedMaterialCost(option: MaterialOption, unit: UsageUnit) {
-  if (unit === 'GRAM') return option.entry.purchaseGramPrice;
-  if (unit === 'STRAND' || option.material.unit === 'BEAD') return option.entry.purchaseUnitPrice;
-  return option.entry.childUnitPrice;
-}
+export { suggestedMaterialCost } from '@/lib/diy-picker/draft';
 
 function materialImages(option: MaterialOption) {
   const batchImages = option.entry.images ?? [];
@@ -37,11 +34,12 @@ function MaterialPrices({ option }: { option: MaterialOption }) {
     <>
       <Sensitive>
         {batchT('purchaseUnitPrice')}:{' '}
-        {unitPrice == null ? '—' : `¥${unitPrice}/${t(option.material.unit)}`}
+        {unitPrice == null ? '—' : `¥${formatAmount(unitPrice)}/${t(option.material.unit)}`}
       </Sensitive>
       {' · '}
       <Sensitive>
-        {batchT('gramPrice')}: {gramPrice == null ? '—' : `¥${gramPrice}/${t('GRAM')}`}
+        {batchT('gramPrice')}:{' '}
+        {gramPrice == null ? '—' : `¥${formatAmount(gramPrice)}/${t('GRAM')}`}
       </Sensitive>
     </>
   );
@@ -158,8 +156,10 @@ export function MaterialSourceSelect({
   onSearch,
   onChange,
   preview,
+  onBrowse,
 }: {
   options: MaterialOption[];
+  onBrowse?: () => void;
   selected?: MaterialOption;
   value: string;
   onSearch: (query: string) => void;
@@ -192,6 +192,24 @@ export function MaterialSourceSelect({
           setSearch('');
           onChange(id);
         }}
+        popupRender={(menu) => (
+          <>
+            {menu}
+            {onBrowse && (
+              <Button
+                block
+                type="link"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  setOpen(false);
+                  onBrowse();
+                }}
+              >
+                {t('browseAll')}
+              </Button>
+            )}
+          </>
+        )}
         virtual={false}
         listHeight={320}
         popupMatchSelectWidth={false}

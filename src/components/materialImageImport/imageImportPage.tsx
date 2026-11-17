@@ -1,5 +1,7 @@
 'use client';
 
+import { ImagePreviewGroup } from '@/components/imagePreviewGroup';
+
 import { RecordAuditPanel } from '@/components/audit-history';
 
 import {
@@ -18,7 +20,6 @@ import {
   Button,
   Collapse,
   Drawer,
-  Image,
   Popconfirm,
   Select,
   Space,
@@ -367,7 +368,7 @@ export function ImageImportPage({ initialId }: { initialId?: string }) {
         <>
           <div className={importStyles.summary}>
             <strong>{job.fileName}</strong>
-            <Image.PreviewGroup
+            <ImagePreviewGroup
               key={job.id}
               items={[{ src: job.sourceUrl, alt: job.fileName }]}
               preview={{ visible: previewSource, onVisibleChange: setPreviewSource }}
@@ -375,7 +376,7 @@ export function ImageImportPage({ initialId }: { initialId?: string }) {
               <Button icon={<PictureOutlined />} onClick={() => setPreviewSource(true)}>
                 {t('viewSourceImage')}
               </Button>
-            </Image.PreviewGroup>
+            </ImagePreviewGroup>
             <span>{t('summary', { count: job.items.length, imported: committed })}</span>
             <Tag>
               {job.provider} · {job.model}

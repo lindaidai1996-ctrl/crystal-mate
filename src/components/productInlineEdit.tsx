@@ -235,7 +235,7 @@ export function ProductInlineEdit({
       placement="bottomLeft"
       destroyOnHidden
     >
-      <span className={styles.cell} onDoubleClick={openEditor}>
+      <span className={styles.cell} data-field={field} onDoubleClick={openEditor}>
         <span className={styles.value}>{children}</span>
         <Tooltip title={`${common('edit')} ${label}`}>
           <Button

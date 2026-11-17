@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-11-17T03:57:31.047Z",
+  "environment": "isolated-development",
+  "realModel": false,
+  "facts": "real P2 purchase/stock + read-only display; frozen selection supplied, not model-selected",
+  "authentication": "short-lived signed test session through real auth; not password login",
+  "checks": [
+    "real read-only 11 purchase rows, exact amount, display metadata and catalog stock",
+    "authenticated whitelisted result HTTP DTO",
+    "default HTTP privacy removes all amount summaries and free text",
+    "desktop structured results, no horizontal overflow",
+    "5/5/1 pagination leaves exact all-result summary unchanged",
+    "real purchase detail link opens read-only page",
+    "mobile card results, no horizontal overflow"
+  ],
+  "passed": false,
+  "failure": "locator.waitFor: Error: strict mode violation: getByText('隐私模式已隐藏成本、金额及可能包含成本的名称和自由文本。') resolved to 2 elements:\n    1) <p class=\"assistantPage_muted__w6S8J\">隐私模式已隐藏成本、金额及可能包含成本的名称和自由文本。</p> aka getByRole('region', { name: '确定集合的全量汇总' }).getByText('隐私模式已隐藏成本、金额及可能包含成本的名称和自由文本。')\n    2) <p class=\"assistantPage_muted__w6S8J\">隐私模式已隐藏成本、金额及可能包含成本的名称和自由文本。</p> aka getByText('隐私模式已隐藏成本、金额及可能包含成本的名称和自由文本。').nth(1)\n\nCall log:\n\u001b[2m  - waiting for getByText('隐私模式已隐藏成本、金额及可能包含成本的名称和自由文本。') to be visible\u001b[2",
+  "browserErrors": [
+    "Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicat",
+    "Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicat"
+  ]
+}

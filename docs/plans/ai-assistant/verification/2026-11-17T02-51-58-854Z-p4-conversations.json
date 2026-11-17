@@ -1,0 +1,60 @@
+{
+  "checkedAt": "2026-11-17T02:51:58.853Z",
+  "environment": "isolated-development",
+  "realModel": false,
+  "checks": [
+    {
+      "name": "durable-new-store-instance",
+      "passed": true
+    },
+    {
+      "name": "cross-account-read-write-isolation",
+      "passed": true
+    },
+    {
+      "name": "active-lease-prevents-concurrent-claim",
+      "passed": true
+    },
+    {
+      "name": "cancel-and-late-response-cas",
+      "passed": true
+    },
+    {
+      "name": "expired-worker-portable-restart-and-fencing",
+      "passed": true
+    }
+  ],
+  "business": {
+    "readOnly": true,
+    "candidateCount": 44,
+    "frozenExpectedCount": 11,
+    "purchaseEntryCount": 11,
+    "amounts": [
+      {
+        "currency": "CNY",
+        "knownAmount": "1897.60",
+        "unknownAmountEntryCount": 0,
+        "businessDefaultCurrencyEntryCount": 11
+      }
+    ],
+    "quantities": [
+      {
+        "unit": "BEAD",
+        "knownQuantity": "7.00",
+        "unknownQuantityEntryCount": 0
+      },
+      {
+        "unit": "GRAM",
+        "knownQuantity": "4.43",
+        "unknownQuantityEntryCount": 0
+      },
+      {
+        "unit": "STRAND",
+        "knownQuantity": "3.00",
+        "unknownQuantityEntryCount": 0
+      }
+    ],
+    "selectionSource": "frozen-reference-ids-not-live-model"
+  },
+  "passed": true
+}

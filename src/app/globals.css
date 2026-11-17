@@ -1,5 +1,7 @@
 :root {
   color-scheme: light;
+  /* Inherited by clickable divs and icons as well as native buttons. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (max-width: 767px) {
@@ -1839,6 +1841,67 @@ body {
     outline-offset: 3px;
   }
 }
+
+/* Low-priority defaults let individual controls keep their own press effects. */
+@layer antd.touch-feedback {
+  @media (hover: none) and (pointer: coarse) {
+    :where(button, [role='button']) {
+      transition:
+        opacity 120ms ease,
+        scale 120ms ease;
+    }
+    :where(button, [role='button']):not(
+        :disabled,
+        [aria-disabled='true'],
+        [aria-busy='true'],
+        .ant-btn-loading
+      ):is(:active, [data-touch-pressed]) {
+      opacity: 0.8;
+      scale: 0.97;
+    }
+  }
+}
+
+/* Preview switches and toolbar actions are divs rendered in a body portal. */
+.ant-image-preview-operations-wrapper
+  :is(
+    .ant-image-preview-close,
+    .ant-image-preview-switch-left,
+    .ant-image-preview-switch-right,
+    .ant-image-preview-operations-operation
+  ) {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  transition:
+    background-color 120ms ease,
+    scale 120ms ease;
+}
+.ant-image-preview-operations-wrapper
+  :is(.ant-image-preview-switch-left, .ant-image-preview-switch-right) {
+  /* The switches' translateY(-50%) places their visual center at the top edge. */
+  transform-origin: center top;
+}
+.ant-image-preview-operations-wrapper
+  :is(
+    .ant-image-preview-close,
+    .ant-image-preview-switch-left,
+    .ant-image-preview-switch-right,
+    .ant-image-preview-operations-operation
+  ):not(
+    .ant-image-preview-switch-left-disabled,
+    .ant-image-preview-switch-right-disabled,
+    .ant-image-preview-operations-operation-disabled
+  ):is(:active, [data-touch-pressed]) {
+  background-color: rgb(255 255 255 / 24%);
+  opacity: 1;
+  scale: 0.92;
+}
+.ant-image-preview-operations-wrapper .ant-image-preview-close:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

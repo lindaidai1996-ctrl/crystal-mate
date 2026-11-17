@@ -1,7 +1,9 @@
 'use client';
 
+import { ImagePreviewGroup } from '@/components/imagePreviewGroup';
+
 import { PictureOutlined, ReloadOutlined, RightOutlined } from '@ant-design/icons';
-import { Alert, Button, Drawer, Empty, Image, Skeleton, Tag } from 'antd';
+import { Alert, Button, Drawer, Empty, Skeleton, Tag } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Link } from '@/i18n/navigation';
@@ -100,7 +102,7 @@ export function MaterialImportSources({ material }: { material: Material }) {
         ) : !sources.length ? (
           <Empty description={t('empty')} />
         ) : (
-          <Image.PreviewGroup
+          <ImagePreviewGroup
             items={sources.map((source) => ({ src: source.sourceUrl, alt: source.fileName }))}
             preview={{
               visible: preview !== undefined,
@@ -165,7 +167,7 @@ export function MaterialImportSources({ material }: { material: Material }) {
                 </article>
               ))}
             </div>
-          </Image.PreviewGroup>
+          </ImagePreviewGroup>
         )}
       </Drawer>
     </>

@@ -2,7 +2,7 @@
 
 日期：2026-11-16。对应 **P2-01**。运行时定义见 `src/lib/ai-assistant/contracts.ts`，示例与拒绝案例见 `tests/unit/ai-assistant-contracts.test.ts`。
 
-这是可执行的 Zod 数据契约；P2-02 地点/字典、P2-03 候选/详情与 P2-04 采购明细/汇总服务已连接数据库，尚未连接 HTTP 工具；P3-03/P3-04 另提供[受控模型判断/执行契约](model-evaluation.md)，不改变这些 P2 业务查询接口。运行时认证、引用存在性、字段来源和运行归属由服务验证，不能仅因 schema 通过就认定查询已被授权或结果属实。
+这是可执行的 Zod 数据契约；P2-02 地点/字典、P2-03 候选/详情与 P2-04 采购明细/汇总服务已连接数据库，已由 P4 编排及 P5 认证 HTTP/界面消费；P3-03/P3-04 另提供[受控模型判断/执行契约](model-evaluation.md)，不改变这些 P2 业务查询接口。运行时认证、引用存在性、字段来源和运行归属由服务验证，不能仅因 schema 通过就认定查询已被授权或结果属实。
 
 ## 查询输入
 
@@ -24,7 +24,7 @@
 
 不同硬条件之间 AND；省略条件表示不限制，显式空 ID 数组会被拒绝，防止误把“没有匹配渠道商”变成“不限渠道商”。确已解析且无匹配的地点应返回完整的空范围，不要删除地点重查。当前目录的渠道商条件表示“存在对应渠道商采购关联”；这不是目录所有者条件。
 
-`purchaseDate` 不接受时间戳、非法日历日期、相同或逆序边界。`createdAt` 不接受无偏移的本地时间，按实际瞬间比较而非字符串排序。北京时间常量为 `ASSISTANT_TIMEZONE = Asia/Shanghai`；相对时间尚未实现，后续由后端注入时钟并计算明确边界，不把模型提供的“当前时间”当可信时钟。
+`purchaseDate` 不接受时间戳、非法日历日期、相同或逆序边界。`createdAt` 不接受无偏移的本地时间，按实际瞬间比较而非字符串排序。北京时间常量为 `ASSISTANT_TIMEZONE = Asia/Shanghai`；P4 编排已支持 this_month / previous_month，由后端注入时钟计算明确边界，不把模型提供的“当前时间”当可信时钟；其他相对日期表达仍需明确范围或澄清。
 
 主案例不依赖模型即可表达：
 
@@ -96,7 +96,7 @@ P2-03 已实现服务端运行/游标校验、查询摘要和不可变候选视�
 - **P2-03 已完成**：[候选/详情查询](candidate-query.md)实现上述目录/采购候选分页、引用存在性、数据范围、游标与实际累计计数；新增详情专用 schema，沿用 v1。
 - **P2-04 已完成**：[采购明细与 Decimal 汇总](purchase-query.md)新增专用 schema，复用目录/采购引用；支持精确采购选择，十进制金额、未知行数、币种和数量单位分别返回。完整选定集合汇总不随当页变化，提交选择不等于语义判断已通过。当前采购币种采用明确标记的 CNY 业务默认，不推断商品售价币种。
 - **P2-05**：库存使用[独立专用契约](stock-query.md)，`catalog_current` 与 `purchase_remaining` 分离；历史采购 query 仅选择对象/来源，不限制目录总库存的批次。原 `assistantQuerySchema` 的 subject 不变。
-- **P2-06 已完成**：[工具边界](tool-boundaries.md)验证现有认证/审计、账号运行隔离和最小字段；地点/字典也使用显式只读事务。schema 不能替代鉴权。目前无助手 HTTP 路由或对话存储，真实 HTTP/未来会话隔离仍待后续接入。
+- **P2-06 已完成**：[工具边界](tool-boundaries.md)验证现有认证/审计、账号运行隔离和最小字段；地点/字典也使用显式只读事务。schema 不能替代鉴权。后续 P4/P5 已接入持久会话与认证 HTTP，当前验证见 P6 交接。
 - **P3-01/P3-02 已完成**：[语义策略与召回](semantic-policy.md)保留 v1 的原查询/候选不变，新增独立召回返回契约。`recallPageSchema` 在候选页面上增加 `policyVersion`、逐候选 `sources` 与全量 `sourceCounts`；独立存储/工具绑定，原候选/采购游标不互通。确定性规则输出复用并校验 `semanticDecisionSchema`，不代表 P3-03 模型判断已完成。
 - **P3-03/P3-04**：绑定实际候选验证判断输出；缺失判定、执行预算、错误和取消据实更新累计计数。
 
@@ -107,3 +107,21 @@ P2-03 已实现服务端运行/游标校验、查询摘要和不可变候选视�
 `start/continue/cancel/readAssistantRelevance` 是独立认证内部服务，使用原 v1 查询与完整有界召回。输出引用证据索引，经后端映射原值并复用本文件的 `decisionsForCandidatesSchema`；候选/采购身份不能由模型生成。运行拥有独立 runId，不接受其他工具游标或客户端候选。缺失判断单独记未评估；分歧/冲突为 uncertain。详细预算、版本和生命周期见[执行契约](model-evaluation.md)。
 
 `confirmedSelection` 仅 include。调用 P2 汇总/库存时必须使用精确选择及原硬范围，并携带 `selectionIsPartial` 和完整性；显式空选择不能省略成全范围。模型失败后不能将空选择生成的零汇总当“无匹配”。`canConcludeNoMatches` 仅在候选遍历与判断全完成、没有 include 或 uncertain 时为真；查询失败直接错误，不产生空成功运行。
+
+## P4 消费
+
+[编排契约](orchestration.md)复用本 v1 查询和原硬范围；模型仅提交条件 patch，不提交账号/SQL/候选选择。每次追问/恢复新读候选，金额/库存重新回源，显式空选择保留。持久会话与执行记录独立于 P2/P3 内存游标；P4 当时没有 HTTP，P5 后续只通过认证 facade 接入，没有改变现有查询字段含义。
+
+## P5 浏览器消费
+
+[界面契约](interface.md)定义白名单 DTO、进度与反馈。图片/规格由只读 display reader 补充，P2 金额/数量/库存和全量汇总不交模型生成，也不由客户端分页重算。完整判断含 uncertain 时仅投影 include 的事实，并标记 selectionIsPartial；未知计数保持 null，失败、未完成和待确认不能变成全量零金额或无记录。隐私投影移除金额及可能嵌入成本的自由文本，切换偏好立即隐藏。
+
+反馈使用独立严格 schema、真实记录存在性/采购关系验证，绑定问题/执行及服务端版本；只保存 pending_review，不修改 v1 语义规则或查询条件。契约源码入口：browser-contracts/view、result-view、progress-view、feedback-contracts/target。
+
+## P6 文字消费补充（2026-11-17）
+
+业务 schema/规则仍为 v1；编排提示/计划版本见 [编排契约](orchestration.md)。文字 `view=stock` 映射 `catalog_current`，`view=purchase_remaining` 映射物料采购来源余量；商品或目录查询不能代用总库存。地点渠道商 `view=distributors` 直接消费地点解析，确定与待确认 ID 分开，扫描未完成不投影成功集合；不能附带采购日期/目录语义条件。
+
+已有查询内两条明确库存追问由后端 R08 规则固定视图并保留原条件；其他输入仍经模型严格 patch。相对月份由后端时钟计算，模型获 referenceNow/Asia/Shanghai；`month` 与明确日期区间冲突时拒绝，`purchaseDate=null` 只是清除旧值，可在同一 patch 后应用月份，不是另一个日期区间。
+
+AI 助手影响：已同步；事实回源、精确身份、待确认与隐私投影的验证及失败见 [P6 交接](handoffs/2026-11-17-p6-01-04.md)。冻结业务预期不变。

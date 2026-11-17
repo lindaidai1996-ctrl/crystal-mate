@@ -1,0 +1,17 @@
+{
+  "phase": "P5-01",
+  "environment": "isolated-development",
+  "realModel": false,
+  "authentication": "short-lived signed test session, real auth callback; not password login",
+  "checks": [
+    "unauthenticated HTTP rejected",
+    "authenticated create/read/list and restore by URL",
+    "desktop no horizontal overflow",
+    "conversation switch",
+    "refresh restores selected conversation",
+    "mobile 390px no horizontal overflow",
+    "English page"
+  ],
+  "errors": [],
+  "passed": true
+}

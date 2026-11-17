@@ -1,5 +1,7 @@
 'use client';
 
+import { formatCurrency } from '@/lib/format-money';
+
 import { Tag } from 'antd';
 import { RecordAuditSummary, useRecordProvenance } from './audit-history';
 import type { PaginationProps } from 'antd';
@@ -12,6 +14,7 @@ import { ProductInlineEdit, type ProductQuickEditChange } from './productInlineE
 import { TextTag } from './text-tag';
 import { CatalogNote } from './catalogNote';
 import { MobileDetails } from './responsive/mobileDetails';
+import { ProductDiyEntry } from './productDiyEntry';
 import catalogStyles from './productCatalog.module.css';
 
 export function ProductGallery({
@@ -22,6 +25,7 @@ export function ProductGallery({
   renderActions,
   renderDetails,
   onQuickEdit,
+  onOpenDiy,
 }: {
   items: Product[];
   listPath: string;
@@ -30,15 +34,12 @@ export function ProductGallery({
   renderActions: (item: Product) => ReactNode;
   renderDetails?: (item: Product) => ReactNode;
   onQuickEdit: (item: Product, change: ProductQuickEditChange) => Promise<void>;
+  onOpenDiy: (item: Product) => void;
 }) {
   const { records: provenance, failed: auditFailed } = useRecordProvenance('Product', items);
   const t = useTranslations('products');
   const sources = useTranslations('productSources');
   const locale = useLocale();
-  const currency = new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'zh-CN', {
-    style: 'currency',
-    currency: 'CNY',
-  });
 
   return (
     <CatalogGallery loading={loading} pagination={pagination} emptyDescription={t('empty')}>
@@ -61,6 +62,7 @@ export function ProductGallery({
               <span>{item.category.name}</span>
               {item.origin && <span>{sources(item.origin)}</span>}
             </div>
+            <ProductDiyEntry product={item} onOpen={onOpenDiy} />
             {(item.tags.length > 0 || item.description || renderDetails) && (
               <MobileDetails>
                 {!!item.tags.length && (
@@ -86,7 +88,7 @@ export function ProductGallery({
                     onSave={(change) => onQuickEdit(item, change)}
                   >
                     <span className={catalogStyles.money}>
-                      {currency.format(item.priceCents / 100)}
+                      {formatCurrency(item.priceCents / 100, locale)}
                     </span>
                   </ProductInlineEdit>
                 </dd>

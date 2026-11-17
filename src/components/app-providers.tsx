@@ -7,9 +7,11 @@ import zhCN from 'antd/locale/zh_CN';
 import { useLocale } from 'next-intl';
 import { useEffect } from 'react';
 import { uiTheme } from '@/lib/ui-theme';
+import { useTouchFeedback } from '@/components/responsive/useTouchFeedback';
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   const locale = useLocale();
+  useTouchFeedback();
   useEffect(() => {
     document.documentElement.lang = locale === 'en' ? 'en' : 'zh-CN';
   }, [locale]);

@@ -1,0 +1,1386 @@
+{
+  "checkedAt": "2026-11-17T06:18:06.788Z",
+  "realModel": false,
+  "database": "crystal_mate_dev",
+  "businessWrites": false,
+  "migration": false,
+  "productionAccess": false,
+  "browser": false,
+  "priceBasis": null,
+  "runs": [],
+  "measurements": [
+    {
+      "label": "one-item",
+      "repetition": 1,
+      "candidates": 1,
+      "durationMs": 618,
+      "modelCalls": 0
+    },
+    {
+      "label": "one-item",
+      "repetition": 2,
+      "candidates": 1,
+      "durationMs": 281,
+      "modelCalls": 0
+    },
+    {
+      "label": "one-item",
+      "repetition": 3,
+      "candidates": 1,
+      "durationMs": 248,
+      "modelCalls": 0
+    },
+    {
+      "label": "main-44-scope",
+      "repetition": 1,
+      "candidates": 44,
+      "durationMs": 254,
+      "modelCalls": 0
+    },
+    {
+      "label": "main-44-scope",
+      "repetition": 2,
+      "candidates": 44,
+      "durationMs": 387,
+      "modelCalls": 0
+    },
+    {
+      "label": "main-44-scope",
+      "repetition": 3,
+      "candidates": 44,
+      "durationMs": 233,
+      "modelCalls": 0
+    },
+    {
+      "label": "all-material-catalog",
+      "repetition": 1,
+      "candidates": 210,
+      "durationMs": 332,
+      "modelCalls": 0
+    },
+    {
+      "label": "all-material-catalog",
+      "repetition": 2,
+      "candidates": 210,
+      "durationMs": 289,
+      "modelCalls": 0
+    },
+    {
+      "label": "all-material-catalog",
+      "repetition": 3,
+      "candidates": 210,
+      "durationMs": 245,
+      "modelCalls": 0
+    }
+  ],
+  "observed": {
+    "counts": {
+      "materials": 210,
+      "products": 127,
+      "distributors": 16,
+      "batches": 13,
+      "materialPurchaseEntries": 213,
+      "productPurchaseEntries": 13
+    },
+    "frozenCounts": {
+      "materials": 210,
+      "products": 127,
+      "distributors": 16,
+      "batches": 13,
+      "materialPurchaseEntries": 213,
+      "productPurchaseEntries": 13
+    },
+    "scopedCandidates": 44,
+    "missing": [],
+    "added": [],
+    "changedFacts": [
+      {
+        "id": "cmwg2h6d1002poq012l3enech",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "75.0000",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "75.00",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg41qd40042oq01bdr95r0f",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "162.5000",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "162.50",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg462ib0049oq01l602ks55",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "110.0000",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "110.00",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg4ekoh004foq01k1uo5kyt",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "17.6000",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "17.60",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg4gc92004loq01w7elwpgm",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "22.0000",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "22.00",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg4irgl004roq01ldythgge",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "29.7000",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "29.70",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg4l0yn004xoq01kdmkix3z",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "15.4000",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "15.40",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg5fuek005foq010y4jszjt",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "120.0000",
+          "quantity": "2.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "120.00",
+          "quantity": "2.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg5jzo9005moq01y9d4q07v",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "23.0000",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "23.00",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg5t23v005woq01u1qq95c0",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "35.0000",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "35.00",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg62y0z0066oq01crq24mcy",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "54.0000",
+          "quantity": "2.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "54.00",
+          "quantity": "2.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg65503006coq016p0qbfgs",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "26.0000",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "26.00",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg695kc006ioq016bxdz2rx",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "35.0000",
+          "quantity": "10.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "35.00",
+          "quantity": "10.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg6kssl006ooq01j1e3go4p",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "19.0000",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "19.00",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg6q67j006uoq012detgflf",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "78.0000",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "78.00",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg6sg3j006yoq017kkapoi8",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "44.0000",
+          "quantity": "4.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "44.00",
+          "quantity": "4.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg6zmto0076oq01k1dobc3c",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "86.0000",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "86.00",
+          "quantity": "1.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg8qfxe0089oq01qgahihor",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "7.5000",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "7.50",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwg8ut8w008goq01ueld40kz",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "20.0000",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "20.00",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwhhwzpx00a1oq01epyun3py",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "100.0000",
+          "quantity": "10.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "100.00",
+          "quantity": "10.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwhi1vm800a9oq01675o73dw",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "115.0000",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "115.00",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwhi6lbu00ahoq01k63brjnz",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "70.0000",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "70.00",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwhiagbj00atoq01sms4uxt6",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "110.0000",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "110.00",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwhid0ek00b1oq01irvvn3cm",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "65.0000",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "65.00",
+          "quantity": "5.00",
+          "unit": "BEAD"
+        }
+      },
+      {
+        "id": "cmwhijons00b9oq01lxg5717t",
+        "differenceKind": "decimal_serialization_only",
+        "frozen": {
+          "amount": "150.0000",
+          "quantity": "2.00",
+          "unit": "BEAD"
+        },
+        "current": {
+          "amount": "150.00",
+          "quantity": "2.00",
+          "unit": "BEAD"
+        }
+      }
+    ],
+    "changedRemaining": [],
+    "semanticSnapshotSha256": "eed51d9423c2e11c1d0e49ee7cc466dbb2c9fe94a63f5e7c0de4d13164d966cd",
+    "changedSemanticFields": [],
+    "interpretation": "Observed development state; differences are reported, never repaired by changing business data or frozen expectations."
+  },
+  "currentRuleUncertainCount": 0,
+  "facts": {
+    "summary": {
+      "basis": "selected_purchases",
+      "scopeCandidateCount": 44,
+      "totals": {
+        "purchaseEntryCount": 11,
+        "catalogItemCount": 11,
+        "amounts": [
+          {
+            "currency": "CNY",
+            "knownAmount": "1897.60",
+            "unknownAmountEntryCount": 0,
+            "businessDefaultCurrencyEntryCount": 11
+          }
+        ],
+        "quantities": [
+          {
+            "unit": "BEAD",
+            "knownQuantity": "7.00",
+            "unknownQuantityEntryCount": 0
+          },
+          {
+            "unit": "GRAM",
+            "knownQuantity": "4.43",
+            "unknownQuantityEntryCount": 0
+          },
+          {
+            "unit": "STRAND",
+            "knownQuantity": "3.00",
+            "unknownQuantityEntryCount": 0
+          }
+        ]
+      },
+      "byDistributor": [
+        {
+          "distributor": {
+            "id": "cmwg3g8ak0032oq01pw87gg5k",
+            "name": "晶缘珠宝"
+          },
+          "totals": {
+            "purchaseEntryCount": 10,
+            "catalogItemCount": 10,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "1811.60",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 10
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "BEAD",
+                "knownQuantity": "6.00",
+                "unknownQuantityEntryCount": 0
+              },
+              {
+                "unit": "GRAM",
+                "knownQuantity": "4.43",
+                "unknownQuantityEntryCount": 0
+              },
+              {
+                "unit": "STRAND",
+                "knownQuantity": "3.00",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          }
+        },
+        {
+          "distributor": {
+            "id": "cmwg6xshd0071oq01h776t219",
+            "name": "曦雅尼珠宝精品绿松石馆"
+          },
+          "totals": {
+            "purchaseEntryCount": 1,
+            "catalogItemCount": 1,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "86.00",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 1
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "BEAD",
+                "knownQuantity": "1.00",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          }
+        }
+      ],
+      "byCatalog": [
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg3jvmq0038oq017cf73132"
+          },
+          "name": "4mm绿松石随形",
+          "totals": {
+            "purchaseEntryCount": 1,
+            "catalogItemCount": 1,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "220.00",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 1
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "STRAND",
+                "knownQuantity": "1.00",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          }
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg3tev8003joq01zlvvug0k"
+          },
+          "name": "3.5mm绿松石药片",
+          "totals": {
+            "purchaseEntryCount": 1,
+            "catalogItemCount": 1,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "185.00",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 1
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "STRAND",
+                "knownQuantity": "1.00",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          }
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg3wwbn003soq01of24lsde"
+          },
+          "name": "3mm绿松石圆珠",
+          "totals": {
+            "purchaseEntryCount": 1,
+            "catalogItemCount": 1,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "869.40",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 1
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "STRAND",
+                "knownQuantity": "1.00",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          }
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg41qcz0040oq016l565fdh"
+          },
+          "name": "13mm绿松石桶珠",
+          "totals": {
+            "purchaseEntryCount": 1,
+            "catalogItemCount": 1,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "162.50",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 1
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "BEAD",
+                "knownQuantity": "1.00",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          }
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg462i80047oq01899ruhhw"
+          },
+          "name": "7.8mm绿松石勒子",
+          "totals": {
+            "purchaseEntryCount": 1,
+            "catalogItemCount": 1,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "110.00",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 1
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "BEAD",
+                "knownQuantity": "1.00",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          }
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4ekob004doq0122uzteo5"
+          },
+          "name": "百香籽绿松石配饰",
+          "totals": {
+            "purchaseEntryCount": 1,
+            "catalogItemCount": 1,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "17.60",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 1
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "BEAD",
+                "knownQuantity": "1.00",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          }
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4gc8z004joq01mwra61gp"
+          },
+          "name": "羽毛绿松石提溜",
+          "totals": {
+            "purchaseEntryCount": 1,
+            "catalogItemCount": 1,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "22.00",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 1
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "BEAD",
+                "knownQuantity": "1.00",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          }
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4irgg004poq01fz0k9ffi"
+          },
+          "name": "太阳绿松石提溜（大）",
+          "totals": {
+            "purchaseEntryCount": 1,
+            "catalogItemCount": 1,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "29.70",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 1
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "BEAD",
+                "knownQuantity": "1.00",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          }
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4l0yi004voq017d2499gv"
+          },
+          "name": "太阳绿松石提溜",
+          "totals": {
+            "purchaseEntryCount": 1,
+            "catalogItemCount": 1,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "15.40",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 1
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "BEAD",
+                "knownQuantity": "1.00",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          }
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4od7h0051oq01rx3ps154"
+          },
+          "name": "藏扣绿松石",
+          "totals": {
+            "purchaseEntryCount": 1,
+            "catalogItemCount": 1,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "180.00",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 1
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "GRAM",
+                "knownQuantity": "4.43",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          }
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg6zmtj0074oq01ogtm3q3z"
+          },
+          "name": "绿松石羽毛提溜",
+          "totals": {
+            "purchaseEntryCount": 1,
+            "catalogItemCount": 1,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "86.00",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 1
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "BEAD",
+                "knownQuantity": "1.00",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "stock": {
+      "version": "v1",
+      "queriedAt": "2026-11-17T06:18:08.310Z",
+      "request": {
+        "mode": "catalog_current",
+        "query": {
+          "version": "v1",
+          "subject": "purchases",
+          "itemTypes": ["MATERIAL"],
+          "hard": {
+            "purchaseDate": {
+              "from": "2026-11-01",
+              "to": "2026-12-01"
+            },
+            "location": {
+              "text": "荔湾广场",
+              "kind": "exact_place"
+            }
+          },
+          "semantic": [
+            {
+              "concept": "material",
+              "text": "绿松石",
+              "relation": "is"
+            },
+            {
+              "concept": "purpose",
+              "text": "配件",
+              "relation": "is"
+            }
+          ],
+          "ruleVersion": "v1",
+          "pagination": {
+            "limit": 5
+          }
+        },
+        "selectedPurchases": [
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg3jvn7003aoq01w2vzww8r"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg3tevc003loq01iq1raphc"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg3wwbs003uoq01fefb4uhm"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg41qd40042oq01bdr95r0f"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg462ib0049oq01l602ks55"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4ekoh004foq01k1uo5kyt"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4gc92004loq01w7elwpgm"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4irgl004roq01ldythgge"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4l0yn004xoq01kdmkix3z"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4od7j0053oq01d96hk3zn"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg6zmto0076oq01k1dobc3c"
+          }
+        ]
+      },
+      "scopeCandidateCount": 44,
+      "selectedCandidateCount": 11,
+      "catalogItemCount": 11,
+      "traversal": "complete",
+      "semanticEvaluation": "not_performed",
+      "catalogStock": [
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg3jvmq0038oq017cf73132"
+          },
+          "name": "4mm绿松石随形",
+          "unit": "STRAND",
+          "knownStock": "1.00",
+          "unknownStockBatchCount": 0,
+          "stockBatchCount": 1
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg3tev8003joq01zlvvug0k"
+          },
+          "name": "3.5mm绿松石药片",
+          "unit": "STRAND",
+          "knownStock": "1.00",
+          "unknownStockBatchCount": 0,
+          "stockBatchCount": 1
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg3wwbn003soq01of24lsde"
+          },
+          "name": "3mm绿松石圆珠",
+          "unit": "STRAND",
+          "knownStock": "1.00",
+          "unknownStockBatchCount": 0,
+          "stockBatchCount": 1
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg41qcz0040oq016l565fdh"
+          },
+          "name": "13mm绿松石桶珠",
+          "unit": "BEAD",
+          "knownStock": "1.00",
+          "unknownStockBatchCount": 0,
+          "stockBatchCount": 1
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg462i80047oq01899ruhhw"
+          },
+          "name": "7.8mm绿松石勒子",
+          "unit": "BEAD",
+          "knownStock": "1.00",
+          "unknownStockBatchCount": 0,
+          "stockBatchCount": 1
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4ekob004doq0122uzteo5"
+          },
+          "name": "百香籽绿松石配饰",
+          "unit": "BEAD",
+          "knownStock": "1.00",
+          "unknownStockBatchCount": 0,
+          "stockBatchCount": 1
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4gc8z004joq01mwra61gp"
+          },
+          "name": "羽毛绿松石提溜",
+          "unit": "BEAD",
+          "knownStock": "1.00",
+          "unknownStockBatchCount": 0,
+          "stockBatchCount": 1
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4irgg004poq01fz0k9ffi"
+          },
+          "name": "太阳绿松石提溜（大）",
+          "unit": "BEAD",
+          "knownStock": "1.00",
+          "unknownStockBatchCount": 0,
+          "stockBatchCount": 1
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4l0yi004voq017d2499gv"
+          },
+          "name": "太阳绿松石提溜",
+          "unit": "BEAD",
+          "knownStock": "1.00",
+          "unknownStockBatchCount": 0,
+          "stockBatchCount": 1
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4od7h0051oq01rx3ps154"
+          },
+          "name": "藏扣绿松石",
+          "unit": "GRAM",
+          "knownStock": "4.43",
+          "unknownStockBatchCount": 0,
+          "stockBatchCount": 1
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg6zmtj0074oq01ogtm3q3z"
+          },
+          "name": "绿松石羽毛提溜",
+          "unit": "BEAD",
+          "knownStock": "1.00",
+          "unknownStockBatchCount": 0,
+          "stockBatchCount": 1
+        }
+      ],
+      "sourceStock": [],
+      "quantities": [
+        {
+          "unit": "BEAD",
+          "knownStock": "7.00",
+          "unknownStockObjectCount": 0,
+          "unknownStockBatchCount": 0
+        },
+        {
+          "unit": "GRAM",
+          "knownStock": "4.43",
+          "unknownStockObjectCount": 0,
+          "unknownStockBatchCount": 0
+        },
+        {
+          "unit": "STRAND",
+          "knownStock": "3.00",
+          "unknownStockObjectCount": 0,
+          "unknownStockBatchCount": 0
+        }
+      ]
+    },
+    "remaining": {
+      "version": "v1",
+      "queriedAt": "2026-11-17T06:18:08.565Z",
+      "request": {
+        "mode": "purchase_remaining",
+        "query": {
+          "version": "v1",
+          "subject": "purchases",
+          "itemTypes": ["MATERIAL"],
+          "hard": {
+            "purchaseDate": {
+              "from": "2026-11-01",
+              "to": "2026-12-01"
+            },
+            "location": {
+              "text": "荔湾广场",
+              "kind": "exact_place"
+            }
+          },
+          "semantic": [
+            {
+              "concept": "material",
+              "text": "绿松石",
+              "relation": "is"
+            },
+            {
+              "concept": "purpose",
+              "text": "配件",
+              "relation": "is"
+            }
+          ],
+          "ruleVersion": "v1",
+          "pagination": {
+            "limit": 5
+          }
+        },
+        "selectedPurchases": [
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg3jvn7003aoq01w2vzww8r"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg3tevc003loq01iq1raphc"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg3wwbs003uoq01fefb4uhm"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg41qd40042oq01bdr95r0f"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg462ib0049oq01l602ks55"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4ekoh004foq01k1uo5kyt"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4gc92004loq01w7elwpgm"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4irgl004roq01ldythgge"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4l0yn004xoq01kdmkix3z"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4od7j0053oq01d96hk3zn"
+          },
+          {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg6zmto0076oq01k1dobc3c"
+          }
+        ]
+      },
+      "scopeCandidateCount": 44,
+      "selectedCandidateCount": 11,
+      "catalogItemCount": 11,
+      "traversal": "complete",
+      "semanticEvaluation": "not_performed",
+      "catalogStock": [],
+      "sourceStock": [
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg3jvmq0038oq017cf73132"
+          },
+          "purchase": {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg3jvn7003aoq01w2vzww8r"
+          },
+          "batch": {
+            "type": "BATCH",
+            "id": "cmwg1jixq0013oq0142v7o2rz"
+          },
+          "name": "4mm绿松石随形",
+          "unit": "STRAND",
+          "purchasedQuantity": "1.00",
+          "remainingQuantity": "1.00"
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg3tev8003joq01zlvvug0k"
+          },
+          "purchase": {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg3tevc003loq01iq1raphc"
+          },
+          "batch": {
+            "type": "BATCH",
+            "id": "cmwg1jixq0013oq0142v7o2rz"
+          },
+          "name": "3.5mm绿松石药片",
+          "unit": "STRAND",
+          "purchasedQuantity": "1.00",
+          "remainingQuantity": "1.00"
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg3wwbn003soq01of24lsde"
+          },
+          "purchase": {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg3wwbs003uoq01fefb4uhm"
+          },
+          "batch": {
+            "type": "BATCH",
+            "id": "cmwg1jixq0013oq0142v7o2rz"
+          },
+          "name": "3mm绿松石圆珠",
+          "unit": "STRAND",
+          "purchasedQuantity": "1.00",
+          "remainingQuantity": "1.00"
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg41qcz0040oq016l565fdh"
+          },
+          "purchase": {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg41qd40042oq01bdr95r0f"
+          },
+          "batch": {
+            "type": "BATCH",
+            "id": "cmwg1jixq0013oq0142v7o2rz"
+          },
+          "name": "13mm绿松石桶珠",
+          "unit": "BEAD",
+          "purchasedQuantity": "1.00",
+          "remainingQuantity": "1.00"
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg462i80047oq01899ruhhw"
+          },
+          "purchase": {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg462ib0049oq01l602ks55"
+          },
+          "batch": {
+            "type": "BATCH",
+            "id": "cmwg1jixq0013oq0142v7o2rz"
+          },
+          "name": "7.8mm绿松石勒子",
+          "unit": "BEAD",
+          "purchasedQuantity": "1.00",
+          "remainingQuantity": "1.00"
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4ekob004doq0122uzteo5"
+          },
+          "purchase": {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4ekoh004foq01k1uo5kyt"
+          },
+          "batch": {
+            "type": "BATCH",
+            "id": "cmwg1jixq0013oq0142v7o2rz"
+          },
+          "name": "百香籽绿松石配饰",
+          "unit": "BEAD",
+          "purchasedQuantity": "1.00",
+          "remainingQuantity": "1.00"
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4gc8z004joq01mwra61gp"
+          },
+          "purchase": {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4gc92004loq01w7elwpgm"
+          },
+          "batch": {
+            "type": "BATCH",
+            "id": "cmwg1jixq0013oq0142v7o2rz"
+          },
+          "name": "羽毛绿松石提溜",
+          "unit": "BEAD",
+          "purchasedQuantity": "1.00",
+          "remainingQuantity": "1.00"
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4irgg004poq01fz0k9ffi"
+          },
+          "purchase": {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4irgl004roq01ldythgge"
+          },
+          "batch": {
+            "type": "BATCH",
+            "id": "cmwg1jixq0013oq0142v7o2rz"
+          },
+          "name": "太阳绿松石提溜（大）",
+          "unit": "BEAD",
+          "purchasedQuantity": "1.00",
+          "remainingQuantity": "1.00"
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4l0yi004voq017d2499gv"
+          },
+          "purchase": {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4l0yn004xoq01kdmkix3z"
+          },
+          "batch": {
+            "type": "BATCH",
+            "id": "cmwg1jixq0013oq0142v7o2rz"
+          },
+          "name": "太阳绿松石提溜",
+          "unit": "BEAD",
+          "purchasedQuantity": "1.00",
+          "remainingQuantity": "1.00"
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg4od7h0051oq01rx3ps154"
+          },
+          "purchase": {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg4od7j0053oq01d96hk3zn"
+          },
+          "batch": {
+            "type": "BATCH",
+            "id": "cmwg1jixq0013oq0142v7o2rz"
+          },
+          "name": "藏扣绿松石",
+          "unit": "GRAM",
+          "purchasedQuantity": "4.43",
+          "remainingQuantity": "4.43"
+        },
+        {
+          "item": {
+            "type": "MATERIAL",
+            "id": "cmwg6zmtj0074oq01ogtm3q3z"
+          },
+          "purchase": {
+            "type": "MATERIAL_PURCHASE",
+            "id": "cmwg6zmto0076oq01k1dobc3c"
+          },
+          "batch": {
+            "type": "BATCH",
+            "id": "cmwg1jixq0013oq0142v7o2rz"
+          },
+          "name": "绿松石羽毛提溜",
+          "unit": "BEAD",
+          "purchasedQuantity": "1.00",
+          "remainingQuantity": "1.00"
+        }
+      ],
+      "quantities": [
+        {
+          "unit": "BEAD",
+          "knownStock": "7.00",
+          "unknownStockObjectCount": 0,
+          "unknownStockBatchCount": 0
+        },
+        {
+          "unit": "GRAM",
+          "knownStock": "4.43",
+          "unknownStockObjectCount": 0,
+          "unknownStockBatchCount": 0
+        },
+        {
+          "unit": "STRAND",
+          "knownStock": "3.00",
+          "unknownStockObjectCount": 0,
+          "unknownStockBatchCount": 0
+        }
+      ]
+    },
+    "independentlyChecked": "parameterized SQL over actual stored totals/quantities/balances; no model arithmetic"
+  },
+  "passed": true,
+  "cleanedAssistantSessions": 0,
+  "businessReadTransactions": 11
+}

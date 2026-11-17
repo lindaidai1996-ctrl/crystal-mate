@@ -1,5 +1,7 @@
 'use client';
 
+import { ImagePreviewGroup } from '@/components/imagePreviewGroup';
+
 import { LazyPreviewImage } from '@/components/loadingImage';
 
 import {
@@ -8,7 +10,7 @@ import {
   PictureOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import { App, Button, Image, Input, Modal, Space } from 'antd';
+import { App, Button, Input, Modal, Space } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { attachmentCoverKey, MAX_ATTACHMENTS, type AttachmentOwner } from '@/lib/attachments';
@@ -205,7 +207,12 @@ export function AttachmentGallery({
           )}
         </div>
         {attachments.length ? (
-          <Image.PreviewGroup>
+          <ImagePreviewGroup
+            items={attachments.map((attachment) => ({
+              src: attachment.url,
+              alt: attachment.fileName,
+            }))}
+          >
             <div
               className={`batch-detail-attachment-list ${galleryStyles.gallery} ${motionStyles.stagger}`}
               data-loading="false"
@@ -252,7 +259,7 @@ export function AttachmentGallery({
                 </div>
               ))}
             </div>
-          </Image.PreviewGroup>
+          </ImagePreviewGroup>
         ) : (
           <div className={galleryStyles.empty}>
             <div className={galleryStyles.choices}>

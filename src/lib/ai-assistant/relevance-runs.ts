@@ -1,14 +1,16 @@
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
 import {
   assistantQuerySchema,
   candidateKey,
   completenessSchema,
+  decisionsForCandidatesSchema,
   type AssistantQuery,
   type QueryCandidate,
   type SemanticDecision,
 } from './contracts';
 import { CandidateQueryError, CANDIDATE_RUN_TTL_MS } from './candidate-contracts';
 import { RecallRuns } from './recall-runs';
+import { assistantModelConfiguration } from './model-config';
 import type { RecallPage } from './recall-contracts';
 import {
   executionBudgetSchema,
@@ -38,7 +40,14 @@ type Attempt = {
   keys: string[];
   startedAt: string;
   durationMs: number;
-  outcome: 'running' | 'success' | 'missing' | 'model_failed' | 'timeout' | 'cancelled';
+  outcome:
+    | 'running'
+    | 'success'
+    | 'missing'
+    | 'model_failed'
+    | 'timeout'
+    | 'cancelled'
+    | 'interrupted';
   errorCode: string | null;
   model: string | null;
   returned: number;
@@ -50,7 +59,14 @@ type Attempt = {
     effectiveStatus: SemanticDecision['status'];
   }[];
 };
+export type RelevanceCheckpoint = {
+  fingerprint: string;
+  decisions: SemanticDecision[];
+  attempts: Attempt[];
+  reservedTokens: number;
+};
 type Run = {
+  fingerprint: string;
   accountId: string;
   query: AssistantQuery;
   page: RecallPage;
@@ -99,11 +115,24 @@ export class RelevanceRuns {
     run.sources = [...new Map([...run.sources, ...page.sources].map((s) => [s.key, s])).values()];
     run.page = page;
   }
-  async start(accountId: string, input: unknown, load: Load) {
+  async start(accountId: string, input: unknown, load: Load, checkpoint?: RelevanceCheckpoint) {
     const query = assistantQuerySchema.parse(input);
     if (query.pagination.cursor)
       throw new CandidateQueryError('NEW_RELEVANCE_RUN_REQUIRES_NEW_SCOPE');
-    const page = await this.recall.query(accountId, query, load);
+    const source = await load(query);
+    let modelIdentity: { model: string; endpoint: string } | null = null;
+    try {
+      const config = assistantModelConfiguration('relevance');
+      modelIdentity = { model: config.model, endpoint: config.endpoint };
+    } catch {
+      // Offline/injected adapters need no provider credentials.
+    }
+    const fingerprint = createHash('sha256')
+      .update(
+        JSON.stringify({ query, source, promptVersion: RELEVANCE_PROMPT_VERSION, modelIdentity }),
+      )
+      .digest('hex');
+    const page = await this.recall.query(accountId, query, async () => source);
     this.prune();
     for (const [id, old] of this.runs) {
       if ([...this.runs.values()].filter((r) => r.accountId === accountId).length < 4) break;
@@ -118,7 +147,14 @@ export class RelevanceRuns {
       this.runs.delete(id);
     }
     const id = randomUUID();
+    const restored =
+      checkpoint?.fingerprint === fingerprint
+        ? decisionsForCandidatesSchema(
+            source.rows.map((r) => relevanceCandidate(r.candidate)),
+          ).safeParse(checkpoint.decisions)
+        : null;
     const run: Run = {
+      fingerprint,
       accountId,
       query,
       page,
@@ -126,18 +162,43 @@ export class RelevanceRuns {
       expires: this.now() + CANDIDATE_RUN_TTL_MS,
       revision: 0,
       candidates: new Map(),
-      decisions: new Map(),
+      decisions: new Map(restored?.success ? restored.data.map((d) => [candidateKey(d), d]) : []),
       sources: [],
       budget: executionBudgetSchema.parse({}),
-      attempts: [],
-      reservedTokens: 0,
+      attempts: structuredClone(checkpoint?.attempts ?? []).map((attempt) =>
+        attempt.outcome === 'running'
+          ? { ...attempt, outcome: 'interrupted' as const, errorCode: 'EXECUTION_INTERRUPTED' }
+          : attempt,
+      ),
+      reservedTokens: checkpoint?.reservedTokens ?? 0,
       stopReason: page.completeness.totalCandidates === 0 ? null : 'running',
       controller: null,
       lastErrorCode: null,
     };
     this.ingest(run, page);
+    // A durable checkpoint contains validated decisions, not a usable old cursor.
+    // Re-read the full bounded source into this process before reporting counts.
+    if (run.decisions.size) {
+      while (run.page.nextCursor) {
+        const next = await this.recall.query(
+          accountId,
+          { ...query, pagination: { ...query.pagination, cursor: run.page.nextCursor } },
+          async () => source,
+        );
+        this.ingest(run, next);
+      }
+    }
     this.runs.set(id, run);
     return this.snapshot(id, run);
+  }
+  checkpoint(accountId: string, runId: string): RelevanceCheckpoint {
+    const run = this.get(accountId, runId);
+    return structuredClone({
+      fingerprint: run.fingerprint,
+      decisions: [...run.decisions.values()],
+      attempts: run.attempts,
+      reservedTokens: run.reservedTokens,
+    });
   }
   read(accountId: string, input: unknown) {
     const { runId } = relevanceReadSchema.parse(input);
@@ -155,7 +216,12 @@ export class RelevanceRuns {
     run.controller = null;
     return this.snapshot(runId, run);
   }
-  async advance(accountId: string, input: unknown, model: RelevanceModel) {
+  async advance(
+    accountId: string,
+    input: unknown,
+    model: RelevanceModel,
+    onProgress?: (checkpoint: RelevanceCheckpoint) => Promise<void>,
+  ) {
     const { runId, revision, budget } = relevanceCommandSchema.parse(input);
     const run = this.get(accountId, runId);
     this.checkRevision(run, revision);
@@ -264,6 +330,7 @@ export class RelevanceRuns {
         run.attempts.push(attempt);
         run.reservedTokens += reservation;
         calls++;
+        await onProgress?.(this.checkpoint(accountId, runId));
         const callStarted = this.now();
         const callTimeout = AbortSignal.timeout(limits.callTimeoutMs);
         const signal = AbortSignal.any([controller.signal, deadline, callTimeout]);
@@ -323,6 +390,7 @@ export class RelevanceRuns {
         } finally {
           if (abortListener) signal.removeEventListener('abort', abortListener);
           attempt.durationMs = this.now() - callStarted;
+          await onProgress?.(this.checkpoint(accountId, runId));
         }
       }
     } catch (error) {

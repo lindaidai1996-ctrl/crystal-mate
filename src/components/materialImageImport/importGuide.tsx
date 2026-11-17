@@ -1,6 +1,7 @@
 'use client';
 
-import { Image } from 'antd';
+import { ImagePreviewGroup } from '@/components/imagePreviewGroup';
+
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { LoadingImage } from '@/components/loadingImage';
@@ -17,7 +18,7 @@ export function ImportGuide() {
         <p>{t('guideDescription')}</p>
       </div>
       <figure className={importStyles.example}>
-        <Image.PreviewGroup
+        <ImagePreviewGroup
           items={[{ src: '/images/example-1.jpg', alt: t('exampleAlt') }]}
           preview={{ visible: preview, onVisibleChange: setPreview }}
         >
@@ -36,7 +37,7 @@ export function ImportGuide() {
             />
             <span>{t('viewExample')}</span>
           </button>
-        </Image.PreviewGroup>
+        </ImagePreviewGroup>
         <figcaption>{t('exampleCaption')}</figcaption>
       </figure>
       <ol className={importStyles.guideSteps}>

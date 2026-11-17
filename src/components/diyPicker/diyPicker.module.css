@@ -1,0 +1,369 @@
+.drawer :global(.ant-drawer-body) {
+  padding: 20px 24px;
+}
+.toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.toolbar > :first-child {
+  flex: 0 0 220px;
+}
+.toolbar > :nth-child(2) {
+  flex: 1;
+}
+.filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: end;
+}
+.filters > :global(.ant-select) {
+  width: 100%;
+  min-width: 0;
+}
+.filterToggle {
+  display: none;
+}
+.range {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+.range legend {
+  float: none;
+  width: auto;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--ant-color-text-secondary);
+}
+.range :global(.ant-input-number) {
+  width: 100%;
+  min-width: 0;
+}
+.resultCount {
+  margin-bottom: 12px;
+  color: var(--ant-color-text-secondary);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.grid[data-kind='materials'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.card {
+  min-width: 0;
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--ant-color-bg-container);
+  transition: border-color 150ms;
+}
+.card[data-selected='true'] {
+  border-color: var(--ant-color-primary);
+  box-shadow: 0 0 0 1px var(--ant-color-primary);
+}
+.picture,
+.emptyPicture {
+  width: 100%;
+  aspect-ratio: 1;
+  display: block;
+  position: relative;
+  border: 0;
+  padding: 0;
+  background: var(--ant-color-fill-alter);
+}
+.picture {
+  cursor: zoom-in;
+  overflow: hidden;
+  color: var(--ant-color-text);
+}
+.picture:focus-visible {
+  outline: 3px solid var(--ant-color-primary);
+  outline-offset: -3px;
+}
+.emptyPicture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--ant-color-text-tertiary);
+}
+.emptyPicture > :first-child {
+  font-size: 24px;
+}
+.zoom {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: var(--ant-color-bg-container);
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.cardBody,
+.batchInfo,
+.materialInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+.cardBody {
+  padding: 14px;
+}
+.cardBody strong,
+.materialInfo strong,
+.batchInfo strong,
+.batchInfo span,
+.selectedList {
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.secondary {
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+}
+.stock {
+  color: var(--ant-color-primary);
+  font-size: 13px;
+}
+.stock[data-empty='true'] {
+  color: var(--ant-color-text-tertiary);
+}
+.batches {
+  width: 100%;
+  padding: 0 16px;
+}
+.batch {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 10px 14px;
+  padding: 16px 0;
+  border-top: 1px solid var(--ant-color-border-secondary);
+}
+.batch > .picture,
+.batch > .emptyPicture {
+  width: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.batch > .emptyPicture {
+  font-size: 11px;
+}
+.batch .zoom,
+.materialHeader .zoom {
+  right: 4px;
+  bottom: 4px;
+}
+.batch[data-selected='true'] .batchInfo > strong {
+  color: var(--ant-color-primary);
+}
+.batchInfo {
+  grid-column: 2;
+  gap: 4px;
+  line-height: 1.6;
+  font-size: 13px;
+}
+.batchInfo:first-child {
+  grid-column: 1 / -1;
+}
+.batchMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+}
+.batchMeta > span {
+  min-width: 0;
+}
+.batchSummary,
+.batchSelection {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 13px;
+}
+.batchSummary {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--ant-color-fill-alter);
+}
+.batchSummary > span {
+  overflow-wrap: anywhere;
+}
+.batchSelection :global(.ant-checkbox-wrapper) {
+  flex: 1;
+  min-height: 36px;
+  align-items: center;
+}
+.materialHeader {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+}
+.materialHeader > .picture,
+.materialHeader > .emptyPicture {
+  border-radius: 8px;
+}
+.materialInfo {
+  gap: 4px;
+}
+.batchToggle:global(.ant-btn) {
+  height: auto;
+  min-height: 36px;
+  padding: 4px 8px;
+  margin-left: -8px;
+  white-space: normal;
+  text-align: left;
+  color: var(--ant-color-primary);
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.selectedList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 100px;
+  overflow-y: auto;
+  align-items: center;
+  flex: 1;
+}
+.selectedList > strong {
+  margin-right: 8px;
+}
+.selectedList :global(.ant-tag) {
+  max-width: 100%;
+  white-space: normal;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .grid[data-kind='materials'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .materialHeader {
+    grid-template-columns: 72px minmax(0, 1fr);
+    padding: 12px;
+    gap: 12px;
+  }
+  .materialInfo {
+    font-size: 14px;
+  }
+  .batches {
+    padding: 0 12px;
+  }
+  .batch {
+    gap: 8px 12px;
+    padding: 12px 0;
+  }
+  .batchToggle:global(.ant-btn),
+  .batchSelection :global(.ant-checkbox-wrapper) {
+    min-height: 44px;
+  }
+}
+@media (max-width: 767px) {
+  .drawer :global(.ant-drawer-body) {
+    padding: 16px;
+  }
+  .drawer :global(.ant-drawer-footer) {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .toolbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .toolbar > :first-child {
+    flex: 0 0 100%;
+  }
+  .toolbar > :nth-child(2) {
+    min-width: 0;
+  }
+  .filterToggle {
+    display: block;
+  }
+  .filters {
+    display: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .filters[data-open='true'] {
+    display: grid;
+  }
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .cardBody {
+    padding: 10px;
+    font-size: 13px;
+  }
+  .cardBody :global(.ant-checkbox-wrapper) {
+    min-height: 44px;
+    align-items: center;
+    width: 100%;
+  }
+  .range :global(.ant-input-number) {
+    width: 100%;
+  }
+  .filters :global(.ant-select-selector),
+  .actions :global(.ant-btn),
+  .toolbar :global(.ant-btn) {
+    min-height: 44px;
+  }
+  .footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .actions > :last-child {
+    flex: 1;
+  }
+  .selectedList {
+    max-height: 72px;
+    font-size: 13px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}

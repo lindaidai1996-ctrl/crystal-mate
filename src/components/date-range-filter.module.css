@@ -8,6 +8,43 @@
   max-width: 100%;
 }
 
+.mobileTrigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  min-height: 48px;
+  padding: 12px;
+  text-align: start;
+}
+
+.triggerText {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+  font-size: 13px;
+  white-space: normal;
+}
+
+.triggerText strong {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ant-color-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.triggerArrow {
+  color: var(--ant-color-text-tertiary);
+  font-size: 12px;
+}
+
+.mobileSheet :global(.ant-drawer-footer .ant-btn) {
+  min-height: 44px;
+}
+
 @media (max-width: 640px) {
   .dateTime,
   .date {

@@ -1,0 +1,326 @@
+{
+  "task": "P4-01",
+  "startedAt": "2026-11-17T02:00:52.043Z",
+  "finishedAt": "2026-11-17T02:00:56.601Z",
+  "timezone": "Asia/Shanghai",
+  "gitHead": "67241b8cce746139036cc9f483992bf4ec2dcdf0",
+  "workspace": "uncommitted P4-01 changes; see handoff",
+  "runtime": {
+    "node": "v24.14.1",
+    "undici": "7.24.4"
+  },
+  "dependencies": {
+    "next": {
+      "installed": "16.4.2",
+      "locked": "16.4.2"
+    },
+    "typescript": {
+      "installed": "5.9.3",
+      "locked": "5.9.3"
+    },
+    "zod": {
+      "installed": "4.6.5",
+      "locked": "4.6.5"
+    },
+    "dotenv": {
+      "installed": "16.6.1",
+      "locked": "16.6.1"
+    },
+    "tsx": {
+      "installed": "4.23.15",
+      "locked": "4.23.15"
+    },
+    "vitest": {
+      "installed": "5.0.3",
+      "locked": "5.0.3"
+    },
+    "ai": {
+      "installed": null,
+      "locked": null
+    },
+    "@ai-sdk/deepseek": {
+      "installed": null,
+      "locked": null
+    },
+    "@ai-sdk/openai-compatible": {
+      "installed": null,
+      "locked": null
+    },
+    "openai": {
+      "installed": null,
+      "locked": null
+    }
+  },
+  "probeVersion": "p4-01-protocol-v1",
+  "mode": "real-model",
+  "input": "synthetic-only-no-database",
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "requestedModel": "deepseek-flash",
+  "configurationSources": {
+    "apiKey": "DEEPSEEK_API_KEY",
+    "endpoint": "DEEPSEEK_BASE_URL",
+    "model": "default"
+  },
+  "attempts": [
+    {
+      "id": "plain",
+      "startedAt": "2026-11-17T02:00:52.064Z",
+      "parameters": {
+        "model": "deepseek-flash",
+        "temperature": 0,
+        "max_tokens": 128,
+        "stream": false,
+        "thinking": {
+          "type": "disabled"
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "This is a minimal protocol test. Follow the requested exact output."
+          },
+          {
+            "role": "user",
+            "content": "记住测试代号 BLUE。只回复 OK。"
+          }
+        ]
+      },
+      "status": "passed",
+      "httpStatus": 200,
+      "usage": {
+        "prompt_tokens": 28,
+        "completion_tokens": 1,
+        "total_tokens": 29,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 28
+      },
+      "actualModel": "deepseek-flash",
+      "headersMs": 275,
+      "finishReason": "stop",
+      "responseBytes": 454,
+      "expectedContentMatched": true,
+      "durationMs": 1199
+    },
+    {
+      "id": "multiturn",
+      "startedAt": "2026-11-17T02:00:53.263Z",
+      "parameters": {
+        "model": "deepseek-flash",
+        "temperature": 0,
+        "max_tokens": 128,
+        "stream": false,
+        "thinking": {
+          "type": "disabled"
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "This is a minimal protocol test. Follow the requested exact output."
+          },
+          {
+            "role": "user",
+            "content": "记住测试代号 BLUE。只回复 OK。"
+          },
+          {
+            "role": "assistant",
+            "content": "OK"
+          },
+          {
+            "role": "user",
+            "content": "刚才的测试代号是什么？只回复代号。"
+          }
+        ]
+      },
+      "status": "passed",
+      "httpStatus": 200,
+      "usage": {
+        "prompt_tokens": 43,
+        "completion_tokens": 2,
+        "total_tokens": 45,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 43
+      },
+      "actualModel": "deepseek-flash",
+      "headersMs": 124,
+      "finishReason": "stop",
+      "responseBytes": 456,
+      "expectedContentMatched": true,
+      "durationMs": 524
+    },
+    {
+      "id": "tool-call",
+      "startedAt": "2026-11-17T02:00:53.787Z",
+      "parameters": {
+        "model": "deepseek-flash",
+        "temperature": 0,
+        "max_tokens": 128,
+        "stream": false,
+        "thinking": {
+          "type": "disabled"
+        },
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "protocol_echo",
+              "description": "Protocol test only: echo the supplied synthetic value. No business data.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "enum": ["BLUE"]
+                  }
+                },
+                "required": ["value"],
+                "additionalProperties": false
+              }
+            }
+          }
+        ],
+        "tool_choice": {
+          "type": "function",
+          "function": {
+            "name": "protocol_echo"
+          }
+        },
+        "parallel_tool_calls": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "调用 protocol_echo，value 为 BLUE。"
+          }
+        ]
+      },
+      "status": "passed",
+      "httpStatus": 200,
+      "usage": {
+        "prompt_tokens": 300,
+        "completion_tokens": 34,
+        "total_tokens": 334,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 300
+      },
+      "actualModel": "deepseek-flash",
+      "headersMs": 121,
+      "finishReason": "tool_calls",
+      "responseBytes": 619,
+      "tool": {
+        "name": "protocol_echo",
+        "arguments": {
+          "value": "BLUE"
+        },
+        "idPresent": true,
+        "type": "function"
+      },
+      "durationMs": 1003
+    },
+    {
+      "id": "tool-result",
+      "startedAt": "2026-11-17T02:00:54.790Z",
+      "parameters": {
+        "model": "deepseek-flash",
+        "temperature": 0,
+        "max_tokens": 128,
+        "stream": false,
+        "thinking": {
+          "type": "disabled"
+        },
+        "messages": [
+          {
+            "role": "user",
+            "content": "调用 protocol_echo，value 为 BLUE。"
+          },
+          {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_00_02nRjwUgGdK4HaV0sS6K0532",
+                "type": "function",
+                "function": {
+                  "name": "protocol_echo",
+                  "arguments": "{\"value\": \"BLUE\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_00_02nRjwUgGdK4HaV0sS6K0532",
+            "content": "{\"value\":\"BLUE\",\"result\":\"TOOL_OK\"}"
+          },
+          {
+            "role": "user",
+            "content": "只回复工具结果的 result 值。"
+          }
+        ]
+      },
+      "status": "passed",
+      "httpStatus": 200,
+      "usage": {
+        "prompt_tokens": 86,
+        "completion_tokens": 3,
+        "total_tokens": 89,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 86
+      },
+      "actualModel": "deepseek-flash",
+      "headersMs": 234,
+      "finishReason": "stop",
+      "responseBytes": 459,
+      "expectedContentMatched": true,
+      "durationMs": 867
+    },
+    {
+      "id": "stream",
+      "startedAt": "2026-11-17T02:00:55.657Z",
+      "parameters": {
+        "model": "deepseek-flash",
+        "temperature": 0,
+        "max_tokens": 128,
+        "stream": true,
+        "thinking": {
+          "type": "disabled"
+        },
+        "stream_options": {
+          "include_usage": true
+        },
+        "messages": [
+          {
+            "role": "user",
+            "content": "只回复 STREAM_OK。"
+          }
+        ]
+      },
+      "status": "passed",
+      "httpStatus": 200,
+      "usage": {
+        "prompt_tokens": 10,
+        "completion_tokens": 3,
+        "total_tokens": 13,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 10
+      },
+      "actualModel": "deepseek-flash",
+      "headersMs": 152,
+      "stream": {
+        "model": "deepseek-flash",
+        "usage": {
+          "prompt_tokens": 10,
+          "completion_tokens": 3,
+          "total_tokens": 13,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 10
+        },
+        "finishReason": "stop",
+        "events": 5,
+        "contentChunks": 3,
+        "firstContentMs": 822,
+        "bytes": 1627,
+        "done": true
+      },
+      "durationMs": 944
+    }
+  ],
+  "passed": true
+}

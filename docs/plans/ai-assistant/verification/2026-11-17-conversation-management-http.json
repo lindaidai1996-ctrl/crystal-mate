@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-11-17T07:41:12.419Z",
+  "environment": "isolated-development",
+  "authentication": "short-lived-signed-test-session-through-real-auth",
+  "realModel": false,
+  "checks": [
+    "authenticated-http-create-rename-list-privacy-validation",
+    "authenticated-http-delete-and-404"
+  ],
+  "passed": true
+}

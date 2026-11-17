@@ -1,7 +1,6 @@
 'use client';
 
-import { Alert, Button, DatePicker, Drawer, Empty, Image, Select, Space, Tag } from 'antd';
-import dayjs from 'dayjs';
+import { Alert, Button, Drawer, Empty, Image, Select, Space, Tag } from 'antd';
 import { HistoryOutlined } from '@ant-design/icons';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
@@ -15,6 +14,7 @@ import {
   type RecordProvenance,
 } from '@/lib/audit';
 import { usePrivacyMode } from './privacyMode';
+import { DateRangeFilter } from './date-range-filter';
 import auditStyles from './audit-history.module.css';
 
 const privateField = /price|cost|quote|amount|fee/i;
@@ -251,22 +251,17 @@ export function AuditHistory({ entityType, entityId }: { entityType?: string; en
           onChange={(next) => change(() => setAction(next))}
           options={['INSERT', 'UPDATE', 'DELETE'].map((name) => ({ value: name, label: t(name) }))}
         />
-        <DatePicker.RangePicker
-          value={
-            range.createdFrom && range.createdTo
-              ? [dayjs(range.createdFrom), dayjs(range.createdTo)]
-              : null
-          }
-          showTime={{ format: 'HH:mm' }}
-          format="YYYY-MM-DD HH:mm"
-          placeholder={[t('start'), t('end')]}
+        <DateRangeFilter
+          kind="created"
+          label={t('time')}
+          value={range.createdFrom && range.createdTo ? [range.createdFrom, range.createdTo] : null}
           onChange={(next) =>
             change(() =>
               setRange(
                 next?.[0] && next[1]
                   ? {
-                      createdFrom: next[0].format('YYYY-MM-DDTHH:mm'),
-                      createdTo: next[1].format('YYYY-MM-DDTHH:mm'),
+                      createdFrom: next[0],
+                      createdTo: next[1],
                     }
                   : {},
               ),

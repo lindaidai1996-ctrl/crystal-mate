@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-11-17T07:32:08.190Z",
+  "environment": "isolated-development",
+  "realModel": false,
+  "migrationApplied": true,
+  "checks": [
+    "rename-persists-without-interrupting-active-execution",
+    "cross-account-rename-and-delete-rejected",
+    "conversation-title-uses-existing-text-minimization",
+    "delete-cascades-to-messages-executions-and-feedback",
+    "deleted-conversation-rejects-late-writes-and-reads"
+  ],
+  "passed": true
+}

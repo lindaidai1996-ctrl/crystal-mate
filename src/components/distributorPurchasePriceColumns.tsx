@@ -1,5 +1,7 @@
 'use client';
 
+import { formatAmount } from '@/lib/format-money';
+
 import type { ColumnsType } from 'antd/es/table';
 import type {
   DistributorPriceRange,
@@ -26,9 +28,16 @@ export function distributorPurchasePriceColumns<Row extends PriceRow>(
       const value: string | DistributorPriceRange | null = row[field];
       if (value === null) return t('unknownValue');
       if (typeof value === 'string')
-        return field === 'childUnitPrice' ? <Sensitive>{value}</Sensitive> : value;
+        return field === 'childUnitPrice' ? (
+          <Sensitive>{formatAmount(value)}</Sensitive>
+        ) : (
+          formatAmount(value)
+        );
       if (value.min === null || value.max === null) return t('unknownValue');
-      const price = value.min === value.max ? value.min : `${value.min} ~ ${value.max}`;
+      const price =
+        value.min === value.max
+          ? formatAmount(value.min)
+          : `${formatAmount(value.min)} ~ ${formatAmount(value.max)}`;
       const label = `${price}${value.hasUnknown ? ` · ${t('hasUnknown')}` : ''}`;
       return field === 'childUnitPrice' ? <Sensitive>{label}</Sensitive> : label;
     },

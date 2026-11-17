@@ -1,5 +1,9 @@
 'use client';
 
+import { ImagePreviewGroup } from '@/components/imagePreviewGroup';
+
+import { formatAmount } from '@/lib/format-money';
+
 import { RecordAuditPanel } from '@/components/audit-history';
 
 import { Sensitive } from '@/components/privacyMode';
@@ -16,19 +20,7 @@ import {
   FileExcelOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import {
-  Alert,
-  Button,
-  Empty,
-  Image,
-  Popconfirm,
-  Select,
-  Space,
-  Steps,
-  Table,
-  Tag,
-  Tooltip,
-} from 'antd';
+import { Alert, Button, Empty, Popconfirm, Select, Space, Steps, Table, Tag, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
@@ -90,7 +82,7 @@ export function ExcelImportPage({ initialId }: { initialId?: string }) {
           row.localImages?.map((image) => image.preview) ??
           [];
         return images.length ? (
-          <Image.PreviewGroup items={images}>
+          <ImagePreviewGroup items={images}>
             <LazyPreviewImage
               className={layout.thumbnail}
               width={52}
@@ -102,7 +94,7 @@ export function ExcelImportPage({ initialId }: { initialId?: string }) {
             {images.length > 1 && (
               <div className={layout.muted}>{t('imageCount', { count: images.length })}</div>
             )}
-          </Image.PreviewGroup>
+          </ImagePreviewGroup>
         ) : (
           '—'
         );
@@ -125,7 +117,7 @@ export function ExcelImportPage({ initialId }: { initialId?: string }) {
     {
       title: t('fields.price'),
       width: 100,
-      render: (_, row) => `¥${normalizeExcelRow(row, tags, styles).price}`,
+      render: (_, row) => `¥${formatAmount(normalizeExcelRow(row, tags, styles).price)}`,
     },
     {
       title: t('cost'),
@@ -136,10 +128,10 @@ export function ExcelImportPage({ initialId }: { initialId?: string }) {
           <Sensitive>
             <div className={layout.issueList}>
               <span>
-                {t('stoneShort')}：{cost?.roughStoneCost ?? '—'}
+                {t('stoneShort')}：{formatAmount(cost?.roughStoneCost)}
               </span>
               <span>
-                {t('settingShort')}：{cost?.settingCost ?? '—'}
+                {t('settingShort')}：{formatAmount(cost?.settingCost)}
               </span>
             </div>
           </Sensitive>

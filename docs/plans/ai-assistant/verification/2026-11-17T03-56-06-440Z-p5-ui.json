@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-11-17T03:55:31.288Z",
+  "environment": "isolated-development",
+  "realModel": false,
+  "facts": "real P2 purchase/stock + read-only display; frozen selection supplied, not model-selected",
+  "authentication": "short-lived signed test session through real auth; not password login",
+  "checks": [
+    "real read-only 11 purchase rows, exact amount, display metadata and catalog stock",
+    "authenticated whitelisted result HTTP DTO",
+    "default HTTP privacy removes all amount summaries and free text"
+  ],
+  "passed": false,
+  "failure": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('region', { name: '结构化结果' }) to be visible\u001b[22m\n\u001b[2m    14 × waiting for \"[url] navigation to finish...\u001b[22m\n\u001b[2m       - navigated to \"[url]\n\u001b[2m    - waiting for navigation to finish...\u001b[22m\n\u001b[2m    3 × navigated to \"[url]\n\u001b[2m      - waiting for \"[url] navigation to finish...\u001b[22m\n\u001b[2m    3 × navigated to \"[url]\n\u001b[2m      - waiting for navigation to finish...\u001b[22m\n\u001b[2m    8 × navigated to \"[url]\n\u001b[2m      - wai",
+  "browserErrors": []
+}

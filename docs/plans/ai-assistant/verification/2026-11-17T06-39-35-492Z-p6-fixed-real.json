@@ -1,0 +1,3951 @@
+{
+  "checkedAt": "2026-11-17T06:39:45.967Z",
+  "mode": "real-model-frozen-business-adapter",
+  "baselineSha256": "b04d3017c4b3b80951695df8f4f9f64899401effa8d37e79b00b60962516910d",
+  "clock": "2026-11-16T04:00:00.000Z",
+  "ruleVersion": "v1",
+  "promptVersions": ["orchestration-v3", "relevance-v3"],
+  "syntheticFields": [
+    "missing createdAt",
+    "batch identity/name",
+    "distributor name/address snippet reconstructed from boolean"
+  ],
+  "databaseAccess": false,
+  "selectedCases": ["REAL-05", "FACT-05"],
+  "completeMatrix": false,
+  "priceBasis": null,
+  "results": [
+    {
+      "id": "REAL-05",
+      "kind": "real-model",
+      "passed": true,
+      "execution": {
+        "metadata": {
+          "contractVersion": "v1",
+          "ruleVersion": "v1",
+          "promptVersion": "orchestration-v3",
+          "relevancePromptVersion": "relevance-v3",
+          "transport": "native-fetch",
+          "requestedModel": "deepseek-flash",
+          "requestedRelevanceModel": "deepseek-flash"
+        },
+        "version": "orchestration-v3",
+        "phase": "finish",
+        "status": "completed",
+        "state": {
+          "query": {
+            "version": "v1",
+            "subject": "purchases",
+            "itemTypes": ["MATERIAL"],
+            "hard": {
+              "purchaseDate": {
+                "from": "2026-11-01",
+                "to": "2026-12-01"
+              },
+              "location": {
+                "text": "荔湾广场",
+                "kind": "exact_place"
+              }
+            },
+            "semantic": [
+              {
+                "concept": "material",
+                "text": "绿松石",
+                "relation": "is"
+              },
+              {
+                "concept": "purpose",
+                "text": "配件",
+                "relation": "is"
+              },
+              {
+                "concept": "form",
+                "text": "直切",
+                "relation": "is"
+              }
+            ],
+            "ruleVersion": "v1",
+            "pagination": {
+              "limit": 100
+            }
+          },
+          "view": "details"
+        },
+        "clarification": null,
+        "pendingPlan": null,
+        "clarificationContext": null,
+        "result": {
+          "relevance": {
+            "version": "v1",
+            "promptVersion": "relevance-v3",
+            "ruleVersion": "v1",
+            "runId": "08544003-cacb-47f0-8478-a706d716e0ec",
+            "revision": 1,
+            "query": {
+              "version": "v1",
+              "subject": "purchases",
+              "itemTypes": ["MATERIAL"],
+              "hard": {
+                "purchaseDate": {
+                  "from": "2026-11-01",
+                  "to": "2026-12-01"
+                },
+                "location": {
+                  "text": "荔湾广场",
+                  "kind": "exact_place"
+                }
+              },
+              "semantic": [
+                {
+                  "concept": "material",
+                  "text": "绿松石",
+                  "relation": "is"
+                },
+                {
+                  "concept": "purpose",
+                  "text": "配件",
+                  "relation": "is"
+                },
+                {
+                  "concept": "form",
+                  "text": "直切",
+                  "relation": "is"
+                }
+              ],
+              "ruleVersion": "v1",
+              "pagination": {
+                "limit": 100
+              }
+            },
+            "queriedAt": "2026-11-17T06:39:37.477Z",
+            "expiresAt": "2026-11-17T06:49:37.482Z",
+            "busy": false,
+            "lastErrorCode": null,
+            "completeness": {
+              "scope": "resolved",
+              "traversal": "complete",
+              "evaluation": "complete",
+              "countBasis": "purchase_entry",
+              "totalCandidates": 44,
+              "readCandidates": 44,
+              "uniqueCatalogItems": 44,
+              "evaluatedCandidates": 44,
+              "included": 1,
+              "excluded": 43,
+              "uncertain": 0,
+              "notEvaluated": 0,
+              "unreadCandidates": 0,
+              "stopReason": null
+            },
+            "coverage": {
+              "traversal": 1,
+              "evaluation": 1
+            },
+            "decisions": [
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg1nejd0017oq01dbrbr9g8"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg1nejj0019oq015v32pexs"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg1nejd0017oq01dbrbr9g8"
+                    },
+                    "field": "name",
+                    "value": "1.5mmS925方形碎银"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63iuqm000b3wm84cggk8ga"
+                    },
+                    "field": "name",
+                    "value": "S925银配饰"
+                  }
+                ],
+                "reason": "材质为S925银，非绿松石；虽属配饰但材质条件不满足",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg1syeo001goq01lo04ot40"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg1syez001ioq017yvh5wia"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg1syeo001goq01lo04ot40"
+                    },
+                    "field": "name",
+                    "value": "1.5mmS925银定位管"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63iuqm000b3wm84cggk8ga"
+                    },
+                    "field": "name",
+                    "value": "S925银配饰"
+                  }
+                ],
+                "reason": "材质为S925银，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg1ydtm001noq01ruchlerr"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg1ydwz001poq01zug4rson"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg1ydtm001noq01ruchlerr"
+                    },
+                    "field": "name",
+                    "value": "2mmS925银圆珠"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63iuqm000b3wm84cggk8ga"
+                    },
+                    "field": "name",
+                    "value": "S925银配饰"
+                  }
+                ],
+                "reason": "材质为S925银，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg1zukg001toq01nbdav125"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg1zuki001voq010pyvuif4"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg1zukg001toq01nbdav125"
+                    },
+                    "field": "name",
+                    "value": "3mmS925银圆珠"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63iuqm000b3wm84cggk8ga"
+                    },
+                    "field": "name",
+                    "value": "S925银配饰"
+                  }
+                ],
+                "reason": "材质为S925银，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg20yat001zoq01l838wus2"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg20yaw0021oq01s0tn7se9"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg20yat001zoq01l838wus2"
+                    },
+                    "field": "name",
+                    "value": "4mmS925银圆珠"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63iuqm000b3wm84cggk8ga"
+                    },
+                    "field": "name",
+                    "value": "S925银配饰"
+                  }
+                ],
+                "reason": "材质为S925银，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg272pm0026oq01ldwgnote"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg272r80028oq01zqmqd4ez"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg272pm0026oq01ldwgnote"
+                    },
+                    "field": "name",
+                    "value": "6mm18K镀金S925银跑环"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63nupn000d3wm85dwsxgzu"
+                    },
+                    "field": "name",
+                    "value": "18K镀金-银配饰"
+                  }
+                ],
+                "reason": "材质为S925银镀金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg2cnkz002eoq01bwj4frmp"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg2cnlq002goq01oth138kc"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg2cnkz002eoq01bwj4frmp"
+                    },
+                    "field": "name",
+                    "value": "锆石18K镀金竹节S925银配饰"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63iuqm000b3wm84cggk8ga"
+                    },
+                    "field": "name",
+                    "value": "S925银配饰"
+                  }
+                ],
+                "reason": "材质为S925银配饰，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg2h6cr002noq01rb9hl6wb"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg2h6d1002poq012l3enech"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg2h6cr002noq01rb9hl6wb"
+                    },
+                    "field": "name",
+                    "value": "锆石四芒星S925银延长链"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63iuqm000b3wm84cggk8ga"
+                    },
+                    "field": "name",
+                    "value": "S925银配饰"
+                  }
+                ],
+                "reason": "材质为S925银，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg35d3c002woq01k0ez5ef4"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg35d3k002yoq01jnveq4fu"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg35d3c002woq01k0ez5ef4"
+                    },
+                    "field": "name",
+                    "value": "3mm18K镀S925银配饰桶珠"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63iuqm000b3wm84cggk8ga"
+                    },
+                    "field": "name",
+                    "value": "S925银配饰"
+                  }
+                ],
+                "reason": "材质为S925银，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg3jvmq0038oq017cf73132"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg3jvn7003aoq01w2vzww8r"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg3jvmq0038oq017cf73132"
+                    },
+                    "field": "name",
+                    "value": "4mm绿松石随形"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv7svpyw00033w5cdo0qzxd2"
+                    },
+                    "field": "name",
+                    "value": "绿松石"
+                  }
+                ],
+                "reason": "材质为绿松石且属配件，但形态为随形，非直切",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg3tev8003joq01zlvvug0k"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg3tevc003loq01iq1raphc"
+                },
+                "status": "include",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg3tev8003joq01zlvvug0k"
+                    },
+                    "field": "name",
+                    "value": "3.5mm绿松石药片"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg3tev8003joq01zlvvug0k"
+                    },
+                    "field": "aliases",
+                    "value": ["绿松石直切"]
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv7svpyw00033w5cdo0qzxd2"
+                    },
+                    "field": "name",
+                    "value": "绿松石"
+                  }
+                ],
+                "reason": "材质绿松石，别名含直切，属制作配件",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg3wwbn003soq01of24lsde"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg3wwbs003uoq01fefb4uhm"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg3wwbn003soq01of24lsde"
+                    },
+                    "field": "name",
+                    "value": "3mm绿松石圆珠"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv7svpyw00033w5cdo0qzxd2"
+                    },
+                    "field": "name",
+                    "value": "绿松石"
+                  }
+                ],
+                "reason": "材质绿松石但形态为圆珠，非直切",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg41qcz0040oq016l565fdh"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg41qd40042oq01bdr95r0f"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg41qcz0040oq016l565fdh"
+                    },
+                    "field": "name",
+                    "value": "13mm绿松石桶珠"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv7svpyw00033w5cdo0qzxd2"
+                    },
+                    "field": "name",
+                    "value": "绿松石"
+                  }
+                ],
+                "reason": "材质绿松石但形态为桶珠，非直切",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg462i80047oq01899ruhhw"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg462ib0049oq01l602ks55"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg462i80047oq01899ruhhw"
+                    },
+                    "field": "name",
+                    "value": "7.8mm绿松石勒子"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv7svpyw00033w5cdo0qzxd2"
+                    },
+                    "field": "name",
+                    "value": "绿松石"
+                  }
+                ],
+                "reason": "材质绿松石但形态为勒子，非直切",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4ekob004doq0122uzteo5"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4ekoh004foq01k1uo5kyt"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg4ekob004doq0122uzteo5"
+                    },
+                    "field": "name",
+                    "value": "百香籽绿松石配饰"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv7svpyw00033w5cdo0qzxd2"
+                    },
+                    "field": "name",
+                    "value": "绿松石"
+                  }
+                ],
+                "reason": "材质绿松石但形态为提溜，非直切",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4gc8z004joq01mwra61gp"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4gc92004loq01w7elwpgm"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg4gc8z004joq01mwra61gp"
+                    },
+                    "field": "name",
+                    "value": "羽毛绿松石提溜"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv7svpyw00033w5cdo0qzxd2"
+                    },
+                    "field": "name",
+                    "value": "绿松石"
+                  }
+                ],
+                "reason": "材质绿松石但形态为提溜，非直切",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4irgg004poq01fz0k9ffi"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4irgl004roq01ldythgge"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg4irgg004poq01fz0k9ffi"
+                    },
+                    "field": "name",
+                    "value": "太阳绿松石提溜（大）"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv7svpyw00033w5cdo0qzxd2"
+                    },
+                    "field": "name",
+                    "value": "绿松石"
+                  }
+                ],
+                "reason": "材质绿松石但形态为提溜，非直切",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4l0yi004voq017d2499gv"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4l0yn004xoq01kdmkix3z"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg4l0yi004voq017d2499gv"
+                    },
+                    "field": "name",
+                    "value": "太阳绿松石提溜"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv7svpyw00033w5cdo0qzxd2"
+                    },
+                    "field": "name",
+                    "value": "绿松石"
+                  }
+                ],
+                "reason": "材质绿松石但形态为提溜，非直切",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4od7h0051oq01rx3ps154"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4od7j0053oq01d96hk3zn"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg4od7h0051oq01rx3ps154"
+                    },
+                    "field": "name",
+                    "value": "藏扣绿松石"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv7svpyw00033w5cdo0qzxd2"
+                    },
+                    "field": "name",
+                    "value": "绿松石"
+                  }
+                ],
+                "reason": "材质绿松石但形态为藏扣，非直切",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg5fueh005doq01nw24tj4y"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg5fuek005foq010y4jszjt"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg5fueh005doq01nw24tj4y"
+                    },
+                    "field": "name",
+                    "value": "20mm晴水无事牌"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv60ruo200093wap0n1ctxii"
+                    },
+                    "field": "name",
+                    "value": "和田玉"
+                  }
+                ],
+                "reason": "材质为和田玉，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg5jznx005koq01b5yqqvvq"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg5jzo9005moq01y9d4q07v"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg5jznx005koq01b5yqqvvq"
+                    },
+                    "field": "name",
+                    "value": "9.6mm晴水直切"
+                  },
+                  {
+                    "entity": {
+                      "type": "TAG",
+                      "id": "cmv6cnpgg002q3wkqktm1fm7b"
+                    },
+                    "field": "name",
+                    "value": "和田玉"
+                  }
+                ],
+                "reason": "形态为直切但材质为和田玉，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg5t23p005uoq01i8osx2xz"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg5t23v005woq01u1qq95c0"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg5t23p005uoq01i8osx2xz"
+                    },
+                    "field": "name",
+                    "value": "10mm且末方形"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv60ruo200093wap0n1ctxii"
+                    },
+                    "field": "name",
+                    "value": "和田玉"
+                  }
+                ],
+                "reason": "材质为和田玉，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg62y0v0064oq018j32l93v"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg62y0z0066oq01crq24mcy"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg62y0v0064oq018j32l93v"
+                    },
+                    "field": "name",
+                    "value": "6mm碧玉直切"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv60ruo200093wap0n1ctxii"
+                    },
+                    "field": "name",
+                    "value": "和田玉"
+                  }
+                ],
+                "reason": "形态为直切但材质为和田玉碧玉，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg65500006aoq01r2ugocml"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg65503006coq016p0qbfgs"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg65500006aoq01r2ugocml"
+                    },
+                    "field": "name",
+                    "value": "碧玉镶嵌48K金四叶草"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv60ruo200093wap0n1ctxii"
+                    },
+                    "field": "name",
+                    "value": "和田玉"
+                  }
+                ],
+                "reason": "材质为和田玉碧玉，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg695k8006goq01kb6pwyk8"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg695kc006ioq016bxdz2rx"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg695k8006goq01kb6pwyk8"
+                    },
+                    "field": "name",
+                    "value": "镀K48-S925银圆环"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63iuqm000b3wm84cggk8ga"
+                    },
+                    "field": "name",
+                    "value": "S925银配饰"
+                  }
+                ],
+                "reason": "材质为S925银，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg6kssg006moq01z3u3l03s"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg6kssl006ooq01j1e3go4p"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg6kssg006moq01z3u3l03s"
+                    },
+                    "field": "name",
+                    "value": "12mm晴水圆珠吊坠"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv60ruo200093wap0n1ctxii"
+                    },
+                    "field": "name",
+                    "value": "和田玉"
+                  }
+                ],
+                "reason": "材质为和田玉，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmv9c5epp000h3we8q5tlmyij"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg6q67j006uoq012detgflf"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmv9c5epp000h3we8q5tlmyij"
+                    },
+                    "field": "name",
+                    "value": "碧玉老料通孔葫芦"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv60ruo200093wap0n1ctxii"
+                    },
+                    "field": "name",
+                    "value": "和田玉"
+                  }
+                ],
+                "reason": "材质为和田玉碧玉，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmv6czxjh00013wwrw95r1hlf"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg6sg3j006yoq017kkapoi8"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmv6czxjh00013wwrw95r1hlf"
+                    },
+                    "field": "name",
+                    "value": "碧玉24K金蝴蝶小花配饰"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63pe63000f3wm8eju8hh61"
+                    },
+                    "field": "name",
+                    "value": "和田玉配饰"
+                  }
+                ],
+                "reason": "材质为和田玉碧玉，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg6zmtj0074oq01ogtm3q3z"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg6zmto0076oq01k1dobc3c"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg6zmtj0074oq01ogtm3q3z"
+                    },
+                    "field": "name",
+                    "value": "绿松石羽毛提溜"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv7svpyw00033w5cdo0qzxd2"
+                    },
+                    "field": "name",
+                    "value": "绿松石"
+                  }
+                ],
+                "reason": "材质绿松石但形态为提溜，非直切",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8cnag007joq01klk7e9a8"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8cnak007loq01x206jc2g"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg8cnag007joq01klk7e9a8"
+                    },
+                    "field": "name",
+                    "value": "4mmS925银配饰猫眼金珠"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63iuqm000b3wm84cggk8ga"
+                    },
+                    "field": "name",
+                    "value": "S925银配饰"
+                  }
+                ],
+                "reason": "材质为S925银，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8hlup007roq01ic1rtpkd"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8hluu007toq01mh5jza4z"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg8hlup007roq01ic1rtpkd"
+                    },
+                    "field": "name",
+                    "value": "2.5m18K镀金S925银圆珠配饰"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63nupn000d3wm85dwsxgzu"
+                    },
+                    "field": "name",
+                    "value": "18K镀金-银配饰"
+                  }
+                ],
+                "reason": "材质为S925银镀金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8meyi007zoq01cwfk1qsl"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8meyk0081oq016gt47ky6"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg8meyi007zoq01cwfk1qsl"
+                    },
+                    "field": "name",
+                    "value": "18K镀金S925银车花直管配饰"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63nupn000d3wm85dwsxgzu"
+                    },
+                    "field": "name",
+                    "value": "18K镀金-银配饰"
+                  }
+                ],
+                "reason": "材质为S925银镀金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8qfxa0087oq01k5a40ff6"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8qfxe0089oq01qgahihor"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg8qfxa0087oq01k5a40ff6"
+                    },
+                    "field": "name",
+                    "value": "2mm18K镀金S925银钉针"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63nupn000d3wm85dwsxgzu"
+                    },
+                    "field": "name",
+                    "value": "18K镀金-银配饰"
+                  }
+                ],
+                "reason": "材质为S925银镀金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8ut8u008eoq012d9j7l12"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8ut8w008goq01ueld40kz"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg8ut8u008eoq012d9j7l12"
+                    },
+                    "field": "name",
+                    "value": "30mm18K镀金S925银圆头针"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63nupn000d3wm85dwsxgzu"
+                    },
+                    "field": "name",
+                    "value": "18K镀金-银配饰"
+                  }
+                ],
+                "reason": "材质为S925银镀金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg9w65m008loq01xvsp88og"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg9w65r008noq01ulq3otqm"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwg9w65m008loq01xvsp88og"
+                    },
+                    "field": "name",
+                    "value": "2mm18K镀金S925碎银方形"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmv63nupn000d3wm85dwsxgzu"
+                    },
+                    "field": "name",
+                    "value": "18K镀金-银配饰"
+                  }
+                ],
+                "reason": "材质为S925银镀金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwgb71ot008yoq01o5milsyi"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwgb71ox0090oq01gsqckvse"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwgb71ot008yoq01o5milsyi"
+                    },
+                    "field": "name",
+                    "value": "2m18K金亮面光珠"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmwgaztl2008toq01qr4sf5oa"
+                    },
+                    "field": "name",
+                    "value": "18K金"
+                  }
+                ],
+                "reason": "材质为18K金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwgbadiv0095oq01l5o0dsqx"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwgbadiy0097oq01s67uj9yo"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwgbadiv0095oq01l5o0dsqx"
+                    },
+                    "field": "name",
+                    "value": "2.5mm18K金亮面光珠"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmwgaztl2008toq01qr4sf5oa"
+                    },
+                    "field": "name",
+                    "value": "18K金"
+                  }
+                ],
+                "reason": "材质为18K金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhhwzpt009zoq01q2qx3jyj"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhhwzpx00a1oq01epyun3py"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwhhwzpt009zoq01q2qx3jyj"
+                    },
+                    "field": "name",
+                    "value": "6mm18K金花车直管"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmwgaztl2008toq01qr4sf5oa"
+                    },
+                    "field": "name",
+                    "value": "18K金"
+                  }
+                ],
+                "reason": "材质为18K金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhi1vm500a7oq0111yohtth"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhi1vm800a9oq01675o73dw"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwhi1vm500a7oq0111yohtth"
+                    },
+                    "field": "name",
+                    "value": "3mm18K金橄榄光珠"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmwgaztl2008toq01qr4sf5oa"
+                    },
+                    "field": "name",
+                    "value": "18K金"
+                  }
+                ],
+                "reason": "材质为18K金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhi6lbq00afoq01ipgxlaxl"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhi6lbu00ahoq01k63brjnz"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwhi6lbq00afoq01ipgxlaxl"
+                    },
+                    "field": "name",
+                    "value": "2m18K金橄榄光珠"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmwgaztl2008toq01qr4sf5oa"
+                    },
+                    "field": "name",
+                    "value": "18K金"
+                  }
+                ],
+                "reason": "材质为18K金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhiagbg00aroq01mwdd2uzx"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhiagbj00atoq01sms4uxt6"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwhiagbg00aroq01mwdd2uzx"
+                    },
+                    "field": "name",
+                    "value": "8mm18K金竹节骨头"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmwgaztl2008toq01qr4sf5oa"
+                    },
+                    "field": "name",
+                    "value": "18K金"
+                  }
+                ],
+                "reason": "材质为18K金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhid0ei00azoq014888pmoe"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhid0ek00b1oq01irvvn3cm"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwhid0ei00azoq014888pmoe"
+                    },
+                    "field": "name",
+                    "value": "2.5mm18K金方糖"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmwgaztl2008toq01qr4sf5oa"
+                    },
+                    "field": "name",
+                    "value": "18K金"
+                  }
+                ],
+                "reason": "材质为18K金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhijono00b7oq01awsa6sbb"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhijons00b9oq01lxg5717t"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwhijono00b7oq01awsa6sbb"
+                    },
+                    "field": "name",
+                    "value": "4mm18K金麦粒"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmwgaztl2008toq01qr4sf5oa"
+                    },
+                    "field": "name",
+                    "value": "18K金"
+                  }
+                ],
+                "reason": "材质为18K金，非绿松石",
+                "ruleVersion": "v1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhip6gf00bfoq01tsr3e0oa"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhip6gi00bhoq01n4u1oiul"
+                },
+                "status": "exclude",
+                "evidence": [
+                  {
+                    "entity": {
+                      "type": "MATERIAL",
+                      "id": "cmwhip6gf00bfoq01tsr3e0oa"
+                    },
+                    "field": "name",
+                    "value": "18K金实心配件"
+                  },
+                  {
+                    "entity": {
+                      "type": "MATERIAL_CATEGORY",
+                      "id": "cmwgaztl2008toq01qr4sf5oa"
+                    },
+                    "field": "name",
+                    "value": "18K金"
+                  }
+                ],
+                "reason": "材质为18K金，非绿松石",
+                "ruleVersion": "v1"
+              }
+            ],
+            "notEvaluatedKeys": [],
+            "sourceCounts": [
+              {
+                "route": "aliases",
+                "candidateCount": 2
+              },
+              {
+                "route": "category",
+                "candidateCount": 28
+              },
+              {
+                "route": "full_scope",
+                "candidateCount": 44
+              },
+              {
+                "route": "name",
+                "candidateCount": 24
+              },
+              {
+                "route": "tag",
+                "candidateCount": 25
+              }
+            ],
+            "budget": {
+              "batchSize": 50,
+              "maxCalls": 20,
+              "maxReservedTokens": 500000,
+              "maxCandidates": 5000,
+              "maxCallsPerStep": 20,
+              "stepTimeoutMs": 120000,
+              "callTimeoutMs": 60000,
+              "maxInputBytes": 300000,
+              "maxOutputTokens": 8000
+            },
+            "usage": {
+              "calls": 1,
+              "reservedTokens": 96165,
+              "knownPromptTokens": 20761,
+              "knownCompletionTokens": 1487,
+              "unknownUsageCalls": 0
+            },
+            "attempts": [
+              {
+                "number": 1,
+                "keys": [
+                  "MATERIAL:cmwg1nejd0017oq01dbrbr9g8:MATERIAL_PURCHASE:cmwg1nejj0019oq015v32pexs",
+                  "MATERIAL:cmwg1syeo001goq01lo04ot40:MATERIAL_PURCHASE:cmwg1syez001ioq017yvh5wia",
+                  "MATERIAL:cmwg1ydtm001noq01ruchlerr:MATERIAL_PURCHASE:cmwg1ydwz001poq01zug4rson",
+                  "MATERIAL:cmwg1zukg001toq01nbdav125:MATERIAL_PURCHASE:cmwg1zuki001voq010pyvuif4",
+                  "MATERIAL:cmwg20yat001zoq01l838wus2:MATERIAL_PURCHASE:cmwg20yaw0021oq01s0tn7se9",
+                  "MATERIAL:cmwg272pm0026oq01ldwgnote:MATERIAL_PURCHASE:cmwg272r80028oq01zqmqd4ez",
+                  "MATERIAL:cmwg2cnkz002eoq01bwj4frmp:MATERIAL_PURCHASE:cmwg2cnlq002goq01oth138kc",
+                  "MATERIAL:cmwg2h6cr002noq01rb9hl6wb:MATERIAL_PURCHASE:cmwg2h6d1002poq012l3enech",
+                  "MATERIAL:cmwg35d3c002woq01k0ez5ef4:MATERIAL_PURCHASE:cmwg35d3k002yoq01jnveq4fu",
+                  "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+                  "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+                  "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+                  "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+                  "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+                  "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+                  "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+                  "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+                  "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+                  "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+                  "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+                  "MATERIAL:cmwg5jznx005koq01b5yqqvvq:MATERIAL_PURCHASE:cmwg5jzo9005moq01y9d4q07v",
+                  "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+                  "MATERIAL:cmwg62y0v0064oq018j32l93v:MATERIAL_PURCHASE:cmwg62y0z0066oq01crq24mcy",
+                  "MATERIAL:cmwg65500006aoq01r2ugocml:MATERIAL_PURCHASE:cmwg65503006coq016p0qbfgs",
+                  "MATERIAL:cmwg695k8006goq01kb6pwyk8:MATERIAL_PURCHASE:cmwg695kc006ioq016bxdz2rx",
+                  "MATERIAL:cmwg6kssg006moq01z3u3l03s:MATERIAL_PURCHASE:cmwg6kssl006ooq01j1e3go4p",
+                  "MATERIAL:cmv9c5epp000h3we8q5tlmyij:MATERIAL_PURCHASE:cmwg6q67j006uoq012detgflf",
+                  "MATERIAL:cmv6czxjh00013wwrw95r1hlf:MATERIAL_PURCHASE:cmwg6sg3j006yoq017kkapoi8",
+                  "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c",
+                  "MATERIAL:cmwg8cnag007joq01klk7e9a8:MATERIAL_PURCHASE:cmwg8cnak007loq01x206jc2g",
+                  "MATERIAL:cmwg8hlup007roq01ic1rtpkd:MATERIAL_PURCHASE:cmwg8hluu007toq01mh5jza4z",
+                  "MATERIAL:cmwg8meyi007zoq01cwfk1qsl:MATERIAL_PURCHASE:cmwg8meyk0081oq016gt47ky6",
+                  "MATERIAL:cmwg8qfxa0087oq01k5a40ff6:MATERIAL_PURCHASE:cmwg8qfxe0089oq01qgahihor",
+                  "MATERIAL:cmwg8ut8u008eoq012d9j7l12:MATERIAL_PURCHASE:cmwg8ut8w008goq01ueld40kz",
+                  "MATERIAL:cmwg9w65m008loq01xvsp88og:MATERIAL_PURCHASE:cmwg9w65r008noq01ulq3otqm",
+                  "MATERIAL:cmwgb71ot008yoq01o5milsyi:MATERIAL_PURCHASE:cmwgb71ox0090oq01gsqckvse",
+                  "MATERIAL:cmwgbadiv0095oq01l5o0dsqx:MATERIAL_PURCHASE:cmwgbadiy0097oq01s67uj9yo",
+                  "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj:MATERIAL_PURCHASE:cmwhhwzpx00a1oq01epyun3py",
+                  "MATERIAL:cmwhi1vm500a7oq0111yohtth:MATERIAL_PURCHASE:cmwhi1vm800a9oq01675o73dw",
+                  "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl:MATERIAL_PURCHASE:cmwhi6lbu00ahoq01k63brjnz",
+                  "MATERIAL:cmwhiagbg00aroq01mwdd2uzx:MATERIAL_PURCHASE:cmwhiagbj00atoq01sms4uxt6",
+                  "MATERIAL:cmwhid0ei00azoq014888pmoe:MATERIAL_PURCHASE:cmwhid0ek00b1oq01irvvn3cm",
+                  "MATERIAL:cmwhijono00b7oq01awsa6sbb:MATERIAL_PURCHASE:cmwhijons00b9oq01lxg5717t",
+                  "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa:MATERIAL_PURCHASE:cmwhip6gi00bhoq01n4u1oiul"
+                ],
+                "startedAt": "2026-11-17T06:39:37.493Z",
+                "durationMs": 5197,
+                "outcome": "success",
+                "errorCode": null,
+                "model": "deepseek-flash",
+                "returned": 44,
+                "reservedTokens": 96165,
+                "usage": {
+                  "promptTokens": 20761,
+                  "completionTokens": 1487
+                },
+                "adjustments": []
+              }
+            ],
+            "confirmedSelection": [
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg3tev8003joq01zlvvug0k"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg3tevc003loq01iq1raphc"
+                }
+              }
+            ],
+            "selectionIsPartial": false,
+            "canConcludeNoMatches": false
+          },
+          "facts": {
+            "items": [
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg3tev8003joq01zlvvug0k"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg3tevc003loq01iq1raphc"
+                },
+                "name": "3.5mm绿松石药片",
+                "code": null,
+                "batch": {
+                  "id": "c000000000000000000005010",
+                  "name": "合成批次名称",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg3g8ak0032oq01pw87gg5k",
+                  "name": "合成渠道商名称"
+                },
+                "quantity": "1.00",
+                "unit": "STRAND",
+                "unitPrice": null,
+                "amount": "185.00",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              }
+            ],
+            "summary": {
+              "basis": "selected_purchases",
+              "scopeCandidateCount": 44,
+              "totals": {
+                "purchaseEntryCount": 1,
+                "catalogItemCount": 1,
+                "amounts": [
+                  {
+                    "currency": "CNY",
+                    "knownAmount": "185.00",
+                    "unknownAmountEntryCount": 0,
+                    "businessDefaultCurrencyEntryCount": 1
+                  }
+                ],
+                "quantities": [
+                  {
+                    "unit": "STRAND",
+                    "knownQuantity": "1.00",
+                    "unknownQuantityEntryCount": 0
+                  }
+                ]
+              },
+              "byDistributor": [
+                {
+                  "distributor": {
+                    "id": "cmwg3g8ak0032oq01pw87gg5k",
+                    "name": "合成渠道商名称"
+                  },
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "185.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "STRAND",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                }
+              ],
+              "byCatalog": [
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg3tev8003joq01zlvvug0k"
+                  },
+                  "name": "3.5mm绿松石药片",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "185.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "STRAND",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "queriedAt": "2026-11-17T06:39:42.700Z",
+            "view": "details"
+          }
+        },
+        "checkpoint": {
+          "fingerprint": "193cc0ff2879b487ada1e881ec7477cf36924f541566340a844578a88bf36c7a",
+          "decisions": [
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg1nejd0017oq01dbrbr9g8"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg1nejj0019oq015v32pexs"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg1nejd0017oq01dbrbr9g8"
+                  },
+                  "field": "name",
+                  "value": "1.5mmS925方形碎银"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63iuqm000b3wm84cggk8ga"
+                  },
+                  "field": "name",
+                  "value": "S925银配饰"
+                }
+              ],
+              "reason": "材质为S925银，非绿松石；虽属配饰但材质条件不满足",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg1syeo001goq01lo04ot40"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg1syez001ioq017yvh5wia"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg1syeo001goq01lo04ot40"
+                  },
+                  "field": "name",
+                  "value": "1.5mmS925银定位管"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63iuqm000b3wm84cggk8ga"
+                  },
+                  "field": "name",
+                  "value": "S925银配饰"
+                }
+              ],
+              "reason": "材质为S925银，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg1ydtm001noq01ruchlerr"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg1ydwz001poq01zug4rson"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg1ydtm001noq01ruchlerr"
+                  },
+                  "field": "name",
+                  "value": "2mmS925银圆珠"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63iuqm000b3wm84cggk8ga"
+                  },
+                  "field": "name",
+                  "value": "S925银配饰"
+                }
+              ],
+              "reason": "材质为S925银，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg1zukg001toq01nbdav125"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg1zuki001voq010pyvuif4"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg1zukg001toq01nbdav125"
+                  },
+                  "field": "name",
+                  "value": "3mmS925银圆珠"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63iuqm000b3wm84cggk8ga"
+                  },
+                  "field": "name",
+                  "value": "S925银配饰"
+                }
+              ],
+              "reason": "材质为S925银，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg20yat001zoq01l838wus2"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg20yaw0021oq01s0tn7se9"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg20yat001zoq01l838wus2"
+                  },
+                  "field": "name",
+                  "value": "4mmS925银圆珠"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63iuqm000b3wm84cggk8ga"
+                  },
+                  "field": "name",
+                  "value": "S925银配饰"
+                }
+              ],
+              "reason": "材质为S925银，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg272pm0026oq01ldwgnote"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg272r80028oq01zqmqd4ez"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg272pm0026oq01ldwgnote"
+                  },
+                  "field": "name",
+                  "value": "6mm18K镀金S925银跑环"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63nupn000d3wm85dwsxgzu"
+                  },
+                  "field": "name",
+                  "value": "18K镀金-银配饰"
+                }
+              ],
+              "reason": "材质为S925银镀金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg2cnkz002eoq01bwj4frmp"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg2cnlq002goq01oth138kc"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg2cnkz002eoq01bwj4frmp"
+                  },
+                  "field": "name",
+                  "value": "锆石18K镀金竹节S925银配饰"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63iuqm000b3wm84cggk8ga"
+                  },
+                  "field": "name",
+                  "value": "S925银配饰"
+                }
+              ],
+              "reason": "材质为S925银配饰，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg2h6cr002noq01rb9hl6wb"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg2h6d1002poq012l3enech"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg2h6cr002noq01rb9hl6wb"
+                  },
+                  "field": "name",
+                  "value": "锆石四芒星S925银延长链"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63iuqm000b3wm84cggk8ga"
+                  },
+                  "field": "name",
+                  "value": "S925银配饰"
+                }
+              ],
+              "reason": "材质为S925银，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg35d3c002woq01k0ez5ef4"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg35d3k002yoq01jnveq4fu"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg35d3c002woq01k0ez5ef4"
+                  },
+                  "field": "name",
+                  "value": "3mm18K镀S925银配饰桶珠"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63iuqm000b3wm84cggk8ga"
+                  },
+                  "field": "name",
+                  "value": "S925银配饰"
+                }
+              ],
+              "reason": "材质为S925银，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg3jvmq0038oq017cf73132"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg3jvn7003aoq01w2vzww8r"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg3jvmq0038oq017cf73132"
+                  },
+                  "field": "name",
+                  "value": "4mm绿松石随形"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv7svpyw00033w5cdo0qzxd2"
+                  },
+                  "field": "name",
+                  "value": "绿松石"
+                }
+              ],
+              "reason": "材质为绿松石且属配件，但形态为随形，非直切",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg3tev8003joq01zlvvug0k"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg3tevc003loq01iq1raphc"
+              },
+              "status": "include",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg3tev8003joq01zlvvug0k"
+                  },
+                  "field": "name",
+                  "value": "3.5mm绿松石药片"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg3tev8003joq01zlvvug0k"
+                  },
+                  "field": "aliases",
+                  "value": ["绿松石直切"]
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv7svpyw00033w5cdo0qzxd2"
+                  },
+                  "field": "name",
+                  "value": "绿松石"
+                }
+              ],
+              "reason": "材质绿松石，别名含直切，属制作配件",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg3wwbn003soq01of24lsde"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg3wwbs003uoq01fefb4uhm"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg3wwbn003soq01of24lsde"
+                  },
+                  "field": "name",
+                  "value": "3mm绿松石圆珠"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv7svpyw00033w5cdo0qzxd2"
+                  },
+                  "field": "name",
+                  "value": "绿松石"
+                }
+              ],
+              "reason": "材质绿松石但形态为圆珠，非直切",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg41qcz0040oq016l565fdh"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg41qd40042oq01bdr95r0f"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg41qcz0040oq016l565fdh"
+                  },
+                  "field": "name",
+                  "value": "13mm绿松石桶珠"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv7svpyw00033w5cdo0qzxd2"
+                  },
+                  "field": "name",
+                  "value": "绿松石"
+                }
+              ],
+              "reason": "材质绿松石但形态为桶珠，非直切",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg462i80047oq01899ruhhw"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg462ib0049oq01l602ks55"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg462i80047oq01899ruhhw"
+                  },
+                  "field": "name",
+                  "value": "7.8mm绿松石勒子"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv7svpyw00033w5cdo0qzxd2"
+                  },
+                  "field": "name",
+                  "value": "绿松石"
+                }
+              ],
+              "reason": "材质绿松石但形态为勒子，非直切",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg4ekob004doq0122uzteo5"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg4ekoh004foq01k1uo5kyt"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4ekob004doq0122uzteo5"
+                  },
+                  "field": "name",
+                  "value": "百香籽绿松石配饰"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv7svpyw00033w5cdo0qzxd2"
+                  },
+                  "field": "name",
+                  "value": "绿松石"
+                }
+              ],
+              "reason": "材质绿松石但形态为提溜，非直切",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg4gc8z004joq01mwra61gp"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg4gc92004loq01w7elwpgm"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4gc8z004joq01mwra61gp"
+                  },
+                  "field": "name",
+                  "value": "羽毛绿松石提溜"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv7svpyw00033w5cdo0qzxd2"
+                  },
+                  "field": "name",
+                  "value": "绿松石"
+                }
+              ],
+              "reason": "材质绿松石但形态为提溜，非直切",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg4irgg004poq01fz0k9ffi"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg4irgl004roq01ldythgge"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4irgg004poq01fz0k9ffi"
+                  },
+                  "field": "name",
+                  "value": "太阳绿松石提溜（大）"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv7svpyw00033w5cdo0qzxd2"
+                  },
+                  "field": "name",
+                  "value": "绿松石"
+                }
+              ],
+              "reason": "材质绿松石但形态为提溜，非直切",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg4l0yi004voq017d2499gv"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg4l0yn004xoq01kdmkix3z"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4l0yi004voq017d2499gv"
+                  },
+                  "field": "name",
+                  "value": "太阳绿松石提溜"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv7svpyw00033w5cdo0qzxd2"
+                  },
+                  "field": "name",
+                  "value": "绿松石"
+                }
+              ],
+              "reason": "材质绿松石但形态为提溜，非直切",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg4od7h0051oq01rx3ps154"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg4od7j0053oq01d96hk3zn"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4od7h0051oq01rx3ps154"
+                  },
+                  "field": "name",
+                  "value": "藏扣绿松石"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv7svpyw00033w5cdo0qzxd2"
+                  },
+                  "field": "name",
+                  "value": "绿松石"
+                }
+              ],
+              "reason": "材质绿松石但形态为藏扣，非直切",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg5fueh005doq01nw24tj4y"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg5fuek005foq010y4jszjt"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg5fueh005doq01nw24tj4y"
+                  },
+                  "field": "name",
+                  "value": "20mm晴水无事牌"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv60ruo200093wap0n1ctxii"
+                  },
+                  "field": "name",
+                  "value": "和田玉"
+                }
+              ],
+              "reason": "材质为和田玉，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg5jznx005koq01b5yqqvvq"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg5jzo9005moq01y9d4q07v"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg5jznx005koq01b5yqqvvq"
+                  },
+                  "field": "name",
+                  "value": "9.6mm晴水直切"
+                },
+                {
+                  "entity": {
+                    "type": "TAG",
+                    "id": "cmv6cnpgg002q3wkqktm1fm7b"
+                  },
+                  "field": "name",
+                  "value": "和田玉"
+                }
+              ],
+              "reason": "形态为直切但材质为和田玉，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg5t23p005uoq01i8osx2xz"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg5t23v005woq01u1qq95c0"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg5t23p005uoq01i8osx2xz"
+                  },
+                  "field": "name",
+                  "value": "10mm且末方形"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv60ruo200093wap0n1ctxii"
+                  },
+                  "field": "name",
+                  "value": "和田玉"
+                }
+              ],
+              "reason": "材质为和田玉，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg62y0v0064oq018j32l93v"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg62y0z0066oq01crq24mcy"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg62y0v0064oq018j32l93v"
+                  },
+                  "field": "name",
+                  "value": "6mm碧玉直切"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv60ruo200093wap0n1ctxii"
+                  },
+                  "field": "name",
+                  "value": "和田玉"
+                }
+              ],
+              "reason": "形态为直切但材质为和田玉碧玉，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg65500006aoq01r2ugocml"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg65503006coq016p0qbfgs"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg65500006aoq01r2ugocml"
+                  },
+                  "field": "name",
+                  "value": "碧玉镶嵌48K金四叶草"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv60ruo200093wap0n1ctxii"
+                  },
+                  "field": "name",
+                  "value": "和田玉"
+                }
+              ],
+              "reason": "材质为和田玉碧玉，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg695k8006goq01kb6pwyk8"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg695kc006ioq016bxdz2rx"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg695k8006goq01kb6pwyk8"
+                  },
+                  "field": "name",
+                  "value": "镀K48-S925银圆环"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63iuqm000b3wm84cggk8ga"
+                  },
+                  "field": "name",
+                  "value": "S925银配饰"
+                }
+              ],
+              "reason": "材质为S925银，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg6kssg006moq01z3u3l03s"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg6kssl006ooq01j1e3go4p"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg6kssg006moq01z3u3l03s"
+                  },
+                  "field": "name",
+                  "value": "12mm晴水圆珠吊坠"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv60ruo200093wap0n1ctxii"
+                  },
+                  "field": "name",
+                  "value": "和田玉"
+                }
+              ],
+              "reason": "材质为和田玉，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmv9c5epp000h3we8q5tlmyij"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg6q67j006uoq012detgflf"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmv9c5epp000h3we8q5tlmyij"
+                  },
+                  "field": "name",
+                  "value": "碧玉老料通孔葫芦"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv60ruo200093wap0n1ctxii"
+                  },
+                  "field": "name",
+                  "value": "和田玉"
+                }
+              ],
+              "reason": "材质为和田玉碧玉，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmv6czxjh00013wwrw95r1hlf"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg6sg3j006yoq017kkapoi8"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmv6czxjh00013wwrw95r1hlf"
+                  },
+                  "field": "name",
+                  "value": "碧玉24K金蝴蝶小花配饰"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63pe63000f3wm8eju8hh61"
+                  },
+                  "field": "name",
+                  "value": "和田玉配饰"
+                }
+              ],
+              "reason": "材质为和田玉碧玉，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg6zmtj0074oq01ogtm3q3z"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg6zmto0076oq01k1dobc3c"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg6zmtj0074oq01ogtm3q3z"
+                  },
+                  "field": "name",
+                  "value": "绿松石羽毛提溜"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv7svpyw00033w5cdo0qzxd2"
+                  },
+                  "field": "name",
+                  "value": "绿松石"
+                }
+              ],
+              "reason": "材质绿松石但形态为提溜，非直切",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg8cnag007joq01klk7e9a8"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg8cnak007loq01x206jc2g"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8cnag007joq01klk7e9a8"
+                  },
+                  "field": "name",
+                  "value": "4mmS925银配饰猫眼金珠"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63iuqm000b3wm84cggk8ga"
+                  },
+                  "field": "name",
+                  "value": "S925银配饰"
+                }
+              ],
+              "reason": "材质为S925银，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg8hlup007roq01ic1rtpkd"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg8hluu007toq01mh5jza4z"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8hlup007roq01ic1rtpkd"
+                  },
+                  "field": "name",
+                  "value": "2.5m18K镀金S925银圆珠配饰"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63nupn000d3wm85dwsxgzu"
+                  },
+                  "field": "name",
+                  "value": "18K镀金-银配饰"
+                }
+              ],
+              "reason": "材质为S925银镀金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg8meyi007zoq01cwfk1qsl"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg8meyk0081oq016gt47ky6"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8meyi007zoq01cwfk1qsl"
+                  },
+                  "field": "name",
+                  "value": "18K镀金S925银车花直管配饰"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63nupn000d3wm85dwsxgzu"
+                  },
+                  "field": "name",
+                  "value": "18K镀金-银配饰"
+                }
+              ],
+              "reason": "材质为S925银镀金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg8qfxa0087oq01k5a40ff6"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg8qfxe0089oq01qgahihor"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8qfxa0087oq01k5a40ff6"
+                  },
+                  "field": "name",
+                  "value": "2mm18K镀金S925银钉针"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63nupn000d3wm85dwsxgzu"
+                  },
+                  "field": "name",
+                  "value": "18K镀金-银配饰"
+                }
+              ],
+              "reason": "材质为S925银镀金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg8ut8u008eoq012d9j7l12"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg8ut8w008goq01ueld40kz"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8ut8u008eoq012d9j7l12"
+                  },
+                  "field": "name",
+                  "value": "30mm18K镀金S925银圆头针"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63nupn000d3wm85dwsxgzu"
+                  },
+                  "field": "name",
+                  "value": "18K镀金-银配饰"
+                }
+              ],
+              "reason": "材质为S925银镀金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg9w65m008loq01xvsp88og"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwg9w65r008noq01ulq3otqm"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwg9w65m008loq01xvsp88og"
+                  },
+                  "field": "name",
+                  "value": "2mm18K镀金S925碎银方形"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmv63nupn000d3wm85dwsxgzu"
+                  },
+                  "field": "name",
+                  "value": "18K镀金-银配饰"
+                }
+              ],
+              "reason": "材质为S925银镀金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwgb71ot008yoq01o5milsyi"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwgb71ox0090oq01gsqckvse"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwgb71ot008yoq01o5milsyi"
+                  },
+                  "field": "name",
+                  "value": "2m18K金亮面光珠"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmwgaztl2008toq01qr4sf5oa"
+                  },
+                  "field": "name",
+                  "value": "18K金"
+                }
+              ],
+              "reason": "材质为18K金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwgbadiv0095oq01l5o0dsqx"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwgbadiy0097oq01s67uj9yo"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwgbadiv0095oq01l5o0dsqx"
+                  },
+                  "field": "name",
+                  "value": "2.5mm18K金亮面光珠"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmwgaztl2008toq01qr4sf5oa"
+                  },
+                  "field": "name",
+                  "value": "18K金"
+                }
+              ],
+              "reason": "材质为18K金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwhhwzpt009zoq01q2qx3jyj"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwhhwzpx00a1oq01epyun3py"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwhhwzpt009zoq01q2qx3jyj"
+                  },
+                  "field": "name",
+                  "value": "6mm18K金花车直管"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmwgaztl2008toq01qr4sf5oa"
+                  },
+                  "field": "name",
+                  "value": "18K金"
+                }
+              ],
+              "reason": "材质为18K金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwhi1vm500a7oq0111yohtth"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwhi1vm800a9oq01675o73dw"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwhi1vm500a7oq0111yohtth"
+                  },
+                  "field": "name",
+                  "value": "3mm18K金橄榄光珠"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmwgaztl2008toq01qr4sf5oa"
+                  },
+                  "field": "name",
+                  "value": "18K金"
+                }
+              ],
+              "reason": "材质为18K金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwhi6lbq00afoq01ipgxlaxl"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwhi6lbu00ahoq01k63brjnz"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwhi6lbq00afoq01ipgxlaxl"
+                  },
+                  "field": "name",
+                  "value": "2m18K金橄榄光珠"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmwgaztl2008toq01qr4sf5oa"
+                  },
+                  "field": "name",
+                  "value": "18K金"
+                }
+              ],
+              "reason": "材质为18K金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwhiagbg00aroq01mwdd2uzx"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwhiagbj00atoq01sms4uxt6"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwhiagbg00aroq01mwdd2uzx"
+                  },
+                  "field": "name",
+                  "value": "8mm18K金竹节骨头"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmwgaztl2008toq01qr4sf5oa"
+                  },
+                  "field": "name",
+                  "value": "18K金"
+                }
+              ],
+              "reason": "材质为18K金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwhid0ei00azoq014888pmoe"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwhid0ek00b1oq01irvvn3cm"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwhid0ei00azoq014888pmoe"
+                  },
+                  "field": "name",
+                  "value": "2.5mm18K金方糖"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmwgaztl2008toq01qr4sf5oa"
+                  },
+                  "field": "name",
+                  "value": "18K金"
+                }
+              ],
+              "reason": "材质为18K金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwhijono00b7oq01awsa6sbb"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwhijons00b9oq01lxg5717t"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwhijono00b7oq01awsa6sbb"
+                  },
+                  "field": "name",
+                  "value": "4mm18K金麦粒"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmwgaztl2008toq01qr4sf5oa"
+                  },
+                  "field": "name",
+                  "value": "18K金"
+                }
+              ],
+              "reason": "材质为18K金，非绿松石",
+              "ruleVersion": "v1"
+            },
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwhip6gf00bfoq01tsr3e0oa"
+              },
+              "purchase": {
+                "type": "MATERIAL_PURCHASE",
+                "id": "cmwhip6gi00bhoq01n4u1oiul"
+              },
+              "status": "exclude",
+              "evidence": [
+                {
+                  "entity": {
+                    "type": "MATERIAL",
+                    "id": "cmwhip6gf00bfoq01tsr3e0oa"
+                  },
+                  "field": "name",
+                  "value": "18K金实心配件"
+                },
+                {
+                  "entity": {
+                    "type": "MATERIAL_CATEGORY",
+                    "id": "cmwgaztl2008toq01qr4sf5oa"
+                  },
+                  "field": "name",
+                  "value": "18K金"
+                }
+              ],
+              "reason": "材质为18K金，非绿松石",
+              "ruleVersion": "v1"
+            }
+          ],
+          "attempts": [
+            {
+              "number": 1,
+              "keys": [
+                "MATERIAL:cmwg1nejd0017oq01dbrbr9g8:MATERIAL_PURCHASE:cmwg1nejj0019oq015v32pexs",
+                "MATERIAL:cmwg1syeo001goq01lo04ot40:MATERIAL_PURCHASE:cmwg1syez001ioq017yvh5wia",
+                "MATERIAL:cmwg1ydtm001noq01ruchlerr:MATERIAL_PURCHASE:cmwg1ydwz001poq01zug4rson",
+                "MATERIAL:cmwg1zukg001toq01nbdav125:MATERIAL_PURCHASE:cmwg1zuki001voq010pyvuif4",
+                "MATERIAL:cmwg20yat001zoq01l838wus2:MATERIAL_PURCHASE:cmwg20yaw0021oq01s0tn7se9",
+                "MATERIAL:cmwg272pm0026oq01ldwgnote:MATERIAL_PURCHASE:cmwg272r80028oq01zqmqd4ez",
+                "MATERIAL:cmwg2cnkz002eoq01bwj4frmp:MATERIAL_PURCHASE:cmwg2cnlq002goq01oth138kc",
+                "MATERIAL:cmwg2h6cr002noq01rb9hl6wb:MATERIAL_PURCHASE:cmwg2h6d1002poq012l3enech",
+                "MATERIAL:cmwg35d3c002woq01k0ez5ef4:MATERIAL_PURCHASE:cmwg35d3k002yoq01jnveq4fu",
+                "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+                "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+                "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+                "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+                "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+                "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+                "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+                "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+                "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+                "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+                "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+                "MATERIAL:cmwg5jznx005koq01b5yqqvvq:MATERIAL_PURCHASE:cmwg5jzo9005moq01y9d4q07v",
+                "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+                "MATERIAL:cmwg62y0v0064oq018j32l93v:MATERIAL_PURCHASE:cmwg62y0z0066oq01crq24mcy",
+                "MATERIAL:cmwg65500006aoq01r2ugocml:MATERIAL_PURCHASE:cmwg65503006coq016p0qbfgs",
+                "MATERIAL:cmwg695k8006goq01kb6pwyk8:MATERIAL_PURCHASE:cmwg695kc006ioq016bxdz2rx",
+                "MATERIAL:cmwg6kssg006moq01z3u3l03s:MATERIAL_PURCHASE:cmwg6kssl006ooq01j1e3go4p",
+                "MATERIAL:cmv9c5epp000h3we8q5tlmyij:MATERIAL_PURCHASE:cmwg6q67j006uoq012detgflf",
+                "MATERIAL:cmv6czxjh00013wwrw95r1hlf:MATERIAL_PURCHASE:cmwg6sg3j006yoq017kkapoi8",
+                "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c",
+                "MATERIAL:cmwg8cnag007joq01klk7e9a8:MATERIAL_PURCHASE:cmwg8cnak007loq01x206jc2g",
+                "MATERIAL:cmwg8hlup007roq01ic1rtpkd:MATERIAL_PURCHASE:cmwg8hluu007toq01mh5jza4z",
+                "MATERIAL:cmwg8meyi007zoq01cwfk1qsl:MATERIAL_PURCHASE:cmwg8meyk0081oq016gt47ky6",
+                "MATERIAL:cmwg8qfxa0087oq01k5a40ff6:MATERIAL_PURCHASE:cmwg8qfxe0089oq01qgahihor",
+                "MATERIAL:cmwg8ut8u008eoq012d9j7l12:MATERIAL_PURCHASE:cmwg8ut8w008goq01ueld40kz",
+                "MATERIAL:cmwg9w65m008loq01xvsp88og:MATERIAL_PURCHASE:cmwg9w65r008noq01ulq3otqm",
+                "MATERIAL:cmwgb71ot008yoq01o5milsyi:MATERIAL_PURCHASE:cmwgb71ox0090oq01gsqckvse",
+                "MATERIAL:cmwgbadiv0095oq01l5o0dsqx:MATERIAL_PURCHASE:cmwgbadiy0097oq01s67uj9yo",
+                "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj:MATERIAL_PURCHASE:cmwhhwzpx00a1oq01epyun3py",
+                "MATERIAL:cmwhi1vm500a7oq0111yohtth:MATERIAL_PURCHASE:cmwhi1vm800a9oq01675o73dw",
+                "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl:MATERIAL_PURCHASE:cmwhi6lbu00ahoq01k63brjnz",
+                "MATERIAL:cmwhiagbg00aroq01mwdd2uzx:MATERIAL_PURCHASE:cmwhiagbj00atoq01sms4uxt6",
+                "MATERIAL:cmwhid0ei00azoq014888pmoe:MATERIAL_PURCHASE:cmwhid0ek00b1oq01irvvn3cm",
+                "MATERIAL:cmwhijono00b7oq01awsa6sbb:MATERIAL_PURCHASE:cmwhijons00b9oq01lxg5717t",
+                "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa:MATERIAL_PURCHASE:cmwhip6gi00bhoq01n4u1oiul"
+              ],
+              "startedAt": "2026-11-17T06:39:37.493Z",
+              "durationMs": 5197,
+              "outcome": "success",
+              "errorCode": null,
+              "model": "deepseek-flash",
+              "returned": 44,
+              "reservedTokens": 96165,
+              "usage": {
+                "promptTokens": 20761,
+                "completionTokens": 1487
+              },
+              "adjustments": []
+            }
+          ],
+          "reservedTokens": 96165
+        },
+        "calls": 3,
+        "reservedTokens": 22697,
+        "trace": [
+          {
+            "stage": "parse",
+            "outcome": "success",
+            "durationMs": 1297,
+            "code": null,
+            "model": "deepseek-flash",
+            "usage": {
+              "promptTokens": 2828,
+              "completionTokens": 122
+            },
+            "completeness": null
+          },
+          {
+            "stage": "facts",
+            "outcome": "success",
+            "durationMs": 5906,
+            "code": null,
+            "model": "deepseek-flash",
+            "usage": {
+              "promptTokens": 1027,
+              "completionTokens": 17
+            },
+            "completeness": null
+          },
+          {
+            "stage": "candidate",
+            "outcome": "success",
+            "durationMs": 15,
+            "code": null,
+            "model": null,
+            "usage": null,
+            "completeness": {
+              "scope": "resolved",
+              "traversal": "complete",
+              "evaluation": "not_started",
+              "countBasis": "purchase_entry",
+              "totalCandidates": 44,
+              "readCandidates": 44,
+              "uniqueCatalogItems": 44,
+              "evaluatedCandidates": 0,
+              "included": 0,
+              "excluded": 0,
+              "uncertain": 0,
+              "notEvaluated": 44,
+              "unreadCandidates": 0,
+              "stopReason": "running"
+            }
+          },
+          {
+            "stage": "judgment",
+            "outcome": "success",
+            "durationMs": 5197,
+            "code": null,
+            "model": "deepseek-flash",
+            "usage": {
+              "promptTokens": 20761,
+              "completionTokens": 1487
+            },
+            "completeness": {
+              "attempt": 1,
+              "keys": [
+                "MATERIAL:cmwg1nejd0017oq01dbrbr9g8:MATERIAL_PURCHASE:cmwg1nejj0019oq015v32pexs",
+                "MATERIAL:cmwg1syeo001goq01lo04ot40:MATERIAL_PURCHASE:cmwg1syez001ioq017yvh5wia",
+                "MATERIAL:cmwg1ydtm001noq01ruchlerr:MATERIAL_PURCHASE:cmwg1ydwz001poq01zug4rson",
+                "MATERIAL:cmwg1zukg001toq01nbdav125:MATERIAL_PURCHASE:cmwg1zuki001voq010pyvuif4",
+                "MATERIAL:cmwg20yat001zoq01l838wus2:MATERIAL_PURCHASE:cmwg20yaw0021oq01s0tn7se9",
+                "MATERIAL:cmwg272pm0026oq01ldwgnote:MATERIAL_PURCHASE:cmwg272r80028oq01zqmqd4ez",
+                "MATERIAL:cmwg2cnkz002eoq01bwj4frmp:MATERIAL_PURCHASE:cmwg2cnlq002goq01oth138kc",
+                "MATERIAL:cmwg2h6cr002noq01rb9hl6wb:MATERIAL_PURCHASE:cmwg2h6d1002poq012l3enech",
+                "MATERIAL:cmwg35d3c002woq01k0ez5ef4:MATERIAL_PURCHASE:cmwg35d3k002yoq01jnveq4fu",
+                "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+                "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+                "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+                "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+                "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+                "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+                "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+                "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+                "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+                "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+                "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+                "MATERIAL:cmwg5jznx005koq01b5yqqvvq:MATERIAL_PURCHASE:cmwg5jzo9005moq01y9d4q07v",
+                "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+                "MATERIAL:cmwg62y0v0064oq018j32l93v:MATERIAL_PURCHASE:cmwg62y0z0066oq01crq24mcy",
+                "MATERIAL:cmwg65500006aoq01r2ugocml:MATERIAL_PURCHASE:cmwg65503006coq016p0qbfgs",
+                "MATERIAL:cmwg695k8006goq01kb6pwyk8:MATERIAL_PURCHASE:cmwg695kc006ioq016bxdz2rx",
+                "MATERIAL:cmwg6kssg006moq01z3u3l03s:MATERIAL_PURCHASE:cmwg6kssl006ooq01j1e3go4p",
+                "MATERIAL:cmv9c5epp000h3we8q5tlmyij:MATERIAL_PURCHASE:cmwg6q67j006uoq012detgflf",
+                "MATERIAL:cmv6czxjh00013wwrw95r1hlf:MATERIAL_PURCHASE:cmwg6sg3j006yoq017kkapoi8",
+                "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c",
+                "MATERIAL:cmwg8cnag007joq01klk7e9a8:MATERIAL_PURCHASE:cmwg8cnak007loq01x206jc2g",
+                "MATERIAL:cmwg8hlup007roq01ic1rtpkd:MATERIAL_PURCHASE:cmwg8hluu007toq01mh5jza4z",
+                "MATERIAL:cmwg8meyi007zoq01cwfk1qsl:MATERIAL_PURCHASE:cmwg8meyk0081oq016gt47ky6",
+                "MATERIAL:cmwg8qfxa0087oq01k5a40ff6:MATERIAL_PURCHASE:cmwg8qfxe0089oq01qgahihor",
+                "MATERIAL:cmwg8ut8u008eoq012d9j7l12:MATERIAL_PURCHASE:cmwg8ut8w008goq01ueld40kz",
+                "MATERIAL:cmwg9w65m008loq01xvsp88og:MATERIAL_PURCHASE:cmwg9w65r008noq01ulq3otqm",
+                "MATERIAL:cmwgb71ot008yoq01o5milsyi:MATERIAL_PURCHASE:cmwgb71ox0090oq01gsqckvse",
+                "MATERIAL:cmwgbadiv0095oq01l5o0dsqx:MATERIAL_PURCHASE:cmwgbadiy0097oq01s67uj9yo",
+                "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj:MATERIAL_PURCHASE:cmwhhwzpx00a1oq01epyun3py",
+                "MATERIAL:cmwhi1vm500a7oq0111yohtth:MATERIAL_PURCHASE:cmwhi1vm800a9oq01675o73dw",
+                "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl:MATERIAL_PURCHASE:cmwhi6lbu00ahoq01k63brjnz",
+                "MATERIAL:cmwhiagbg00aroq01mwdd2uzx:MATERIAL_PURCHASE:cmwhiagbj00atoq01sms4uxt6",
+                "MATERIAL:cmwhid0ei00azoq014888pmoe:MATERIAL_PURCHASE:cmwhid0ek00b1oq01irvvn3cm",
+                "MATERIAL:cmwhijono00b7oq01awsa6sbb:MATERIAL_PURCHASE:cmwhijons00b9oq01lxg5717t",
+                "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa:MATERIAL_PURCHASE:cmwhip6gi00bhoq01n4u1oiul"
+              ],
+              "evaluated": 44,
+              "reservedTokens": 96165
+            }
+          },
+          {
+            "stage": "judgment",
+            "outcome": "success",
+            "durationMs": 5209,
+            "code": null,
+            "model": "deepseek-flash",
+            "usage": null,
+            "completeness": {
+              "completeness": {
+                "scope": "resolved",
+                "traversal": "complete",
+                "evaluation": "complete",
+                "countBasis": "purchase_entry",
+                "totalCandidates": 44,
+                "readCandidates": 44,
+                "uniqueCatalogItems": 44,
+                "evaluatedCandidates": 44,
+                "included": 1,
+                "excluded": 43,
+                "uncertain": 0,
+                "notEvaluated": 0,
+                "unreadCandidates": 0,
+                "stopReason": null
+              },
+              "coverage": {
+                "traversal": 1,
+                "evaluation": 1
+              },
+              "attempts": [
+                {
+                  "number": 1,
+                  "keys": [
+                    "MATERIAL:cmwg1nejd0017oq01dbrbr9g8:MATERIAL_PURCHASE:cmwg1nejj0019oq015v32pexs",
+                    "MATERIAL:cmwg1syeo001goq01lo04ot40:MATERIAL_PURCHASE:cmwg1syez001ioq017yvh5wia",
+                    "MATERIAL:cmwg1ydtm001noq01ruchlerr:MATERIAL_PURCHASE:cmwg1ydwz001poq01zug4rson",
+                    "MATERIAL:cmwg1zukg001toq01nbdav125:MATERIAL_PURCHASE:cmwg1zuki001voq010pyvuif4",
+                    "MATERIAL:cmwg20yat001zoq01l838wus2:MATERIAL_PURCHASE:cmwg20yaw0021oq01s0tn7se9",
+                    "MATERIAL:cmwg272pm0026oq01ldwgnote:MATERIAL_PURCHASE:cmwg272r80028oq01zqmqd4ez",
+                    "MATERIAL:cmwg2cnkz002eoq01bwj4frmp:MATERIAL_PURCHASE:cmwg2cnlq002goq01oth138kc",
+                    "MATERIAL:cmwg2h6cr002noq01rb9hl6wb:MATERIAL_PURCHASE:cmwg2h6d1002poq012l3enech",
+                    "MATERIAL:cmwg35d3c002woq01k0ez5ef4:MATERIAL_PURCHASE:cmwg35d3k002yoq01jnveq4fu",
+                    "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+                    "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+                    "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+                    "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+                    "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+                    "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+                    "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+                    "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+                    "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+                    "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+                    "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+                    "MATERIAL:cmwg5jznx005koq01b5yqqvvq:MATERIAL_PURCHASE:cmwg5jzo9005moq01y9d4q07v",
+                    "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+                    "MATERIAL:cmwg62y0v0064oq018j32l93v:MATERIAL_PURCHASE:cmwg62y0z0066oq01crq24mcy",
+                    "MATERIAL:cmwg65500006aoq01r2ugocml:MATERIAL_PURCHASE:cmwg65503006coq016p0qbfgs",
+                    "MATERIAL:cmwg695k8006goq01kb6pwyk8:MATERIAL_PURCHASE:cmwg695kc006ioq016bxdz2rx",
+                    "MATERIAL:cmwg6kssg006moq01z3u3l03s:MATERIAL_PURCHASE:cmwg6kssl006ooq01j1e3go4p",
+                    "MATERIAL:cmv9c5epp000h3we8q5tlmyij:MATERIAL_PURCHASE:cmwg6q67j006uoq012detgflf",
+                    "MATERIAL:cmv6czxjh00013wwrw95r1hlf:MATERIAL_PURCHASE:cmwg6sg3j006yoq017kkapoi8",
+                    "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c",
+                    "MATERIAL:cmwg8cnag007joq01klk7e9a8:MATERIAL_PURCHASE:cmwg8cnak007loq01x206jc2g",
+                    "MATERIAL:cmwg8hlup007roq01ic1rtpkd:MATERIAL_PURCHASE:cmwg8hluu007toq01mh5jza4z",
+                    "MATERIAL:cmwg8meyi007zoq01cwfk1qsl:MATERIAL_PURCHASE:cmwg8meyk0081oq016gt47ky6",
+                    "MATERIAL:cmwg8qfxa0087oq01k5a40ff6:MATERIAL_PURCHASE:cmwg8qfxe0089oq01qgahihor",
+                    "MATERIAL:cmwg8ut8u008eoq012d9j7l12:MATERIAL_PURCHASE:cmwg8ut8w008goq01ueld40kz",
+                    "MATERIAL:cmwg9w65m008loq01xvsp88og:MATERIAL_PURCHASE:cmwg9w65r008noq01ulq3otqm",
+                    "MATERIAL:cmwgb71ot008yoq01o5milsyi:MATERIAL_PURCHASE:cmwgb71ox0090oq01gsqckvse",
+                    "MATERIAL:cmwgbadiv0095oq01l5o0dsqx:MATERIAL_PURCHASE:cmwgbadiy0097oq01s67uj9yo",
+                    "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj:MATERIAL_PURCHASE:cmwhhwzpx00a1oq01epyun3py",
+                    "MATERIAL:cmwhi1vm500a7oq0111yohtth:MATERIAL_PURCHASE:cmwhi1vm800a9oq01675o73dw",
+                    "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl:MATERIAL_PURCHASE:cmwhi6lbu00ahoq01k63brjnz",
+                    "MATERIAL:cmwhiagbg00aroq01mwdd2uzx:MATERIAL_PURCHASE:cmwhiagbj00atoq01sms4uxt6",
+                    "MATERIAL:cmwhid0ei00azoq014888pmoe:MATERIAL_PURCHASE:cmwhid0ek00b1oq01irvvn3cm",
+                    "MATERIAL:cmwhijono00b7oq01awsa6sbb:MATERIAL_PURCHASE:cmwhijons00b9oq01lxg5717t",
+                    "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa:MATERIAL_PURCHASE:cmwhip6gi00bhoq01n4u1oiul"
+                  ],
+                  "startedAt": "2026-11-17T06:39:37.493Z",
+                  "durationMs": 5197,
+                  "outcome": "success",
+                  "errorCode": null,
+                  "model": "deepseek-flash",
+                  "returned": 44,
+                  "reservedTokens": 96165,
+                  "usage": {
+                    "promptTokens": 20761,
+                    "completionTokens": 1487
+                  },
+                  "adjustments": []
+                }
+              ],
+              "usage": {
+                "calls": 1,
+                "reservedTokens": 96165,
+                "knownPromptTokens": 20761,
+                "knownCompletionTokens": 1487,
+                "unknownUsageCalls": 0
+              },
+              "ruleVersion": "v1",
+              "promptVersion": "relevance-v3"
+            }
+          },
+          {
+            "stage": "facts",
+            "outcome": "success",
+            "durationMs": 7,
+            "code": null,
+            "model": null,
+            "usage": null,
+            "completeness": null
+          },
+          {
+            "stage": "finish",
+            "outcome": "success",
+            "durationMs": 482,
+            "code": null,
+            "model": "deepseek-flash",
+            "usage": {
+              "promptTokens": 1069,
+              "completionTokens": 16
+            },
+            "completeness": null
+          }
+        ],
+        "errorCode": null
+      },
+      "actual": {
+        "selectedIds": ["cmwg3tevc003loq01iq1raphc"],
+        "summary": {
+          "basis": "selected_purchases",
+          "scopeCandidateCount": 44,
+          "totals": {
+            "purchaseEntryCount": 1,
+            "catalogItemCount": 1,
+            "amounts": [
+              {
+                "currency": "CNY",
+                "knownAmount": "185.00",
+                "unknownAmountEntryCount": 0,
+                "businessDefaultCurrencyEntryCount": 1
+              }
+            ],
+            "quantities": [
+              {
+                "unit": "STRAND",
+                "knownQuantity": "1.00",
+                "unknownQuantityEntryCount": 0
+              }
+            ]
+          },
+          "byDistributor": [
+            {
+              "distributor": {
+                "id": "cmwg3g8ak0032oq01pw87gg5k",
+                "name": "合成渠道商名称"
+              },
+              "totals": {
+                "purchaseEntryCount": 1,
+                "catalogItemCount": 1,
+                "amounts": [
+                  {
+                    "currency": "CNY",
+                    "knownAmount": "185.00",
+                    "unknownAmountEntryCount": 0,
+                    "businessDefaultCurrencyEntryCount": 1
+                  }
+                ],
+                "quantities": [
+                  {
+                    "unit": "STRAND",
+                    "knownQuantity": "1.00",
+                    "unknownQuantityEntryCount": 0
+                  }
+                ]
+              }
+            }
+          ],
+          "byCatalog": [
+            {
+              "item": {
+                "type": "MATERIAL",
+                "id": "cmwg3tev8003joq01zlvvug0k"
+              },
+              "name": "3.5mm绿松石药片",
+              "totals": {
+                "purchaseEntryCount": 1,
+                "catalogItemCount": 1,
+                "amounts": [
+                  {
+                    "currency": "CNY",
+                    "knownAmount": "185.00",
+                    "unknownAmountEntryCount": 0,
+                    "businessDefaultCurrencyEntryCount": 1
+                  }
+                ],
+                "quantities": [
+                  {
+                    "unit": "STRAND",
+                    "knownQuantity": "1.00",
+                    "unknownQuantityEntryCount": 0
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "completeness": {
+          "scope": "resolved",
+          "traversal": "complete",
+          "evaluation": "complete",
+          "countBasis": "purchase_entry",
+          "totalCandidates": 44,
+          "readCandidates": 44,
+          "uniqueCatalogItems": 44,
+          "evaluatedCandidates": 44,
+          "included": 1,
+          "excluded": 43,
+          "uncertain": 0,
+          "notEvaluated": 0,
+          "unreadCandidates": 0,
+          "stopReason": null
+        },
+        "recall": 1,
+        "precision": 1,
+        "state": {
+          "query": {
+            "version": "v1",
+            "subject": "purchases",
+            "itemTypes": ["MATERIAL"],
+            "hard": {
+              "purchaseDate": {
+                "from": "2026-11-01",
+                "to": "2026-12-01"
+              },
+              "location": {
+                "text": "荔湾广场",
+                "kind": "exact_place"
+              }
+            },
+            "semantic": [
+              {
+                "concept": "material",
+                "text": "绿松石",
+                "relation": "is"
+              },
+              {
+                "concept": "purpose",
+                "text": "配件",
+                "relation": "is"
+              },
+              {
+                "concept": "form",
+                "text": "直切",
+                "relation": "is"
+              }
+            ],
+            "ruleVersion": "v1",
+            "pagination": {
+              "limit": 100
+            }
+          },
+          "view": "details"
+        }
+      },
+      "durationMs": 7691,
+      "calls": [
+        {
+          "kind": "plan_query",
+          "usage": {
+            "promptTokens": 2828,
+            "completionTokens": 122
+          },
+          "model": "deepseek-flash",
+          "outcome": "returned",
+          "planValidation": "valid",
+          "planShape": {
+            "month": "this_month",
+            "hardKeys": [],
+            "purchaseDateIsNull": false,
+            "view": "details"
+          },
+          "durationMs": 1296
+        },
+        {
+          "kind": "query_facts",
+          "usage": {
+            "promptTokens": 1027,
+            "completionTokens": 17
+          },
+          "model": "deepseek-flash",
+          "outcome": "returned",
+          "durationMs": 673
+        },
+        {
+          "kind": "relevance",
+          "candidates": 44,
+          "usage": {
+            "promptTokens": 20761,
+            "completionTokens": 1487
+          },
+          "model": "deepseek-flash",
+          "outcome": "returned",
+          "durationMs": 5182
+        },
+        {
+          "kind": "finish",
+          "usage": {
+            "promptTokens": 1069,
+            "completionTokens": 16
+          },
+          "model": "deepseek-flash",
+          "outcome": "returned",
+          "durationMs": 482
+        }
+      ]
+    },
+    {
+      "id": "FACT-05",
+      "kind": "reader-current-vs-source-stock",
+      "passed": false,
+      "stockExecutions": [
+        {
+          "metadata": {
+            "contractVersion": "v1",
+            "ruleVersion": "v1",
+            "promptVersion": "orchestration-v3",
+            "relevancePromptVersion": "relevance-v3",
+            "transport": "native-fetch",
+            "requestedModel": "deepseek-flash",
+            "requestedRelevanceModel": "deepseek-flash"
+          },
+          "version": "orchestration-v3",
+          "phase": "finish",
+          "status": "completed",
+          "state": {
+            "query": {
+              "version": "v1",
+              "subject": "purchases",
+              "itemTypes": ["MATERIAL"],
+              "hard": {
+                "purchaseDate": {
+                  "from": "2026-11-01",
+                  "to": "2026-12-01"
+                },
+                "items": [
+                  {
+                    "type": "MATERIAL",
+                    "id": "cmwg1nejd0017oq01dbrbr9g8"
+                  }
+                ],
+                "location": {
+                  "text": "荔湾广场",
+                  "kind": "exact_place"
+                }
+              },
+              "semantic": [],
+              "ruleVersion": "v1",
+              "pagination": {
+                "limit": 100
+              }
+            },
+            "view": "purchase_remaining"
+          },
+          "clarification": null,
+          "pendingPlan": null,
+          "clarificationContext": null,
+          "result": {
+            "relevance": null,
+            "facts": {
+              "version": "v1",
+              "queriedAt": "2026-11-17T06:39:45.088Z",
+              "request": {
+                "mode": "purchase_remaining",
+                "query": {
+                  "version": "v1",
+                  "subject": "purchases",
+                  "itemTypes": ["MATERIAL"],
+                  "hard": {
+                    "purchaseDate": {
+                      "from": "2026-11-01",
+                      "to": "2026-12-01"
+                    },
+                    "items": [
+                      {
+                        "type": "MATERIAL",
+                        "id": "cmwg1nejd0017oq01dbrbr9g8"
+                      }
+                    ],
+                    "location": {
+                      "text": "荔湾广场",
+                      "kind": "exact_place"
+                    }
+                  },
+                  "semantic": [],
+                  "ruleVersion": "v1",
+                  "pagination": {
+                    "limit": 100
+                  }
+                },
+                "selectedPurchases": [
+                  {
+                    "type": "MATERIAL_PURCHASE",
+                    "id": "cmwg1nejj0019oq015v32pexs"
+                  }
+                ]
+              },
+              "scopeCandidateCount": 1,
+              "selectedCandidateCount": 1,
+              "catalogItemCount": 1,
+              "traversal": "complete",
+              "semanticEvaluation": "not_performed",
+              "catalogStock": [],
+              "sourceStock": [
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg1nejd0017oq01dbrbr9g8"
+                  },
+                  "purchase": {
+                    "type": "MATERIAL_PURCHASE",
+                    "id": "cmwg1nejj0019oq015v32pexs"
+                  },
+                  "batch": {
+                    "type": "BATCH",
+                    "id": "c000000000000000000005000"
+                  },
+                  "name": "1.5mmS925方形碎银",
+                  "unit": "GRAM",
+                  "purchasedQuantity": "10.00",
+                  "remainingQuantity": "2.00"
+                }
+              ],
+              "quantities": [
+                {
+                  "unit": "GRAM",
+                  "knownStock": "2.00",
+                  "unknownStockObjectCount": 0,
+                  "unknownStockBatchCount": 0
+                }
+              ]
+            }
+          },
+          "checkpoint": null,
+          "calls": 3,
+          "reservedTokens": 22021,
+          "trace": [
+            {
+              "stage": "parse",
+              "outcome": "success",
+              "durationMs": 1256,
+              "code": null,
+              "model": "deepseek-flash",
+              "usage": {
+                "promptTokens": 2817,
+                "completionTokens": 83
+              },
+              "completeness": null
+            },
+            {
+              "stage": "facts",
+              "outcome": "success",
+              "durationMs": 640,
+              "code": null,
+              "model": "deepseek-flash",
+              "usage": {
+                "promptTokens": 962,
+                "completionTokens": 17
+              },
+              "completeness": null
+            },
+            {
+              "stage": "candidate",
+              "outcome": "success",
+              "durationMs": 1,
+              "code": null,
+              "model": null,
+              "usage": null,
+              "completeness": {
+                "traversal": "complete",
+                "totalCandidates": 1,
+                "readCandidates": 1,
+                "semanticEvaluation": "not_performed"
+              }
+            },
+            {
+              "stage": "facts",
+              "outcome": "success",
+              "durationMs": 0,
+              "code": null,
+              "model": null,
+              "usage": null,
+              "completeness": null
+            },
+            {
+              "stage": "finish",
+              "outcome": "success",
+              "durationMs": 871,
+              "code": null,
+              "model": "deepseek-flash",
+              "usage": {
+                "promptTokens": 1004,
+                "completionTokens": 16
+              },
+              "completeness": null
+            }
+          ],
+          "errorCode": null
+        }
+      ],
+      "failure": {
+        "code": "ERR_ASSERTION",
+        "actual": "purchase_remaining",
+        "expected": "stock"
+      },
+      "durationMs": 2776,
+      "calls": [
+        {
+          "kind": "plan_query",
+          "usage": {
+            "promptTokens": 2817,
+            "completionTokens": 83
+          },
+          "model": "deepseek-flash",
+          "outcome": "returned",
+          "planValidation": "valid",
+          "planShape": {
+            "hardKeys": [],
+            "purchaseDateIsNull": false,
+            "view": "purchase_remaining"
+          },
+          "durationMs": 1256
+        },
+        {
+          "kind": "query_facts",
+          "usage": {
+            "promptTokens": 962,
+            "completionTokens": 17
+          },
+          "model": "deepseek-flash",
+          "outcome": "returned",
+          "durationMs": 639
+        },
+        {
+          "kind": "finish",
+          "usage": {
+            "promptTokens": 1004,
+            "completionTokens": 16
+          },
+          "model": "deepseek-flash",
+          "outcome": "returned",
+          "durationMs": 870
+        }
+      ]
+    }
+  ],
+  "calls": [
+    {
+      "kind": "plan_query",
+      "usage": {
+        "promptTokens": 2828,
+        "completionTokens": 122
+      },
+      "model": "deepseek-flash",
+      "outcome": "returned",
+      "planValidation": "valid",
+      "planShape": {
+        "month": "this_month",
+        "hardKeys": [],
+        "purchaseDateIsNull": false,
+        "view": "details"
+      },
+      "durationMs": 1296
+    },
+    {
+      "kind": "query_facts",
+      "usage": {
+        "promptTokens": 1027,
+        "completionTokens": 17
+      },
+      "model": "deepseek-flash",
+      "outcome": "returned",
+      "durationMs": 673
+    },
+    {
+      "kind": "relevance",
+      "candidates": 44,
+      "usage": {
+        "promptTokens": 20761,
+        "completionTokens": 1487
+      },
+      "model": "deepseek-flash",
+      "outcome": "returned",
+      "durationMs": 5182
+    },
+    {
+      "kind": "finish",
+      "usage": {
+        "promptTokens": 1069,
+        "completionTokens": 16
+      },
+      "model": "deepseek-flash",
+      "outcome": "returned",
+      "durationMs": 482
+    },
+    {
+      "kind": "plan_query",
+      "usage": {
+        "promptTokens": 2817,
+        "completionTokens": 83
+      },
+      "model": "deepseek-flash",
+      "outcome": "returned",
+      "planValidation": "valid",
+      "planShape": {
+        "hardKeys": [],
+        "purchaseDateIsNull": false,
+        "view": "purchase_remaining"
+      },
+      "durationMs": 1256
+    },
+    {
+      "kind": "query_facts",
+      "usage": {
+        "promptTokens": 962,
+        "completionTokens": 17
+      },
+      "model": "deepseek-flash",
+      "outcome": "returned",
+      "durationMs": 639
+    },
+    {
+      "kind": "finish",
+      "usage": {
+        "promptTokens": 1004,
+        "completionTokens": 16
+      },
+      "model": "deepseek-flash",
+      "outcome": "returned",
+      "durationMs": 870
+    }
+  ],
+  "passed": false,
+  "notes": [
+    "No live database, authentication or browser in this report.",
+    "Independent cases continue after failures; no automatic retries of failed model calls.",
+    "Mock usage is unknown, not zero actual tokens."
+  ]
+}

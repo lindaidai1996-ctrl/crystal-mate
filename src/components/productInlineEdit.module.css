@@ -11,6 +11,12 @@
   cursor: pointer;
 }
 
+.cell[data-field='price'] .value {
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
 .editButton {
   flex: none;
   color: var(--ant-color-text-tertiary);

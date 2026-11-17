@@ -12,7 +12,7 @@ import {
 } from './semantic-policy';
 import { CandidateQueryError } from './candidate-contracts';
 
-export const RELEVANCE_PROMPT_VERSION = 'relevance-v1';
+export const RELEVANCE_PROMPT_VERSION = 'relevance-v3';
 export const executionBudgetSchema = z.strictObject({
   batchSize: z.number().int().min(1).max(50).default(10),
   maxCalls: z.number().int().min(1).max(200).default(20),

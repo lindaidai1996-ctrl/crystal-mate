@@ -1,0 +1,362 @@
+{
+  "checkedAt": "2026-11-17T06:50:29.974288+00:00",
+  "model": "deepseek-flash",
+  "transport": "native-fetch",
+  "promptVersions": ["orchestration-v5", "relevance-v3"],
+  "historicalPromptVersionsRetained": true,
+  "sourceReports": [
+    {
+      "file": "2026-11-17T05-57-38-756Z-p6-fixed-real.json",
+      "kind": "fixed-real",
+      "passed": false,
+      "calls": 48,
+      "inputTokens": 459342,
+      "outputTokens": 34371,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-01-39-434Z-p6-fixed-real.json",
+      "kind": "fixed-real",
+      "passed": false,
+      "calls": 47,
+      "inputTokens": 302279,
+      "outputTokens": 32706,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-04-12-850Z-p6-fixed-real.json",
+      "kind": "fixed-real",
+      "passed": true,
+      "calls": 49,
+      "inputTokens": 236636,
+      "outputTokens": 17537,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-35-27-633Z-p6-fixed-real.json",
+      "kind": "fixed-real",
+      "passed": false,
+      "calls": 56,
+      "inputTokens": 230762,
+      "outputTokens": 16635,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-37-22-029Z-p6-fixed-real.json",
+      "kind": "fixed-real",
+      "passed": false,
+      "calls": 51,
+      "inputTokens": 225781,
+      "outputTokens": 16825,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-39-35-492Z-p6-fixed-real.json",
+      "kind": "fixed-real",
+      "passed": false,
+      "calls": 7,
+      "inputTokens": 30468,
+      "outputTokens": 1758,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-40-59-869Z-p6-fixed-real.json",
+      "kind": "fixed-real",
+      "passed": false,
+      "calls": 54,
+      "inputTokens": 231803,
+      "outputTokens": 16198,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-43-42-065Z-p6-fixed-real.json",
+      "kind": "fixed-real",
+      "passed": true,
+      "calls": 57,
+      "inputTokens": 255384,
+      "outputTokens": 17764,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-07-24-325Z-p6-development-real.json",
+      "kind": "live-service",
+      "passed": true,
+      "calls": 13,
+      "inputTokens": 30280,
+      "outputTokens": 2493,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-37-23-586Z-p6-development-real.json",
+      "kind": "live-service",
+      "passed": true,
+      "calls": 13,
+      "inputTokens": 31406,
+      "outputTokens": 2542,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-42-56-554Z-p6-development-real.json",
+      "kind": "live-service",
+      "passed": true,
+      "calls": 13,
+      "inputTokens": 31710,
+      "outputTokens": 2489,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-49-35-461Z-p6-development-real.json",
+      "kind": "live-service",
+      "passed": true,
+      "calls": 13,
+      "inputTokens": 31838,
+      "outputTokens": 2536,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-09-43-306Z-p6-browser-real.json",
+      "kind": "live-browser",
+      "passed": null,
+      "seededMain": false,
+      "calls": 4,
+      "inputTokens": 12701,
+      "outputTokens": 1096,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-13-22-549Z-p6-browser-real.json",
+      "kind": "live-browser",
+      "passed": false,
+      "seededMain": false,
+      "calls": 10,
+      "inputTokens": 26056,
+      "outputTokens": 2364,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-19-33-531Z-p6-browser-real.json",
+      "kind": "live-browser",
+      "passed": false,
+      "seededMain": true,
+      "calls": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-21-03-077Z-p6-browser-real.json",
+      "kind": "live-browser",
+      "passed": true,
+      "seededMain": true,
+      "calls": 10,
+      "inputTokens": 28690,
+      "outputTokens": 2086,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-36-21-121Z-p6-browser-real.json",
+      "kind": "live-browser",
+      "passed": true,
+      "seededMain": false,
+      "calls": 8,
+      "inputTokens": 12451,
+      "outputTokens": 467,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-38-14-391Z-p6-browser-real.json",
+      "kind": "live-browser",
+      "passed": false,
+      "seededMain": false,
+      "calls": 5,
+      "inputTokens": 8369,
+      "outputTokens": 349,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-41-00-468Z-p6-browser-real.json",
+      "kind": "live-browser",
+      "passed": true,
+      "seededMain": false,
+      "calls": 8,
+      "inputTokens": 13455,
+      "outputTokens": 523,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-46-05-117Z-p6-browser-real.json",
+      "kind": "live-browser",
+      "passed": true,
+      "seededMain": false,
+      "calls": 20,
+      "inputTokens": 56692,
+      "outputTokens": 4366,
+      "unknownUsageCalls": 0
+    },
+    {
+      "file": "2026-11-17T06-25-41-434Z-p5-ui.json",
+      "kind": "final-current-source-http",
+      "passed": true,
+      "calls": 3,
+      "inputTokens": 4216,
+      "outputTokens": 181,
+      "unknownUsageCalls": 0
+    }
+  ],
+  "totalRealUsageIncludingFailures": {
+    "calls": 489,
+    "inputTokens": 2260319,
+    "outputTokens": 175286,
+    "unknownUsageCalls": 0
+  },
+  "moneyCost": null,
+  "priceEvidence": null,
+  "costNote": "No verified current price or billing statement. Tokens are provider-reported; no currency estimate.",
+  "profiles": [
+    {
+      "label": "REAL-01#1",
+      "durationMs": 8405,
+      "candidates": 44,
+      "batchSize": 50,
+      "calls": 4,
+      "inputTokens": 23213,
+      "outputTokens": 1695,
+      "unknownUsageCalls": 0
+    },
+    {
+      "label": "REAL-01#2",
+      "durationMs": 7411,
+      "candidates": 44,
+      "batchSize": 50,
+      "calls": 4,
+      "inputTokens": 23213,
+      "outputTokens": 1707,
+      "unknownUsageCalls": 0
+    },
+    {
+      "label": "REAL-01#3",
+      "durationMs": 7968,
+      "candidates": 44,
+      "batchSize": 50,
+      "calls": 4,
+      "inputTokens": 23245,
+      "outputTokens": 1737,
+      "unknownUsageCalls": 0
+    },
+    {
+      "label": "development-default-main-plus-two-explicit-continues",
+      "durationMs": 22041,
+      "commandDurationsMs": [8362, 7405, 6274],
+      "statuses": ["budget", "budget", "completed"],
+      "candidates": 44,
+      "batchSize": 10,
+      "promptVersion": "orchestration-v5",
+      "calls": 10,
+      "inputTokens": 27018,
+      "outputTokens": 2353,
+      "unknownUsageCalls": 0
+    },
+    {
+      "label": "development-one-item-no-semantics",
+      "durationMs": 5035,
+      "calls": 3,
+      "inputTokens": 4820,
+      "outputTokens": 183,
+      "unknownUsageCalls": 0
+    },
+    {
+      "label": "browser-desktop-natural-main",
+      "report": "2026-11-17T06-46-05-117Z-p6-browser-real.json",
+      "promptVersion": "orchestration-v5",
+      "durationMs": 26103,
+      "commandDurationsMs": [10024, 9744, 6335],
+      "statuses": ["budget", "budget", "completed"],
+      "calls": 10,
+      "inputTokens": 27021,
+      "outputTokens": 2269,
+      "unknownUsageCalls": 0
+    },
+    {
+      "label": "browser-mobile-natural-round-followup",
+      "report": "2026-11-17T06-46-05-117Z-p6-browser-real.json",
+      "promptVersion": "orchestration-v5",
+      "durationMs": 22968,
+      "commandDurationsMs": [8240, 7708, 7020],
+      "statuses": ["budget", "budget", "completed"],
+      "calls": 10,
+      "inputTokens": 29671,
+      "outputTokens": 2097,
+      "unknownUsageCalls": 0
+    }
+  ],
+  "databaseRecall": [
+    {
+      "label": "one-item",
+      "candidates": 1,
+      "samples": 3,
+      "minMs": 210,
+      "medianMs": 261,
+      "maxMs": 500,
+      "modelCalls": 0
+    },
+    {
+      "label": "main-44-scope",
+      "candidates": 44,
+      "samples": 3,
+      "minMs": 342,
+      "medianMs": 401,
+      "maxMs": 532,
+      "modelCalls": 0
+    },
+    {
+      "label": "all-material-catalog",
+      "candidates": 210,
+      "samples": 3,
+      "minMs": 305,
+      "medianMs": 430,
+      "maxMs": 515,
+      "modelCalls": 0
+    }
+  ],
+  "budgets": {
+    "orchestrationDefault": {
+      "maxCalls": 6,
+      "maxReservedTokens": 100000,
+      "timeoutMs": 90000,
+      "callTimeoutMs": 30000
+    },
+    "relevanceDefault": {
+      "batchSize": 10,
+      "maxCalls": 20,
+      "maxReservedTokens": 200000,
+      "maxCallsPerStep": 2,
+      "stepTimeoutMs": 60000,
+      "callTimeoutMs": 30000,
+      "maxInputBytes": 100000,
+      "maxOutputTokens": 4000
+    },
+    "hardCandidateLimit": 5000,
+    "stockBatchLimit": 5000,
+    "leaseMs": 150000
+  },
+  "releaseThresholds": {
+    "oneItemNoSemanticsMs": 15000,
+    "full44BackendActiveTimeMs": 45000,
+    "full44MaxModelCalls": 12,
+    "fixed44OneBatchMs": 20000,
+    "readOnlyRecall210Ms": 2000
+  },
+  "limitations": [
+    "Small sequential samples within each script; scripts sometimes overlapped. No controlled-load/p95/concurrency/throughput claim.",
+    "210 catalog rows measured without model judgment. No 5000-row real model load measurement.",
+    "Default main pauses twice at per-step budget; explicit continue. Human waiting time excluded.",
+    "Reserved tokens are conservative UTF-8 based limits, not invoice tokens.",
+    "Cancelled/in-flight provider billing cannot be undone.",
+    "Fact-cache safety exercised with mutable in-memory fixture only; live business data never mutated."
+  ],
+  "choices": {
+    "cache": "No cross-query fact cache. Reuse only matching source/query/prompt/model checkpoint; always read amount/quantity/stock afresh.",
+    "semanticIndex": "Deferred; current finite-case recall/precision=1 and bounded complete fallback; no vector performance claim."
+  },
+  "passed": true
+}

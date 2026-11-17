@@ -1,3 +1,4 @@
+import { recordSavedDiyUsage } from '@/lib/diy-picker/recent';
 import { sameOrderedRows } from './unchanged-relations';
 import { serializeImageFraming } from '@/lib/image-framing';
 import { Prisma } from '@prisma/client';
@@ -256,7 +257,9 @@ async function diyValues(
 
 async function writeDiy(tx: Tx, productId: string, input: Extract<SourceInput, { origin: 'DIY' }>) {
   const values = await diyValues(tx, productId, input);
-  return tx.productDiyRun.create({ data: { productId, ...values } });
+  const run = await tx.productDiyRun.create({ data: { productId, ...values } });
+  await recordSavedDiyUsage(tx, input);
+  return run;
 }
 
 export async function createSource(tx: Tx, productId: string, input: SourceInput) {
@@ -339,6 +342,7 @@ export async function updateProductSource(productId: string, sourceId: string, i
           },
         });
         await changeProductStock(tx, productId, input.quantity - current.quantity);
+        await recordSavedDiyUsage(tx, input);
       }
       return tx.product.findUniqueOrThrow({
         where: { id: productId },

@@ -9,15 +9,17 @@ datasource db {
 }
 
 model Admin {
-  id              String   @id @default(cuid())
-  username        String   @unique
+  id              String              @id @default(cuid())
+  username        String              @unique
   passwordHash    String
-  nickname        String   @default("")
+  nickname        String              @default("")
   avatarObjectKey String?
   avatarUrl       String?
-  sessionVersion  Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  recentMaterials DiyRecentMaterial[]
+  recentCabochons DiyRecentCabochon[]
+  sessionVersion  Int                 @default(0)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
 }
 
 model EditorDraft {
@@ -116,6 +118,9 @@ model Product {
   purchaseEntries  ProductPurchaseEntry[]
   diyImageImports  DiyImageImport[]
   diyRuns          ProductDiyRun[]
+  cards            ProductCard[]
+  cardAssets       ProductCardAsset[]
+  recentDiyUses    DiyRecentCabochon[]
   diyInputs        ProductDiyCabochon[]     @relation("DiyCabochonInput")
   stockAdjustments ProductStockAdjustment[]
   createdAt        DateTime                 @default(now())
@@ -197,6 +202,7 @@ model ProductPurchaseEntry {
 
 model ProductDiyRun {
   imageImport          DiyImageImport?
+  cards                ProductCard[]
   id                   String               @id @default(cuid())
   productId            String
   product              Product              @relation(fields: [productId], references: [id], onDelete: Restrict)
@@ -217,6 +223,45 @@ model ProductDiyRun {
   updatedAt            DateTime             @updatedAt
 
   @@index([productId, createdAt])
+}
+
+model ProductCard {
+  id              String         @id @default(cuid())
+  productId       String
+  product         Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  runId           String?
+  run             ProductDiyRun? @relation(fields: [runId], references: [id], onDelete: SetNull)
+  title           String
+  templateId      String
+  templateVersion Int            @default(1)
+  data            Json
+  quoteSnapshot   Json?
+  sourceSnapshot  Json
+  version         Int            @default(1)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([productId, updatedAt])
+  @@index([runId])
+}
+
+model ProductCardAsset {
+  id         String   @id @default(uuid())
+  productId  String?
+  product    Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  kind       String
+  storageKey String   @unique
+  sourceKey  String?
+  createdAt  DateTime @default(now())
+
+  @@index([productId, sourceKey])
+}
+
+model ProductCardBrandSettings {
+  id        String   @id @default("default")
+  data      Json
+  version   Int      @default(1)
+  updatedAt DateTime @updatedAt
 }
 
 model SilverPricing {
@@ -505,6 +550,7 @@ model MaterialBatch {
 }
 
 model MaterialBatchEntry {
+  recentDiyUses            DiyRecentMaterial[]
   id                       String                    @id @default(cuid())
   materialId               String
   material                 Material                  @relation(fields: [materialId], references: [id], onDelete: Restrict)
@@ -678,4 +724,101 @@ model AuditLog {
   @@index([rootType, rootId, createdAt(sort: Desc)])
   @@index([operationId])
   @@index([relatedIds], type: Gin)
+}
+
+// Assistant-only persistence. Business records are never written by this subsystem.
+model AssistantConversation {
+  id                String               @id @default(uuid())
+  ownerId           String
+  title             String?              @db.VarChar(80)
+  revision          Int                  @default(0)
+  state             Json?
+  activeExecutionId String?
+  leaseUntil        DateTime?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  executions        AssistantExecution[]
+  messages          AssistantMessage[]
+  feedback          AssistantFeedback[]
+
+  @@index([ownerId, updatedAt(sort: Desc)])
+}
+
+model AssistantExecution {
+  id             String                @id @default(uuid())
+  conversationId String
+  ownerId        String
+  generation     Int
+  parentId       String?
+  text           String
+  data           Json
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  conversation   AssistantConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  feedback AssistantFeedback[]
+
+  @@unique([conversationId, generation])
+  @@index([ownerId, conversationId, createdAt])
+}
+
+model AssistantMessage {
+  id             String                @id @default(uuid())
+  conversationId String
+  ownerId        String
+  executionId    String
+  role           String
+  content        Json
+  createdAt      DateTime              @default(now())
+  conversation   AssistantConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  feedback       AssistantFeedback[]
+
+  @@unique([executionId, role])
+  @@index([ownerId, conversationId, createdAt])
+}
+
+// Feedback is a review queue, never an automatic rule update.
+model AssistantFeedback {
+  id                     String                @id @default(uuid())
+  ownerId                String
+  conversationId         String
+  executionId            String
+  questionMessageId      String
+  kind                   String
+  target                 Json?
+  note                   String                @default("") @db.Text
+  ruleVersion            String
+  promptVersion          String
+  relevancePromptVersion String
+  status                 String                @default("pending_review")
+  createdAt              DateTime              @default(now())
+  conversation           AssistantConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  execution              AssistantExecution    @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  question               AssistantMessage      @relation(fields: [questionMessageId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId, conversationId, createdAt(sort: Desc)])
+  @@index([executionId])
+}
+
+/// Personal selection history, updated only in a successful DIY save transaction.
+model DiyRecentMaterial {
+  ownerId String
+  owner   Admin              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  entryId String
+  entry   MaterialBatchEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  usedAt  DateTime           @default(now())
+
+  @@id([ownerId, entryId])
+  @@index([ownerId, usedAt(sort: Desc)])
+}
+
+model DiyRecentCabochon {
+  ownerId   String
+  owner     Admin    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  usedAt    DateTime @default(now())
+
+  @@id([ownerId, productId])
+  @@index([ownerId, usedAt(sort: Desc)])
 }

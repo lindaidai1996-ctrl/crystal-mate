@@ -1,5 +1,7 @@
 'use client';
 
+import { ImagePreviewGroup } from '@/components/imagePreviewGroup';
+
 import { Sensitive } from '@/components/privacyMode';
 
 import { LazyPreviewImage } from '@/components/loadingImage';
@@ -7,18 +9,7 @@ import { LazyPreviewImage } from '@/components/loadingImage';
 import { imageThumbnailUrl } from '@/lib/image-storage';
 
 import { useEffect, useRef, useState } from 'react';
-import {
-  Alert,
-  Button,
-  Checkbox,
-  Image,
-  Input,
-  InputNumber,
-  Popconfirm,
-  Select,
-  Space,
-  Tag,
-} from 'antd';
+import { Alert, Button, Checkbox, Input, InputNumber, Popconfirm, Select, Space, Tag } from 'antd';
 import { DeleteOutlined, ScanOutlined } from '@ant-design/icons';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/client-api';
@@ -35,6 +26,7 @@ import {
   useMaterialImagePreview,
 } from '@/components/product-material-select';
 import { suggestedMaterialQuote } from '@/lib/product-diy-quote';
+import { preferredMaterialUsageUnit } from '@/lib/diy-picker/draft';
 import { diyQuoteLineTotal } from '@/lib/product-diy-cost';
 import styles from './diyImport.module.css';
 
@@ -315,10 +307,12 @@ export function DiyPartEditor({
                       entry,
                       label: `${material!.name} · ${entry.batch.name}`,
                     };
+                    const usageUnit = preferredMaterialUsageUnit(selected, part.usageUnit);
                     onPatch({
                       materialBatchEntryId: id,
-                      unitCost: suggestedMaterialCost(selected, part.usageUnit) ?? '',
-                      quoteUnitPrice: suggestedMaterialQuote(selected, part.usageUnit),
+                      usageUnit,
+                      unitCost: suggestedMaterialCost(selected, usageUnit) ?? '',
+                      quoteUnitPrice: suggestedMaterialQuote(selected, usageUnit),
                     });
                   }}
                 />
@@ -335,7 +329,9 @@ export function DiyPartEditor({
                   {t('previewImages')}
                 </Button>
                 {previewCabochon && (
-                  <Image.PreviewGroup>
+                  <ImagePreviewGroup
+                    items={cabochon.images.map((image) => ({ src: image.url, alt: cabochon.name }))}
+                  >
                     {cabochon.images.map((image) => (
                       <LazyPreviewImage
                         key={image.objectKey}
@@ -346,7 +342,7 @@ export function DiyPartEditor({
                         alt={cabochon.name}
                       />
                     ))}
-                  </Image.PreviewGroup>
+                  </ImagePreviewGroup>
                 )}
               </div>
             )}

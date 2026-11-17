@@ -1,0 +1,17 @@
+.surface,
+.neighbor {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.surface {
+  touch-action: none;
+  user-select: none;
+}
+
+.neighbor {
+  pointer-events: none;
+}

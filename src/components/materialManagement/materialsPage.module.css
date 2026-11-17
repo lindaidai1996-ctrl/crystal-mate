@@ -81,6 +81,7 @@
 }
 
 .priceGrid {
+  container-type: inline-size;
   padding: 12px;
   border-radius: 8px;
   background: var(--ant-color-fill-alter);
@@ -126,6 +127,10 @@
 }
 
 .priceCell strong {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
   font-size: 16px;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
@@ -149,6 +154,16 @@
 
 .priceCell[data-sale='true']:only-child {
   grid-column: 1;
+}
+
+@container (max-width: 240px) {
+  .priceRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .priceCell[data-sale='true'] {
+    grid-column: 1;
+  }
 }
 
 @media (max-width: 767px) {

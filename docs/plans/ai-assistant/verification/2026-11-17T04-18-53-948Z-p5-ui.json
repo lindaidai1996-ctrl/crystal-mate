@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-11-17T04:18:49.091Z",
+  "environment": "isolated-development",
+  "realModel": true,
+  "facts": "real P2 purchase/stock + read-only display; frozen selection supplied, not model-selected",
+  "authentication": "short-lived signed test session through real auth; not password login",
+  "checks": ["real read-only 11 purchase rows, exact amount, display metadata and catalog stock"],
+  "passed": false,
+  "failure": "Expected values to be strictly equal:\n\n500 !== 200\n",
+  "browserErrors": []
+}

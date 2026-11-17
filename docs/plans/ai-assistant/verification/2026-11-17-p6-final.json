@@ -1,0 +1,293 @@
+{
+  "checkedAt": "2026-11-17T06:56:40.007735+00:00",
+  "delivery": {
+    "passed": true,
+    "status": "text-delivery-complete",
+    "scope": "P6-01 through P6-04 text assistant in isolated development; not production deployment",
+    "completedTasks": ["P6-01", "P6-02", "P6-03", "P6-04"],
+    "pendingFinalCheck": [],
+    "notImplemented": ["P6-05", "P6-06"],
+    "nextTask": "P6-05 (outside authorization; stop)",
+    "activeOccupancy": []
+  },
+  "versions": {
+    "business": "v1",
+    "rules": "v1",
+    "orchestration": "orchestration-v5",
+    "relevance": "relevance-v3"
+  },
+  "layers": {
+    "mockFrozen": {
+      "passed": true,
+      "checks": 45,
+      "file": "2026-11-17T06-45-20-512Z-p6-fixed-mock.json",
+      "database": false,
+      "realModel": false
+    },
+    "realFrozen": {
+      "passed": true,
+      "checks": 73,
+      "file": "2026-11-17T06-43-42-065Z-p6-fixed-real.json",
+      "database": false,
+      "realModel": true,
+      "coreRepetitions": 3,
+      "semanticBoundaryRepetitions": 3
+    },
+    "development": {
+      "passed": true,
+      "file": "2026-11-17T06-49-35-461Z-p6-development-real.json",
+      "realModel": true,
+      "businessReadOnly": true,
+      "allDefaultBudgets": true,
+      "sqlIndependentFacts": true,
+      "foreignAccountRejected": true,
+      "crossStoreReload": true
+    },
+    "browserFullText": {
+      "passed": true,
+      "file": "2026-11-17T06-46-05-117Z-p6-browser-real.json",
+      "realModel": true,
+      "seededMain": false,
+      "widths": [1440, 390],
+      "passwordLoginTested": false,
+      "constructedUncertaintyNotRealModel": true
+    },
+    "browserStockLocation": {
+      "passed": true,
+      "file": "2026-11-17T06-41-00-468Z-p6-browser-real.json",
+      "realModel": true,
+      "promptVersion": "orchestration-v4",
+      "note": "Final v5 date-null compatibility repair did not change these views. Distributor progress counts added later and checked with unit/typecheck, no additional billed browser regression."
+    },
+    "p5Supplemental": {
+      "passed": true,
+      "file": "2026-11-17T06-25-41-434Z-p5-ui.json",
+      "note": "Real minimal HTTP query separate from constructed terminal states and delayed HTTP mocks."
+    },
+    "cleanup": {
+      "passed": true,
+      "file": "2026-11-17-p6-cleanup-audit.json",
+      "remainingBrowserSessions": 0,
+      "remainingServiceVerificationSessions": 0
+    },
+    "performance": {
+      "passed": true,
+      "file": "2026-11-17-p6-performance.json"
+    }
+  },
+  "checks": {
+    "unit": {
+      "passed": true,
+      "command": "npx vitest run tests/unit/ai-assistant-*.test.ts",
+      "files": 22,
+      "tests": 381
+    },
+    "typecheck": {
+      "passed": true,
+      "command": "npm run typecheck"
+    },
+    "lint": {
+      "passed": true,
+      "command": "npm run lint",
+      "errors": 0,
+      "warnings": 2,
+      "warningSource": ".cache/product-card-qa/smoke.mjs (other session): unused createHash/readFile imports"
+    },
+    "targetedPrettier": {
+      "passed": true,
+      "scope": "created/modified assistant sources, messages, docs and P6 JSON reports"
+    },
+    "format": {
+      "passed": true,
+      "command": "npm run format:check",
+      "initialFailureRecorded": true
+    },
+    "diff": {
+      "passed": true,
+      "command": "git diff --check"
+    }
+  },
+  "baseline": {
+    "sha256": "b04d3017c4b3b80951695df8f4f9f64899401effa8d37e79b00b60962516910d",
+    "unchangedFromHEAD": true,
+    "overwritten": false,
+    "liveDifference": "No missing/new scope IDs or semantic changes. 25 amount strings differ only in decimal serialization, all 44 source remaining values match."
+  },
+  "realUsageIncludingFailures": {
+    "calls": 489,
+    "inputTokens": 2260319,
+    "outputTokens": 175286,
+    "unknownUsageCalls": 0
+  },
+  "currencyCost": null,
+  "priceEvidence": null,
+  "failedReportsRetained": [
+    {
+      "file": "2026-11-17T05-55-44-202Z-p6-fixed-mock.json",
+      "passed": false,
+      "failedCases": [
+        "REAL-01#1",
+        "REAL-02",
+        "REAL-03",
+        "REAL-04",
+        "REAL-05",
+        "REAL-09",
+        "REAL-10",
+        "SEM-batch#1",
+        "SEM-01#1",
+        "SEM-02#1",
+        "SEM-03#1",
+        "SEM-04#1",
+        "SEM-05#1",
+        "SEM-06#1",
+        "SEM-07#1",
+        "SEM-08#1",
+        "SEM-10#1",
+        "SEM-11#1",
+        "SEM-12#1",
+        "SEM-13#1",
+        "SEM-09",
+        "FLOW-06",
+        "FLOW-07",
+        "FLOW-10",
+        "PRIVACY-01"
+      ],
+      "targetedDiagnostic": false
+    },
+    {
+      "file": "2026-11-17T05-56-41-272Z-p6-fixed-mock.json",
+      "passed": false,
+      "failedCases": ["FLOW-06"],
+      "targetedDiagnostic": false
+    },
+    {
+      "file": "2026-11-17T05-57-38-756Z-p6-fixed-real.json",
+      "passed": false,
+      "failedCases": ["REAL-04"],
+      "targetedDiagnostic": false
+    },
+    {
+      "file": "2026-11-17T06-01-39-434Z-p6-fixed-real.json",
+      "passed": false,
+      "failedCases": ["REAL-01#1", "REAL-01#3", "PRIVACY-01"],
+      "targetedDiagnostic": false
+    },
+    {
+      "file": "2026-11-17T06-09-43-306Z-p6-browser-real.json",
+      "passed": null,
+      "failedCases": [],
+      "targetedDiagnostic": false
+    },
+    {
+      "file": "2026-11-17T06-13-21-390Z-p6-browser-failure-cleanup.json",
+      "passed": false,
+      "failedCases": [],
+      "targetedDiagnostic": false
+    },
+    {
+      "file": "2026-11-17T06-13-22-549Z-p6-browser-real.json",
+      "passed": false,
+      "failedCases": [],
+      "targetedDiagnostic": false
+    },
+    {
+      "file": "2026-11-17T06-19-33-531Z-p6-browser-real.json",
+      "passed": false,
+      "failedCases": [],
+      "targetedDiagnostic": false
+    },
+    {
+      "file": "2026-11-17T06-34-20-243Z-p6-fixed-mock.json",
+      "passed": false,
+      "failedCases": ["FACT-05"],
+      "targetedDiagnostic": false
+    },
+    {
+      "file": "2026-11-17T06-35-27-633Z-p6-fixed-real.json",
+      "passed": false,
+      "failedCases": ["REAL-05"],
+      "targetedDiagnostic": false
+    },
+    {
+      "file": "2026-11-17T06-37-22-029Z-p6-fixed-real.json",
+      "passed": false,
+      "failedCases": ["REAL-05", "FACT-05"],
+      "targetedDiagnostic": false
+    },
+    {
+      "file": "2026-11-17T06-38-14-391Z-p6-browser-real.json",
+      "passed": false,
+      "failedCases": [],
+      "targetedDiagnostic": false
+    },
+    {
+      "file": "2026-11-17T06-39-35-492Z-p6-fixed-real.json",
+      "passed": false,
+      "failedCases": ["FACT-05"],
+      "targetedDiagnostic": true
+    },
+    {
+      "file": "2026-11-17T06-40-59-869Z-p6-fixed-real.json",
+      "passed": false,
+      "failedCases": ["REAL-05"],
+      "targetedDiagnostic": false
+    }
+  ],
+  "additionalFailedChecksRetained": [
+    {
+      "check": "unit source-stock test",
+      "reason": "Test assumed numeric remaining order instead of stable purchase identity order; corrected collection assertion, production order unchanged."
+    },
+    {
+      "check": "typecheck during harness work",
+      "reason": "Untyped diagnostic execution array; explicitly typed Execution[]."
+    },
+    {
+      "check": "format:check first final pass",
+      "reason": "28 generated P6 JSON reports needed formatting; targeted Prettier applied with parsed JSON equality asserted, failure/status values unchanged."
+    }
+  ],
+  "notVerified": [
+    "password login",
+    "real provider 429/5xx/timeout and billing invoice",
+    "other models/providers/SDK/thinking/streaming tool arguments",
+    "5000-row real-model load",
+    "concurrency/p95/multi-instance deployment",
+    "repository E2E suite",
+    "full build",
+    "production",
+    "voice"
+  ],
+  "boundaries": {
+    "businessWrites": false,
+    "assistantOnlyWrites": true,
+    "productionAccess": false,
+    "deployed": false,
+    "migration": false,
+    "gitCommitted": false,
+    "gitPushed": false,
+    "preservedOtherSessionChanges": true,
+    "voiceStarted": false
+  },
+  "sourceSha256": {
+    "src/lib/ai-assistant/orchestration-contracts.ts": "39abd4a4a1dea5ea625645c942ce1e5b1c869f1963194311d1df54b5400b5e37",
+    "src/lib/ai-assistant/orchestrator.ts": "f561022269d024ff569133bbf8be03c594f5381d8ae8d1841c889dcfe3e6826a",
+    "src/lib/ai-assistant/orchestration-facts.ts": "25f911135b4833e5920f360e85fa3ab082d42414d5b72a5526b9c8f8fd112131",
+    "src/lib/ai-assistant/conversation-service.ts": "94fd3ba9b0d1da97495c3f8ca9a5d69aa5205c908eabae3ac456282da429e092",
+    "src/lib/ai-assistant/relevance-contracts.ts": "0eb99684f1c8d4ca35da0e2d89b8756578b5f08cbcca76c1559b5630e1aa748d",
+    "src/lib/ai-assistant/relevance-model.ts": "1975e6d832802c603e18cabba300f139651d81e52e353f5098ef3d0a48cbba0f",
+    "src/lib/ai-assistant/relevance-runs.ts": "c66b62ecf06e2af927c132a52b8ee12588a98648281b5236b412f1650c72386f",
+    "src/lib/ai-assistant/result-view.ts": "a0bf69e0ddb902cd28ec9227974944f88aa787d1b7bb5441b4fb4dd5b87ac189",
+    "src/lib/ai-assistant/browser-view.ts": "2a072a718792a8a768880c7e91065067c181c093bc51a082bd452d1f00cc2bd6",
+    "src/lib/ai-assistant/progress-view.ts": "bb1493a5a6fb688784527dd4d9dca269c245bfc2dcf7d50bf9cdb1185a5931e4",
+    "src/components/assistant/assistantResults.tsx": "4c056a320dbd372d7af1a2ad572986b73d94e6424e0c5d70870565627b7d368e",
+    "src/components/assistant/assistantSummary.tsx": "63ea43a229ae2c12c25b1533d4874ea6feef7def48f2f3175474e2841fd8ded7",
+    "scripts/check-ai-assistant-acceptance.ts": "01833f1972b4f9243cdd96dd1450bcdf1ecbce231996a007439eec2a3be3d91b",
+    "scripts/check-ai-assistant-delivery.ts": "3d03116a46c621d6e31e80019a0825c05b08eb0c3e7cb345169ed6f3e092f6ce",
+    "scripts/check-ai-assistant-delivery-browser.ts": "91e4380c5de48c26caa09acc83b8eec1f2277ae7baf09a3df4f2614b029c3385",
+    "scripts/lib/assistant-acceptance-fixture.ts": "2d032c85080d3f2d610c7641567db1f46a1fa7244b2d8400a9e8ef4a5c118f40"
+  },
+  "handoff": "docs/plans/ai-assistant/handoffs/2026-11-17-p6-01-04.md",
+  "guide": "docs/plans/ai-assistant/text-guide.md",
+  "aiAssistantImpact": "已同步"
+}
