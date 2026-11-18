@@ -327,12 +327,18 @@ export class AssistantConversationStore {
             status: execution.status,
             clarification: execution.clarification,
             errorCode: execution.errorCode,
+            ...(execution.answer ? { answer: execution.answer } : {}),
           }),
         },
       });
     });
   }
-  async cancel(ownerId: string, conversationId: string, revision: number) {
+  async cancel(
+    ownerId: string,
+    conversationId: string,
+    revision: number,
+    invalidatePending = false,
+  ) {
     return this.client.$transaction(async (tx) => {
       const current = await tx.assistantConversation.findFirst({
         where: { id: conversationId, ownerId, revision },
@@ -349,11 +355,23 @@ export class AssistantConversationStore {
       if (
         !current.activeExecutionId &&
         record &&
-        ['completed', 'no_results', 'cancelled'].includes(
-          (record.data as unknown as Execution).status,
-        )
-      )
-        return { revision, status: (record.data as unknown as Execution).status };
+        (invalidatePending ||
+          ['completed', 'no_results', 'cancelled'].includes(
+            (record.data as unknown as Execution).status,
+          ))
+      ) {
+        if (invalidatePending) {
+          const invalidated = await tx.assistantConversation.updateMany({
+            where: { id: conversationId, ownerId, revision },
+            data: { revision: { increment: 1 } },
+          });
+          if (!invalidated.count) throw new CandidateQueryError('STALE_REVISION');
+        }
+        return {
+          revision: revision + (invalidatePending ? 1 : 0),
+          status: (record.data as unknown as Execution).status,
+        };
+      }
       const updated = await tx.assistantConversation.updateMany({
         where: { id: conversationId, ownerId, revision },
         data: { revision: { increment: 1 }, activeExecutionId: null, leaseUntil: null },

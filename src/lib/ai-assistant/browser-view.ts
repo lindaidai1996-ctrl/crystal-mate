@@ -4,6 +4,7 @@ import type { Execution } from './orchestrator';
 import { assistantResultView } from './result-view';
 import { assistantProgressView } from './progress-view';
 import { assistantFeedbackKindSchema, feedbackTargetSchema } from './feedback-contracts';
+import { answerDocumentView } from './answer-document';
 
 export function assistantBrowserView(
   source: Awaited<ReturnType<AssistantConversationStore['read']>>,
@@ -30,11 +31,17 @@ export function assistantBrowserView(
       createdAt: row.createdAt.toISOString(),
     })),
     messages: [...source.messages].reverse().map((message) => {
-      const content = message.content as { text?: string; status?: Execution['status'] };
+      const content = message.content as {
+        text?: string;
+        status?: Execution['status'];
+        answer?: unknown;
+        clarification?: string;
+      };
       return {
         id: message.id,
         role: message.role,
-        text: privacy ? null : (content.text ?? null),
+        text: privacy ? null : (content.text ?? content.clarification ?? null),
+        answer: answerDocumentView(content.answer, privacy),
         status: content.status ?? null,
         executionId: message.executionId,
       };
@@ -50,6 +57,11 @@ export function assistantBrowserView(
           metadata: latest.data.metadata,
           progress: assistantProgressView(latest.data, privacy),
           pendingPlan: privacy ? null : latest.data.pendingPlan,
+          answer:
+            !source.interrupted &&
+            ['completed', 'no_results', 'needs_confirmation'].includes(latest.data.status)
+              ? answerDocumentView(latest.data.answer, privacy)
+              : null,
           results:
             ['completed', 'no_results', 'needs_confirmation'].includes(latest.data.status) &&
             !source.interrupted

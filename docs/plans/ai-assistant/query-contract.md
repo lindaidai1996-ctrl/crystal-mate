@@ -125,3 +125,7 @@ P2-03 已实现服务端运行/游标校验、查询摘要和不可变候选视�
 已有查询内两条明确库存追问由后端 R08 规则固定视图并保留原条件；其他输入仍经模型严格 patch。相对月份由后端时钟计算，模型获 referenceNow/Asia/Shanghai；`month` 与明确日期区间冲突时拒绝，`purchaseDate=null` 只是清除旧值，可在同一 patch 后应用月份，不是另一个日期区间。
 
 AI 助手影响：已同步；事实回源、精确身份、待确认与隐私投影的验证及失败见 [P6 交接](handoffs/2026-11-17-p6-01-04.md)。冻结业务预期不变。
+
+## P7—P10 消费（2026-11-18）
+
+原 v1 硬范围/语义/采购/库存契约保持。新编排通过 `next_action.query` 必须明确 subject 和 itemTypes，以原 patch 计算查询；服务端按结果生成事实集合并执行有界、受控整理。返回的 AnswerDocument 不让模型编造业务值或 URL。QueryState.task 的表达/整理不替代业务权限，隐私开启时不会把受保护字段或旧自由文本发给模型。详见 [现行架构](composable-architecture.md)。

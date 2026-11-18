@@ -27,11 +27,16 @@ import type {
   ProductImage,
   Tag,
 } from '@/lib/client-types';
-import { editMaterial, recalculateMaterial } from '@/lib/material-calculations';
+import {
+  editMaterial,
+  initializeMaterialPricing,
+  recalculateMaterial,
+} from '@/lib/material-calculations';
 import { BatchSelector } from './batchSelector';
 import { DistributorSelect } from '@/components/distributorSelect/distributorSelect';
 import { MaterialBasicFields } from './materialBasicFields';
 import { MaterialDetailFields } from './materialDetailFields';
+import { MaterialLossRateField } from './materialLossRateField';
 import {
   calculatePurchase,
   emptyPurchase,
@@ -88,10 +93,12 @@ export function MaterialEditor({
   const [savedDraft] = useState(() =>
     id === 'new' && !initialDraftId ? readNewMaterialDraft(draftStorageKey) : null,
   );
-  const [inputDraft, setDraft] = useState<MaterialValues>(() => ({
-    ...emptyMaterial(),
-    ...savedDraft?.values,
-  }));
+  const [inputDraft, setDraft] = useState<MaterialValues>(() =>
+    initializeMaterialPricing({
+      ...emptyMaterial(),
+      ...savedDraft?.values,
+    }),
+  );
   const [categories, setCategories] = useState<MaterialCategory[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [tagIds, setTagIds] = useState<string[]>(savedDraft?.tagIds ?? []);
@@ -206,7 +213,7 @@ export function MaterialEditor({
           if (entryId && !isAddingEntry && !entry) throw new Error('NOT_FOUND');
           const source = entry ?? material;
           const values = Object.fromEntries(
-            Object.keys(emptyMaterial()).map((field) => [
+            Object.keys(initializeMaterialPricing(emptyMaterial())).map((field) => [
               field,
               field === 'name' ||
               field === 'aliases' ||
@@ -217,7 +224,12 @@ export function MaterialEditor({
                 : (source as Partial<MaterialValues>)[field as keyof MaterialValues],
             ]),
           ) as MaterialValues;
-          setDraft(values);
+          setDraft(
+            initializeMaterialPricing({
+              ...values,
+              lossRate: isAddingEntry ? (material.lossRate ?? null) : values.lossRate,
+            }),
+          );
           if (material.unit === 'GRAM' && isAddingEntry)
             setPurchase({ ...emptyPurchase(), mode: 'BATCH' });
           setImages(source.images);
@@ -247,7 +259,7 @@ export function MaterialEditor({
     apiFetch<EditorDraftRecord<NewMaterialDraft>>(`/api/editor-drafts/${initialDraftId}`)
       .then((saved) => {
         if (!active || saved.kind !== 'MATERIAL') throw new Error('INVALID_DRAFT');
-        setDraft({ ...emptyMaterial(), ...saved.data.values });
+        setDraft(initializeMaterialPricing({ ...emptyMaterial(), ...saved.data.values }));
         setTagIds(saved.data.tagIds ?? []);
         setImages(saved.data.images ?? []);
         setSelection(saved.data.selection ?? null);
@@ -318,6 +330,8 @@ export function MaterialEditor({
           weightGrams: null,
           purchaseGramPrice: null,
           purchaseGramManual: false,
+          baseSaleUnitPrice: null,
+          baseSaleGramPrice: null,
           saleUnitPrice: null,
           saleGramPrice: null,
           saleUnitManual: false,
@@ -428,6 +442,7 @@ export function MaterialEditor({
             tagIds,
             unit: values.unit,
             notes: values.notes,
+            lossRate: values.lossRate,
           }),
         });
       } else if (isNew) {
@@ -645,6 +660,15 @@ export function MaterialEditor({
                   <Link href="/admin/distributors">{batchText('addSource')}</Link>
                 )}
               </Form.Item>
+            </section>
+          )}
+          {isMasterEdit && (
+            <section className="editor-block">
+              <MaterialLossRateField
+                value={draft.lossRate ?? null}
+                onChange={(value) => change('lossRate', value)}
+                isDefault
+              />
             </section>
           )}
           <MaterialDetailFields

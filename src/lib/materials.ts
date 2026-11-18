@@ -12,6 +12,7 @@ import {
 } from '@/lib/inventory';
 import { calculatePurchase, emptyPurchase, type MaterialPurchase } from '@/lib/material-purchase';
 import type { MaterialValues } from '@/lib/client-types';
+import { initializeMaterialPricing } from './material-calculations';
 import {
   materialBatchEntrySchema,
   materialBatchEntryUpdateSchema,
@@ -54,6 +55,10 @@ type MaterialWithRelations = Prisma.MaterialGetPayload<{ include: typeof materia
 type EntryWithRelations = Prisma.MaterialBatchEntryGetPayload<{ include: typeof entryInclude }>;
 
 const decimalFields = [
+  'lossRate',
+  'baseSaleUnitPrice',
+  'baseSaleGramPrice',
+  'baseSaleChildUnitPrice',
   'purchaseUnitPrice',
   'weightGrams',
   'purchaseGramPrice',
@@ -71,7 +76,7 @@ const decimalFields = [
 function amounts(record: MaterialWithRelations | EntryWithRelations) {
   return Object.fromEntries(
     decimalFields.map((field) => [field, record[field]?.toFixed(2) ?? null]),
-  );
+  ) as { [Field in (typeof decimalFields)[number]]: string | null };
 }
 
 export function serializeEntry(entry: EntryWithRelations) {
@@ -163,7 +168,7 @@ function detailValues(
     unit: _unit,
     notes: _notes,
     ...detail
-  } = calculated.values;
+  } = initializeMaterialPricing(calculated.values);
   void _name;
   void _aliases;
   void _categoryId;
@@ -172,7 +177,7 @@ function detailValues(
   if (
     decimalFields.some((field) => {
       const value = detail[field];
-      return value !== null && !/^\d{1,10}(?:\.\d{1,2})?$/.test(value);
+      return value != null && !/^\d{1,10}(?:\.\d{1,2})?$/.test(value);
     })
   )
     throw new ApiError(400, 'INVALID_INPUT');
@@ -305,6 +310,7 @@ export async function createMaterialInTransaction(
       categoryId,
       unit,
       notes,
+      lossRate: input.values.lossRate ?? null,
       tags: { create: input.tagIds.map((tagId) => ({ tag: { connect: { id: tagId } } })) },
     },
   });
@@ -407,7 +413,13 @@ export async function createMaterialEntryInTransaction(
   )
     throw new ApiError(409, 'MATERIAL_ALREADY_IN_BATCH');
   const { detail, imageKeys, imageFramings } = detailValues(
-    input.values,
+    {
+      ...input.values,
+      lossRate:
+        input.values.lossRate === undefined
+          ? (material.lossRate?.toFixed(2) ?? null)
+          : input.values.lossRate,
+    },
     material,
     input.purchase,
     input.receivedQty,

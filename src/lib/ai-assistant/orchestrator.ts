@@ -14,6 +14,8 @@ import {
 import type { ToolMessage, ToolModel } from './orchestration-model';
 import { assistantModelConfiguration } from './model-config';
 import { RELEVANCE_PROMPT_VERSION } from './relevance-contracts';
+import type { AgentState } from './composable-agent';
+import type { AnswerDocument } from './answer-document';
 
 export type TraceEvent = {
   stage: 'parse' | 'candidate' | 'judgment' | 'facts' | 'finish';
@@ -29,13 +31,13 @@ export type Execution = {
   metadata: {
     contractVersion: 'v1';
     ruleVersion: 'v1';
-    promptVersion: typeof ORCHESTRATION_VERSION;
+    promptVersion: typeof ORCHESTRATION_VERSION | 'assistant-agent-v1';
     relevancePromptVersion: string;
     transport: 'native-fetch';
     requestedModel: string | null;
     requestedRelevanceModel: string | null;
   };
-  phase: 'plan_query' | 'query_facts' | 'finish';
+  phase: 'plan_query' | 'query_facts' | 'finish' | 'next_action';
   status: AssistantStatus | 'running';
   state: QueryState | null;
   clarification: string | null;
@@ -51,6 +53,8 @@ export type Execution = {
   reservedTokens: number;
   trace: TraceEvent[];
   errorCode: string | null;
+  agent?: AgentState;
+  answer?: AnswerDocument | null;
 };
 export function newAssistantExecution(state: QueryState | null): Execution {
   const model = (purpose: 'assistant' | 'relevance') => {

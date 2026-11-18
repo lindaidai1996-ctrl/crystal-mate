@@ -20,12 +20,14 @@ export function validMobileDateRange(value: DateRange) {
 export function MobileDateRange({
   kind = 'created',
   label,
+  endpointLabels,
   hideLabel = false,
   value,
   onChange,
 }: {
   kind?: 'created' | 'received';
   label?: string;
+  endpointLabels?: readonly [string, string];
   hideLabel?: boolean;
   value: DateRange;
   onChange: (value: DateRange) => void;
@@ -58,9 +60,10 @@ export function MobileDateRange({
   );
   const weekdayFormatter = new Intl.DateTimeFormat(locale, { weekday: 'narrow', timeZone: 'UTC' });
   const endpointLabel = (index: 0 | 1) =>
-    withTime
+    endpointLabels?.[index] ??
+    (withTime
       ? t(index === 0 ? 'start' : 'end')
-      : dateText(`${kind}${index === 0 ? 'Start' : 'End'}`);
+      : dateText(`${kind}${index === 0 ? 'Start' : 'End'}`));
   const dateValue = (date: string, index: 0 | 1) => (withTime ? `${date}T${timeAt(index)}` : date);
 
   function selectDate(date: string) {

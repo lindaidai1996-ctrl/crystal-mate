@@ -1,0 +1,3477 @@
+{
+  "checkedAt": "2026-11-18T03:45:39.111Z",
+  "version": "assistant-agent-v1",
+  "realModel": true,
+  "database": "frozen-fixture",
+  "businessWrites": false,
+  "checks": [
+    {
+      "id": "advice-1",
+      "text": "结合本月物料采购和当前库存，给我补货参考建议，并说明数据缺口，不要预测销量和用完时间。",
+      "status": "completed",
+      "errorCode": null,
+      "durationMs": 10079,
+      "calls": 4,
+      "reservedTokens": 113293,
+      "trace": [
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 4595,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 6592,
+            "completionTokens": 236
+          },
+          "completeness": null
+        },
+        {
+          "stage": "candidate",
+          "outcome": "success",
+          "durationMs": 2,
+          "code": null,
+          "model": null,
+          "usage": null,
+          "completeness": {
+            "traversal": "complete",
+            "totalCandidates": 44,
+            "readCandidates": 44,
+            "semanticEvaluation": "not_performed"
+          }
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 11,
+          "code": null,
+          "model": null,
+          "usage": null,
+          "completeness": null
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 936,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 8379,
+            "completionTokens": 122
+          },
+          "completeness": null
+        },
+        {
+          "stage": "finish",
+          "outcome": "failed",
+          "durationMs": 2714,
+          "code": "ANSWER_FIELDS_MISMATCH",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 9054,
+            "completionTokens": 442
+          },
+          "completeness": null
+        },
+        {
+          "stage": "finish",
+          "outcome": "success",
+          "durationMs": 1818,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 8138,
+            "completionTokens": 414
+          },
+          "completeness": null
+        }
+      ],
+      "answer": {
+        "version": "answer-v1",
+        "privacy": false,
+        "observations": ["2026-11-18T03:45:43.706Z", "2026-11-18T03:45:43.696Z"],
+        "warnings": ["采购币种采用 CNY 业务默认值。", "库存为货品的全部当前库存，非本次采购余量。"],
+        "fallback": false,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "cells": [
+              {
+                "text": "以下为本月物料采购明细（按货品去重，并附各货品全部当前库存，按库存升序排列）。库存为货品全部当前库存，并非本次采购余量；采购币种按业务默认币种处理。",
+                "href": null
+              }
+            ]
+          },
+          {
+            "type": "data",
+            "format": "table",
+            "fields": ["name", "quantity", "unit", "stock", "stockUnknown", "date", "distributor"],
+            "rows": [
+              {
+                "id": "d43",
+                "cells": [
+                  {
+                    "text": "18K金实心配件",
+                    "href": "/admin/materials/cmwhip6gf00bfoq01tsr3e0oa/batches/cmwhip6gi00bhoq01n4u1oiul"
+                  },
+                  {
+                    "text": "1.76",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "1.76",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d34",
+                "cells": [
+                  {
+                    "text": "2mm18K镀金S925碎银方形",
+                    "href": "/admin/materials/cmwg9w65m008loq01xvsp88og/batches/cmwg9w65r008noq01ulq3otqm"
+                  },
+                  {
+                    "text": "2.27",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "2.27",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d1",
+                "cells": [
+                  {
+                    "text": "1.5mmS925银定位管",
+                    "href": "/admin/materials/cmwg1syeo001goq01lo04ot40/batches/cmwg1syez001ioq017yvh5wia"
+                  },
+                  {
+                    "text": "2.30",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "2.30",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d31",
+                "cells": [
+                  {
+                    "text": "18K镀金S925银车花直管配饰",
+                    "href": "/admin/materials/cmwg8meyi007zoq01cwfk1qsl/batches/cmwg8meyk0081oq016gt47ky6"
+                  },
+                  {
+                    "text": "2.40",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "2.40",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d3",
+                "cells": [
+                  {
+                    "text": "3mmS925银圆珠",
+                    "href": "/admin/materials/cmwg1zukg001toq01nbdav125/batches/cmwg1zuki001voq010pyvuif4"
+                  },
+                  {
+                    "text": "2.81",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "2.81",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d30",
+                "cells": [
+                  {
+                    "text": "2.5m18K镀金S925银圆珠配饰",
+                    "href": "/admin/materials/cmwg8hlup007roq01ic1rtpkd/batches/cmwg8hluu007toq01mh5jza4z"
+                  },
+                  {
+                    "text": "2.84",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "2.84",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d4",
+                "cells": [
+                  {
+                    "text": "4mmS925银圆珠",
+                    "href": "/admin/materials/cmwg20yat001zoq01l838wus2/batches/cmwg20yaw0021oq01s0tn7se9"
+                  },
+                  {
+                    "text": "3.07",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "3.07",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d2",
+                "cells": [
+                  {
+                    "text": "2mmS925银圆珠",
+                    "href": "/admin/materials/cmwg1ydtm001noq01ruchlerr/batches/cmwg1ydwz001poq01zug4rson"
+                  },
+                  {
+                    "text": "3.25",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "3.25",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d18",
+                "cells": [
+                  {
+                    "text": "藏扣绿松石",
+                    "href": "/admin/materials/cmwg4od7h0051oq01rx3ps154/batches/cmwg4od7j0053oq01d96hk3zn"
+                  },
+                  {
+                    "text": "4.43",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "4.43",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d8",
+                "cells": [
+                  {
+                    "text": "3mm18K镀S925银配饰桶珠",
+                    "href": "/admin/materials/cmwg35d3c002woq01k0ez5ef4/batches/cmwg35d3k002yoq01jnveq4fu"
+                  },
+                  {
+                    "text": "5.94",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "5.94",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d0",
+                "cells": [
+                  {
+                    "text": "1.5mmS925方形碎银",
+                    "href": "/admin/materials/cmwg1nejd0017oq01dbrbr9g8/batches/cmwg1nejj0019oq015v32pexs"
+                  },
+                  {
+                    "text": "10.77",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "10.77",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d12",
+                "cells": [
+                  {
+                    "text": "13mm绿松石桶珠",
+                    "href": "/admin/materials/cmwg41qcz0040oq016l565fdh/batches/cmwg41qd40042oq01bdr95r0f"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d13",
+                "cells": [
+                  {
+                    "text": "7.8mm绿松石勒子",
+                    "href": "/admin/materials/cmwg462i80047oq01899ruhhw/batches/cmwg462ib0049oq01l602ks55"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d14",
+                "cells": [
+                  {
+                    "text": "百香籽绿松石配饰",
+                    "href": "/admin/materials/cmwg4ekob004doq0122uzteo5/batches/cmwg4ekoh004foq01k1uo5kyt"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d15",
+                "cells": [
+                  {
+                    "text": "羽毛绿松石提溜",
+                    "href": "/admin/materials/cmwg4gc8z004joq01mwra61gp/batches/cmwg4gc92004loq01w7elwpgm"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d16",
+                "cells": [
+                  {
+                    "text": "太阳绿松石提溜（大）",
+                    "href": "/admin/materials/cmwg4irgg004poq01fz0k9ffi/batches/cmwg4irgl004roq01ldythgge"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d17",
+                "cells": [
+                  {
+                    "text": "太阳绿松石提溜",
+                    "href": "/admin/materials/cmwg4l0yi004voq017d2499gv/batches/cmwg4l0yn004xoq01kdmkix3z"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d20",
+                "cells": [
+                  {
+                    "text": "9.6mm晴水直切",
+                    "href": "/admin/materials/cmwg5jznx005koq01b5yqqvvq/batches/cmwg5jzo9005moq01y9d4q07v"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d21",
+                "cells": [
+                  {
+                    "text": "10mm且末方形",
+                    "href": "/admin/materials/cmwg5t23p005uoq01i8osx2xz/batches/cmwg5t23v005woq01u1qq95c0"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d23",
+                "cells": [
+                  {
+                    "text": "碧玉镶嵌48K金四叶草",
+                    "href": "/admin/materials/cmwg65500006aoq01r2ugocml/batches/cmwg65503006coq016p0qbfgs"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d25",
+                "cells": [
+                  {
+                    "text": "12mm晴水圆珠吊坠",
+                    "href": "/admin/materials/cmwg6kssg006moq01z3u3l03s/batches/cmwg6kssl006ooq01j1e3go4p"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d26",
+                "cells": [
+                  {
+                    "text": "碧玉老料通孔葫芦",
+                    "href": "/admin/materials/cmv9c5epp000h3we8q5tlmyij/batches/cmwg6q67j006uoq012detgflf"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d28",
+                "cells": [
+                  {
+                    "text": "绿松石羽毛提溜",
+                    "href": "/admin/materials/cmwg6zmtj0074oq01ogtm3q3z/batches/cmwg6zmto0076oq01k1dobc3c"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d19",
+                "cells": [
+                  {
+                    "text": "20mm晴水无事牌",
+                    "href": "/admin/materials/cmwg5fueh005doq01nw24tj4y/batches/cmwg5fuek005foq010y4jszjt"
+                  },
+                  {
+                    "text": "2.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "2.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d22",
+                "cells": [
+                  {
+                    "text": "6mm碧玉直切",
+                    "href": "/admin/materials/cmwg62y0v0064oq018j32l93v/batches/cmwg62y0z0066oq01crq24mcy"
+                  },
+                  {
+                    "text": "2.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "2.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d42",
+                "cells": [
+                  {
+                    "text": "4mm18K金麦粒",
+                    "href": "/admin/materials/cmwhijono00b7oq01awsa6sbb/batches/cmwhijons00b9oq01lxg5717t"
+                  },
+                  {
+                    "text": "2.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "2.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d27",
+                "cells": [
+                  {
+                    "text": "碧玉24K金蝴蝶小花配饰",
+                    "href": "/admin/materials/cmv6czxjh00013wwrw95r1hlf/batches/cmwg6sg3j006yoq017kkapoi8"
+                  },
+                  {
+                    "text": "4.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "4.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d32",
+                "cells": [
+                  {
+                    "text": "2mm18K镀金S925银钉针",
+                    "href": "/admin/materials/cmwg8qfxa0087oq01k5a40ff6/batches/cmwg8qfxe0089oq01qgahihor"
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d33",
+                "cells": [
+                  {
+                    "text": "30mm18K镀金S925银圆头针",
+                    "href": "/admin/materials/cmwg8ut8u008eoq012d9j7l12/batches/cmwg8ut8w008goq01ueld40kz"
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d38",
+                "cells": [
+                  {
+                    "text": "3mm18K金橄榄光珠",
+                    "href": "/admin/materials/cmwhi1vm500a7oq0111yohtth/batches/cmwhi1vm800a9oq01675o73dw"
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d39",
+                "cells": [
+                  {
+                    "text": "2m18K金橄榄光珠",
+                    "href": "/admin/materials/cmwhi6lbq00afoq01ipgxlaxl/batches/cmwhi6lbu00ahoq01k63brjnz"
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d40",
+                "cells": [
+                  {
+                    "text": "8mm18K金竹节骨头",
+                    "href": "/admin/materials/cmwhiagbg00aroq01mwdd2uzx/batches/cmwhiagbj00atoq01sms4uxt6"
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d41",
+                "cells": [
+                  {
+                    "text": "2.5mm18K金方糖",
+                    "href": "/admin/materials/cmwhid0ei00azoq014888pmoe/batches/cmwhid0ek00b1oq01irvvn3cm"
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d7",
+                "cells": [
+                  {
+                    "text": "锆石四芒星S925银延长链",
+                    "href": "/admin/materials/cmwg2h6cr002noq01rb9hl6wb/batches/cmwg2h6d1002poq012l3enech"
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d6",
+                "cells": [
+                  {
+                    "text": "锆石18K镀金竹节S925银配饰",
+                    "href": "/admin/materials/cmwg2cnkz002eoq01bwj4frmp/batches/cmwg2cnlq002goq01oth138kc"
+                  },
+                  {
+                    "text": "6.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "6.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d24",
+                "cells": [
+                  {
+                    "text": "镀K48-S925银圆环",
+                    "href": "/admin/materials/cmwg695k8006goq01kb6pwyk8/batches/cmwg695kc006ioq016bxdz2rx"
+                  },
+                  {
+                    "text": "10.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "10.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d37",
+                "cells": [
+                  {
+                    "text": "6mm18K金花车直管",
+                    "href": "/admin/materials/cmwhhwzpt009zoq01q2qx3jyj/batches/cmwhhwzpx00a1oq01epyun3py"
+                  },
+                  {
+                    "text": "10.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "10.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d35",
+                "cells": [
+                  {
+                    "text": "2m18K金亮面光珠",
+                    "href": "/admin/materials/cmwgb71ot008yoq01o5milsyi/batches/cmwgb71ox0090oq01gsqckvse"
+                  },
+                  {
+                    "text": "20.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "20.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d36",
+                "cells": [
+                  {
+                    "text": "2.5mm18K金亮面光珠",
+                    "href": "/admin/materials/cmwgbadiv0095oq01l5o0dsqx/batches/cmwgbadiy0097oq01s67uj9yo"
+                  },
+                  {
+                    "text": "20.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "20.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d29",
+                "cells": [
+                  {
+                    "text": "4mmS925银配饰猫眼金珠",
+                    "href": "/admin/materials/cmwg8cnag007joq01klk7e9a8/batches/cmwg8cnak007loq01x206jc2g"
+                  },
+                  {
+                    "text": "28.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "28.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d5",
+                "cells": [
+                  {
+                    "text": "6mm18K镀金S925银跑环",
+                    "href": "/admin/materials/cmwg272pm0026oq01ldwgnote/batches/cmwg272r80028oq01zqmqd4ez"
+                  },
+                  {
+                    "text": "33.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "33.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d10",
+                "cells": [
+                  {
+                    "text": "3.5mm绿松石药片",
+                    "href": "/admin/materials/cmwg3tev8003joq01zlvvug0k/batches/cmwg3tevc003loq01iq1raphc"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "串",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d11",
+                "cells": [
+                  {
+                    "text": "3mm绿松石圆珠",
+                    "href": "/admin/materials/cmwg3wwbn003soq01of24lsde/batches/cmwg3wwbs003uoq01fefb4uhm"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "串",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d9",
+                "cells": [
+                  {
+                    "text": "4mm绿松石随形",
+                    "href": "/admin/materials/cmwg3jvmq0038oq017cf73132/batches/cmwg3jvn7003aoq01w2vzww8r"
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "串",
+                    "href": null
+                  },
+                  {
+                    "text": "1.00",
+                    "href": null
+                  },
+                  {
+                    "text": "0",
+                    "href": null
+                  },
+                  {
+                    "text": "2026-11-14",
+                    "href": null
+                  },
+                  {
+                    "text": "合成渠道商名称",
+                    "href": null
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "advice",
+            "cells": [
+              {
+                "text": "补货参考：可优先关注本月已采购、当前库存数量相对偏低的货品，结合后续实际用量决定是否追加采购；由于没有低库存阈值，这里不判定任何货品为缺货。",
+                "href": null
+              }
+            ]
+          },
+          {
+            "type": "advice",
+            "cells": [
+              {
+                "text": "数据缺口：系统无销量与订单、消耗速度及低库存阈值，因此无法预测销量、畅销程度或预计用完时间；DIY 用料不会自动扣减库存，库存数字可能高于实际可用量；部分采购行缺少单价，无法据此核算单位成本。",
+                "href": null
+              }
+            ]
+          }
+        ]
+      },
+      "actions": [
+        {
+          "action": "query",
+          "patch": {
+            "subject": "purchases",
+            "itemTypes": ["MATERIAL"],
+            "hard": {
+              "purchaseDate": null,
+              "createdAt": null,
+              "distributorIds": null,
+              "items": null,
+              "categories": null,
+              "tagIds": null,
+              "location": null
+            },
+            "semantic": {},
+            "month": "this_month",
+            "view": "details",
+            "clarification": null
+          },
+          "reset": true,
+          "purpose": "answer",
+          "retainOperations": false,
+          "intent": {
+            "format": "list",
+            "fields": ["name", "quantity", "unit", "stock", "stockUnknown", "date", "distributor"],
+            "concise": false
+          }
+        },
+        {
+          "action": "transform",
+          "set": "5d4761db-5c8c-4ec9-877a-59c6563b81b3",
+          "operations": [
+            {
+              "op": "deduplicate",
+              "by": "item"
+            },
+            {
+              "op": "sort",
+              "field": "stock",
+              "direction": "asc"
+            }
+          ]
+        },
+        {
+          "action": "answer",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "segments": [
+                {
+                  "text": "以下为本月物料采购明细（按货品去重，并附各货品全部当前库存，按库存升序排列）。库存为货品全部当前库存，并非本次采购余量；采购币种按业务默认 CNY 处理。"
+                }
+              ],
+              "sources": ["dcf49fa6-4d5e-4123-a4b7-0521367946a5"]
+            },
+            {
+              "type": "data",
+              "set": "dcf49fa6-4d5e-4123-a4b7-0521367946a5",
+              "format": "table",
+              "fields": [
+                "name",
+                "specification",
+                "quantity",
+                "unit",
+                "stock",
+                "stockUnknown",
+                "date",
+                "distributor"
+              ]
+            },
+            {
+              "type": "advice",
+              "segments": [
+                {
+                  "text": "补货参考：可优先关注本月已采购、当前库存数量相对偏低的货品，结合后续实际用量决定是否追加采购；由于没有低库存阈值，这里不判定任何货品为缺货。"
+                }
+              ],
+              "sources": ["dcf49fa6-4d5e-4123-a4b7-0521367946a5"]
+            },
+            {
+              "type": "advice",
+              "segments": [
+                {
+                  "text": "数据缺口：系统无销量/订单、消耗速度与低库存阈值，因此无法预测销量、畅销程度或预计用完时间；DIY 用料不会自动扣减库存，库存数字可能高于实际可用量；部分采购行缺少单价，无法据此核算单位成本；库存未知标记为 0 表示已确认，但若后续出现未知库存需另行核对。"
+                }
+              ],
+              "sources": ["dcf49fa6-4d5e-4123-a4b7-0521367946a5"]
+            }
+          ]
+        },
+        {
+          "action": "answer",
+          "blocks": [
+            {
+              "sources": ["dcf49fa6-4d5e-4123-a4b7-0521367946a5"],
+              "segments": [
+                {
+                  "text": "以下为本月物料采购明细（按货品去重，并附各货品全部当前库存，按库存升序排列）。库存为货品全部当前库存，并非本次采购余量；采购币种按业务默认币种处理。"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "fields": [
+                "name",
+                "quantity",
+                "unit",
+                "stock",
+                "stockUnknown",
+                "date",
+                "distributor"
+              ],
+              "format": "table",
+              "set": "dcf49fa6-4d5e-4123-a4b7-0521367946a5",
+              "type": "data"
+            },
+            {
+              "sources": ["dcf49fa6-4d5e-4123-a4b7-0521367946a5"],
+              "segments": [
+                {
+                  "text": "补货参考：可优先关注本月已采购、当前库存数量相对偏低的货品，结合后续实际用量决定是否追加采购；由于没有低库存阈值，这里不判定任何货品为缺货。"
+                }
+              ],
+              "type": "advice"
+            },
+            {
+              "sources": ["dcf49fa6-4d5e-4123-a4b7-0521367946a5"],
+              "segments": [
+                {
+                  "text": "数据缺口：系统无销量与订单、消耗速度及低库存阈值，因此无法预测销量、畅销程度或预计用完时间；DIY 用料不会自动扣减库存，库存数字可能高于实际可用量；部分采购行缺少单价，无法据此核算单位成本。"
+                }
+              ],
+              "type": "advice"
+            }
+          ]
+        }
+      ],
+      "protocol": [
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 505,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 177,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 802,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 750,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "state": {
+        "query": {
+          "version": "v1",
+          "subject": "purchases",
+          "itemTypes": ["MATERIAL"],
+          "hard": {
+            "purchaseDate": {
+              "from": "2026-11-01",
+              "to": "2026-12-01"
+            }
+          },
+          "semantic": [],
+          "ruleVersion": "v1",
+          "pagination": {
+            "limit": 100
+          }
+        },
+        "view": "details",
+        "task": {
+          "intent": {
+            "format": "list",
+            "fields": ["name", "quantity", "unit", "stock", "stockUnknown", "date", "distributor"],
+            "concise": false
+          },
+          "operations": [
+            {
+              "op": "deduplicate",
+              "by": "item"
+            },
+            {
+              "op": "sort",
+              "field": "stock",
+              "direction": "asc"
+            }
+          ]
+        }
+      },
+      "sets": [
+        {
+          "id": "5d4761db-5c8c-4ec9-877a-59c6563b81b3",
+          "count": 44,
+          "complete": true,
+          "parents": []
+        },
+        {
+          "id": "dcf49fa6-4d5e-4123-a4b7-0521367946a5",
+          "count": 44,
+          "complete": true,
+          "parents": ["5d4761db-5c8c-4ec9-877a-59c6563b81b3"]
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "fuzzy-1",
+      "text": "查找名称或描述与小号银色方形配件相关的物料，有多个可能就给我候选，不要擅自选定一个。",
+      "status": "needs_confirmation",
+      "errorCode": null,
+      "durationMs": 7024,
+      "calls": 2,
+      "reservedTokens": 49127,
+      "trace": [
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 5549,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 6590,
+            "completionTokens": 195
+          },
+          "completeness": null
+        },
+        {
+          "stage": "candidate",
+          "outcome": "success",
+          "durationMs": 15,
+          "code": null,
+          "model": null,
+          "usage": null,
+          "completeness": {
+            "scope": "resolved",
+            "traversal": "complete",
+            "evaluation": "not_started",
+            "countBasis": "catalog",
+            "totalCandidates": 44,
+            "readCandidates": 44,
+            "uniqueCatalogItems": 44,
+            "evaluatedCandidates": 0,
+            "included": 0,
+            "excluded": 0,
+            "uncertain": 0,
+            "notEvaluated": 44,
+            "unreadCandidates": 0,
+            "stopReason": "running"
+          }
+        },
+        {
+          "stage": "judgment",
+          "outcome": "success",
+          "durationMs": 4362,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 13826,
+            "completionTokens": 1343
+          },
+          "completeness": {
+            "attempt": 1,
+            "keys": [
+              "MATERIAL:cmv6czxjh00013wwrw95r1hlf::",
+              "MATERIAL:cmv9c5epp000h3we8q5tlmyij::",
+              "MATERIAL:cmwg1nejd0017oq01dbrbr9g8::",
+              "MATERIAL:cmwg1syeo001goq01lo04ot40::",
+              "MATERIAL:cmwg1ydtm001noq01ruchlerr::",
+              "MATERIAL:cmwg1zukg001toq01nbdav125::",
+              "MATERIAL:cmwg20yat001zoq01l838wus2::",
+              "MATERIAL:cmwg272pm0026oq01ldwgnote::",
+              "MATERIAL:cmwg2cnkz002eoq01bwj4frmp::",
+              "MATERIAL:cmwg2h6cr002noq01rb9hl6wb::",
+              "MATERIAL:cmwg35d3c002woq01k0ez5ef4::",
+              "MATERIAL:cmwg3jvmq0038oq017cf73132::",
+              "MATERIAL:cmwg3tev8003joq01zlvvug0k::",
+              "MATERIAL:cmwg3wwbn003soq01of24lsde::",
+              "MATERIAL:cmwg41qcz0040oq016l565fdh::",
+              "MATERIAL:cmwg462i80047oq01899ruhhw::",
+              "MATERIAL:cmwg4ekob004doq0122uzteo5::",
+              "MATERIAL:cmwg4gc8z004joq01mwra61gp::",
+              "MATERIAL:cmwg4irgg004poq01fz0k9ffi::",
+              "MATERIAL:cmwg4l0yi004voq017d2499gv::",
+              "MATERIAL:cmwg4od7h0051oq01rx3ps154::",
+              "MATERIAL:cmwg5fueh005doq01nw24tj4y::",
+              "MATERIAL:cmwg5jznx005koq01b5yqqvvq::",
+              "MATERIAL:cmwg5t23p005uoq01i8osx2xz::",
+              "MATERIAL:cmwg62y0v0064oq018j32l93v::",
+              "MATERIAL:cmwg65500006aoq01r2ugocml::",
+              "MATERIAL:cmwg695k8006goq01kb6pwyk8::",
+              "MATERIAL:cmwg6kssg006moq01z3u3l03s::",
+              "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z::",
+              "MATERIAL:cmwg8cnag007joq01klk7e9a8::",
+              "MATERIAL:cmwg8hlup007roq01ic1rtpkd::",
+              "MATERIAL:cmwg8meyi007zoq01cwfk1qsl::",
+              "MATERIAL:cmwg8qfxa0087oq01k5a40ff6::",
+              "MATERIAL:cmwg8ut8u008eoq012d9j7l12::",
+              "MATERIAL:cmwg9w65m008loq01xvsp88og::",
+              "MATERIAL:cmwgb71ot008yoq01o5milsyi::",
+              "MATERIAL:cmwgbadiv0095oq01l5o0dsqx::",
+              "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj::",
+              "MATERIAL:cmwhi1vm500a7oq0111yohtth::",
+              "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl::",
+              "MATERIAL:cmwhiagbg00aroq01mwdd2uzx::",
+              "MATERIAL:cmwhid0ei00azoq014888pmoe::",
+              "MATERIAL:cmwhijono00b7oq01awsa6sbb::",
+              "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa::"
+            ],
+            "evaluated": 44,
+            "reservedTokens": 62496
+          }
+        },
+        {
+          "stage": "judgment",
+          "outcome": "success",
+          "durationMs": 4371,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": null,
+          "completeness": {
+            "completeness": {
+              "scope": "resolved",
+              "traversal": "complete",
+              "evaluation": "complete",
+              "countBasis": "catalog",
+              "totalCandidates": 44,
+              "readCandidates": 44,
+              "uniqueCatalogItems": 44,
+              "evaluatedCandidates": 44,
+              "included": 2,
+              "excluded": 41,
+              "uncertain": 1,
+              "notEvaluated": 0,
+              "unreadCandidates": 0,
+              "stopReason": null
+            },
+            "coverage": {
+              "traversal": 1,
+              "evaluation": 1
+            },
+            "attempts": [
+              {
+                "number": 1,
+                "keys": [
+                  "MATERIAL:cmv6czxjh00013wwrw95r1hlf::",
+                  "MATERIAL:cmv9c5epp000h3we8q5tlmyij::",
+                  "MATERIAL:cmwg1nejd0017oq01dbrbr9g8::",
+                  "MATERIAL:cmwg1syeo001goq01lo04ot40::",
+                  "MATERIAL:cmwg1ydtm001noq01ruchlerr::",
+                  "MATERIAL:cmwg1zukg001toq01nbdav125::",
+                  "MATERIAL:cmwg20yat001zoq01l838wus2::",
+                  "MATERIAL:cmwg272pm0026oq01ldwgnote::",
+                  "MATERIAL:cmwg2cnkz002eoq01bwj4frmp::",
+                  "MATERIAL:cmwg2h6cr002noq01rb9hl6wb::",
+                  "MATERIAL:cmwg35d3c002woq01k0ez5ef4::",
+                  "MATERIAL:cmwg3jvmq0038oq017cf73132::",
+                  "MATERIAL:cmwg3tev8003joq01zlvvug0k::",
+                  "MATERIAL:cmwg3wwbn003soq01of24lsde::",
+                  "MATERIAL:cmwg41qcz0040oq016l565fdh::",
+                  "MATERIAL:cmwg462i80047oq01899ruhhw::",
+                  "MATERIAL:cmwg4ekob004doq0122uzteo5::",
+                  "MATERIAL:cmwg4gc8z004joq01mwra61gp::",
+                  "MATERIAL:cmwg4irgg004poq01fz0k9ffi::",
+                  "MATERIAL:cmwg4l0yi004voq017d2499gv::",
+                  "MATERIAL:cmwg4od7h0051oq01rx3ps154::",
+                  "MATERIAL:cmwg5fueh005doq01nw24tj4y::",
+                  "MATERIAL:cmwg5jznx005koq01b5yqqvvq::",
+                  "MATERIAL:cmwg5t23p005uoq01i8osx2xz::",
+                  "MATERIAL:cmwg62y0v0064oq018j32l93v::",
+                  "MATERIAL:cmwg65500006aoq01r2ugocml::",
+                  "MATERIAL:cmwg695k8006goq01kb6pwyk8::",
+                  "MATERIAL:cmwg6kssg006moq01z3u3l03s::",
+                  "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z::",
+                  "MATERIAL:cmwg8cnag007joq01klk7e9a8::",
+                  "MATERIAL:cmwg8hlup007roq01ic1rtpkd::",
+                  "MATERIAL:cmwg8meyi007zoq01cwfk1qsl::",
+                  "MATERIAL:cmwg8qfxa0087oq01k5a40ff6::",
+                  "MATERIAL:cmwg8ut8u008eoq012d9j7l12::",
+                  "MATERIAL:cmwg9w65m008loq01xvsp88og::",
+                  "MATERIAL:cmwgb71ot008yoq01o5milsyi::",
+                  "MATERIAL:cmwgbadiv0095oq01l5o0dsqx::",
+                  "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj::",
+                  "MATERIAL:cmwhi1vm500a7oq0111yohtth::",
+                  "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl::",
+                  "MATERIAL:cmwhiagbg00aroq01mwdd2uzx::",
+                  "MATERIAL:cmwhid0ei00azoq014888pmoe::",
+                  "MATERIAL:cmwhijono00b7oq01awsa6sbb::",
+                  "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa::"
+                ],
+                "startedAt": "2026-11-18T03:45:50.461Z",
+                "durationMs": 4362,
+                "outcome": "success",
+                "errorCode": null,
+                "model": "deepseek-flash",
+                "returned": 44,
+                "reservedTokens": 62496,
+                "usage": {
+                  "promptTokens": 13826,
+                  "completionTokens": 1343
+                },
+                "adjustments": []
+              }
+            ],
+            "usage": {
+              "calls": 1,
+              "reservedTokens": 62496,
+              "knownPromptTokens": 13826,
+              "knownCompletionTokens": 1343,
+              "unknownUsageCalls": 0
+            },
+            "ruleVersion": "v1",
+            "promptVersion": "relevance-v3"
+          }
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 1,
+          "code": null,
+          "model": null,
+          "usage": null,
+          "completeness": null
+        },
+        {
+          "stage": "finish",
+          "outcome": "success",
+          "durationMs": 1435,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 7081,
+            "completionTokens": 174
+          },
+          "completeness": null
+        }
+      ],
+      "answer": {
+        "version": "answer-v1",
+        "privacy": false,
+        "observations": ["2026-11-18T03:45:54.827Z", "2026-11-18T03:45:54.826Z"],
+        "warnings": [
+          "部分记录待确认，以下只包含已确定记录。",
+          "库存为货品的全部当前库存，非本次采购余量。"
+        ],
+        "fallback": false,
+        "blocks": [
+          {
+            "type": "paragraph",
+            "cells": [
+              {
+                "text": "按“小号银色方形配件”做语义匹配，找到以下候选物料（未替你选定）：",
+                "href": null
+              }
+            ]
+          },
+          {
+            "type": "data",
+            "format": "list",
+            "fields": ["name", "specification", "unit"],
+            "rows": [
+              {
+                "id": "MATERIAL:cmwg1nejd0017oq01dbrbr9g8",
+                "cells": [
+                  {
+                    "text": "1.5mmS925方形碎银",
+                    "href": "/admin/materials/cmwg1nejd0017oq01dbrbr9g8"
+                  },
+                  {
+                    "text": "1.00 × 1.00 × 1.00 mm",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "MATERIAL:cmwg9w65m008loq01xvsp88og",
+                "cells": [
+                  {
+                    "text": "2mm18K镀金S925碎银方形",
+                    "href": "/admin/materials/cmwg9w65m008loq01xvsp88og"
+                  },
+                  {
+                    "text": "1.00 × 1.00 × 1.00 mm",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "actions": [
+        {
+          "action": "query",
+          "patch": {
+            "subject": "catalog",
+            "itemTypes": ["MATERIAL"],
+            "hard": {},
+            "semantic": {
+              "other": [
+                {
+                  "concept": "other",
+                  "text": "小号银色方形配件",
+                  "relation": "is"
+                }
+              ]
+            },
+            "clarification": null
+          },
+          "reset": true,
+          "purpose": "answer",
+          "retainOperations": false,
+          "intent": {
+            "format": "list",
+            "fields": ["name", "specification", "unit"],
+            "concise": false
+          }
+        },
+        {
+          "action": "answer",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "segments": [
+                {
+                  "text": "按“小号银色方形配件”做语义匹配，找到以下候选物料（未替你选定）："
+                }
+              ],
+              "sources": ["011c2ac5-ec28-4404-8e69-2d15b41ce2c4"]
+            },
+            {
+              "type": "data",
+              "set": "011c2ac5-ec28-4404-8e69-2d15b41ce2c4",
+              "format": "list",
+              "fields": ["name", "specification", "unit"]
+            }
+          ]
+        }
+      ],
+      "protocol": [
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 355,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 297,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "state": {
+        "query": {
+          "version": "v1",
+          "subject": "catalog",
+          "itemTypes": ["MATERIAL"],
+          "hard": {},
+          "semantic": [
+            {
+              "concept": "other",
+              "text": "小号银色方形配件",
+              "relation": "is"
+            }
+          ],
+          "ruleVersion": "v1",
+          "pagination": {
+            "limit": 100
+          }
+        },
+        "view": "details",
+        "task": {
+          "intent": {
+            "format": "list",
+            "fields": ["name", "specification", "unit"],
+            "concise": false
+          },
+          "operations": []
+        }
+      },
+      "sets": [
+        {
+          "id": "011c2ac5-ec28-4404-8e69-2d15b41ce2c4",
+          "count": 2,
+          "complete": false,
+          "parents": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "explain-1",
+      "text": "本月荔湾广场的物料采购总金额怎么算出来的？给我汇总并说明来源。",
+      "status": "completed",
+      "errorCode": "ANSWER_FIELDS_MISMATCH",
+      "durationMs": 8848,
+      "calls": 5,
+      "reservedTokens": 133354,
+      "trace": [
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 1121,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 6585,
+            "completionTokens": 78
+          },
+          "completeness": null
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 1412,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 6737,
+            "completionTokens": 218
+          },
+          "completeness": null
+        },
+        {
+          "stage": "candidate",
+          "outcome": "success",
+          "durationMs": 4,
+          "code": null,
+          "model": null,
+          "usage": null,
+          "completeness": {
+            "traversal": "complete",
+            "totalCandidates": 44,
+            "readCandidates": 44,
+            "semanticEvaluation": "not_performed"
+          }
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 5,
+          "code": null,
+          "model": null,
+          "usage": null,
+          "completeness": null
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 1861,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 8503,
+            "completionTokens": 111
+          },
+          "completeness": null
+        },
+        {
+          "stage": "finish",
+          "outcome": "failed",
+          "durationMs": 2860,
+          "code": "ANSWER_FIELDS_MISMATCH",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 7506,
+            "completionTokens": 425
+          },
+          "completeness": null
+        },
+        {
+          "stage": "finish",
+          "outcome": "success",
+          "durationMs": 1578,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 8098,
+            "completionTokens": 421
+          },
+          "completeness": null
+        }
+      ],
+      "answer": {
+        "version": "answer-v1",
+        "privacy": false,
+        "observations": ["2026-11-18T03:45:58.801Z", "2026-11-18T03:45:58.796Z"],
+        "warnings": ["采购币种采用 CNY 业务默认值。", "库存为货品的全部当前库存，非本次采购余量。"],
+        "fallback": true,
+        "blocks": [
+          {
+            "type": "data",
+            "format": "table",
+            "fields": [
+              "name",
+              "date",
+              "distributor",
+              "quantity",
+              "unit",
+              "unitPrice",
+              "amount",
+              "currency"
+            ],
+            "rows": [
+              {
+                "id": "g0",
+                "cells": [
+                  {
+                    "text": "未知",
+                    "href": null
+                  },
+                  {
+                    "text": "未知",
+                    "href": null
+                  },
+                  {
+                    "text": "未知",
+                    "href": null
+                  },
+                  {
+                    "text": "未知",
+                    "href": null
+                  },
+                  {
+                    "text": "未知",
+                    "href": null
+                  },
+                  {
+                    "text": "未知",
+                    "href": null
+                  },
+                  {
+                    "text": "5320.28",
+                    "href": null
+                  },
+                  {
+                    "text": "CNY",
+                    "href": null
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "actions": [
+        {
+          "action": "lookup",
+          "query": {
+            "text": "荔湾广场",
+            "kinds": ["DISTRIBUTOR"],
+            "offset": 0,
+            "limit": 50
+          }
+        },
+        {
+          "action": "query",
+          "patch": {
+            "subject": "purchases",
+            "itemTypes": ["MATERIAL"],
+            "hard": {
+              "location": {
+                "text": "荔湾广场",
+                "kind": "exact_place"
+              }
+            },
+            "semantic": {},
+            "month": "this_month",
+            "view": "details",
+            "clarification": null
+          },
+          "reset": true,
+          "purpose": "answer",
+          "retainOperations": false,
+          "intent": {
+            "format": "table",
+            "fields": [
+              "name",
+              "date",
+              "distributor",
+              "quantity",
+              "unit",
+              "unitPrice",
+              "amount",
+              "currency"
+            ],
+            "concise": false
+          }
+        },
+        {
+          "action": "transform",
+          "set": "b7ee25c9-88da-4cfb-96a3-f792919f1403",
+          "operations": [
+            {
+              "op": "group",
+              "keys": ["currency"],
+              "metric": "amount",
+              "calculation": "sum"
+            }
+          ]
+        },
+        {
+          "action": "answer",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "segments": [
+                {
+                  "text": "本月（上海时区）在荔湾广场的物料采购共 "
+                },
+                {
+                  "set": "3999f06c-35b7-4f3d-af7b-edcd61d2728c",
+                  "row": "g0",
+                  "field": "count"
+                },
+                {
+                  "text": " 条采购记录，按币种汇总的采购金额如下（金额由后端对明细逐条求和，币种为业务默认 CNY）："
+                }
+              ],
+              "sources": ["3999f06c-35b7-4f3d-af7b-edcd61d2728c"]
+            },
+            {
+              "type": "data",
+              "set": "3999f06c-35b7-4f3d-af7b-edcd61d2728c",
+              "format": "table",
+              "fields": ["currency", "amount", "count", "unknown"]
+            },
+            {
+              "type": "paragraph",
+              "segments": [
+                {
+                  "text": "计算口径与来源：筛选条件为采购日期落在本月、地点为荔湾广场、货品类型为物料；汇总方式为对每条采购记录的金额字段求和，未出现金额缺失的记录。以下为参与汇总的采购明细，可逐条核对："
+                }
+              ],
+              "sources": ["b7ee25c9-88da-4cfb-96a3-f792919f1403"]
+            },
+            {
+              "type": "data",
+              "set": "b7ee25c9-88da-4cfb-96a3-f792919f1403",
+              "format": "table",
+              "fields": [
+                "name",
+                "specification",
+                "date",
+                "distributor",
+                "quantity",
+                "unit",
+                "unitPrice",
+                "amount",
+                "currency"
+              ]
+            }
+          ]
+        },
+        {
+          "action": "answer",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "segments": [
+                {
+                  "text": "本月（上海时区）在荔湾广场的物料采购共 "
+                },
+                {
+                  "set": "3999f06c-35b7-4f3d-af7b-edcd61d2728c",
+                  "row": "g0",
+                  "field": "count"
+                },
+                {
+                  "text": " 条采购记录，按币种汇总的采购金额如下（金额由后端对明细逐条求和，币种为业务默认值）："
+                }
+              ],
+              "sources": ["3999f06c-35b7-4f3d-af7b-edcd61d2728c"]
+            },
+            {
+              "type": "data",
+              "set": "3999f06c-35b7-4f3d-af7b-edcd61d2728c",
+              "format": "table",
+              "fields": ["currency", "amount", "count", "unknown"]
+            },
+            {
+              "type": "paragraph",
+              "segments": [
+                {
+                  "text": "计算口径与来源：筛选条件为采购日期落在本月、地点为荔湾广场、货品类型为物料；汇总方式为对每条采购记录的金额字段求和，未出现金额缺失的记录。以下为参与汇总的采购明细，可逐条核对："
+                }
+              ],
+              "sources": ["b7ee25c9-88da-4cfb-96a3-f792919f1403"]
+            },
+            {
+              "type": "data",
+              "set": "b7ee25c9-88da-4cfb-96a3-f792919f1403",
+              "format": "table",
+              "fields": [
+                "name",
+                "date",
+                "distributor",
+                "quantity",
+                "unit",
+                "unitPrice",
+                "amount",
+                "currency"
+              ]
+            }
+          ]
+        }
+      ],
+      "protocol": [
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 99,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 435,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 167,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 825,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 805,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "state": {
+        "query": {
+          "version": "v1",
+          "subject": "purchases",
+          "itemTypes": ["MATERIAL"],
+          "hard": {
+            "purchaseDate": {
+              "from": "2026-11-01",
+              "to": "2026-12-01"
+            },
+            "location": {
+              "text": "荔湾广场",
+              "kind": "exact_place"
+            }
+          },
+          "semantic": [],
+          "ruleVersion": "v1",
+          "pagination": {
+            "limit": 100
+          }
+        },
+        "view": "details",
+        "task": {
+          "intent": {
+            "format": "table",
+            "fields": [
+              "name",
+              "date",
+              "distributor",
+              "quantity",
+              "unit",
+              "unitPrice",
+              "amount",
+              "currency"
+            ],
+            "concise": false
+          },
+          "operations": [
+            {
+              "op": "group",
+              "keys": ["currency"],
+              "metric": "amount",
+              "calculation": "sum"
+            }
+          ]
+        }
+      },
+      "sets": [
+        {
+          "id": "b7ee25c9-88da-4cfb-96a3-f792919f1403",
+          "count": 44,
+          "complete": true,
+          "parents": []
+        },
+        {
+          "id": "3999f06c-35b7-4f3d-af7b-edcd61d2728c",
+          "count": 1,
+          "complete": true,
+          "parents": ["b7ee25c9-88da-4cfb-96a3-f792919f1403"]
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "exclude-1",
+      "text": "本月采购的银配件里，排除耳钩和定位管，只列还有库存的名称。",
+      "status": "completed",
+      "errorCode": null,
+      "durationMs": 12880,
+      "calls": 3,
+      "reservedTokens": 85382,
+      "trace": [
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 8728,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 6586,
+            "completionTokens": 307
+          },
+          "completeness": null
+        },
+        {
+          "stage": "candidate",
+          "outcome": "success",
+          "durationMs": 12,
+          "code": null,
+          "model": null,
+          "usage": null,
+          "completeness": {
+            "scope": "resolved",
+            "traversal": "complete",
+            "evaluation": "not_started",
+            "countBasis": "purchase_entry",
+            "totalCandidates": 44,
+            "readCandidates": 44,
+            "uniqueCatalogItems": 44,
+            "evaluatedCandidates": 0,
+            "included": 0,
+            "excluded": 0,
+            "uncertain": 0,
+            "notEvaluated": 44,
+            "unreadCandidates": 0,
+            "stopReason": "running"
+          }
+        },
+        {
+          "stage": "judgment",
+          "outcome": "success",
+          "durationMs": 7256,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 18768,
+            "completionTokens": 1415
+          },
+          "completeness": {
+            "attempt": 1,
+            "keys": [
+              "MATERIAL:cmwg1nejd0017oq01dbrbr9g8:MATERIAL_PURCHASE:cmwg1nejj0019oq015v32pexs",
+              "MATERIAL:cmwg1syeo001goq01lo04ot40:MATERIAL_PURCHASE:cmwg1syez001ioq017yvh5wia",
+              "MATERIAL:cmwg1ydtm001noq01ruchlerr:MATERIAL_PURCHASE:cmwg1ydwz001poq01zug4rson",
+              "MATERIAL:cmwg1zukg001toq01nbdav125:MATERIAL_PURCHASE:cmwg1zuki001voq010pyvuif4",
+              "MATERIAL:cmwg20yat001zoq01l838wus2:MATERIAL_PURCHASE:cmwg20yaw0021oq01s0tn7se9",
+              "MATERIAL:cmwg272pm0026oq01ldwgnote:MATERIAL_PURCHASE:cmwg272r80028oq01zqmqd4ez",
+              "MATERIAL:cmwg2cnkz002eoq01bwj4frmp:MATERIAL_PURCHASE:cmwg2cnlq002goq01oth138kc",
+              "MATERIAL:cmwg2h6cr002noq01rb9hl6wb:MATERIAL_PURCHASE:cmwg2h6d1002poq012l3enech",
+              "MATERIAL:cmwg35d3c002woq01k0ez5ef4:MATERIAL_PURCHASE:cmwg35d3k002yoq01jnveq4fu",
+              "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+              "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+              "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+              "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+              "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+              "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+              "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+              "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+              "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+              "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+              "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+              "MATERIAL:cmwg5jznx005koq01b5yqqvvq:MATERIAL_PURCHASE:cmwg5jzo9005moq01y9d4q07v",
+              "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+              "MATERIAL:cmwg62y0v0064oq018j32l93v:MATERIAL_PURCHASE:cmwg62y0z0066oq01crq24mcy",
+              "MATERIAL:cmwg65500006aoq01r2ugocml:MATERIAL_PURCHASE:cmwg65503006coq016p0qbfgs",
+              "MATERIAL:cmwg695k8006goq01kb6pwyk8:MATERIAL_PURCHASE:cmwg695kc006ioq016bxdz2rx",
+              "MATERIAL:cmwg6kssg006moq01z3u3l03s:MATERIAL_PURCHASE:cmwg6kssl006ooq01j1e3go4p",
+              "MATERIAL:cmv9c5epp000h3we8q5tlmyij:MATERIAL_PURCHASE:cmwg6q67j006uoq012detgflf",
+              "MATERIAL:cmv6czxjh00013wwrw95r1hlf:MATERIAL_PURCHASE:cmwg6sg3j006yoq017kkapoi8",
+              "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c",
+              "MATERIAL:cmwg8cnag007joq01klk7e9a8:MATERIAL_PURCHASE:cmwg8cnak007loq01x206jc2g",
+              "MATERIAL:cmwg8hlup007roq01ic1rtpkd:MATERIAL_PURCHASE:cmwg8hluu007toq01mh5jza4z",
+              "MATERIAL:cmwg8meyi007zoq01cwfk1qsl:MATERIAL_PURCHASE:cmwg8meyk0081oq016gt47ky6",
+              "MATERIAL:cmwg8qfxa0087oq01k5a40ff6:MATERIAL_PURCHASE:cmwg8qfxe0089oq01qgahihor",
+              "MATERIAL:cmwg8ut8u008eoq012d9j7l12:MATERIAL_PURCHASE:cmwg8ut8w008goq01ueld40kz",
+              "MATERIAL:cmwg9w65m008loq01xvsp88og:MATERIAL_PURCHASE:cmwg9w65r008noq01ulq3otqm",
+              "MATERIAL:cmwgb71ot008yoq01o5milsyi:MATERIAL_PURCHASE:cmwgb71ox0090oq01gsqckvse",
+              "MATERIAL:cmwgbadiv0095oq01l5o0dsqx:MATERIAL_PURCHASE:cmwgbadiy0097oq01s67uj9yo",
+              "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj:MATERIAL_PURCHASE:cmwhhwzpx00a1oq01epyun3py",
+              "MATERIAL:cmwhi1vm500a7oq0111yohtth:MATERIAL_PURCHASE:cmwhi1vm800a9oq01675o73dw",
+              "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl:MATERIAL_PURCHASE:cmwhi6lbu00ahoq01k63brjnz",
+              "MATERIAL:cmwhiagbg00aroq01mwdd2uzx:MATERIAL_PURCHASE:cmwhiagbj00atoq01sms4uxt6",
+              "MATERIAL:cmwhid0ei00azoq014888pmoe:MATERIAL_PURCHASE:cmwhid0ek00b1oq01irvvn3cm",
+              "MATERIAL:cmwhijono00b7oq01awsa6sbb:MATERIAL_PURCHASE:cmwhijons00b9oq01lxg5717t",
+              "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa:MATERIAL_PURCHASE:cmwhip6gi00bhoq01n4u1oiul"
+            ],
+            "evaluated": 44,
+            "reservedTokens": 86534
+          }
+        },
+        {
+          "stage": "judgment",
+          "outcome": "success",
+          "durationMs": 7264,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": null,
+          "completeness": {
+            "completeness": {
+              "scope": "resolved",
+              "traversal": "complete",
+              "evaluation": "complete",
+              "countBasis": "purchase_entry",
+              "totalCandidates": 44,
+              "readCandidates": 44,
+              "uniqueCatalogItems": 44,
+              "evaluatedCandidates": 44,
+              "included": 15,
+              "excluded": 29,
+              "uncertain": 0,
+              "notEvaluated": 0,
+              "unreadCandidates": 0,
+              "stopReason": null
+            },
+            "coverage": {
+              "traversal": 1,
+              "evaluation": 1
+            },
+            "attempts": [
+              {
+                "number": 1,
+                "keys": [
+                  "MATERIAL:cmwg1nejd0017oq01dbrbr9g8:MATERIAL_PURCHASE:cmwg1nejj0019oq015v32pexs",
+                  "MATERIAL:cmwg1syeo001goq01lo04ot40:MATERIAL_PURCHASE:cmwg1syez001ioq017yvh5wia",
+                  "MATERIAL:cmwg1ydtm001noq01ruchlerr:MATERIAL_PURCHASE:cmwg1ydwz001poq01zug4rson",
+                  "MATERIAL:cmwg1zukg001toq01nbdav125:MATERIAL_PURCHASE:cmwg1zuki001voq010pyvuif4",
+                  "MATERIAL:cmwg20yat001zoq01l838wus2:MATERIAL_PURCHASE:cmwg20yaw0021oq01s0tn7se9",
+                  "MATERIAL:cmwg272pm0026oq01ldwgnote:MATERIAL_PURCHASE:cmwg272r80028oq01zqmqd4ez",
+                  "MATERIAL:cmwg2cnkz002eoq01bwj4frmp:MATERIAL_PURCHASE:cmwg2cnlq002goq01oth138kc",
+                  "MATERIAL:cmwg2h6cr002noq01rb9hl6wb:MATERIAL_PURCHASE:cmwg2h6d1002poq012l3enech",
+                  "MATERIAL:cmwg35d3c002woq01k0ez5ef4:MATERIAL_PURCHASE:cmwg35d3k002yoq01jnveq4fu",
+                  "MATERIAL:cmwg3jvmq0038oq017cf73132:MATERIAL_PURCHASE:cmwg3jvn7003aoq01w2vzww8r",
+                  "MATERIAL:cmwg3tev8003joq01zlvvug0k:MATERIAL_PURCHASE:cmwg3tevc003loq01iq1raphc",
+                  "MATERIAL:cmwg3wwbn003soq01of24lsde:MATERIAL_PURCHASE:cmwg3wwbs003uoq01fefb4uhm",
+                  "MATERIAL:cmwg41qcz0040oq016l565fdh:MATERIAL_PURCHASE:cmwg41qd40042oq01bdr95r0f",
+                  "MATERIAL:cmwg462i80047oq01899ruhhw:MATERIAL_PURCHASE:cmwg462ib0049oq01l602ks55",
+                  "MATERIAL:cmwg4ekob004doq0122uzteo5:MATERIAL_PURCHASE:cmwg4ekoh004foq01k1uo5kyt",
+                  "MATERIAL:cmwg4gc8z004joq01mwra61gp:MATERIAL_PURCHASE:cmwg4gc92004loq01w7elwpgm",
+                  "MATERIAL:cmwg4irgg004poq01fz0k9ffi:MATERIAL_PURCHASE:cmwg4irgl004roq01ldythgge",
+                  "MATERIAL:cmwg4l0yi004voq017d2499gv:MATERIAL_PURCHASE:cmwg4l0yn004xoq01kdmkix3z",
+                  "MATERIAL:cmwg4od7h0051oq01rx3ps154:MATERIAL_PURCHASE:cmwg4od7j0053oq01d96hk3zn",
+                  "MATERIAL:cmwg5fueh005doq01nw24tj4y:MATERIAL_PURCHASE:cmwg5fuek005foq010y4jszjt",
+                  "MATERIAL:cmwg5jznx005koq01b5yqqvvq:MATERIAL_PURCHASE:cmwg5jzo9005moq01y9d4q07v",
+                  "MATERIAL:cmwg5t23p005uoq01i8osx2xz:MATERIAL_PURCHASE:cmwg5t23v005woq01u1qq95c0",
+                  "MATERIAL:cmwg62y0v0064oq018j32l93v:MATERIAL_PURCHASE:cmwg62y0z0066oq01crq24mcy",
+                  "MATERIAL:cmwg65500006aoq01r2ugocml:MATERIAL_PURCHASE:cmwg65503006coq016p0qbfgs",
+                  "MATERIAL:cmwg695k8006goq01kb6pwyk8:MATERIAL_PURCHASE:cmwg695kc006ioq016bxdz2rx",
+                  "MATERIAL:cmwg6kssg006moq01z3u3l03s:MATERIAL_PURCHASE:cmwg6kssl006ooq01j1e3go4p",
+                  "MATERIAL:cmv9c5epp000h3we8q5tlmyij:MATERIAL_PURCHASE:cmwg6q67j006uoq012detgflf",
+                  "MATERIAL:cmv6czxjh00013wwrw95r1hlf:MATERIAL_PURCHASE:cmwg6sg3j006yoq017kkapoi8",
+                  "MATERIAL:cmwg6zmtj0074oq01ogtm3q3z:MATERIAL_PURCHASE:cmwg6zmto0076oq01k1dobc3c",
+                  "MATERIAL:cmwg8cnag007joq01klk7e9a8:MATERIAL_PURCHASE:cmwg8cnak007loq01x206jc2g",
+                  "MATERIAL:cmwg8hlup007roq01ic1rtpkd:MATERIAL_PURCHASE:cmwg8hluu007toq01mh5jza4z",
+                  "MATERIAL:cmwg8meyi007zoq01cwfk1qsl:MATERIAL_PURCHASE:cmwg8meyk0081oq016gt47ky6",
+                  "MATERIAL:cmwg8qfxa0087oq01k5a40ff6:MATERIAL_PURCHASE:cmwg8qfxe0089oq01qgahihor",
+                  "MATERIAL:cmwg8ut8u008eoq012d9j7l12:MATERIAL_PURCHASE:cmwg8ut8w008goq01ueld40kz",
+                  "MATERIAL:cmwg9w65m008loq01xvsp88og:MATERIAL_PURCHASE:cmwg9w65r008noq01ulq3otqm",
+                  "MATERIAL:cmwgb71ot008yoq01o5milsyi:MATERIAL_PURCHASE:cmwgb71ox0090oq01gsqckvse",
+                  "MATERIAL:cmwgbadiv0095oq01l5o0dsqx:MATERIAL_PURCHASE:cmwgbadiy0097oq01s67uj9yo",
+                  "MATERIAL:cmwhhwzpt009zoq01q2qx3jyj:MATERIAL_PURCHASE:cmwhhwzpx00a1oq01epyun3py",
+                  "MATERIAL:cmwhi1vm500a7oq0111yohtth:MATERIAL_PURCHASE:cmwhi1vm800a9oq01675o73dw",
+                  "MATERIAL:cmwhi6lbq00afoq01ipgxlaxl:MATERIAL_PURCHASE:cmwhi6lbu00ahoq01k63brjnz",
+                  "MATERIAL:cmwhiagbg00aroq01mwdd2uzx:MATERIAL_PURCHASE:cmwhiagbj00atoq01sms4uxt6",
+                  "MATERIAL:cmwhid0ei00azoq014888pmoe:MATERIAL_PURCHASE:cmwhid0ek00b1oq01irvvn3cm",
+                  "MATERIAL:cmwhijono00b7oq01awsa6sbb:MATERIAL_PURCHASE:cmwhijons00b9oq01lxg5717t",
+                  "MATERIAL:cmwhip6gf00bfoq01tsr3e0oa:MATERIAL_PURCHASE:cmwhip6gi00bhoq01n4u1oiul"
+                ],
+                "startedAt": "2026-11-18T03:46:06.584Z",
+                "durationMs": 7256,
+                "outcome": "success",
+                "errorCode": null,
+                "model": "deepseek-flash",
+                "returned": 44,
+                "reservedTokens": 86534,
+                "usage": {
+                  "promptTokens": 18768,
+                  "completionTokens": 1415
+                },
+                "adjustments": []
+              }
+            ],
+            "usage": {
+              "calls": 1,
+              "reservedTokens": 86534,
+              "knownPromptTokens": 18768,
+              "knownCompletionTokens": 1415,
+              "unknownUsageCalls": 0
+            },
+            "ruleVersion": "v1",
+            "promptVersion": "relevance-v3"
+          }
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 3,
+          "code": null,
+          "model": null,
+          "usage": null,
+          "completeness": null
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 2518,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 8255,
+            "completionTokens": 124
+          },
+          "completeness": null
+        },
+        {
+          "stage": "finish",
+          "outcome": "success",
+          "durationMs": 1622,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 9524,
+            "completionTokens": 104
+          },
+          "completeness": null
+        }
+      ],
+      "answer": {
+        "version": "answer-v1",
+        "privacy": false,
+        "observations": ["2026-11-18T03:46:13.846Z", "2026-11-18T03:46:13.844Z"],
+        "warnings": ["采购币种采用 CNY 业务默认值。", "库存为货品的全部当前库存，非本次采购余量。"],
+        "fallback": false,
+        "blocks": [
+          {
+            "type": "data",
+            "format": "list",
+            "fields": ["name", "quantity", "unit", "stock"],
+            "rows": [
+              {
+                "id": "d0",
+                "cells": [
+                  {
+                    "text": "1.5mmS925方形碎银",
+                    "href": "/admin/materials/cmwg1nejd0017oq01dbrbr9g8/batches/cmwg1nejj0019oq015v32pexs"
+                  },
+                  {
+                    "text": "10.77",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "10.77",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d1",
+                "cells": [
+                  {
+                    "text": "2mmS925银圆珠",
+                    "href": "/admin/materials/cmwg1ydtm001noq01ruchlerr/batches/cmwg1ydwz001poq01zug4rson"
+                  },
+                  {
+                    "text": "3.25",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "3.25",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d2",
+                "cells": [
+                  {
+                    "text": "3mmS925银圆珠",
+                    "href": "/admin/materials/cmwg1zukg001toq01nbdav125/batches/cmwg1zuki001voq010pyvuif4"
+                  },
+                  {
+                    "text": "2.81",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "2.81",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d3",
+                "cells": [
+                  {
+                    "text": "4mmS925银圆珠",
+                    "href": "/admin/materials/cmwg20yat001zoq01l838wus2/batches/cmwg20yaw0021oq01s0tn7se9"
+                  },
+                  {
+                    "text": "3.07",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "3.07",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d4",
+                "cells": [
+                  {
+                    "text": "6mm18K镀金S925银跑环",
+                    "href": "/admin/materials/cmwg272pm0026oq01ldwgnote/batches/cmwg272r80028oq01zqmqd4ez"
+                  },
+                  {
+                    "text": "33.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "33.00",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d5",
+                "cells": [
+                  {
+                    "text": "锆石18K镀金竹节S925银配饰",
+                    "href": "/admin/materials/cmwg2cnkz002eoq01bwj4frmp/batches/cmwg2cnlq002goq01oth138kc"
+                  },
+                  {
+                    "text": "6.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "6.00",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d6",
+                "cells": [
+                  {
+                    "text": "锆石四芒星S925银延长链",
+                    "href": "/admin/materials/cmwg2h6cr002noq01rb9hl6wb/batches/cmwg2h6d1002poq012l3enech"
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d7",
+                "cells": [
+                  {
+                    "text": "3mm18K镀S925银配饰桶珠",
+                    "href": "/admin/materials/cmwg35d3c002woq01k0ez5ef4/batches/cmwg35d3k002yoq01jnveq4fu"
+                  },
+                  {
+                    "text": "5.94",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "5.94",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d8",
+                "cells": [
+                  {
+                    "text": "镀K48-S925银圆环",
+                    "href": "/admin/materials/cmwg695k8006goq01kb6pwyk8/batches/cmwg695kc006ioq016bxdz2rx"
+                  },
+                  {
+                    "text": "10.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "10.00",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d9",
+                "cells": [
+                  {
+                    "text": "4mmS925银配饰猫眼金珠",
+                    "href": "/admin/materials/cmwg8cnag007joq01klk7e9a8/batches/cmwg8cnak007loq01x206jc2g"
+                  },
+                  {
+                    "text": "28.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "28.00",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d10",
+                "cells": [
+                  {
+                    "text": "2.5m18K镀金S925银圆珠配饰",
+                    "href": "/admin/materials/cmwg8hlup007roq01ic1rtpkd/batches/cmwg8hluu007toq01mh5jza4z"
+                  },
+                  {
+                    "text": "2.84",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "2.84",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d11",
+                "cells": [
+                  {
+                    "text": "18K镀金S925银车花直管配饰",
+                    "href": "/admin/materials/cmwg8meyi007zoq01cwfk1qsl/batches/cmwg8meyk0081oq016gt47ky6"
+                  },
+                  {
+                    "text": "2.40",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "2.40",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d12",
+                "cells": [
+                  {
+                    "text": "2mm18K镀金S925银钉针",
+                    "href": "/admin/materials/cmwg8qfxa0087oq01k5a40ff6/batches/cmwg8qfxe0089oq01qgahihor"
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d13",
+                "cells": [
+                  {
+                    "text": "30mm18K镀金S925银圆头针",
+                    "href": "/admin/materials/cmwg8ut8u008eoq012d9j7l12/batches/cmwg8ut8w008goq01ueld40kz"
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  },
+                  {
+                    "text": "颗",
+                    "href": null
+                  },
+                  {
+                    "text": "5.00",
+                    "href": null
+                  }
+                ]
+              },
+              {
+                "id": "d14",
+                "cells": [
+                  {
+                    "text": "2mm18K镀金S925碎银方形",
+                    "href": "/admin/materials/cmwg9w65m008loq01xvsp88og/batches/cmwg9w65r008noq01ulq3otqm"
+                  },
+                  {
+                    "text": "2.27",
+                    "href": null
+                  },
+                  {
+                    "text": "克",
+                    "href": null
+                  },
+                  {
+                    "text": "2.27",
+                    "href": null
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "actions": [
+        {
+          "action": "query",
+          "patch": {
+            "subject": "purchases",
+            "itemTypes": ["MATERIAL"],
+            "hard": {
+              "purchaseDate": null,
+              "createdAt": null,
+              "distributorIds": null,
+              "items": null,
+              "categories": null,
+              "tagIds": null,
+              "location": null
+            },
+            "semantic": {
+              "material": [
+                {
+                  "concept": "material",
+                  "text": "银配件",
+                  "relation": "is"
+                }
+              ],
+              "purpose": [],
+              "form": [
+                {
+                  "concept": "form",
+                  "text": "耳钩",
+                  "relation": "not"
+                },
+                {
+                  "concept": "form",
+                  "text": "定位管",
+                  "relation": "not"
+                }
+              ],
+              "other": []
+            },
+            "month": "this_month",
+            "view": "details",
+            "clarification": null
+          },
+          "reset": true,
+          "purpose": "answer",
+          "retainOperations": false,
+          "intent": {
+            "format": "list",
+            "fields": ["name", "quantity", "unit", "stock", "stockUnknown"],
+            "concise": false
+          }
+        },
+        {
+          "action": "transform",
+          "set": "86742742-de81-4d96-af84-074c8c4d4aa2",
+          "operations": [
+            {
+              "op": "filter",
+              "field": "stock",
+              "relation": "gt",
+              "value": "0"
+            },
+            {
+              "op": "deduplicate",
+              "by": "item"
+            }
+          ]
+        },
+        {
+          "action": "answer",
+          "blocks": [
+            {
+              "type": "data",
+              "set": "53b4fc3c-1855-4c15-bedd-2523b366e60c",
+              "format": "list",
+              "fields": ["name", "quantity", "unit", "stock"]
+            }
+          ]
+        }
+      ],
+      "protocol": [
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 699,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 191,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 164,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "state": {
+        "query": {
+          "version": "v1",
+          "subject": "purchases",
+          "itemTypes": ["MATERIAL"],
+          "hard": {
+            "purchaseDate": {
+              "from": "2026-11-01",
+              "to": "2026-12-01"
+            }
+          },
+          "semantic": [
+            {
+              "concept": "material",
+              "text": "银配件",
+              "relation": "is"
+            },
+            {
+              "concept": "form",
+              "text": "耳钩",
+              "relation": "not"
+            },
+            {
+              "concept": "form",
+              "text": "定位管",
+              "relation": "not"
+            }
+          ],
+          "ruleVersion": "v1",
+          "pagination": {
+            "limit": 100
+          }
+        },
+        "view": "details",
+        "task": {
+          "intent": {
+            "format": "list",
+            "fields": ["name", "quantity", "unit", "stock", "stockUnknown"],
+            "concise": false
+          },
+          "operations": [
+            {
+              "op": "filter",
+              "field": "stock",
+              "relation": "gt",
+              "value": "0"
+            },
+            {
+              "op": "deduplicate",
+              "by": "item"
+            }
+          ]
+        }
+      },
+      "sets": [
+        {
+          "id": "86742742-de81-4d96-af84-074c8c4d4aa2",
+          "count": 15,
+          "complete": true,
+          "parents": []
+        },
+        {
+          "id": "53b4fc3c-1855-4c15-bedd-2523b366e60c",
+          "count": 15,
+          "complete": true,
+          "parents": ["86742742-de81-4d96-af84-074c8c4d4aa2"]
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "success": true
+}

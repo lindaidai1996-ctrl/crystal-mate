@@ -9,7 +9,11 @@ import type {
   MaterialValues,
   Tag as MaterialTag,
 } from '@/lib/client-types';
-import { editMaterial, recalculateMaterial } from '@/lib/material-calculations';
+import {
+  editMaterial,
+  initializeMaterialPricing,
+  recalculateMaterial,
+} from '@/lib/material-calculations';
 import { calculatePurchase, emptyPurchase, type MaterialPurchase } from '@/lib/material-purchase';
 import { MaterialBasicFields } from '@/components/materialManagement/materialBasicFields';
 import {
@@ -58,7 +62,7 @@ export function ImportItemEditor({
   const material = importMaterialDraft(data);
   const quantity = importQuantity(data, material);
   const result = calculatePurchase(material.values, material.purchase, quantity);
-  const values = result.values;
+  const values = initializeMaterialPricing(result.values);
 
   function update(next: ImportMaterialDraft, nextQuantity = data.quantity) {
     onChange({
@@ -84,6 +88,8 @@ export function ImportItemEditor({
                 weightGrams: null,
                 purchaseGramPrice: null,
                 purchaseGramManual: false,
+                baseSaleUnitPrice: null,
+                baseSaleGramPrice: null,
                 saleUnitPrice: null,
                 saleGramPrice: null,
                 saleUnitManual: false,
@@ -281,12 +287,15 @@ export function ImportItemEditor({
                         categoryId: match.categoryId,
                         unit: match.unit,
                         notes: match.notes,
+                        lossRate: match.lossRate ?? null,
                         ...(unitChanged
                           ? {
                               purchaseUnitPrice: null,
                               purchaseGramPrice: null,
                               purchaseGramManual: false,
                               weightGrams: null,
+                              baseSaleUnitPrice: null,
+                              baseSaleGramPrice: null,
                               saleUnitPrice: null,
                               saleGramPrice: null,
                               saleUnitManual: false,

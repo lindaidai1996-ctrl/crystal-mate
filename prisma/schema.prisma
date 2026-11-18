@@ -487,38 +487,42 @@ model MaterialCategory {
 }
 
 model Material {
-  id                 String                    @id @default(cuid())
-  name               String
-  aliases            String[]                  @default([])
-  categoryId         String
-  category           MaterialCategory          @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  unit               MaterialUnit              @default(STRAND)
-  purchaseUnitPrice  Decimal?                  @db.Decimal(12, 2)
-  weightGrams        Decimal?                  @db.Decimal(12, 2)
-  purchaseGramPrice  Decimal?                  @db.Decimal(12, 2)
-  purchaseGramManual Boolean                   @default(false)
-  lengthMm           Decimal?                  @db.Decimal(12, 2)
-  widthMm            Decimal?                  @db.Decimal(12, 2)
-  heightMm           Decimal?                  @db.Decimal(12, 2)
-  childCount         Int?
-  childWeightGrams   Decimal?                  @db.Decimal(12, 2)
-  childUnitPrice     Decimal?                  @db.Decimal(12, 2)
-  childPriceSource   MaterialPriceSource?
-  saleRule           MaterialSaleRule          @default(COST)
-  saleRuleValue      Decimal?                  @db.Decimal(12, 2)
-  saleUnitPrice      Decimal?                  @db.Decimal(12, 2)
-  saleGramPrice      Decimal?                  @db.Decimal(12, 2)
-  saleChildUnitPrice Decimal?                  @db.Decimal(12, 2)
-  saleUnitManual     Boolean                   @default(false)
-  saleGramManual     Boolean                   @default(false)
-  saleChildManual    Boolean                   @default(false)
-  notes              String                    @default("") @db.Text
-  images             MaterialImage[]
-  tags               MaterialTag[]
-  batchEntries       MaterialBatchEntry[]
-  imageImportItems   MaterialImageImportItem[]
-  createdAt          DateTime                  @default(now())
-  updatedAt          DateTime                  @updatedAt
+  id                     String                    @id @default(cuid())
+  name                   String
+  aliases                String[]                  @default([])
+  categoryId             String
+  category               MaterialCategory          @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  unit                   MaterialUnit              @default(STRAND)
+  purchaseUnitPrice      Decimal?                  @db.Decimal(12, 2)
+  weightGrams            Decimal?                  @db.Decimal(12, 2)
+  purchaseGramPrice      Decimal?                  @db.Decimal(12, 2)
+  purchaseGramManual     Boolean                   @default(false)
+  lengthMm               Decimal?                  @db.Decimal(12, 2)
+  widthMm                Decimal?                  @db.Decimal(12, 2)
+  heightMm               Decimal?                  @db.Decimal(12, 2)
+  childCount             Int?
+  childWeightGrams       Decimal?                  @db.Decimal(12, 2)
+  childUnitPrice         Decimal?                  @db.Decimal(12, 2)
+  childPriceSource       MaterialPriceSource?
+  lossRate               Decimal?                  @db.Decimal(5, 2)
+  baseSaleUnitPrice      Decimal?                  @db.Decimal(12, 2)
+  baseSaleGramPrice      Decimal?                  @db.Decimal(12, 2)
+  baseSaleChildUnitPrice Decimal?                  @db.Decimal(12, 2)
+  saleRule               MaterialSaleRule          @default(COST)
+  saleRuleValue          Decimal?                  @db.Decimal(12, 2)
+  saleUnitPrice          Decimal?                  @db.Decimal(12, 2)
+  saleGramPrice          Decimal?                  @db.Decimal(12, 2)
+  saleChildUnitPrice     Decimal?                  @db.Decimal(12, 2)
+  saleUnitManual         Boolean                   @default(false)
+  saleGramManual         Boolean                   @default(false)
+  saleChildManual        Boolean                   @default(false)
+  notes                  String                    @default("") @db.Text
+  images                 MaterialImage[]
+  tags                   MaterialTag[]
+  batchEntries           MaterialBatchEntry[]
+  imageImportItems       MaterialImageImportItem[]
+  createdAt              DateTime                  @default(now())
+  updatedAt              DateTime                  @updatedAt
 
   @@index([categoryId])
   @@index([createdAt])
@@ -581,6 +585,10 @@ model MaterialBatchEntry {
   childWeightGrams         Decimal?                  @db.Decimal(12, 2)
   childUnitPrice           Decimal?                  @db.Decimal(12, 2)
   childPriceSource         MaterialPriceSource?
+  lossRate                 Decimal?                  @db.Decimal(5, 2)
+  baseSaleUnitPrice        Decimal?                  @db.Decimal(12, 2)
+  baseSaleGramPrice        Decimal?                  @db.Decimal(12, 2)
+  baseSaleChildUnitPrice   Decimal?                  @db.Decimal(12, 2)
   saleRule                 MaterialSaleRule          @default(COST)
   saleRuleValue            Decimal?                  @db.Decimal(12, 2)
   saleUnitPrice            Decimal?                  @db.Decimal(12, 2)

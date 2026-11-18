@@ -11,6 +11,11 @@ const mocks = vi.hoisted(() => ({
   list: vi.fn(),
   rename: vi.fn(),
   remove: vi.fn(),
+  run: vi.fn(),
+}));
+vi.mock('@/lib/ai-assistant/composable-agent', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/ai-assistant/composable-agent')>()),
+  runComposableAssistant: mocks.run,
 }));
 vi.mock('@/lib/api', () => ({ requireAccount: mocks.requireAccount }));
 vi.mock('@/lib/db', () => ({ db: {} }));
@@ -36,6 +41,7 @@ import {
   deleteAssistantConversation,
   listAssistantConversations,
 } from '@/lib/ai-assistant/conversation-service';
+import { newAssistantExecution } from '@/lib/ai-assistant/orchestrator';
 const id = 'f73234da-a4f2-44c5-a2eb-10e576c2f787';
 const request = new NextRequest('http://localhost/api/assistant', { method: 'POST' });
 beforeEach(() => {
@@ -104,6 +110,33 @@ describe('authenticated conversation facade', () => {
     ).rejects.toThrow('UNAUTHORIZED');
     expect(mocks.create).not.toHaveBeenCalled();
     expect(mocks.cancel).not.toHaveBeenCalled();
+  });
+  it('invalidates an unclaimed old request on privacy change using only authenticated identity', async () => {
+    await commandAssistantConversation(request, {
+      action: 'cancel',
+      conversationId: id,
+      revision: 2,
+      reason: 'privacy_changed',
+    });
+    expect(mocks.cancel).toHaveBeenCalledWith('authenticated-owner', id, 2, true);
+  });
+  it('does not resend a historical question when resuming with privacy enabled', async () => {
+    const previous = { ...newAssistantExecution(null), status: 'budget' as const };
+    mocks.read.mockResolvedValue({
+      session: { revision: 2, state: null },
+      latest: { id: 'previous', data: previous, text: '历史货品和成本 SECRET 100元' },
+      messages: [{ role: 'user', content: { text: '历史自由文本 SECRET' } }],
+    });
+    mocks.begin.mockResolvedValue({ id: 'execution', generation: 3 });
+    mocks.run.mockImplementation(async ({ execution }) => execution);
+    await commandAssistantConversation(request, {
+      action: 'continue',
+      conversationId: id,
+      revision: 2,
+    });
+    const input = mocks.run.mock.calls[0][0];
+    expect(input.text).not.toContain('SECRET');
+    expect(input.execution.agent.history).toEqual([]);
   });
   it('rejects client identities/custom tools and stale revisions', async () => {
     await expect(

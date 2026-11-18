@@ -15,11 +15,12 @@ import dateRangeStyles from './date-range-filter.module.css';
 type Props = {
   kind: 'created' | 'received';
   label?: string;
+  endpointLabels?: readonly [string, string];
   value: DateRange;
   onChange: (range: DateRange) => void;
 };
 
-export function DateRangeFilter({ kind, label, value, onChange }: Props) {
+export function DateRangeFilter({ kind, label, endpointLabels, value, onChange }: Props) {
   const t = useTranslations('dateRangeFilter');
   const mobileText = useTranslations('mobile');
   const locale = useLocale() === 'en' ? 'en' : 'zh-cn';
@@ -84,6 +85,7 @@ export function DateRangeFilter({ kind, label, value, onChange }: Props) {
             <MobileDateRange
               kind={kind}
               label={title}
+              endpointLabels={endpointLabels}
               hideLabel
               value={draft}
               onChange={setDraft}
@@ -98,8 +100,8 @@ export function DateRangeFilter({ kind, label, value, onChange }: Props) {
     <DatePicker.RangePicker
       className={withTime ? dateRangeStyles.dateTime : dateRangeStyles.date}
       aria-label={title}
-      placeholder={[t(`${kind}Start`), t(`${kind}End`)]}
-      title={t(withTime ? 'beijingTime' : 'received')}
+      placeholder={endpointLabels ? [...endpointLabels] : [t(`${kind}Start`), t(`${kind}End`)]}
+      title={label ?? t(withTime ? 'beijingTime' : 'received')}
       format={format}
       showTime={
         withTime

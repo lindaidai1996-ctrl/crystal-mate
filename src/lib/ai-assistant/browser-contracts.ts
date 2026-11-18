@@ -3,6 +3,7 @@ import type { QueryState } from './orchestration-contracts';
 import type { AssistantBrowserResults } from './result-view';
 import type { AssistantProgress } from './progress-view';
 import type { AssistantFeedbackInput } from './feedback-contracts';
+import type { AnswerDocument } from './answer-document';
 
 // A deliberate browser projection. Checkpoints, owner IDs and model input never cross HTTP.
 export type AssistantSessionList = {
@@ -39,6 +40,7 @@ export type AssistantBrowserConversation = {
     text: string | null;
     status: Execution['status'] | null;
     executionId: string | null;
+    answer?: AnswerDocument | null;
   }[];
   latest: {
     id: string;
@@ -49,6 +51,7 @@ export type AssistantBrowserConversation = {
     errorCode: string | null;
     metadata: Execution['metadata'];
     results: AssistantBrowserResults | null;
+    answer?: AnswerDocument | null;
     progress: AssistantProgress;
     // Pending edits are distinct from confirmed state; privacy removes their free text.
     pendingPlan: Execution['pendingPlan'];

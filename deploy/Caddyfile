@@ -7,5 +7,8 @@
     @englishHome path /en /en/
     redir @englishHome /en/admin 307
 
-    reverse_proxy app:3000
+    reverse_proxy app:3000 {
+        # Overwrite client-supplied values for the public market API limiter.
+        header_up X-Real-IP {remote_host}
+    }
 }

@@ -42,6 +42,7 @@ export function useAssistantConversation(initialId: string | null, privacy: bool
   const commandRequest = useRef<AbortController | null>(null);
   const listSequence = useRef(0);
   const listPrivacy = useRef(privacy);
+  const executionPrivacy = useRef(privacy);
   const managing = useRef(false);
   useEffect(() => {
     listPrivacy.current = privacy;
@@ -105,6 +106,35 @@ export function useAssistantConversation(initialId: string | null, privacy: bool
     },
     [],
   );
+
+  useEffect(() => {
+    if (executionPrivacy.current === privacy) return;
+    executionPrivacy.current = privacy;
+    const id = currentId.current;
+    const inFlight = commandRequest.current && !commandRequest.current.signal.aborted;
+    const privacyEpoch = ++epoch.current;
+    commandRequest.current?.abort();
+    setPending(false);
+    setSnapshot(null);
+    setRefresh((n) => n + 1);
+    if (!id || (!inFlight && !snapshot?.active)) return;
+    // A server-side CAS cancellation prevents another model request with the old privacy input.
+    void assistantFetch<AssistantBrowserConversation>(`${endpoint}/${id}`, true)
+      .then(async (value) => {
+        if (currentId.current === id && epoch.current === privacyEpoch) {
+          await assistantFetch(`${endpoint}/${id}`, true, {
+            method: 'POST',
+            body: JSON.stringify({
+              action: 'cancel',
+              revision: value.revision,
+              reason: 'privacy_changed',
+            }),
+          });
+          setRefresh((n) => n + 1);
+        }
+      })
+      .catch(() => {});
+  }, [privacy, snapshot?.active]);
 
   useEffect(() => {
     if (
@@ -239,6 +269,7 @@ export function useAssistantConversation(initialId: string | null, privacy: bool
       if (epoch.current === version && !controller.signal.aborted)
         setError((cause as Error).message);
     } finally {
+      if (commandRequest.current === controller) commandRequest.current = null;
       if (epoch.current === version && currentId.current === id) {
         setPending(false);
         setRefresh((n) => n + 1);

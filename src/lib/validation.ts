@@ -234,6 +234,11 @@ export const materialCategorySchema = z.strictObject({
     ),
 });
 
+export const materialLossRateSchema = nullableAmount.refine(
+  (value) => value === null || Number(value) < 100,
+  { message: 'Loss rate must be at least zero and less than 100%' },
+);
+
 export const materialSchema = z
   .strictObject({
     name: z.string().trim().min(1).max(120),
@@ -262,6 +267,10 @@ export const materialSchema = z
       'CUSTOM_PERCENT',
       'CUSTOM_AMOUNT',
     ]),
+    lossRate: materialLossRateSchema.optional(),
+    baseSaleUnitPrice: nullableAmount.optional(),
+    baseSaleGramPrice: nullableAmount.optional(),
+    baseSaleChildUnitPrice: nullableAmount.optional(),
     saleRuleValue: nullableAmount,
     saleUnitPrice: nullableAmount,
     saleGramPrice: nullableAmount,
@@ -277,6 +286,22 @@ export const materialSchema = z
       .refine((keys) => new Set(keys).size === keys.length),
   })
   .superRefine((data, context) => {
+    const baseFields = [
+      data.baseSaleUnitPrice,
+      data.baseSaleGramPrice,
+      data.baseSaleChildUnitPrice,
+    ];
+    if (
+      baseFields.some((value) => value !== undefined) &&
+      baseFields.some((value) => value === undefined)
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['baseSaleUnitPrice'],
+        message: 'Complete base pricing fields required',
+      });
+    }
+
     if (
       (data.saleRule === 'FIXED_AMOUNT' || data.saleRule === 'CUSTOM_PERCENT') !==
       (data.saleRuleValue !== null)
@@ -290,6 +315,7 @@ export const materialSchema = z
         data.childUnitPrice !== null ||
         data.childPriceSource !== null ||
         data.saleChildUnitPrice !== null ||
+        data.baseSaleChildUnitPrice != null ||
         data.saleChildManual)
     ) {
       context.addIssue({
@@ -316,6 +342,7 @@ export const materialListSchema = z
   });
 
 export const materialMasterSchema = z.strictObject({
+  lossRate: materialLossRateSchema.optional(),
   name: z.string().trim().min(1).max(120),
   aliases: catalogAliasesSchema.optional(),
   categoryId: z.string().cuid(),

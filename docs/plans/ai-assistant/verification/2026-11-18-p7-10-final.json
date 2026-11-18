@@ -1,0 +1,140 @@
+{
+  "checkedAt": "2026-11-18T04:08:10.330288+00:00",
+  "version": "assistant-agent-v1",
+  "answerVersion": "answer-v1",
+  "aiAssistantImpact": "synchronized",
+  "scope": {
+    "businessReadOnly": true,
+    "productionAccess": false,
+    "deployment": false,
+    "databaseMigration": false,
+    "committedOrPushed": false,
+    "unrelatedConcurrentChangesPreserved": true
+  },
+  "checks": [
+    {
+      "command": "npx vitest run tests/unit/ai-assistant-*.test.ts",
+      "exitCode": 0,
+      "files": 23,
+      "tests": 410
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "command": "npx eslint (20 task source/script/test files; final changed operation/test rechecked)",
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "command": "npm run format:check",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "evidence": {
+    "developmentCore": "2026-11-18T03-53-10-185Z-agent-dev-real.json",
+    "frozenCore": "2026-11-18T03-49-06-049Z-agent-fixed-real.json",
+    "extended": "2026-11-18T03-53-09-479Z-agent-fixed-real.json",
+    "browser": "2026-11-18T03-57-51-639Z-agent-browser.json",
+    "persistence": "2026-11-18T03-59-41-612Z-p4-conversations.json"
+  },
+  "developmentCore": {
+    "runs": 18,
+    "allCompleted": true,
+    "allWithoutAnswerFallback": true,
+    "repeatPerScenario": 3,
+    "durationMs": {
+      "min": 3946,
+      "median": 5335.5,
+      "max": 12784
+    }
+  },
+  "recordedModelUsage": {
+    "reports": 18,
+    "executions": 116,
+    "orchestrationCalls": 320,
+    "reservedTokens": 9569982,
+    "promptTokens": 2846691,
+    "completionTokens": 61742,
+    "excludesBrowser": true,
+    "includesFailedAttempts": true,
+    "monetaryCost": null,
+    "monetaryCostReason": "No verified provider pricing basis"
+  },
+  "verificationBoundary": "Real model reports capture their own run. Later ranking partitions, partial labels, per-command budgets, primary fallback, join identity and private resume input were verified deterministically; not claimed as new three-repeat model runs.",
+  "limits": [
+    "5000 rows per source collection; 12 collections / 20000 accumulated rows per execution",
+    "Reference validation cannot prove all model prose reasoning",
+    "Ambiguous semantics and absent thresholds/sales require clarification",
+    "No password-login, provider failure injection, production build, full-repository E2E or load test"
+  ],
+  "sourceSHA256": {
+    "scripts/check-ai-assistant-agent-browser.ts": "e74f4ce952f588c297a11c038502e626eb1d035ce3260275835f53eaf4b8cb80",
+    "scripts/check-ai-assistant-agent.ts": "29bce3e0511dfcdc8ccfd580aab144ca77d194e16a9a1883736cf45066d5df0c",
+    "scripts/check-ai-assistant-conversations.ts": "da741796ca91460f564271a3c1da8a95e0c7277c082b1e2be8f037d123805ee8",
+    "src/components/assistant/assistantAnswer.tsx": "20af6da6ce403632470519f724b348b2f744f63f58905ec6407832e9b33e49e1",
+    "src/components/assistant/assistantFeedback.tsx": "1c2e815dd22f16a63953986df228ca3babf224a93af8fbd9adbd4f058b388f87",
+    "src/components/assistant/assistantPage.module.css": "9b902d41c2a60427ca93cadfd15927980c647f6541ca1a852d1fa41bfdaeffb9",
+    "src/components/assistant/assistantPage.tsx": "5161a0a5004f998fe6bdf0ed97862820a63f3c9ffe8bece5f1a9fd2ea861265e",
+    "src/components/assistant/assistantResults.tsx": "4c056a320dbd372d7af1a2ad572986b73d94e6424e0c5d70870565627b7d368e",
+    "src/components/assistant/assistantScope.tsx": "42fb50ec82e04133c2bff85695e35bf2cee0a84dafc560fd2fcf1fc58f7eb159",
+    "src/components/assistant/assistantSessions.tsx": "e6fb8cc6dbc91a6736a2851a8671441a91f859bb6f516a48486028f777d6f8fe",
+    "src/components/assistant/assistantSummary.tsx": "63ea43a229ae2c12c25b1533d4874ea6feef7def48f2f3175474e2841fd8ded7",
+    "src/components/assistant/useAssistantConversation.ts": "862e4181ee460e491e5977c570d89866e3e33ee06754a78494ffde9208b7bfe6",
+    "src/lib/ai-assistant/answer-document.ts": "19c613a6e53c766d4437fd4f53bcc80a7c7f2db8c76be12dd3b89803f594db80",
+    "src/lib/ai-assistant/browser-contracts.ts": "897d06df40edd1c383ffd91dc1ad600724b2e4330c5be600e8669e846a95364e",
+    "src/lib/ai-assistant/browser-view.ts": "24a47ee551f39a966e29264c0ff6b801bf6e3d71c176b74894f1dd20f2a3d5aa",
+    "src/lib/ai-assistant/candidate-contracts.ts": "07ebaeff90910e45a30cf3878393567cb2c955ec9a10b6cce81f2e64951e0a71",
+    "src/lib/ai-assistant/candidate-data.ts": "3b8647cb7450c4b3a4c550e53211050261f98f700b49dc479fa332e217fcee9a",
+    "src/lib/ai-assistant/candidate-runs.ts": "71a524a7c7c769c0507bbdf98d89a5fb12af05ace39055c841a4e85048f208b5",
+    "src/lib/ai-assistant/candidate-service.ts": "ea46ecd322b0edcb4c0b13114d4c2eb93cdd60f0e0f148558da4fd0d62ecbee4",
+    "src/lib/ai-assistant/composable-agent.ts": "12afd13e8904bfba9a2f0c3a7911dca578f3c60c0f9e99a5c807d16b9991086b",
+    "src/lib/ai-assistant/composable-contracts.ts": "931bb1711f1347100b729bdb7cf4c2d7c51b73a01906cb6a54c02365714ffb07",
+    "src/lib/ai-assistant/contracts.ts": "a576242bbf9756670b7a4ea3243735236db0b165a67ba67fe6dcf094961f77ec",
+    "src/lib/ai-assistant/conversation-service.ts": "dc8a732909c73c8c5df1b1dc15d465a6077bf90769feccb50ba0d2be0c1a1a78",
+    "src/lib/ai-assistant/conversation-store.ts": "b7ebcfe9ae3bc32739560bf2fde058d9137d5d9f24b8fc7f9bf6c7a789225001",
+    "src/lib/ai-assistant/conversation-title.ts": "6b7d15377c99519f6e84bdd79bbe333e7871dde84f9d7897287255572bce6af0",
+    "src/lib/ai-assistant/display-data.ts": "ba16d288c7db9e7afb9931059067c81bc7ee26ae51fa4a955de1b4f1192179c4",
+    "src/lib/ai-assistant/fact-operations.ts": "bd49e9ea4c2f6d024294fcc6d8750905b7016f66da56576b4502edb7dfc3787a",
+    "src/lib/ai-assistant/fact-sets.ts": "a0b89dbb0aabd143f9954a653bd00ea55187375a1c0e8ca7669462d8fd109036",
+    "src/lib/ai-assistant/feedback-contracts.ts": "f0f0490eb54fa96845c49b6d5a655f953287ecac960d8667577f2ad94cc50304",
+    "src/lib/ai-assistant/feedback-target.ts": "9520be7b09378d20927ab2d66b4775f8f12d4a405bf397686561e5467361b098",
+    "src/lib/ai-assistant/http.ts": "f80c950dcab6b4d29b96a892b443fbd49b71f9a95bf68f87f056350f1a84cf7e",
+    "src/lib/ai-assistant/model-config.ts": "57204e480c465212afed9aa2abc645b560b34cede24a21fd09eddf8119b359a9",
+    "src/lib/ai-assistant/orchestration-contracts.ts": "d6480bc9e1126e8eae12c16f80552a387154fac7987dc291ece62ccee0a34a78",
+    "src/lib/ai-assistant/orchestration-facts.ts": "25f911135b4833e5920f360e85fa3ab082d42414d5b72a5526b9c8f8fd112131",
+    "src/lib/ai-assistant/orchestration-model.ts": "93e00d7686b0d5afcd740bc6d0123d674c08b4ceb2c5ba4bbaee18f828f3a532",
+    "src/lib/ai-assistant/orchestrator.ts": "f6a2e8583823fbbc744a679562aaa392e83d03e3bff301cf8ed1f5ae0b72e622",
+    "src/lib/ai-assistant/privacy.ts": "173a1c2b4a1bccb683d4e9a4e5179071066688866695f3f865760d0e9c2b88b8",
+    "src/lib/ai-assistant/progress-view.ts": "bb1493a5a6fb688784527dd4d9dca269c245bfc2dcf7d50bf9cdb1185a5931e4",
+    "src/lib/ai-assistant/purchase-contracts.ts": "5bc260b3eb9f07725b6e1ef0b0c4f2628d04155057d82b95cc584aebe0b3f350",
+    "src/lib/ai-assistant/purchase-data.ts": "9504dab7dcc15fbe18f7ffa176d300e3a0c64e184d8c8ccdd52dd9a2808404af",
+    "src/lib/ai-assistant/purchase-runs.ts": "f474c0772c742e3ede85952df634e7bfc65c5d5304b84c894502622f63770b51",
+    "src/lib/ai-assistant/purchase-service.ts": "9b4d2be9aafe3abce9eea087745421ef0e47b89417e554c2c419d53e1876eb6e",
+    "src/lib/ai-assistant/purchase-summary.ts": "1befbf007b9d64ecb371397701acdc6d2921e0007781a8fdcd5412e42c635f16",
+    "src/lib/ai-assistant/recall-contracts.ts": "48ae3dca6c3adf87ff7af6dd3ad5c3b8ea0e489bd61838dc12ff1688920f51a7",
+    "src/lib/ai-assistant/recall-data.ts": "9f65ae6c9ee9fc30638b033cfb608a8d606a66ebeebcbaf072c9834034f457c0",
+    "src/lib/ai-assistant/recall-runs.ts": "f43d3943fbce3a4b74134e4b3569617b6570bc82f3d7c3b71526a79e5df715eb",
+    "src/lib/ai-assistant/recall-service.ts": "4484d42878f62e0a039ae37ed03f02fc636ea8e3d616323680556d7b7143862a",
+    "src/lib/ai-assistant/reference-contracts.ts": "71b6833e9c71fa4961fbb45c9809861d0fb29e7aa2e70c51ad8d0a3125e54d09",
+    "src/lib/ai-assistant/reference-resolution.ts": "2066b7ad07e83bd255a32d0927c0f4e4a6ecd913804067613828ab7f17782607",
+    "src/lib/ai-assistant/reference-service.ts": "7f9f466103e779341a0501caefaee2f9d57e6c35caf7548d91cda64060c7e150",
+    "src/lib/ai-assistant/relevance-contracts.ts": "0eb99684f1c8d4ca35da0e2d89b8756578b5f08cbcca76c1559b5630e1aa748d",
+    "src/lib/ai-assistant/relevance-model.ts": "1975e6d832802c603e18cabba300f139651d81e52e353f5098ef3d0a48cbba0f",
+    "src/lib/ai-assistant/relevance-runs.ts": "c66b62ecf06e2af927c132a52b8ee12588a98648281b5236b412f1650c72386f",
+    "src/lib/ai-assistant/relevance-service.ts": "bf534a3438cb2e80dc2b22e6207c40c0e5b31f806d1b3267e0a0020d47f724e3",
+    "src/lib/ai-assistant/result-view.ts": "a0bf69e0ddb902cd28ec9227974944f88aa787d1b7bb5441b4fb4dd5b87ac189",
+    "src/lib/ai-assistant/semantic-policy.ts": "385d47e1e65b3c75b179f99c2d8d98fbbc157ddda5ffef895c0513de0b709693",
+    "src/lib/ai-assistant/stock-contracts.ts": "a6a88500060573aec9e537c1d6ff2b0bb69c1ef612085b34d940d478f8d9546f",
+    "src/lib/ai-assistant/stock-data.ts": "5ae60cb4f4ef2bb2450a14c66fe5dfaac4f031125b0ead1f31d6599bf464ab57",
+    "src/lib/ai-assistant/stock-service.ts": "62422a2ae6c82d00d716df1db32b5e457d0b26fa42b967a2f88c2f67065ed174",
+    "tests/unit/ai-assistant-composable.test.ts": "feeffc420a8485f5a0101a014a93cb12ce4aec2834be899db178af772e9f192d",
+    "tests/unit/ai-assistant-conversation-service.test.ts": "52cc1d0dfc17e0de752abf1e77437289092a967be4fcd0f74b713d46c538c31f"
+  }
+}

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { assistantQuerySchema, hardConditionsSchema, semanticConditionSchema } from './contracts';
+import type { AnswerIntent, FactTransform } from './composable-contracts';
 
 export const ORCHESTRATION_VERSION = 'orchestration-v5';
 const nullableHard = hardConditionsSchema.partial().extend({
@@ -41,6 +42,7 @@ export type Plan = z.infer<typeof planToolSchema>;
 export type QueryState = {
   query: z.infer<typeof assistantQuerySchema>;
   view: 'details' | 'by_distributor' | 'stock' | 'purchase_remaining' | 'distributors';
+  task?: { intent: AnswerIntent; operations: FactTransform[] };
 };
 // R08 has two explicit follow-up phrases with different accounting scopes.
 // Resolve these exact phrases in the backend; never let a model swap them or
@@ -97,6 +99,7 @@ export function applyAssistantPlan(
   const semantic = base.query.semantic.filter((c) => patch.semantic[c.concept] === undefined);
   semantic.push(...Object.values(patch.semantic).flatMap((c) => c ?? []));
   return {
+    ...(base.task ? { task: base.task } : {}),
     query: assistantQuerySchema.parse({
       ...base.query,
       subject: patch.subject ?? base.query.subject,
@@ -109,9 +112,9 @@ export function applyAssistantPlan(
   };
 }
 export const orchestrationBudgetSchema = z.strictObject({
-  maxCalls: z.number().int().min(1).max(20).default(6),
-  maxReservedTokens: z.number().int().min(1).max(500_000).default(100_000),
-  timeoutMs: z.number().int().min(1).max(120_000).default(90_000),
+  maxCalls: z.number().int().min(1).max(20).default(12),
+  maxReservedTokens: z.number().int().min(1).max(500_000).default(200_000),
+  timeoutMs: z.number().int().min(1).max(120_000).default(120_000),
   callTimeoutMs: z.number().int().min(1).max(60_000).default(30_000),
 });
 export const assistantStatusSchema = z.enum([

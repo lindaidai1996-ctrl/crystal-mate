@@ -1,0 +1,121 @@
+{
+  "checkedAt": "2026-11-18T03:37:34.936Z",
+  "version": "assistant-agent-v1",
+  "realModel": true,
+  "database": "isolated-development",
+  "businessWrites": false,
+  "checks": [
+    {
+      "id": "names-1",
+      "text": "帮我查这个月在荔湾广场进了哪些货？仅告诉我货品名称就行。",
+      "status": "model_failed",
+      "errorCode": "MODEL_INVALID_RESPONSE",
+      "durationMs": 2760,
+      "calls": 2,
+      "reservedTokens": 51618,
+      "trace": [
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 1526,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 7228,
+            "completionTokens": 78
+          },
+          "completeness": null
+        },
+        {
+          "stage": "parse",
+          "outcome": "failed",
+          "durationMs": 1227,
+          "code": "MODEL_INVALID_RESPONSE",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 7380,
+            "completionTokens": 199
+          },
+          "completeness": null
+        }
+      ],
+      "answer": null,
+      "actions": [
+        {
+          "action": "lookup",
+          "query": {
+            "text": "荔湾广场",
+            "kinds": ["DISTRIBUTOR"],
+            "offset": 0,
+            "limit": 50
+          }
+        },
+        {
+          "action": "query",
+          "patch": {
+            "subject": "purchases",
+            "itemTypes": ["MATERIAL", "PRODUCT"],
+            "hard": {
+              "month": "this_month",
+              "location": {
+                "text": "荔湾广场",
+                "kind": "exact_place"
+              }
+            },
+            "semantic": {},
+            "clarification": null,
+            "view": "details"
+          },
+          "reset": true,
+          "purpose": "answer",
+          "retainOperations": false,
+          "intent": {
+            "format": "names",
+            "fields": ["name"],
+            "concise": true
+          }
+        }
+      ],
+      "protocol": [
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 99,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 367,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "state": null,
+      "sets": [],
+      "passed": false
+    },
+    {
+      "fatal": "VERIFICATION_ASSERTION_FAILED",
+      "assertion": "names-1: model_failed/MODEL_INVALID_RESPONSE"
+    }
+  ],
+  "success": false
+}

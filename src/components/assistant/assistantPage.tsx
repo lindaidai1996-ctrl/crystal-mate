@@ -17,6 +17,7 @@ import { AssistantResults } from './assistantResults';
 import { AssistantScope } from './assistantScope';
 import { AssistantFeedback } from './assistantFeedback';
 import { AssistantSessions } from './assistantSessions';
+import { AssistantAnswer } from './assistantAnswer';
 
 export function AssistantPage({ initialId }: { initialId: string | null }) {
   const t = useTranslations('assistant');
@@ -24,8 +25,8 @@ export function AssistantPage({ initialId }: { initialId: string | null }) {
   const assistant = useAssistantConversation(initialId, privacy);
   const [text, setText] = useState('');
   const [adjustBudget, setAdjustBudget] = useState(false);
-  const [toolCalls, setToolCalls] = useState(6);
-  const [toolTokens, setToolTokens] = useState(100000);
+  const [toolCalls, setToolCalls] = useState(12);
+  const [toolTokens, setToolTokens] = useState(200000);
   const [relevanceCalls, setRelevanceCalls] = useState(20);
   const [relevanceTokens, setRelevanceTokens] = useState(200000);
   const budgets = adjustBudget
@@ -125,12 +126,16 @@ export function AssistantPage({ initialId }: { initialId: string | null }) {
                     }
                   >
                     <strong>{message.role === 'user' ? t('you') : t('title')}</strong>
-                    <p>
-                      {protectedText && message.role === 'user'
-                        ? t('privateText')
-                        : (message.text ??
-                          (message.status ? t(`status.${message.status}`) : t('privateText')))}
-                    </p>
+                    {message.answer ? (
+                      <AssistantAnswer answer={message.answer} privacy={Boolean(protectedText)} />
+                    ) : (
+                      <p>
+                        {protectedText && message.role === 'user'
+                          ? t('privateText')
+                          : (message.text ??
+                            (message.status ? t(`status.${message.status}`) : t('privateText')))}
+                      </p>
+                    )}
                   </article>
                 ))}
               </div>
@@ -151,15 +156,18 @@ export function AssistantPage({ initialId }: { initialId: string | null }) {
                   >
                     {t(`status.${latest.status}`)}
                   </Tag>
-                  <p className={assistantStyles.muted}>{t('progressHint')}</p>
-                  <ol className={assistantStyles.trace}>
-                    {latest.trace.slice(-8).map((event, index) => (
-                      <li key={index}>
-                        {t(`stage.${event.stage}`)} · {t(`outcome.${event.outcome}`)}
-                        {event.durationMs > 0 ? ` · ${event.durationMs} ms` : ''}
-                      </li>
-                    ))}
-                  </ol>
+                  <details open={Boolean(running) || undefined}>
+                    <summary>{t('executionDetails')}</summary>
+                    <p className={assistantStyles.muted}>{t('progressHint')}</p>
+                    <ol className={assistantStyles.trace}>
+                      {latest.trace.slice(-8).map((event, index) => (
+                        <li key={index}>
+                          {t(`stage.${event.stage}`)} · {t(`outcome.${event.outcome}`)}
+                          {event.durationMs > 0 ? ` · ${event.durationMs} ms` : ''}
+                        </li>
+                      ))}
+                    </ol>
+                  </details>
                   {!protectedText && latest.clarification && <p>{latest.clarification}</p>}
                   {snapshot.interrupted && <Alert type="warning" message={t('interrupted')} />}
                   {latest.errorCode && (
@@ -169,19 +177,22 @@ export function AssistantPage({ initialId }: { initialId: string | null }) {
                   )}
                 </section>
               )}
-              <AssistantScope
-                key={`scope-${latest?.id}`}
-                snapshot={snapshot}
-                privacy={Boolean(protectedText)}
-              />
-              {latest?.results && (
-                <AssistantResults
-                  key={`results-${latest.id}`}
-                  result={latest.results}
+              <details className={assistantStyles.answerSources}>
+                <summary>{t('queryDetails')}</summary>
+                <AssistantScope
+                  key={`scope-${latest?.id}`}
+                  snapshot={snapshot}
                   privacy={Boolean(protectedText)}
-                  grouped={snapshot.state?.view === 'by_distributor'}
                 />
-              )}
+                {latest?.results && !latest.answer && (
+                  <AssistantResults
+                    key={`results-${latest.id}`}
+                    result={latest.results}
+                    privacy={Boolean(protectedText)}
+                    grouped={snapshot.state?.view === 'by_distributor'}
+                  />
+                )}
+              </details>
               <div className={assistantStyles.controls}>
                 {running && (
                   <Button icon={<StopOutlined />} onClick={() => void assistant.command('cancel')}>
@@ -281,13 +292,36 @@ export function AssistantPage({ initialId }: { initialId: string | null }) {
                   aria-label={t('question')}
                   value={text}
                   onChange={(event) => setText(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (
+                      event.key !== 'Enter' ||
+                      event.nativeEvent.isComposing ||
+                      event.nativeEvent.keyCode === 229
+                    ) {
+                      return;
+                    }
+                    event.preventDefault();
+                    if (event.repeat) return;
+                    if (event.metaKey || event.ctrlKey) {
+                      const input = event.currentTarget;
+                      const remainingLength =
+                        input.value.length - (input.selectionEnd - input.selectionStart);
+                      if (remainingLength >= input.maxLength) return;
+                      input.setRangeText('\n', input.selectionStart, input.selectionEnd, 'end');
+                      setText(input.value);
+                      return;
+                    }
+                    send();
+                  }}
                   placeholder={t('placeholder')}
                   autoSize={{ minRows: 2, maxRows: 6 }}
                   maxLength={4000}
                   disabled={Boolean(running)}
                 />
                 <div className={assistantStyles.composerFooter}>
-                  <span>{t('nonStreaming')}</span>
+                  <span>
+                    {t('nonStreaming')} {t('keyboardHint')}
+                  </span>
                   <Button
                     type="primary"
                     htmlType="submit"

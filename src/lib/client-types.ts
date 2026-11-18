@@ -297,6 +297,11 @@ export type MaterialValues = {
   childWeightGrams: MaterialAmount;
   childUnitPrice: MaterialAmount;
   childPriceSource: MaterialPriceSource;
+  // Optional for drafts and API payloads created before separate base/actual pricing.
+  lossRate?: MaterialAmount;
+  baseSaleUnitPrice?: MaterialAmount;
+  baseSaleGramPrice?: MaterialAmount;
+  baseSaleChildUnitPrice?: MaterialAmount;
   saleRule: MaterialSaleRule;
   saleRuleValue: MaterialAmount;
   saleUnitPrice: MaterialAmount;

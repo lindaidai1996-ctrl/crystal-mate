@@ -131,6 +131,15 @@ async function main() {
       await future.finish(winner.value, { ...execution, status: 'completed' });
       assert.equal((await future.cancel(owner, session.id, 7)).status, 'completed');
       checks.push({ name: 'single-concurrent-winner-and-completed-cancel-noop', passed: true });
+      const invalidated = await future.cancel(owner, session.id, 7, true);
+      assert.equal(invalidated.revision, 8);
+      assert.equal(invalidated.status, 'completed');
+      assert.equal((await future.read(owner, session.id)).latest?.data.status, 'completed');
+      await assert.rejects(() => future.begin(owner, session.id, 7, '旧隐私请求', execution));
+      checks.push({
+        name: 'privacy-invalidates-unclaimed-request-preserves-history',
+        passed: true,
+      });
     } finally {
       // Only the synthetic assistant session and its cascading assistant records.
       await client.assistantConversation.deleteMany({ where: { id: session.id, ownerId: owner } });

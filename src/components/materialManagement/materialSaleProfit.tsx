@@ -9,10 +9,12 @@ export function MaterialSaleProfit({
   cost,
   salePrice,
   unit,
+  lossAdjusted = false,
 }: {
   cost: MaterialAmount;
   salePrice: MaterialAmount;
   unit: MaterialUnit;
+  lossAdjusted?: boolean;
 }) {
   const t = useTranslations('materialEditor');
   const privacyMode = usePrivacyMode();
@@ -24,18 +26,27 @@ export function MaterialSaleProfit({
 
   return (
     <p
-      className={`product-pricing-profit${profit === null ? ' is-pending' : isLoss ? ' is-loss' : ''}`}
+      className={`product-pricing-profit${lossAdjusted ? ' material-loss-profit' : ''}${profit === null ? ' is-pending' : isLoss ? ' is-loss' : ''}`}
       role="status"
       aria-live="polite"
       aria-atomic="true"
     >
       {profit === null
         ? t('profitPending', { unit: t(unit) })
-        : t.rich(isLoss ? 'estimatedLoss' : 'estimatedProfit', {
-            unit: t(unit),
-            amount: centsToAmount(isLoss ? -profit : profit),
-            money: (chunks) => <strong>{chunks}</strong>,
-          })}
+        : t.rich(
+            lossAdjusted
+              ? isLoss
+                ? 'lossAdjustedLoss'
+                : 'lossAdjustedProfit'
+              : isLoss
+                ? 'estimatedLoss'
+                : 'estimatedProfit',
+            {
+              unit: t(unit),
+              amount: centsToAmount(isLoss ? -profit : profit),
+              money: (chunks) => <strong>{chunks}</strong>,
+            },
+          )}
     </p>
   );
 }

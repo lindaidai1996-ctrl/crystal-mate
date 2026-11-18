@@ -124,7 +124,27 @@ export function bulkSaleValues(current: MaterialValues, sale: BulkSale) {
       true,
     );
   }
+  if (current.baseSaleUnitPrice !== undefined) {
+    if (sale.rule === 'CUSTOM_AMOUNT') {
+      // Bulk prices are actual prices; preserve the separate pricing baseline.
+      values = { ...values, ...sale.prices[current.unit] };
+      if (current.unit === 'GRAM') values.saleUnitPrice = values.saleGramPrice;
+      values.saleUnitManual = values.saleUnitPrice !== null;
+      values.saleGramManual = values.saleGramPrice !== null;
+      values.saleChildManual = current.unit === 'STRAND' && values.saleChildUnitPrice !== null;
+    } else {
+      values.saleUnitPrice = values.baseSaleUnitPrice ?? null;
+      values.saleGramPrice = values.baseSaleGramPrice ?? null;
+      values.saleChildUnitPrice = values.baseSaleChildUnitPrice ?? null;
+      values.saleUnitManual = false;
+      values.saleGramManual = false;
+      values.saleChildManual = false;
+    }
+  }
   const fields = [
+    'baseSaleUnitPrice',
+    'baseSaleGramPrice',
+    'baseSaleChildUnitPrice',
     'saleUnitPrice',
     'saleGramPrice',
     'saleChildUnitPrice',

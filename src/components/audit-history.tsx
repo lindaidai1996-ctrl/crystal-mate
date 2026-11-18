@@ -17,7 +17,7 @@ import { usePrivacyMode } from './privacyMode';
 import { DateRangeFilter } from './date-range-filter';
 import auditStyles from './audit-history.module.css';
 
-const privateField = /price|cost|quote|amount|fee/i;
+const privateField = /price|cost|quote|amount|fee|lossRate/i;
 const technicalField =
   /^(id|url|sourceUrl|avatarUrl|fileHash|promptVersion|provider|model|width|height|sequence)$/;
 const formatTime = (value: string) =>

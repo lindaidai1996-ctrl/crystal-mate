@@ -1,0 +1,423 @@
+{
+  "checkedAt": "2026-11-18T03:42:42.656Z",
+  "version": "assistant-agent-v1",
+  "realModel": true,
+  "database": "frozen-fixture",
+  "businessWrites": false,
+  "checks": [
+    {
+      "id": "advice-1",
+      "text": "结合本月物料采购和当前库存，给我补货参考建议，并说明数据缺口，不要预测销量和用完时间。",
+      "status": "budget",
+      "errorCode": "ORCHESTRATION_BUDGET_EXCEEDED",
+      "durationMs": 7622,
+      "calls": 6,
+      "reservedTokens": 168563,
+      "trace": [
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 1233,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 6216,
+            "completionTokens": 243
+          },
+          "completeness": null
+        },
+        {
+          "stage": "candidate",
+          "outcome": "success",
+          "durationMs": 2,
+          "code": null,
+          "model": null,
+          "usage": null,
+          "completeness": {
+            "traversal": "complete",
+            "totalCandidates": 44,
+            "readCandidates": 44,
+            "semanticEvaluation": "not_performed"
+          }
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 10,
+          "code": null,
+          "model": null,
+          "usage": null,
+          "completeness": null
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 1113,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 8006,
+            "completionTokens": 226
+          },
+          "completeness": null
+        },
+        {
+          "stage": "candidate",
+          "outcome": "success",
+          "durationMs": 2,
+          "code": null,
+          "model": null,
+          "usage": null,
+          "completeness": {
+            "traversal": "complete",
+            "totalCandidates": 44,
+            "readCandidates": 44,
+            "semanticEvaluation": "not_performed"
+          }
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 3,
+          "code": null,
+          "model": null,
+          "usage": null,
+          "completeness": null
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 1064,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 7983,
+            "completionTokens": 120
+          },
+          "completeness": null
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 1932,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 8301,
+            "completionTokens": 124
+          },
+          "completeness": null
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 1442,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 8535,
+            "completionTokens": 151
+          },
+          "completeness": null
+        },
+        {
+          "stage": "facts",
+          "outcome": "success",
+          "durationMs": 808,
+          "code": null,
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 9064,
+            "completionTokens": 107
+          },
+          "completeness": null
+        }
+      ],
+      "answer": null,
+      "actions": [
+        {
+          "action": "query",
+          "patch": {
+            "subject": "purchases",
+            "itemTypes": ["MATERIAL"],
+            "hard": {
+              "purchaseDate": null,
+              "createdAt": null,
+              "distributorIds": null,
+              "items": null,
+              "categories": null,
+              "tagIds": null,
+              "location": null
+            },
+            "semantic": {},
+            "month": "this_month",
+            "view": "details",
+            "clarification": null
+          },
+          "reset": true,
+          "purpose": "answer",
+          "retainOperations": false,
+          "intent": {
+            "format": "list",
+            "fields": [
+              "name",
+              "specification",
+              "quantity",
+              "unit",
+              "unitPrice",
+              "amount",
+              "currency",
+              "date",
+              "distributor"
+            ],
+            "concise": false
+          }
+        },
+        {
+          "action": "query",
+          "patch": {
+            "subject": "catalog",
+            "itemTypes": ["MATERIAL"],
+            "hard": {
+              "purchaseDate": null,
+              "createdAt": null,
+              "distributorIds": null,
+              "items": null,
+              "categories": null,
+              "tagIds": null,
+              "location": null
+            },
+            "semantic": {},
+            "month": null,
+            "view": "stock",
+            "clarification": null
+          },
+          "reset": false,
+          "purpose": "answer",
+          "retainOperations": false,
+          "intent": {
+            "format": "list",
+            "fields": ["name", "specification", "stock", "unit", "stockUnknown"],
+            "concise": false
+          }
+        },
+        {
+          "action": "transform",
+          "set": "e1c19e77-840c-430a-b180-fa40711c8ed6",
+          "operations": [
+            {
+              "op": "group",
+              "keys": ["item", "name", "specification", "unit"],
+              "metric": "quantity",
+              "calculation": "sum"
+            }
+          ]
+        },
+        {
+          "action": "transform",
+          "set": "ff6f2c82-ae3d-43a3-b04b-2dee92b5b260",
+          "operations": [
+            {
+              "op": "group",
+              "keys": ["item", "name", "specification", "unit"],
+              "metric": "stock",
+              "calculation": "sum"
+            }
+          ]
+        },
+        {
+          "action": "transform",
+          "set": "2a8ad35d-03cc-4955-bb32-f42ec7ec760f",
+          "operations": [
+            {
+              "op": "compare",
+              "other": "11f1a1fb-2fb5-4dec-9b68-90a88577aed9",
+              "keys": ["item", "name", "specification", "unit"],
+              "metric": "quantity",
+              "mode": "totals"
+            }
+          ]
+        },
+        {
+          "action": "transform",
+          "set": "3c1a4072-c8b5-4d30-a164-75ece62e6f3c",
+          "operations": [
+            {
+              "op": "sort",
+              "field": "current",
+              "direction": "asc"
+            }
+          ]
+        }
+      ],
+      "protocol": [
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 532,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 476,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 198,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 195,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 245,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "next_action",
+                  "argumentBytes": 142,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "state": {
+        "task": {
+          "intent": {
+            "format": "list",
+            "fields": ["name", "specification", "stock", "unit", "stockUnknown"],
+            "concise": false
+          },
+          "operations": [
+            {
+              "op": "group",
+              "keys": ["item", "name", "specification", "unit"],
+              "metric": "stock",
+              "calculation": "sum"
+            }
+          ]
+        },
+        "query": {
+          "version": "v1",
+          "subject": "catalog",
+          "itemTypes": ["MATERIAL"],
+          "hard": {},
+          "semantic": [],
+          "ruleVersion": "v1",
+          "pagination": {
+            "limit": 100
+          }
+        },
+        "view": "stock"
+      },
+      "sets": [
+        {
+          "id": "e1c19e77-840c-430a-b180-fa40711c8ed6",
+          "count": 44,
+          "complete": true,
+          "parents": []
+        },
+        {
+          "id": "ff6f2c82-ae3d-43a3-b04b-2dee92b5b260",
+          "count": 44,
+          "complete": true,
+          "parents": []
+        },
+        {
+          "id": "2a8ad35d-03cc-4955-bb32-f42ec7ec760f",
+          "count": 44,
+          "complete": true,
+          "parents": ["e1c19e77-840c-430a-b180-fa40711c8ed6"]
+        },
+        {
+          "id": "11f1a1fb-2fb5-4dec-9b68-90a88577aed9",
+          "count": 44,
+          "complete": true,
+          "parents": ["ff6f2c82-ae3d-43a3-b04b-2dee92b5b260"]
+        },
+        {
+          "id": "3c1a4072-c8b5-4d30-a164-75ece62e6f3c",
+          "count": 44,
+          "complete": true,
+          "parents": [
+            "796b686a-fa31-4465-a726-88970bf650df",
+            "11f1a1fb-2fb5-4dec-9b68-90a88577aed9"
+          ]
+        },
+        {
+          "id": "2d649d43-974d-4717-a3a8-5b03c5f8ce3c",
+          "count": 44,
+          "complete": true,
+          "parents": ["3c1a4072-c8b5-4d30-a164-75ece62e6f3c"]
+        }
+      ],
+      "passed": false
+    },
+    {
+      "fatal": "VERIFICATION_ASSERTION_FAILED",
+      "assertion": "advice-1: budget/ORCHESTRATION_BUDGET_EXCEEDED"
+    }
+  ],
+  "success": false
+}

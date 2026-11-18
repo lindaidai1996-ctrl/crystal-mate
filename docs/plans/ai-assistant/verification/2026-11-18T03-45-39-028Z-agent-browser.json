@@ -1,0 +1,4762 @@
+{
+  "checkedAt": "2026-11-18T03:45:39.028Z",
+  "authentication": "signed short-lived test JWT through real callback; not password login",
+  "realModel": true,
+  "businessWrites": false,
+  "checks": [
+    "Real HTTP names answer contains complete linked names and no result table in the message",
+    "1440px desktop and 390px mobile have no page horizontal overflow"
+  ],
+  "steps": [
+    {
+      "question": "帮我查这个月在荔湾广场进了哪些货？仅告诉我货品名称就行。",
+      "snapshot": {
+        "id": "0c5503db-7126-46ee-99c5-10d734958354",
+        "revision": 1,
+        "active": false,
+        "interrupted": false,
+        "privacy": false,
+        "state": {
+          "task": {
+            "intent": {
+              "fields": ["name"],
+              "format": "names",
+              "concise": true
+            },
+            "operations": [
+              {
+                "by": "item",
+                "op": "deduplicate"
+              }
+            ]
+          },
+          "view": "details",
+          "query": {
+            "hard": {
+              "location": {
+                "kind": "exact_place",
+                "text": "荔湾广场"
+              },
+              "purchaseDate": {
+                "to": "2026-12-01",
+                "from": "2026-11-01"
+              }
+            },
+            "subject": "purchases",
+            "version": "v1",
+            "semantic": [],
+            "itemTypes": ["MATERIAL", "PRODUCT"],
+            "pagination": {
+              "limit": 100
+            },
+            "ruleVersion": "v1"
+          }
+        },
+        "feedback": [],
+        "messages": [
+          {
+            "id": "4c52272b-8ed0-4d9c-a0f8-3b4d77ac1683",
+            "role": "user",
+            "text": "帮我查这个月在荔湾广场进了哪些货？仅告诉我货品名称就行。",
+            "answer": null,
+            "status": null,
+            "executionId": "624e3de3-a67b-4866-8826-dd28185b93dd"
+          },
+          {
+            "id": "e7cca4fa-0871-404f-a24b-d8a55f3f0c05",
+            "role": "assistant",
+            "text": null,
+            "answer": {
+              "version": "answer-v1",
+              "privacy": false,
+              "observations": ["2026-11-18T03:46:10.270Z", "2026-11-18T03:46:03.708Z"],
+              "warnings": [],
+              "fallback": false,
+              "blocks": [
+                {
+                  "type": "data",
+                  "format": "names",
+                  "fields": ["name"],
+                  "rows": [
+                    {
+                      "id": "d0",
+                      "cells": [
+                        {
+                          "text": "1.5mmS925方形碎银",
+                          "href": "/admin/materials/cmwg1nejd0017oq01dbrbr9g8/batches/cmwg1nejj0019oq015v32pexs"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d1",
+                      "cells": [
+                        {
+                          "text": "1.5mmS925银定位管",
+                          "href": "/admin/materials/cmwg1syeo001goq01lo04ot40/batches/cmwg1syez001ioq017yvh5wia"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d2",
+                      "cells": [
+                        {
+                          "text": "2mmS925银圆珠",
+                          "href": "/admin/materials/cmwg1ydtm001noq01ruchlerr/batches/cmwg1ydwz001poq01zug4rson"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d3",
+                      "cells": [
+                        {
+                          "text": "3mmS925银圆珠",
+                          "href": "/admin/materials/cmwg1zukg001toq01nbdav125/batches/cmwg1zuki001voq010pyvuif4"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d4",
+                      "cells": [
+                        {
+                          "text": "4mmS925银圆珠",
+                          "href": "/admin/materials/cmwg20yat001zoq01l838wus2/batches/cmwg20yaw0021oq01s0tn7se9"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d5",
+                      "cells": [
+                        {
+                          "text": "6mm18K镀金S925银跑环",
+                          "href": "/admin/materials/cmwg272pm0026oq01ldwgnote/batches/cmwg272r80028oq01zqmqd4ez"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d6",
+                      "cells": [
+                        {
+                          "text": "锆石18K镀金竹节S925银配饰",
+                          "href": "/admin/materials/cmwg2cnkz002eoq01bwj4frmp/batches/cmwg2cnlq002goq01oth138kc"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d7",
+                      "cells": [
+                        {
+                          "text": "锆石四芒星S925银延长链",
+                          "href": "/admin/materials/cmwg2h6cr002noq01rb9hl6wb/batches/cmwg2h6d1002poq012l3enech"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d8",
+                      "cells": [
+                        {
+                          "text": "3mm18K镀S925银配饰桶珠",
+                          "href": "/admin/materials/cmwg35d3c002woq01k0ez5ef4/batches/cmwg35d3k002yoq01jnveq4fu"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d9",
+                      "cells": [
+                        {
+                          "text": "4mm绿松石随形",
+                          "href": "/admin/materials/cmwg3jvmq0038oq017cf73132/batches/cmwg3jvn7003aoq01w2vzww8r"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d10",
+                      "cells": [
+                        {
+                          "text": "3.5mm绿松石药片",
+                          "href": "/admin/materials/cmwg3tev8003joq01zlvvug0k/batches/cmwg3tevc003loq01iq1raphc"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d11",
+                      "cells": [
+                        {
+                          "text": "3mm绿松石圆珠",
+                          "href": "/admin/materials/cmwg3wwbn003soq01of24lsde/batches/cmwg3wwbs003uoq01fefb4uhm"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d12",
+                      "cells": [
+                        {
+                          "text": "13mm绿松石桶珠",
+                          "href": "/admin/materials/cmwg41qcz0040oq016l565fdh/batches/cmwg41qd40042oq01bdr95r0f"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d13",
+                      "cells": [
+                        {
+                          "text": "7.8mm绿松石勒子",
+                          "href": "/admin/materials/cmwg462i80047oq01899ruhhw/batches/cmwg462ib0049oq01l602ks55"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d14",
+                      "cells": [
+                        {
+                          "text": "百香籽绿松石配饰",
+                          "href": "/admin/materials/cmwg4ekob004doq0122uzteo5/batches/cmwg4ekoh004foq01k1uo5kyt"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d15",
+                      "cells": [
+                        {
+                          "text": "羽毛绿松石提溜",
+                          "href": "/admin/materials/cmwg4gc8z004joq01mwra61gp/batches/cmwg4gc92004loq01w7elwpgm"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d16",
+                      "cells": [
+                        {
+                          "text": "太阳绿松石提溜（大）",
+                          "href": "/admin/materials/cmwg4irgg004poq01fz0k9ffi/batches/cmwg4irgl004roq01ldythgge"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d17",
+                      "cells": [
+                        {
+                          "text": "太阳绿松石提溜",
+                          "href": "/admin/materials/cmwg4l0yi004voq017d2499gv/batches/cmwg4l0yn004xoq01kdmkix3z"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d18",
+                      "cells": [
+                        {
+                          "text": "藏扣绿松石",
+                          "href": "/admin/materials/cmwg4od7h0051oq01rx3ps154/batches/cmwg4od7j0053oq01d96hk3zn"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d19",
+                      "cells": [
+                        {
+                          "text": "20mm晴水无事牌",
+                          "href": "/admin/materials/cmwg5fueh005doq01nw24tj4y/batches/cmwg5fuek005foq010y4jszjt"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d20",
+                      "cells": [
+                        {
+                          "text": "9.6mm晴水直切",
+                          "href": "/admin/materials/cmwg5jznx005koq01b5yqqvvq/batches/cmwg5jzo9005moq01y9d4q07v"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d21",
+                      "cells": [
+                        {
+                          "text": "10mm且末方形",
+                          "href": "/admin/materials/cmwg5t23p005uoq01i8osx2xz/batches/cmwg5t23v005woq01u1qq95c0"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d22",
+                      "cells": [
+                        {
+                          "text": "6mm碧玉直切",
+                          "href": "/admin/materials/cmwg62y0v0064oq018j32l93v/batches/cmwg62y0z0066oq01crq24mcy"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d23",
+                      "cells": [
+                        {
+                          "text": "碧玉镶嵌48K金四叶草",
+                          "href": "/admin/materials/cmwg65500006aoq01r2ugocml/batches/cmwg65503006coq016p0qbfgs"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d24",
+                      "cells": [
+                        {
+                          "text": "镀K48-S925银圆环",
+                          "href": "/admin/materials/cmwg695k8006goq01kb6pwyk8/batches/cmwg695kc006ioq016bxdz2rx"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d25",
+                      "cells": [
+                        {
+                          "text": "12mm晴水圆珠吊坠",
+                          "href": "/admin/materials/cmwg6kssg006moq01z3u3l03s/batches/cmwg6kssl006ooq01j1e3go4p"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d26",
+                      "cells": [
+                        {
+                          "text": "碧玉老料通孔葫芦",
+                          "href": "/admin/materials/cmv9c5epp000h3we8q5tlmyij/batches/cmwg6q67j006uoq012detgflf"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d27",
+                      "cells": [
+                        {
+                          "text": "碧玉24K金蝴蝶小花配饰",
+                          "href": "/admin/materials/cmv6czxjh00013wwrw95r1hlf/batches/cmwg6sg3j006yoq017kkapoi8"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d28",
+                      "cells": [
+                        {
+                          "text": "绿松石羽毛提溜",
+                          "href": "/admin/materials/cmwg6zmtj0074oq01ogtm3q3z/batches/cmwg6zmto0076oq01k1dobc3c"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d29",
+                      "cells": [
+                        {
+                          "text": "4mmS925银配饰猫眼金珠",
+                          "href": "/admin/materials/cmwg8cnag007joq01klk7e9a8/batches/cmwg8cnak007loq01x206jc2g"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d30",
+                      "cells": [
+                        {
+                          "text": "2.5m18K镀金S925银圆珠配饰",
+                          "href": "/admin/materials/cmwg8hlup007roq01ic1rtpkd/batches/cmwg8hluu007toq01mh5jza4z"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d31",
+                      "cells": [
+                        {
+                          "text": "18K镀金S925银车花直管配饰",
+                          "href": "/admin/materials/cmwg8meyi007zoq01cwfk1qsl/batches/cmwg8meyk0081oq016gt47ky6"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d32",
+                      "cells": [
+                        {
+                          "text": "2mm18K镀金S925银钉针",
+                          "href": "/admin/materials/cmwg8qfxa0087oq01k5a40ff6/batches/cmwg8qfxe0089oq01qgahihor"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d33",
+                      "cells": [
+                        {
+                          "text": "30mm18K镀金S925银圆头针",
+                          "href": "/admin/materials/cmwg8ut8u008eoq012d9j7l12/batches/cmwg8ut8w008goq01ueld40kz"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d34",
+                      "cells": [
+                        {
+                          "text": "2mm18K镀金S925碎银方形",
+                          "href": "/admin/materials/cmwg9w65m008loq01xvsp88og/batches/cmwg9w65r008noq01ulq3otqm"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d35",
+                      "cells": [
+                        {
+                          "text": "2m18K金亮面光珠",
+                          "href": "/admin/materials/cmwgb71ot008yoq01o5milsyi/batches/cmwgb71ox0090oq01gsqckvse"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d36",
+                      "cells": [
+                        {
+                          "text": "2.5mm18K金亮面光珠",
+                          "href": "/admin/materials/cmwgbadiv0095oq01l5o0dsqx/batches/cmwgbadiy0097oq01s67uj9yo"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d37",
+                      "cells": [
+                        {
+                          "text": "6mm18K金花车直管",
+                          "href": "/admin/materials/cmwhhwzpt009zoq01q2qx3jyj/batches/cmwhhwzpx00a1oq01epyun3py"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d38",
+                      "cells": [
+                        {
+                          "text": "3mm18K金橄榄光珠",
+                          "href": "/admin/materials/cmwhi1vm500a7oq0111yohtth/batches/cmwhi1vm800a9oq01675o73dw"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d39",
+                      "cells": [
+                        {
+                          "text": "2m18K金橄榄光珠",
+                          "href": "/admin/materials/cmwhi6lbq00afoq01ipgxlaxl/batches/cmwhi6lbu00ahoq01k63brjnz"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d40",
+                      "cells": [
+                        {
+                          "text": "8mm18K金竹节骨头",
+                          "href": "/admin/materials/cmwhiagbg00aroq01mwdd2uzx/batches/cmwhiagbj00atoq01sms4uxt6"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d41",
+                      "cells": [
+                        {
+                          "text": "2.5mm18K金方糖",
+                          "href": "/admin/materials/cmwhid0ei00azoq014888pmoe/batches/cmwhid0ek00b1oq01irvvn3cm"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d42",
+                      "cells": [
+                        {
+                          "text": "4mm18K金麦粒",
+                          "href": "/admin/materials/cmwhijono00b7oq01awsa6sbb/batches/cmwhijons00b9oq01lxg5717t"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "d43",
+                      "cells": [
+                        {
+                          "text": "18K金实心配件",
+                          "href": "/admin/materials/cmwhip6gf00bfoq01tsr3e0oa/batches/cmwhip6gi00bhoq01n4u1oiul"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "status": "completed",
+            "executionId": "624e3de3-a67b-4866-8826-dd28185b93dd"
+          }
+        ],
+        "latest": {
+          "id": "624e3de3-a67b-4866-8826-dd28185b93dd",
+          "generation": 1,
+          "status": "completed",
+          "phase": "next_action",
+          "clarification": null,
+          "errorCode": null,
+          "metadata": {
+            "transport": "native-fetch",
+            "ruleVersion": "v1",
+            "promptVersion": "assistant-agent-v1",
+            "requestedModel": "deepseek-flash",
+            "contractVersion": "v1",
+            "relevancePromptVersion": "relevance-v3",
+            "requestedRelevanceModel": "deepseek-flash"
+          },
+          "progress": {
+            "countBasis": "purchase_entry",
+            "totalCandidates": 44,
+            "readCandidates": 44,
+            "evaluatedCandidates": 44,
+            "included": 44,
+            "excluded": 0,
+            "uncertain": 0,
+            "notEvaluated": 0,
+            "unreadCandidates": 0,
+            "traversal": "complete",
+            "evaluation": "not_required",
+            "decisions": [],
+            "calls": 3,
+            "reservedTokens": 82181,
+            "relevanceCalls": 0,
+            "relevanceReservedTokens": 0
+          },
+          "pendingPlan": null,
+          "answer": {
+            "version": "answer-v1",
+            "privacy": false,
+            "observations": ["2026-11-18T03:46:10.270Z", "2026-11-18T03:46:03.708Z"],
+            "warnings": [],
+            "fallback": false,
+            "blocks": [
+              {
+                "type": "data",
+                "format": "names",
+                "fields": ["name"],
+                "rows": [
+                  {
+                    "id": "d0",
+                    "cells": [
+                      {
+                        "text": "1.5mmS925方形碎银",
+                        "href": "/admin/materials/cmwg1nejd0017oq01dbrbr9g8/batches/cmwg1nejj0019oq015v32pexs"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d1",
+                    "cells": [
+                      {
+                        "text": "1.5mmS925银定位管",
+                        "href": "/admin/materials/cmwg1syeo001goq01lo04ot40/batches/cmwg1syez001ioq017yvh5wia"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d2",
+                    "cells": [
+                      {
+                        "text": "2mmS925银圆珠",
+                        "href": "/admin/materials/cmwg1ydtm001noq01ruchlerr/batches/cmwg1ydwz001poq01zug4rson"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d3",
+                    "cells": [
+                      {
+                        "text": "3mmS925银圆珠",
+                        "href": "/admin/materials/cmwg1zukg001toq01nbdav125/batches/cmwg1zuki001voq010pyvuif4"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d4",
+                    "cells": [
+                      {
+                        "text": "4mmS925银圆珠",
+                        "href": "/admin/materials/cmwg20yat001zoq01l838wus2/batches/cmwg20yaw0021oq01s0tn7se9"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d5",
+                    "cells": [
+                      {
+                        "text": "6mm18K镀金S925银跑环",
+                        "href": "/admin/materials/cmwg272pm0026oq01ldwgnote/batches/cmwg272r80028oq01zqmqd4ez"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d6",
+                    "cells": [
+                      {
+                        "text": "锆石18K镀金竹节S925银配饰",
+                        "href": "/admin/materials/cmwg2cnkz002eoq01bwj4frmp/batches/cmwg2cnlq002goq01oth138kc"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d7",
+                    "cells": [
+                      {
+                        "text": "锆石四芒星S925银延长链",
+                        "href": "/admin/materials/cmwg2h6cr002noq01rb9hl6wb/batches/cmwg2h6d1002poq012l3enech"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d8",
+                    "cells": [
+                      {
+                        "text": "3mm18K镀S925银配饰桶珠",
+                        "href": "/admin/materials/cmwg35d3c002woq01k0ez5ef4/batches/cmwg35d3k002yoq01jnveq4fu"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d9",
+                    "cells": [
+                      {
+                        "text": "4mm绿松石随形",
+                        "href": "/admin/materials/cmwg3jvmq0038oq017cf73132/batches/cmwg3jvn7003aoq01w2vzww8r"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d10",
+                    "cells": [
+                      {
+                        "text": "3.5mm绿松石药片",
+                        "href": "/admin/materials/cmwg3tev8003joq01zlvvug0k/batches/cmwg3tevc003loq01iq1raphc"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d11",
+                    "cells": [
+                      {
+                        "text": "3mm绿松石圆珠",
+                        "href": "/admin/materials/cmwg3wwbn003soq01of24lsde/batches/cmwg3wwbs003uoq01fefb4uhm"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d12",
+                    "cells": [
+                      {
+                        "text": "13mm绿松石桶珠",
+                        "href": "/admin/materials/cmwg41qcz0040oq016l565fdh/batches/cmwg41qd40042oq01bdr95r0f"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d13",
+                    "cells": [
+                      {
+                        "text": "7.8mm绿松石勒子",
+                        "href": "/admin/materials/cmwg462i80047oq01899ruhhw/batches/cmwg462ib0049oq01l602ks55"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d14",
+                    "cells": [
+                      {
+                        "text": "百香籽绿松石配饰",
+                        "href": "/admin/materials/cmwg4ekob004doq0122uzteo5/batches/cmwg4ekoh004foq01k1uo5kyt"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d15",
+                    "cells": [
+                      {
+                        "text": "羽毛绿松石提溜",
+                        "href": "/admin/materials/cmwg4gc8z004joq01mwra61gp/batches/cmwg4gc92004loq01w7elwpgm"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d16",
+                    "cells": [
+                      {
+                        "text": "太阳绿松石提溜（大）",
+                        "href": "/admin/materials/cmwg4irgg004poq01fz0k9ffi/batches/cmwg4irgl004roq01ldythgge"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d17",
+                    "cells": [
+                      {
+                        "text": "太阳绿松石提溜",
+                        "href": "/admin/materials/cmwg4l0yi004voq017d2499gv/batches/cmwg4l0yn004xoq01kdmkix3z"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d18",
+                    "cells": [
+                      {
+                        "text": "藏扣绿松石",
+                        "href": "/admin/materials/cmwg4od7h0051oq01rx3ps154/batches/cmwg4od7j0053oq01d96hk3zn"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d19",
+                    "cells": [
+                      {
+                        "text": "20mm晴水无事牌",
+                        "href": "/admin/materials/cmwg5fueh005doq01nw24tj4y/batches/cmwg5fuek005foq010y4jszjt"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d20",
+                    "cells": [
+                      {
+                        "text": "9.6mm晴水直切",
+                        "href": "/admin/materials/cmwg5jznx005koq01b5yqqvvq/batches/cmwg5jzo9005moq01y9d4q07v"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d21",
+                    "cells": [
+                      {
+                        "text": "10mm且末方形",
+                        "href": "/admin/materials/cmwg5t23p005uoq01i8osx2xz/batches/cmwg5t23v005woq01u1qq95c0"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d22",
+                    "cells": [
+                      {
+                        "text": "6mm碧玉直切",
+                        "href": "/admin/materials/cmwg62y0v0064oq018j32l93v/batches/cmwg62y0z0066oq01crq24mcy"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d23",
+                    "cells": [
+                      {
+                        "text": "碧玉镶嵌48K金四叶草",
+                        "href": "/admin/materials/cmwg65500006aoq01r2ugocml/batches/cmwg65503006coq016p0qbfgs"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d24",
+                    "cells": [
+                      {
+                        "text": "镀K48-S925银圆环",
+                        "href": "/admin/materials/cmwg695k8006goq01kb6pwyk8/batches/cmwg695kc006ioq016bxdz2rx"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d25",
+                    "cells": [
+                      {
+                        "text": "12mm晴水圆珠吊坠",
+                        "href": "/admin/materials/cmwg6kssg006moq01z3u3l03s/batches/cmwg6kssl006ooq01j1e3go4p"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d26",
+                    "cells": [
+                      {
+                        "text": "碧玉老料通孔葫芦",
+                        "href": "/admin/materials/cmv9c5epp000h3we8q5tlmyij/batches/cmwg6q67j006uoq012detgflf"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d27",
+                    "cells": [
+                      {
+                        "text": "碧玉24K金蝴蝶小花配饰",
+                        "href": "/admin/materials/cmv6czxjh00013wwrw95r1hlf/batches/cmwg6sg3j006yoq017kkapoi8"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d28",
+                    "cells": [
+                      {
+                        "text": "绿松石羽毛提溜",
+                        "href": "/admin/materials/cmwg6zmtj0074oq01ogtm3q3z/batches/cmwg6zmto0076oq01k1dobc3c"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d29",
+                    "cells": [
+                      {
+                        "text": "4mmS925银配饰猫眼金珠",
+                        "href": "/admin/materials/cmwg8cnag007joq01klk7e9a8/batches/cmwg8cnak007loq01x206jc2g"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d30",
+                    "cells": [
+                      {
+                        "text": "2.5m18K镀金S925银圆珠配饰",
+                        "href": "/admin/materials/cmwg8hlup007roq01ic1rtpkd/batches/cmwg8hluu007toq01mh5jza4z"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d31",
+                    "cells": [
+                      {
+                        "text": "18K镀金S925银车花直管配饰",
+                        "href": "/admin/materials/cmwg8meyi007zoq01cwfk1qsl/batches/cmwg8meyk0081oq016gt47ky6"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d32",
+                    "cells": [
+                      {
+                        "text": "2mm18K镀金S925银钉针",
+                        "href": "/admin/materials/cmwg8qfxa0087oq01k5a40ff6/batches/cmwg8qfxe0089oq01qgahihor"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d33",
+                    "cells": [
+                      {
+                        "text": "30mm18K镀金S925银圆头针",
+                        "href": "/admin/materials/cmwg8ut8u008eoq012d9j7l12/batches/cmwg8ut8w008goq01ueld40kz"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d34",
+                    "cells": [
+                      {
+                        "text": "2mm18K镀金S925碎银方形",
+                        "href": "/admin/materials/cmwg9w65m008loq01xvsp88og/batches/cmwg9w65r008noq01ulq3otqm"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d35",
+                    "cells": [
+                      {
+                        "text": "2m18K金亮面光珠",
+                        "href": "/admin/materials/cmwgb71ot008yoq01o5milsyi/batches/cmwgb71ox0090oq01gsqckvse"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d36",
+                    "cells": [
+                      {
+                        "text": "2.5mm18K金亮面光珠",
+                        "href": "/admin/materials/cmwgbadiv0095oq01l5o0dsqx/batches/cmwgbadiy0097oq01s67uj9yo"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d37",
+                    "cells": [
+                      {
+                        "text": "6mm18K金花车直管",
+                        "href": "/admin/materials/cmwhhwzpt009zoq01q2qx3jyj/batches/cmwhhwzpx00a1oq01epyun3py"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d38",
+                    "cells": [
+                      {
+                        "text": "3mm18K金橄榄光珠",
+                        "href": "/admin/materials/cmwhi1vm500a7oq0111yohtth/batches/cmwhi1vm800a9oq01675o73dw"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d39",
+                    "cells": [
+                      {
+                        "text": "2m18K金橄榄光珠",
+                        "href": "/admin/materials/cmwhi6lbq00afoq01ipgxlaxl/batches/cmwhi6lbu00ahoq01k63brjnz"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d40",
+                    "cells": [
+                      {
+                        "text": "8mm18K金竹节骨头",
+                        "href": "/admin/materials/cmwhiagbg00aroq01mwdd2uzx/batches/cmwhiagbj00atoq01sms4uxt6"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d41",
+                    "cells": [
+                      {
+                        "text": "2.5mm18K金方糖",
+                        "href": "/admin/materials/cmwhid0ei00azoq014888pmoe/batches/cmwhid0ek00b1oq01irvvn3cm"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d42",
+                    "cells": [
+                      {
+                        "text": "4mm18K金麦粒",
+                        "href": "/admin/materials/cmwhijono00b7oq01awsa6sbb/batches/cmwhijons00b9oq01lxg5717t"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d43",
+                    "cells": [
+                      {
+                        "text": "18K金实心配件",
+                        "href": "/admin/materials/cmwhip6gf00bfoq01tsr3e0oa/batches/cmwhip6gi00bhoq01n4u1oiul"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "results": {
+            "selectionIsPartial": false,
+            "stockMode": "catalog_current",
+            "kind": "purchases",
+            "queriedAt": "2026-11-18T03:46:10.270Z",
+            "purchases": [
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg1nejd0017oq01dbrbr9g8"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg1nejj0019oq015v32pexs"
+                },
+                "name": "1.5mmS925方形碎银",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "10.77",
+                "unit": "GRAM",
+                "unitPrice": "15.00",
+                "amount": "161.55",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg1syeo001goq01lo04ot40"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg1syez001ioq017yvh5wia"
+                },
+                "name": "1.5mmS925银定位管",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "2.30",
+                "unit": "GRAM",
+                "unitPrice": "15.00",
+                "amount": "34.50",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg1ydtm001noq01ruchlerr"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg1ydwz001poq01zug4rson"
+                },
+                "name": "2mmS925银圆珠",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "3.25",
+                "unit": "GRAM",
+                "unitPrice": "15.00",
+                "amount": "48.75",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg1zukg001toq01nbdav125"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg1zuki001voq010pyvuif4"
+                },
+                "name": "3mmS925银圆珠",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "2.81",
+                "unit": "GRAM",
+                "unitPrice": "15.00",
+                "amount": "42.15",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg20yat001zoq01l838wus2"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg20yaw0021oq01s0tn7se9"
+                },
+                "name": "4mmS925银圆珠",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "3.07",
+                "unit": "GRAM",
+                "unitPrice": "15.00",
+                "amount": "46.05",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg272pm0026oq01ldwgnote"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg272r80028oq01zqmqd4ez"
+                },
+                "name": "6mm18K镀金S925银跑环",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "33.00",
+                "unit": "BEAD",
+                "unitPrice": "3.00",
+                "amount": "99.00",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg2cnkz002eoq01bwj4frmp"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg2cnlq002goq01oth138kc"
+                },
+                "name": "锆石18K镀金竹节S925银配饰",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "6.00",
+                "unit": "BEAD",
+                "unitPrice": "10.00",
+                "amount": "60.00",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg2h6cr002noq01rb9hl6wb"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg2h6d1002poq012l3enech"
+                },
+                "name": "锆石四芒星S925银延长链",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "5.00",
+                "unit": "BEAD",
+                "unitPrice": "15.00",
+                "amount": "75.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg35d3c002woq01k0ez5ef4"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg35d3k002yoq01jnveq4fu"
+                },
+                "name": "3mm18K镀S925银配饰桶珠",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "5.94",
+                "unit": "GRAM",
+                "unitPrice": "20.00",
+                "amount": "118.80",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg3jvmq0038oq017cf73132"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg3jvn7003aoq01w2vzww8r"
+                },
+                "name": "4mm绿松石随形",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg3g8ak0032oq01pw87gg5k",
+                  "name": "晶缘珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "STRAND",
+                "unitPrice": "220.00",
+                "amount": "220.00",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg3tev8003joq01zlvvug0k"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg3tevc003loq01iq1raphc"
+                },
+                "name": "3.5mm绿松石药片",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg3g8ak0032oq01pw87gg5k",
+                  "name": "晶缘珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "STRAND",
+                "unitPrice": "185.00",
+                "amount": "185.00",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg3wwbn003soq01of24lsde"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg3wwbs003uoq01fefb4uhm"
+                },
+                "name": "3mm绿松石圆珠",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg3g8ak0032oq01pw87gg5k",
+                  "name": "晶缘珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "STRAND",
+                "unitPrice": "869.40",
+                "amount": "869.40",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg41qcz0040oq016l565fdh"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg41qd40042oq01bdr95r0f"
+                },
+                "name": "13mm绿松石桶珠",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg3g8ak0032oq01pw87gg5k",
+                  "name": "晶缘珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "BEAD",
+                "unitPrice": "162.50",
+                "amount": "162.50",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg462i80047oq01899ruhhw"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg462ib0049oq01l602ks55"
+                },
+                "name": "7.8mm绿松石勒子",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg3g8ak0032oq01pw87gg5k",
+                  "name": "晶缘珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "BEAD",
+                "unitPrice": "110.00",
+                "amount": "110.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4ekob004doq0122uzteo5"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4ekoh004foq01k1uo5kyt"
+                },
+                "name": "百香籽绿松石配饰",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg3g8ak0032oq01pw87gg5k",
+                  "name": "晶缘珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "BEAD",
+                "unitPrice": "17.60",
+                "amount": "17.60",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4gc8z004joq01mwra61gp"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4gc92004loq01w7elwpgm"
+                },
+                "name": "羽毛绿松石提溜",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg3g8ak0032oq01pw87gg5k",
+                  "name": "晶缘珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "BEAD",
+                "unitPrice": "22.00",
+                "amount": "22.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4irgg004poq01fz0k9ffi"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4irgl004roq01ldythgge"
+                },
+                "name": "太阳绿松石提溜（大）",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg3g8ak0032oq01pw87gg5k",
+                  "name": "晶缘珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "BEAD",
+                "unitPrice": "29.70",
+                "amount": "29.70",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4l0yi004voq017d2499gv"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4l0yn004xoq01kdmkix3z"
+                },
+                "name": "太阳绿松石提溜",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg3g8ak0032oq01pw87gg5k",
+                  "name": "晶缘珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "BEAD",
+                "unitPrice": "15.40",
+                "amount": "15.40",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4od7h0051oq01rx3ps154"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4od7j0053oq01d96hk3zn"
+                },
+                "name": "藏扣绿松石",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg3g8ak0032oq01pw87gg5k",
+                  "name": "晶缘珠宝"
+                },
+                "quantity": "4.43",
+                "unit": "GRAM",
+                "unitPrice": "40.63",
+                "amount": "180.00",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg5fueh005doq01nw24tj4y"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg5fuek005foq010y4jszjt"
+                },
+                "name": "20mm晴水无事牌",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmv60i7vq00043wapt6b5xvp9",
+                  "name": "晶钰鑫珠宝"
+                },
+                "quantity": "2.00",
+                "unit": "BEAD",
+                "unitPrice": "60.00",
+                "amount": "120.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg5jznx005koq01b5yqqvvq"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg5jzo9005moq01y9d4q07v"
+                },
+                "name": "9.6mm晴水直切",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmv60i7vq00043wapt6b5xvp9",
+                  "name": "晶钰鑫珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "BEAD",
+                "unitPrice": "23.00",
+                "amount": "23.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg5t23p005uoq01i8osx2xz"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg5t23v005woq01u1qq95c0"
+                },
+                "name": "10mm且末方形",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmv60i7vq00043wapt6b5xvp9",
+                  "name": "晶钰鑫珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "BEAD",
+                "unitPrice": "35.00",
+                "amount": "35.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg62y0v0064oq018j32l93v"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg62y0z0066oq01crq24mcy"
+                },
+                "name": "6mm碧玉直切",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmv60i7vq00043wapt6b5xvp9",
+                  "name": "晶钰鑫珠宝"
+                },
+                "quantity": "2.00",
+                "unit": "BEAD",
+                "unitPrice": "27.00",
+                "amount": "54.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg65500006aoq01r2ugocml"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg65503006coq016p0qbfgs"
+                },
+                "name": "碧玉镶嵌48K金四叶草",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmv60i7vq00043wapt6b5xvp9",
+                  "name": "晶钰鑫珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "BEAD",
+                "unitPrice": "26.00",
+                "amount": "26.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg695k8006goq01kb6pwyk8"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg695kc006ioq016bxdz2rx"
+                },
+                "name": "镀K48-S925银圆环",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmv60i7vq00043wapt6b5xvp9",
+                  "name": "晶钰鑫珠宝"
+                },
+                "quantity": "10.00",
+                "unit": "BEAD",
+                "unitPrice": "3.50",
+                "amount": "35.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg6kssg006moq01z3u3l03s"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg6kssl006ooq01j1e3go4p"
+                },
+                "name": "12mm晴水圆珠吊坠",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmv60i7vq00043wapt6b5xvp9",
+                  "name": "晶钰鑫珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "BEAD",
+                "unitPrice": "19.00",
+                "amount": "19.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmv9c5epp000h3we8q5tlmyij"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg6q67j006uoq012detgflf"
+                },
+                "name": "碧玉老料通孔葫芦",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmv60i7vq00043wapt6b5xvp9",
+                  "name": "晶钰鑫珠宝"
+                },
+                "quantity": "1.00",
+                "unit": "BEAD",
+                "unitPrice": "78.00",
+                "amount": "78.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmv6czxjh00013wwrw95r1hlf"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg6sg3j006yoq017kkapoi8"
+                },
+                "name": "碧玉24K金蝴蝶小花配饰",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmv60i7vq00043wapt6b5xvp9",
+                  "name": "晶钰鑫珠宝"
+                },
+                "quantity": "4.00",
+                "unit": "BEAD",
+                "unitPrice": "11.00",
+                "amount": "44.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg6zmtj0074oq01ogtm3q3z"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg6zmto0076oq01k1dobc3c"
+                },
+                "name": "绿松石羽毛提溜",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg6xshd0071oq01h776t219",
+                  "name": "曦雅尼珠宝精品绿松石馆"
+                },
+                "quantity": "1.00",
+                "unit": "BEAD",
+                "unitPrice": "86.00",
+                "amount": "86.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8cnag007joq01klk7e9a8"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8cnak007loq01x206jc2g"
+                },
+                "name": "4mmS925银配饰猫眼金珠",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "28.00",
+                "unit": "BEAD",
+                "unitPrice": "1.73",
+                "amount": "48.30",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8hlup007roq01ic1rtpkd"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8hluu007toq01mh5jza4z"
+                },
+                "name": "2.5m18K镀金S925银圆珠配饰",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "2.84",
+                "unit": "GRAM",
+                "unitPrice": "20.00",
+                "amount": "56.80",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8meyi007zoq01cwfk1qsl"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8meyk0081oq016gt47ky6"
+                },
+                "name": "18K镀金S925银车花直管配饰",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "2.40",
+                "unit": "GRAM",
+                "unitPrice": "20.00",
+                "amount": "48.00",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8qfxa0087oq01k5a40ff6"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8qfxe0089oq01qgahihor"
+                },
+                "name": "2mm18K镀金S925银钉针",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "5.00",
+                "unit": "BEAD",
+                "unitPrice": "1.50",
+                "amount": "7.50",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8ut8u008eoq012d9j7l12"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8ut8w008goq01ueld40kz"
+                },
+                "name": "30mm18K镀金S925银圆头针",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "5.00",
+                "unit": "BEAD",
+                "unitPrice": "4.00",
+                "amount": "20.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg9w65m008loq01xvsp88og"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg9w65r008noq01ulq3otqm"
+                },
+                "name": "2mm18K镀金S925碎银方形",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmvhsthsm00013w1j69j5vq5i",
+                  "name": "明发银配饰"
+                },
+                "quantity": "2.27",
+                "unit": "GRAM",
+                "unitPrice": "20.00",
+                "amount": "45.40",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwgb71ot008yoq01o5milsyi"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwgb71ox0090oq01gsqckvse"
+                },
+                "name": "2m18K金亮面光珠",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg9xsc6008roq01cds80ijb",
+                  "name": "禧至尊18K金"
+                },
+                "quantity": "20.00",
+                "unit": "BEAD",
+                "unitPrice": "6.00",
+                "amount": "120.00",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwgbadiv0095oq01l5o0dsqx"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwgbadiy0097oq01s67uj9yo"
+                },
+                "name": "2.5mm18K金亮面光珠",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg9xsc6008roq01cds80ijb",
+                  "name": "禧至尊18K金"
+                },
+                "quantity": "20.00",
+                "unit": "BEAD",
+                "unitPrice": "20.00",
+                "amount": "180.00",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhhwzpt009zoq01q2qx3jyj"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhhwzpx00a1oq01epyun3py"
+                },
+                "name": "6mm18K金花车直管",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg9xsc6008roq01cds80ijb",
+                  "name": "禧至尊18K金"
+                },
+                "quantity": "10.00",
+                "unit": "BEAD",
+                "unitPrice": "10.00",
+                "amount": "100.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhi1vm500a7oq0111yohtth"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhi1vm800a9oq01675o73dw"
+                },
+                "name": "3mm18K金橄榄光珠",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg9xsc6008roq01cds80ijb",
+                  "name": "禧至尊18K金"
+                },
+                "quantity": "5.00",
+                "unit": "BEAD",
+                "unitPrice": "23.00",
+                "amount": "115.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhi6lbq00afoq01ipgxlaxl"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhi6lbu00ahoq01k63brjnz"
+                },
+                "name": "2m18K金橄榄光珠",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg9xsc6008roq01cds80ijb",
+                  "name": "禧至尊18K金"
+                },
+                "quantity": "5.00",
+                "unit": "BEAD",
+                "unitPrice": "14.00",
+                "amount": "70.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhiagbg00aroq01mwdd2uzx"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhiagbj00atoq01sms4uxt6"
+                },
+                "name": "8mm18K金竹节骨头",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg9xsc6008roq01cds80ijb",
+                  "name": "禧至尊18K金"
+                },
+                "quantity": "5.00",
+                "unit": "BEAD",
+                "unitPrice": "22.00",
+                "amount": "110.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhid0ei00azoq014888pmoe"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhid0ek00b1oq01irvvn3cm"
+                },
+                "name": "2.5mm18K金方糖",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg9xsc6008roq01cds80ijb",
+                  "name": "禧至尊18K金"
+                },
+                "quantity": "5.00",
+                "unit": "BEAD",
+                "unitPrice": "13.00",
+                "amount": "65.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhijono00b7oq01awsa6sbb"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhijons00b9oq01lxg5717t"
+                },
+                "name": "4mm18K金麦粒",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg9xsc6008roq01cds80ijb",
+                  "name": "禧至尊18K金"
+                },
+                "quantity": "2.00",
+                "unit": "BEAD",
+                "unitPrice": "75.00",
+                "amount": "150.00",
+                "amountBasis": "quantity_times_unit_price",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhip6gf00bfoq01tsr3e0oa"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhip6gi00bhoq01n4u1oiul"
+                },
+                "name": "18K金实心配件",
+                "code": null,
+                "batch": {
+                  "id": "cmwg1jixq0013oq0142v7o2rz",
+                  "name": "2026年11月荔湾广场",
+                  "receivedAt": "2026-11-14"
+                },
+                "distributor": {
+                  "id": "cmwg9xsc6008roq01cds80ijb",
+                  "name": "禧至尊18K金"
+                },
+                "quantity": "1.76",
+                "unit": "GRAM",
+                "unitPrice": "663.00",
+                "amount": "1166.88",
+                "amountBasis": "recorded_total",
+                "currency": "CNY",
+                "currencyBasis": "business_default"
+              }
+            ],
+            "catalog": [
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg1nejd0017oq01dbrbr9g8"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg1nejj0019oq015v32pexs"
+                },
+                "name": "1.5mmS925方形碎银",
+                "code": null,
+                "imageKey": "images/ace52a94-7c8d-421a-8669-5c4d65661fc6.webp",
+                "lengthMm": "1.5",
+                "widthMm": "1.5",
+                "heightMm": "1.5"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg1syeo001goq01lo04ot40"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg1syez001ioq017yvh5wia"
+                },
+                "name": "1.5mmS925银定位管",
+                "code": null,
+                "imageKey": "images/ad88eb5b-fa69-479d-aaca-803de996bb1f.webp",
+                "lengthMm": "1.5",
+                "widthMm": "1.2",
+                "heightMm": "1.2"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg1ydtm001noq01ruchlerr"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg1ydwz001poq01zug4rson"
+                },
+                "name": "2mmS925银圆珠",
+                "code": null,
+                "imageKey": "images/d1bce098-ed94-4397-905e-7068ac554da3.webp",
+                "lengthMm": "2",
+                "widthMm": "2",
+                "heightMm": "2"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg1zukg001toq01nbdav125"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg1zuki001voq010pyvuif4"
+                },
+                "name": "3mmS925银圆珠",
+                "code": null,
+                "imageKey": "images/b66c88e3-f330-4166-ad83-47963d0a303b.webp",
+                "lengthMm": "3",
+                "widthMm": "3",
+                "heightMm": "3"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg20yat001zoq01l838wus2"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg20yaw0021oq01s0tn7se9"
+                },
+                "name": "4mmS925银圆珠",
+                "code": null,
+                "imageKey": "images/e88df0f3-452e-4291-95fe-458c222457cf.webp",
+                "lengthMm": "4",
+                "widthMm": "4",
+                "heightMm": "4"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg272pm0026oq01ldwgnote"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg272r80028oq01zqmqd4ez"
+                },
+                "name": "6mm18K镀金S925银跑环",
+                "code": null,
+                "imageKey": "images/6d3845f7-faa1-4bab-90de-cac332723bfb.webp",
+                "lengthMm": "6",
+                "widthMm": "6",
+                "heightMm": "1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg2cnkz002eoq01bwj4frmp"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg2cnlq002goq01oth138kc"
+                },
+                "name": "锆石18K镀金竹节S925银配饰",
+                "code": null,
+                "imageKey": "images/9c0c8326-0fbb-4d3a-ab84-bda88d3a9392.webp",
+                "lengthMm": "6",
+                "widthMm": "2.5",
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg2h6cr002noq01rb9hl6wb"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg2h6d1002poq012l3enech"
+                },
+                "name": "锆石四芒星S925银延长链",
+                "code": null,
+                "imageKey": "images/98cc97b7-9907-4432-a7d8-49455e201e29.webp",
+                "lengthMm": null,
+                "widthMm": null,
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg35d3c002woq01k0ez5ef4"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg35d3k002yoq01jnveq4fu"
+                },
+                "name": "3mm18K镀S925银配饰桶珠",
+                "code": null,
+                "imageKey": "images/fdc57a24-7570-4458-9348-92a1008470d7.webp",
+                "lengthMm": "6",
+                "widthMm": "3",
+                "heightMm": "3"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg3jvmq0038oq017cf73132"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg3jvn7003aoq01w2vzww8r"
+                },
+                "name": "4mm绿松石随形",
+                "code": null,
+                "imageKey": "images/e2a93d0e-6175-4d89-b2c6-62367d91082e.webp",
+                "lengthMm": "4",
+                "widthMm": null,
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg3tev8003joq01zlvvug0k"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg3tevc003loq01iq1raphc"
+                },
+                "name": "3.5mm绿松石药片",
+                "code": null,
+                "imageKey": "images/8e92279c-7501-48aa-9102-4ed53402938c.webp",
+                "lengthMm": "3.5",
+                "widthMm": "3.5",
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg3wwbn003soq01of24lsde"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg3wwbs003uoq01fefb4uhm"
+                },
+                "name": "3mm绿松石圆珠",
+                "code": null,
+                "imageKey": "images/45b4eddf-7a8c-4737-9cab-dbeb74b2353f.webp",
+                "lengthMm": "3",
+                "widthMm": "3",
+                "heightMm": "3"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg41qcz0040oq016l565fdh"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg41qd40042oq01bdr95r0f"
+                },
+                "name": "13mm绿松石桶珠",
+                "code": null,
+                "imageKey": "images/843a9863-4ef6-4f0b-a208-80e8dd824cda.webp",
+                "lengthMm": "10",
+                "widthMm": "13.3",
+                "heightMm": "10"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg462i80047oq01899ruhhw"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg462ib0049oq01l602ks55"
+                },
+                "name": "7.8mm绿松石勒子",
+                "code": null,
+                "imageKey": "images/5a3ef6fb-eacc-4b4f-81eb-79717a470c94.webp",
+                "lengthMm": "26",
+                "widthMm": "7.8",
+                "heightMm": "26"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4ekob004doq0122uzteo5"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4ekoh004foq01k1uo5kyt"
+                },
+                "name": "百香籽绿松石配饰",
+                "code": null,
+                "imageKey": "images/40e8cd66-2450-4dde-9e32-07778fa2eadf.webp",
+                "lengthMm": null,
+                "widthMm": null,
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4gc8z004joq01mwra61gp"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4gc92004loq01w7elwpgm"
+                },
+                "name": "羽毛绿松石提溜",
+                "code": null,
+                "imageKey": "images/e63c9c78-61d4-4441-bbfe-77530a8b1167.webp",
+                "lengthMm": null,
+                "widthMm": null,
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4irgg004poq01fz0k9ffi"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4irgl004roq01ldythgge"
+                },
+                "name": "太阳绿松石提溜（大）",
+                "code": null,
+                "imageKey": "images/0de00222-ca4f-4502-97fe-d5f1a5933d76.webp",
+                "lengthMm": null,
+                "widthMm": null,
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4l0yi004voq017d2499gv"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4l0yn004xoq01kdmkix3z"
+                },
+                "name": "太阳绿松石提溜",
+                "code": null,
+                "imageKey": "images/cc9d8216-1ad2-41ad-aef4-26fa8aefded9.webp",
+                "lengthMm": null,
+                "widthMm": null,
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg4od7h0051oq01rx3ps154"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg4od7j0053oq01d96hk3zn"
+                },
+                "name": "藏扣绿松石",
+                "code": null,
+                "imageKey": "images/5f0014c6-9c1d-4a0a-a3ad-f60483c5453e.webp",
+                "lengthMm": null,
+                "widthMm": null,
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg5fueh005doq01nw24tj4y"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg5fuek005foq010y4jszjt"
+                },
+                "name": "20mm晴水无事牌",
+                "code": null,
+                "imageKey": "images/12921bbe-1052-4fa7-8008-b4dba9009466.webp",
+                "lengthMm": "20",
+                "widthMm": "15",
+                "heightMm": "9.6"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg5jznx005koq01b5yqqvvq"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg5jzo9005moq01y9d4q07v"
+                },
+                "name": "9.6mm晴水直切",
+                "code": null,
+                "imageKey": "images/6b3951ba-f47b-413b-b10c-815b08ae3044.webp",
+                "lengthMm": "13.3",
+                "widthMm": "9.6",
+                "heightMm": "9.6"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg5t23p005uoq01i8osx2xz"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg5t23v005woq01u1qq95c0"
+                },
+                "name": "10mm且末方形",
+                "code": null,
+                "imageKey": "images/80515a43-410b-4c71-8207-1209d97a500b.webp",
+                "lengthMm": "10.2",
+                "widthMm": "10.2",
+                "heightMm": "10.2"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg62y0v0064oq018j32l93v"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg62y0z0066oq01crq24mcy"
+                },
+                "name": "6mm碧玉直切",
+                "code": null,
+                "imageKey": "images/3cb96b10-e087-48be-bc4c-3dcf99237381.webp",
+                "lengthMm": "8.4",
+                "widthMm": "6",
+                "heightMm": "6"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg65500006aoq01r2ugocml"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg65503006coq016p0qbfgs"
+                },
+                "name": "碧玉镶嵌48K金四叶草",
+                "code": null,
+                "imageKey": "images/cec3c3eb-b66d-4124-9a3c-944e0dafd1f8.webp",
+                "lengthMm": "9.4",
+                "widthMm": "9.4",
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg695k8006goq01kb6pwyk8"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg695kc006ioq016bxdz2rx"
+                },
+                "name": "镀K48-S925银圆环",
+                "code": null,
+                "imageKey": "images/e364335d-b693-420d-b79c-e39857e10803.webp",
+                "lengthMm": null,
+                "widthMm": null,
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg6kssg006moq01z3u3l03s"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg6kssl006ooq01j1e3go4p"
+                },
+                "name": "12mm晴水圆珠吊坠",
+                "code": null,
+                "imageKey": "images/1673b9d8-43eb-4cbd-8e7c-09c2db88f361.webp",
+                "lengthMm": "12",
+                "widthMm": "12",
+                "heightMm": "12"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmv9c5epp000h3we8q5tlmyij"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg6q67j006uoq012detgflf"
+                },
+                "name": "碧玉老料通孔葫芦",
+                "code": null,
+                "imageKey": "images/a48f5e35-f037-42a7-a1ac-1af3bfab8407.webp",
+                "lengthMm": null,
+                "widthMm": null,
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmv6czxjh00013wwrw95r1hlf"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg6sg3j006yoq017kkapoi8"
+                },
+                "name": "碧玉24K金蝴蝶小花配饰",
+                "code": null,
+                "imageKey": "images/cebaa642-e8db-4030-9e2d-7a79f6f1b864.webp",
+                "lengthMm": "6",
+                "widthMm": "6",
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg6zmtj0074oq01ogtm3q3z"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg6zmto0076oq01k1dobc3c"
+                },
+                "name": "绿松石羽毛提溜",
+                "code": null,
+                "imageKey": "images/53a29df0-7783-44c5-8fd1-e2ac8a4e324c.webp",
+                "lengthMm": null,
+                "widthMm": null,
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8cnag007joq01klk7e9a8"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8cnak007loq01x206jc2g"
+                },
+                "name": "4mmS925银配饰猫眼金珠",
+                "code": null,
+                "imageKey": "images/ccfb8f15-63de-4866-86be-7ae87a5644b1.webp",
+                "lengthMm": "4",
+                "widthMm": "4",
+                "heightMm": "4"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8hlup007roq01ic1rtpkd"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8hluu007toq01mh5jza4z"
+                },
+                "name": "2.5m18K镀金S925银圆珠配饰",
+                "code": null,
+                "imageKey": "images/754702e6-2c91-467f-86b4-bd0581d94c1a.webp",
+                "lengthMm": "25",
+                "widthMm": "25",
+                "heightMm": "25"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8meyi007zoq01cwfk1qsl"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8meyk0081oq016gt47ky6"
+                },
+                "name": "18K镀金S925银车花直管配饰",
+                "code": null,
+                "imageKey": "images/281d997b-cab6-4ff8-979e-277c3286eb07.webp",
+                "lengthMm": "8",
+                "widthMm": "1.1",
+                "heightMm": "1.1"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8qfxa0087oq01k5a40ff6"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8qfxe0089oq01qgahihor"
+                },
+                "name": "2mm18K镀金S925银钉针",
+                "code": null,
+                "imageKey": "images/50e60b82-6774-4bab-b165-62d1095de4c4.webp",
+                "lengthMm": "2",
+                "widthMm": null,
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg8ut8u008eoq012d9j7l12"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg8ut8w008goq01ueld40kz"
+                },
+                "name": "30mm18K镀金S925银圆头针",
+                "code": null,
+                "imageKey": "images/70b5fa21-a2d6-44a8-8bd5-ffe741161bb2.webp",
+                "lengthMm": "30",
+                "widthMm": null,
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwg9w65m008loq01xvsp88og"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwg9w65r008noq01ulq3otqm"
+                },
+                "name": "2mm18K镀金S925碎银方形",
+                "code": null,
+                "imageKey": "images/8f7e08db-8aeb-4a64-a246-17fcb1f58eea.webp",
+                "lengthMm": "2",
+                "widthMm": null,
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwgb71ot008yoq01o5milsyi"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwgb71ox0090oq01gsqckvse"
+                },
+                "name": "2m18K金亮面光珠",
+                "code": null,
+                "imageKey": "images/77998573-d201-4eda-b8eb-6870cfc63339.webp",
+                "lengthMm": "2",
+                "widthMm": "2",
+                "heightMm": "2"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwgbadiv0095oq01l5o0dsqx"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwgbadiy0097oq01s67uj9yo"
+                },
+                "name": "2.5mm18K金亮面光珠",
+                "code": null,
+                "imageKey": "images/ea0e840b-5a78-4329-9dcb-c122215b3458.webp",
+                "lengthMm": "2.5",
+                "widthMm": "2.5",
+                "heightMm": "2.5"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhhwzpt009zoq01q2qx3jyj"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhhwzpx00a1oq01epyun3py"
+                },
+                "name": "6mm18K金花车直管",
+                "code": null,
+                "imageKey": "images/2271402f-d69d-42f6-9380-5094ec0fd908.webp",
+                "lengthMm": "6",
+                "widthMm": "1.5",
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhi1vm500a7oq0111yohtth"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhi1vm800a9oq01675o73dw"
+                },
+                "name": "3mm18K金橄榄光珠",
+                "code": null,
+                "imageKey": "images/2f74fb60-cd89-4408-81c2-775641db0529.webp",
+                "lengthMm": "5",
+                "widthMm": "3",
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhi6lbq00afoq01ipgxlaxl"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhi6lbu00ahoq01k63brjnz"
+                },
+                "name": "2m18K金橄榄光珠",
+                "code": null,
+                "imageKey": "images/50dcf475-2185-4b7f-80e6-573a75558590.webp",
+                "lengthMm": "3.5",
+                "widthMm": "2",
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhiagbg00aroq01mwdd2uzx"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhiagbj00atoq01sms4uxt6"
+                },
+                "name": "8mm18K金竹节骨头",
+                "code": null,
+                "imageKey": "images/2bad22ed-0bd1-4bed-9f43-169121c59f15.webp",
+                "lengthMm": "8",
+                "widthMm": "2",
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhid0ei00azoq014888pmoe"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhid0ek00b1oq01irvvn3cm"
+                },
+                "name": "2.5mm18K金方糖",
+                "code": null,
+                "imageKey": "images/8e50877d-7be9-4255-8902-5bd8c9697923.webp",
+                "lengthMm": "2.5",
+                "widthMm": "2.5",
+                "heightMm": "2.5"
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhijono00b7oq01awsa6sbb"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhijons00b9oq01lxg5717t"
+                },
+                "name": "4mm18K金麦粒",
+                "code": null,
+                "imageKey": "images/89586cbe-bd8c-4acf-8c84-ba9d53521557.webp",
+                "lengthMm": "7",
+                "widthMm": "4",
+                "heightMm": null
+              },
+              {
+                "item": {
+                  "type": "MATERIAL",
+                  "id": "cmwhip6gf00bfoq01tsr3e0oa"
+                },
+                "purchase": {
+                  "type": "MATERIAL_PURCHASE",
+                  "id": "cmwhip6gi00bhoq01n4u1oiul"
+                },
+                "name": "18K金实心配件",
+                "code": null,
+                "imageKey": "images/a7668d86-f2dc-47fe-bb8d-56c3d2cc60cb.webp",
+                "lengthMm": null,
+                "widthMm": null,
+                "heightMm": null
+              }
+            ],
+            "stock": {
+              "version": "v1",
+              "queriedAt": "2026-11-18T03:46:03.708Z",
+              "scopeCandidateCount": 44,
+              "selectedCandidateCount": 44,
+              "catalogItemCount": 44,
+              "traversal": "complete",
+              "semanticEvaluation": "not_performed",
+              "catalogStock": [
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmv6czxjh00013wwrw95r1hlf"
+                  },
+                  "name": "碧玉24K金蝴蝶小花配饰",
+                  "unit": "BEAD",
+                  "knownStock": "6.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 2
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmv9c5epp000h3we8q5tlmyij"
+                  },
+                  "name": "碧玉老料通孔葫芦",
+                  "unit": "BEAD",
+                  "knownStock": "3.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 2
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg1nejd0017oq01dbrbr9g8"
+                  },
+                  "name": "1.5mmS925方形碎银",
+                  "unit": "GRAM",
+                  "knownStock": "10.77",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg1syeo001goq01lo04ot40"
+                  },
+                  "name": "1.5mmS925银定位管",
+                  "unit": "GRAM",
+                  "knownStock": "2.30",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg1ydtm001noq01ruchlerr"
+                  },
+                  "name": "2mmS925银圆珠",
+                  "unit": "GRAM",
+                  "knownStock": "3.25",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg1zukg001toq01nbdav125"
+                  },
+                  "name": "3mmS925银圆珠",
+                  "unit": "GRAM",
+                  "knownStock": "2.81",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg20yat001zoq01l838wus2"
+                  },
+                  "name": "4mmS925银圆珠",
+                  "unit": "GRAM",
+                  "knownStock": "3.07",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg272pm0026oq01ldwgnote"
+                  },
+                  "name": "6mm18K镀金S925银跑环",
+                  "unit": "BEAD",
+                  "knownStock": "33.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg2cnkz002eoq01bwj4frmp"
+                  },
+                  "name": "锆石18K镀金竹节S925银配饰",
+                  "unit": "BEAD",
+                  "knownStock": "6.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg2h6cr002noq01rb9hl6wb"
+                  },
+                  "name": "锆石四芒星S925银延长链",
+                  "unit": "BEAD",
+                  "knownStock": "5.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg35d3c002woq01k0ez5ef4"
+                  },
+                  "name": "3mm18K镀S925银配饰桶珠",
+                  "unit": "GRAM",
+                  "knownStock": "5.94",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg3jvmq0038oq017cf73132"
+                  },
+                  "name": "4mm绿松石随形",
+                  "unit": "STRAND",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg3tev8003joq01zlvvug0k"
+                  },
+                  "name": "3.5mm绿松石药片",
+                  "unit": "STRAND",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg3wwbn003soq01of24lsde"
+                  },
+                  "name": "3mm绿松石圆珠",
+                  "unit": "STRAND",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg41qcz0040oq016l565fdh"
+                  },
+                  "name": "13mm绿松石桶珠",
+                  "unit": "BEAD",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg462i80047oq01899ruhhw"
+                  },
+                  "name": "7.8mm绿松石勒子",
+                  "unit": "BEAD",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4ekob004doq0122uzteo5"
+                  },
+                  "name": "百香籽绿松石配饰",
+                  "unit": "BEAD",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4gc8z004joq01mwra61gp"
+                  },
+                  "name": "羽毛绿松石提溜",
+                  "unit": "BEAD",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4irgg004poq01fz0k9ffi"
+                  },
+                  "name": "太阳绿松石提溜（大）",
+                  "unit": "BEAD",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4l0yi004voq017d2499gv"
+                  },
+                  "name": "太阳绿松石提溜",
+                  "unit": "BEAD",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4od7h0051oq01rx3ps154"
+                  },
+                  "name": "藏扣绿松石",
+                  "unit": "GRAM",
+                  "knownStock": "4.43",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg5fueh005doq01nw24tj4y"
+                  },
+                  "name": "20mm晴水无事牌",
+                  "unit": "BEAD",
+                  "knownStock": "2.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg5jznx005koq01b5yqqvvq"
+                  },
+                  "name": "9.6mm晴水直切",
+                  "unit": "BEAD",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg5t23p005uoq01i8osx2xz"
+                  },
+                  "name": "10mm且末方形",
+                  "unit": "BEAD",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg62y0v0064oq018j32l93v"
+                  },
+                  "name": "6mm碧玉直切",
+                  "unit": "BEAD",
+                  "knownStock": "2.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg65500006aoq01r2ugocml"
+                  },
+                  "name": "碧玉镶嵌48K金四叶草",
+                  "unit": "BEAD",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg695k8006goq01kb6pwyk8"
+                  },
+                  "name": "镀K48-S925银圆环",
+                  "unit": "BEAD",
+                  "knownStock": "10.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg6kssg006moq01z3u3l03s"
+                  },
+                  "name": "12mm晴水圆珠吊坠",
+                  "unit": "BEAD",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg6zmtj0074oq01ogtm3q3z"
+                  },
+                  "name": "绿松石羽毛提溜",
+                  "unit": "BEAD",
+                  "knownStock": "1.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8cnag007joq01klk7e9a8"
+                  },
+                  "name": "4mmS925银配饰猫眼金珠",
+                  "unit": "BEAD",
+                  "knownStock": "28.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8hlup007roq01ic1rtpkd"
+                  },
+                  "name": "2.5m18K镀金S925银圆珠配饰",
+                  "unit": "GRAM",
+                  "knownStock": "2.84",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8meyi007zoq01cwfk1qsl"
+                  },
+                  "name": "18K镀金S925银车花直管配饰",
+                  "unit": "GRAM",
+                  "knownStock": "2.40",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8qfxa0087oq01k5a40ff6"
+                  },
+                  "name": "2mm18K镀金S925银钉针",
+                  "unit": "BEAD",
+                  "knownStock": "5.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8ut8u008eoq012d9j7l12"
+                  },
+                  "name": "30mm18K镀金S925银圆头针",
+                  "unit": "BEAD",
+                  "knownStock": "5.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg9w65m008loq01xvsp88og"
+                  },
+                  "name": "2mm18K镀金S925碎银方形",
+                  "unit": "GRAM",
+                  "knownStock": "2.27",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwgb71ot008yoq01o5milsyi"
+                  },
+                  "name": "2m18K金亮面光珠",
+                  "unit": "BEAD",
+                  "knownStock": "20.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwgbadiv0095oq01l5o0dsqx"
+                  },
+                  "name": "2.5mm18K金亮面光珠",
+                  "unit": "BEAD",
+                  "knownStock": "20.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhhwzpt009zoq01q2qx3jyj"
+                  },
+                  "name": "6mm18K金花车直管",
+                  "unit": "BEAD",
+                  "knownStock": "10.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhi1vm500a7oq0111yohtth"
+                  },
+                  "name": "3mm18K金橄榄光珠",
+                  "unit": "BEAD",
+                  "knownStock": "5.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhi6lbq00afoq01ipgxlaxl"
+                  },
+                  "name": "2m18K金橄榄光珠",
+                  "unit": "BEAD",
+                  "knownStock": "5.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhiagbg00aroq01mwdd2uzx"
+                  },
+                  "name": "8mm18K金竹节骨头",
+                  "unit": "BEAD",
+                  "knownStock": "5.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhid0ei00azoq014888pmoe"
+                  },
+                  "name": "2.5mm18K金方糖",
+                  "unit": "BEAD",
+                  "knownStock": "5.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhijono00b7oq01awsa6sbb"
+                  },
+                  "name": "4mm18K金麦粒",
+                  "unit": "BEAD",
+                  "knownStock": "2.00",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhip6gf00bfoq01tsr3e0oa"
+                  },
+                  "name": "18K金实心配件",
+                  "unit": "GRAM",
+                  "knownStock": "1.76",
+                  "unknownStockBatchCount": 0,
+                  "stockBatchCount": 1
+                }
+              ],
+              "sourceStock": [],
+              "quantities": [
+                {
+                  "unit": "BEAD",
+                  "knownStock": "188.00",
+                  "unknownStockObjectCount": 0,
+                  "unknownStockBatchCount": 0
+                },
+                {
+                  "unit": "GRAM",
+                  "knownStock": "41.84",
+                  "unknownStockObjectCount": 0,
+                  "unknownStockBatchCount": 0
+                },
+                {
+                  "unit": "STRAND",
+                  "knownStock": "3.00",
+                  "unknownStockObjectCount": 0,
+                  "unknownStockBatchCount": 0
+                }
+              ]
+            },
+            "summary": {
+              "basis": "selected_purchases",
+              "scopeCandidateCount": 44,
+              "totals": {
+                "purchaseEntryCount": 44,
+                "catalogItemCount": 44,
+                "amounts": [
+                  {
+                    "currency": "CNY",
+                    "knownAmount": "5320.28",
+                    "unknownAmountEntryCount": 0,
+                    "businessDefaultCurrencyEntryCount": 44
+                  }
+                ],
+                "quantities": [
+                  {
+                    "unit": "BEAD",
+                    "knownQuantity": "184.00",
+                    "unknownQuantityEntryCount": 0
+                  },
+                  {
+                    "unit": "GRAM",
+                    "knownQuantity": "41.84",
+                    "unknownQuantityEntryCount": 0
+                  },
+                  {
+                    "unit": "STRAND",
+                    "knownQuantity": "3.00",
+                    "unknownQuantityEntryCount": 0
+                  }
+                ]
+              },
+              "byDistributor": [
+                {
+                  "distributor": {
+                    "id": "cmv60i7vq00043wapt6b5xvp9",
+                    "name": "晶钰鑫珠宝"
+                  },
+                  "totals": {
+                    "purchaseEntryCount": 9,
+                    "catalogItemCount": 9,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "434.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 9
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "23.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "distributor": {
+                    "id": "cmvhsthsm00013w1j69j5vq5i",
+                    "name": "明发银配饰"
+                  },
+                  "totals": {
+                    "purchaseEntryCount": 15,
+                    "catalogItemCount": 15,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "911.80",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 15
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "82.00",
+                        "unknownQuantityEntryCount": 0
+                      },
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "35.65",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "distributor": {
+                    "id": "cmwg3g8ak0032oq01pw87gg5k",
+                    "name": "晶缘珠宝"
+                  },
+                  "totals": {
+                    "purchaseEntryCount": 10,
+                    "catalogItemCount": 10,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "1811.60",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 10
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "6.00",
+                        "unknownQuantityEntryCount": 0
+                      },
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "4.43",
+                        "unknownQuantityEntryCount": 0
+                      },
+                      {
+                        "unit": "STRAND",
+                        "knownQuantity": "3.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "distributor": {
+                    "id": "cmwg6xshd0071oq01h776t219",
+                    "name": "曦雅尼珠宝精品绿松石馆"
+                  },
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "86.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "distributor": {
+                    "id": "cmwg9xsc6008roq01cds80ijb",
+                    "name": "禧至尊18K金"
+                  },
+                  "totals": {
+                    "purchaseEntryCount": 9,
+                    "catalogItemCount": 9,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "2076.88",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 9
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "72.00",
+                        "unknownQuantityEntryCount": 0
+                      },
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "1.76",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                }
+              ],
+              "byCatalog": [
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmv6czxjh00013wwrw95r1hlf"
+                  },
+                  "name": "碧玉24K金蝴蝶小花配饰",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "44.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "4.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmv9c5epp000h3we8q5tlmyij"
+                  },
+                  "name": "碧玉老料通孔葫芦",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "78.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg1nejd0017oq01dbrbr9g8"
+                  },
+                  "name": "1.5mmS925方形碎银",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "161.55",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "10.77",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg1syeo001goq01lo04ot40"
+                  },
+                  "name": "1.5mmS925银定位管",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "34.50",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "2.30",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg1ydtm001noq01ruchlerr"
+                  },
+                  "name": "2mmS925银圆珠",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "48.75",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "3.25",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg1zukg001toq01nbdav125"
+                  },
+                  "name": "3mmS925银圆珠",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "42.15",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "2.81",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg20yat001zoq01l838wus2"
+                  },
+                  "name": "4mmS925银圆珠",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "46.05",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "3.07",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg272pm0026oq01ldwgnote"
+                  },
+                  "name": "6mm18K镀金S925银跑环",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "99.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "33.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg2cnkz002eoq01bwj4frmp"
+                  },
+                  "name": "锆石18K镀金竹节S925银配饰",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "60.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "6.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg2h6cr002noq01rb9hl6wb"
+                  },
+                  "name": "锆石四芒星S925银延长链",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "75.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "5.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg35d3c002woq01k0ez5ef4"
+                  },
+                  "name": "3mm18K镀S925银配饰桶珠",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "118.80",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "5.94",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg3jvmq0038oq017cf73132"
+                  },
+                  "name": "4mm绿松石随形",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "220.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "STRAND",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg3tev8003joq01zlvvug0k"
+                  },
+                  "name": "3.5mm绿松石药片",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "185.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "STRAND",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg3wwbn003soq01of24lsde"
+                  },
+                  "name": "3mm绿松石圆珠",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "869.40",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "STRAND",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg41qcz0040oq016l565fdh"
+                  },
+                  "name": "13mm绿松石桶珠",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "162.50",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg462i80047oq01899ruhhw"
+                  },
+                  "name": "7.8mm绿松石勒子",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "110.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4ekob004doq0122uzteo5"
+                  },
+                  "name": "百香籽绿松石配饰",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "17.60",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4gc8z004joq01mwra61gp"
+                  },
+                  "name": "羽毛绿松石提溜",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "22.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4irgg004poq01fz0k9ffi"
+                  },
+                  "name": "太阳绿松石提溜（大）",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "29.70",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4l0yi004voq017d2499gv"
+                  },
+                  "name": "太阳绿松石提溜",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "15.40",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg4od7h0051oq01rx3ps154"
+                  },
+                  "name": "藏扣绿松石",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "180.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "4.43",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg5fueh005doq01nw24tj4y"
+                  },
+                  "name": "20mm晴水无事牌",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "120.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "2.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg5jznx005koq01b5yqqvvq"
+                  },
+                  "name": "9.6mm晴水直切",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "23.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg5t23p005uoq01i8osx2xz"
+                  },
+                  "name": "10mm且末方形",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "35.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg62y0v0064oq018j32l93v"
+                  },
+                  "name": "6mm碧玉直切",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "54.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "2.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg65500006aoq01r2ugocml"
+                  },
+                  "name": "碧玉镶嵌48K金四叶草",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "26.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg695k8006goq01kb6pwyk8"
+                  },
+                  "name": "镀K48-S925银圆环",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "35.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "10.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg6kssg006moq01z3u3l03s"
+                  },
+                  "name": "12mm晴水圆珠吊坠",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "19.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg6zmtj0074oq01ogtm3q3z"
+                  },
+                  "name": "绿松石羽毛提溜",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "86.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "1.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8cnag007joq01klk7e9a8"
+                  },
+                  "name": "4mmS925银配饰猫眼金珠",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "48.30",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "28.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8hlup007roq01ic1rtpkd"
+                  },
+                  "name": "2.5m18K镀金S925银圆珠配饰",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "56.80",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "2.84",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8meyi007zoq01cwfk1qsl"
+                  },
+                  "name": "18K镀金S925银车花直管配饰",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "48.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "2.40",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8qfxa0087oq01k5a40ff6"
+                  },
+                  "name": "2mm18K镀金S925银钉针",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "7.50",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "5.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg8ut8u008eoq012d9j7l12"
+                  },
+                  "name": "30mm18K镀金S925银圆头针",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "20.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "5.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwg9w65m008loq01xvsp88og"
+                  },
+                  "name": "2mm18K镀金S925碎银方形",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "45.40",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "2.27",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwgb71ot008yoq01o5milsyi"
+                  },
+                  "name": "2m18K金亮面光珠",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "120.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "20.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwgbadiv0095oq01l5o0dsqx"
+                  },
+                  "name": "2.5mm18K金亮面光珠",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "180.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "20.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhhwzpt009zoq01q2qx3jyj"
+                  },
+                  "name": "6mm18K金花车直管",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "100.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "10.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhi1vm500a7oq0111yohtth"
+                  },
+                  "name": "3mm18K金橄榄光珠",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "115.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "5.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhi6lbq00afoq01ipgxlaxl"
+                  },
+                  "name": "2m18K金橄榄光珠",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "70.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "5.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhiagbg00aroq01mwdd2uzx"
+                  },
+                  "name": "8mm18K金竹节骨头",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "110.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "5.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhid0ei00azoq014888pmoe"
+                  },
+                  "name": "2.5mm18K金方糖",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "65.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "5.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhijono00b7oq01awsa6sbb"
+                  },
+                  "name": "4mm18K金麦粒",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "150.00",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "BEAD",
+                        "knownQuantity": "2.00",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "item": {
+                    "type": "MATERIAL",
+                    "id": "cmwhip6gf00bfoq01tsr3e0oa"
+                  },
+                  "name": "18K金实心配件",
+                  "totals": {
+                    "purchaseEntryCount": 1,
+                    "catalogItemCount": 1,
+                    "amounts": [
+                      {
+                        "currency": "CNY",
+                        "knownAmount": "1166.88",
+                        "unknownAmountEntryCount": 0,
+                        "businessDefaultCurrencyEntryCount": 1
+                      }
+                    ],
+                    "quantities": [
+                      {
+                        "unit": "GRAM",
+                        "knownQuantity": "1.76",
+                        "unknownQuantityEntryCount": 0
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "legacyDetails": false
+          },
+          "trace": [
+            {
+              "stage": "facts",
+              "outcome": "success",
+              "durationMs": 21873,
+              "code": null
+            },
+            {
+              "stage": "candidate",
+              "outcome": "success",
+              "durationMs": 4340,
+              "code": null
+            },
+            {
+              "stage": "facts",
+              "outcome": "success",
+              "durationMs": 13630,
+              "code": null
+            },
+            {
+              "stage": "facts",
+              "outcome": "success",
+              "durationMs": 3796,
+              "code": null
+            },
+            {
+              "stage": "finish",
+              "outcome": "success",
+              "durationMs": 1461,
+              "code": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "error": "BROWSER_VERIFICATION_FAILED",
+      "detail": "locator.click: Error: strict mode violation: locator('button[type=\"submit\"]') resolved to 2 elements:\n    1) <button disabled type=\"submit\" class=\"ant-btn css-dev-only-do-not-override-1iu69nf crystal-mate ant-btn-default ant-btn-color-default ant-btn-variant-outlined\">…</button> aka locator('button').filter({ hasText: '保存反馈' })\n    2) <button type=\"submit\" class=\"ant-btn css-dev-only-do-not-override-1iu69nf crystal-mate ant-btn-primary ant-btn-color-primary ant-btn-variant-solid\">…</button> aka getByRole('button', { name: 'send 发送' })\n\nCall log:\n\u001b[2m  - waiting for locator('button[type=\"submit\"]')\u001b[22m\n"
+    }
+  ],
+  "success": false
+}

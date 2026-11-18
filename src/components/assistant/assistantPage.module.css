@@ -231,6 +231,58 @@
 }
 .assistantMessage {
   justify-self: start;
+  min-width: 0;
+  width: 100%;
+}
+.answer {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.answerList {
+  padding-left: 22px;
+  margin: 0;
+}
+.answerTable {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.answerTable table {
+  border-collapse: collapse;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+.answerTable th,
+.answerTable td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+  min-width: 90px;
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+.answerTable th {
+  background: var(--ant-color-fill-alter);
+  font-weight: 600;
+}
+.nameLinks a {
+  overflow-wrap: anywhere;
+}
+.answerSources {
+  min-width: 0;
+  font-size: 12px;
+  color: var(--ant-color-text-secondary);
+}
+.answerSources summary,
+.execution summary {
+  min-height: 44px;
+  padding: 10px 0;
+  cursor: pointer;
+}
+.answerSources time {
+  display: block;
+  overflow-wrap: anywhere;
 }
 .execution {
   padding-top: 16px;

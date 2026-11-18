@@ -1,0 +1,56 @@
+{
+  "checkedAt": "2026-11-18T03:33:39.595Z",
+  "version": "assistant-agent-v1",
+  "realModel": true,
+  "database": "frozen-fixture",
+  "businessWrites": false,
+  "checks": [
+    {
+      "id": "names-1",
+      "text": "帮我查这个月在荔湾广场进了哪些货？仅告诉我货品名称就行。",
+      "status": "model_failed",
+      "errorCode": "MODEL_INVALID_RESPONSE",
+      "durationMs": 1313,
+      "calls": 1,
+      "reservedTokens": 24540,
+      "trace": [
+        {
+          "stage": "parse",
+          "outcome": "failed",
+          "durationMs": 1308,
+          "code": "MODEL_INVALID_RESPONSE",
+          "model": null,
+          "usage": null,
+          "completeness": null
+        }
+      ],
+      "answer": null,
+      "actions": [],
+      "protocol": [
+        {
+          "status": 200,
+          "choices": [
+            {
+              "finish": "tool_calls",
+              "calls": [
+                {
+                  "name": "lookup",
+                  "argumentBytes": 79,
+                  "validJSON": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "state": null,
+      "sets": [],
+      "passed": false
+    },
+    {
+      "fatal": "VERIFICATION_ASSERTION_FAILED",
+      "assertion": "names-1: model_failed/MODEL_INVALID_RESPONSE"
+    }
+  ],
+  "success": false
+}

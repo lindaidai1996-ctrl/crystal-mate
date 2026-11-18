@@ -79,3 +79,7 @@ node scripts/with-dev-db.mjs tsx scripts/check-ai-assistant-execution.ts --real
 - relevance-v3 使用请求内 C0…短引用和逐字段 index，后端恢复原身份再执行原严格证据检查。来源/提示/模型配置不一致会重新判断且保留累计消耗；金额、数量、库存永远重新读取。
 
 服务 mock、完整冻结矩阵、真实模型、实库 SQL/服务、桌面手机和失败明细分开见 [P6 交接](handoffs/2026-11-17-p6-01-04.md)与[运行说明](text-guide.md)。AI 助手影响：已同步；不新增业务写工具、语音或部署能力。
+
+## P7—P10 更新（2026-11-18）
+
+当前认证入口改用 `assistant-agent-v1` 的统一 `next_action` 循环，旧固定三步函数仅保留历史协议回归；本文件上方的三步/模型不可见数值说明为历史 P4/P6 行为。现行工具、默认 12 调用/200000 预留 tokens/120 秒、集合 journal、跨集合比较与回答校验见 [新架构](composable-architecture.md)。底层 v1 业务查询/语义和权限继续复用，未增加业务 SQL/写入接口。

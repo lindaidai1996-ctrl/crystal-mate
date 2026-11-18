@@ -5,7 +5,9 @@ import { requireAccount } from '@/lib/api';
 import { db } from '@/lib/db';
 import { CandidateQueryError } from './candidate-contracts';
 import { AssistantConversationStore, minimizeAssistantText } from './conversation-store';
-import { newAssistantExecution, runAssistantLoop } from './orchestrator';
+import { prepareAgentExecution, runComposableAssistant } from './composable-agent';
+import type { AnswerDocument } from './answer-document';
+import { searchAssistantDictionary } from './reference-service';
 import { createAssistantToolModel } from './orchestration-model';
 import { createAssistantFacts } from './orchestration-facts';
 import { readAssistantRecall } from './recall-data';
@@ -41,7 +43,7 @@ export const conversationCommandSchema = z.discriminatedUnion('action', [
     budget: orchestrationBudgetSchema.optional(),
     relevanceBudget: executionBudgetSchema.optional(),
   }),
-  command.extend({ action: z.literal('cancel') }),
+  command.extend({ action: z.literal('cancel'), reason: z.literal('privacy_changed').optional() }),
 ]);
 const store = new AssistantConversationStore(db);
 export async function saveAssistantConversationFeedback(request: NextRequest, input: unknown) {
@@ -99,7 +101,10 @@ export async function readAssistantConversation(request: NextRequest, input: unk
 export async function commandAssistantConversation(request: NextRequest, input: unknown) {
   const account = await requireAccount(request); // Never accept account IDs from input/model.
   const cmd = conversationCommandSchema.parse(input);
-  if (cmd.action === 'cancel') return store.cancel(account.id, cmd.conversationId, cmd.revision);
+  if (cmd.action === 'cancel')
+    return cmd.reason === 'privacy_changed'
+      ? store.cancel(account.id, cmd.conversationId, cmd.revision, true)
+      : store.cancel(account.id, cmd.conversationId, cmd.revision);
   const current = await store.read(account.id, cmd.conversationId);
   if (current.session.revision !== cmd.revision) throw new CandidateQueryError('STALE_REVISION');
   const previous = current.latest;
@@ -108,10 +113,33 @@ export async function commandAssistantConversation(request: NextRequest, input: 
     (!previous || ['completed', 'no_results', 'needs_confirmation'].includes(previous.data.status))
   )
     throw new CandidateQueryError('EXECUTION_NOT_RESUMABLE');
-  const execution =
-    cmd.action === 'message'
-      ? newAssistantExecution(current.session.state)
-      : structuredClone(previous!.data);
+  const privacy = request.headers.get('x-assistant-privacy') !== 'off';
+  const history = privacy
+    ? []
+    : [...current.messages]
+        .reverse()
+        .slice(-6)
+        .map((message) => {
+          const content = message.content as {
+            text?: string;
+            answer?: AnswerDocument;
+            clarification?: string;
+          };
+          return {
+            role: message.role,
+            text: (
+              content.text ??
+              content.clarification ??
+              (content.answer ? JSON.stringify(content.answer) : '')
+            ).slice(0, 1000),
+          };
+        });
+  const execution = prepareAgentExecution(
+    cmd.action === 'message' ? null : previous!.data,
+    current.session.state,
+    privacy,
+    history,
+  );
   const text = cmd.action === 'message' ? minimizeAssistantText(cmd.text) : previous!.text;
   if (cmd.action === 'message' && previous?.data.status === 'needs_confirmation') {
     execution.clarificationContext = {
@@ -119,15 +147,6 @@ export async function commandAssistantConversation(request: NextRequest, input: 
       clarification: previous.data.clarification,
       pendingPlan: previous.data.pendingPlan,
     };
-  }
-  if (cmd.action !== 'message') {
-    execution.metadata = newAssistantExecution(execution.state).metadata;
-    // Every resume reads current facts again; persisted evidence decisions are reused only
-    // after P3 checks the entire freshly read source fingerprint. No old process cursor.
-    if (execution.phase === 'finish') execution.phase = 'query_facts';
-    execution.result = null;
-    execution.status = 'running';
-    execution.errorCode = null;
   }
   const record = await store.begin(
     account.id,
@@ -161,11 +180,15 @@ export async function commandAssistantConversation(request: NextRequest, input: 
         );
       }),
   });
-  const result = await runAssistantLoop({
+  const result = await runComposableAssistant({
     execution,
-    text,
+    text:
+      privacy && cmd.action !== 'message'
+        ? '继续已确认查询，遵循当前隐私设置；缺少必要条件时先询问。'
+        : text,
     model: createAssistantToolModel(),
     facts,
+    lookup: (query) => searchAssistantDictionary(request, query),
     save: (data) => store.save(record, data),
     signal: request.signal,
     budget: cmd.budget,

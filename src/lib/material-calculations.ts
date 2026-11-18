@@ -81,6 +81,7 @@ export function saleGramPriceFromUnit(values: MaterialValues): MaterialAmount {
 export function adoptSaleUnitPriceFromBeads(values: MaterialValues): MaterialValues {
   const price = saleUnitPriceFromBeads(values);
   if (price === null) return values;
+  if (values.baseSaleUnitPrice !== undefined) return editMaterial(values, 'saleUnitPrice', price);
   return recalculateMaterial({
     ...values,
     saleRule: 'CUSTOM_AMOUNT',
@@ -137,7 +138,7 @@ function salePrice(cost: MaterialAmount, values: MaterialValues, isUnit = false)
   return percentageSalePrice(cost, values)?.price ?? null;
 }
 
-export function recalculateMaterial(values: MaterialValues, resetSales = false): MaterialValues {
+function recalculateLegacyMaterial(values: MaterialValues, resetSales = false): MaterialValues {
   const next = { ...values };
   if (next.saleRule === 'PERCENT_10' || next.saleRule === 'PERCENT_20') {
     next.saleRuleValue = next.saleRule === 'PERCENT_10' ? '10.00' : '20.00';
@@ -187,12 +188,82 @@ export function recalculateMaterial(values: MaterialValues, resetSales = false):
   return next;
 }
 
+/** Keep the editable base separate from the price used by catalog and DIY quotes. */
+export function initializeMaterialPricing(values: MaterialValues): MaterialValues {
+  if (values.baseSaleUnitPrice !== undefined) return values;
+  const base = recalculateLegacyMaterial(values);
+  return {
+    ...values,
+    lossRate: values.lossRate ?? null,
+    baseSaleUnitPrice: base.saleUnitPrice,
+    baseSaleGramPrice: base.saleGramPrice,
+    baseSaleChildUnitPrice: base.saleChildUnitPrice,
+  };
+}
+
+export function materialBaseValues(values: MaterialValues): MaterialValues {
+  return recalculateLegacyMaterial(
+    {
+      ...values,
+      saleUnitPrice: values.baseSaleUnitPrice ?? null,
+      saleGramPrice: values.baseSaleGramPrice ?? null,
+      saleChildUnitPrice: values.baseSaleChildUnitPrice ?? null,
+      saleUnitManual: false,
+      saleGramManual: false,
+      saleChildManual: false,
+    },
+    true,
+  );
+}
+
+export function recalculateMaterial(values: MaterialValues, resetSales = false): MaterialValues {
+  // Keep legacy payloads compatible; editors explicitly initialize the new pricing fields.
+  if (values.baseSaleUnitPrice === undefined) return recalculateLegacyMaterial(values, resetSales);
+  const base = materialBaseValues(values);
+  return {
+    ...base,
+    baseSaleUnitPrice: base.saleUnitPrice,
+    baseSaleGramPrice: base.saleGramPrice,
+    baseSaleChildUnitPrice: base.saleChildUnitPrice,
+    saleUnitPrice: values.unit === 'GRAM' ? values.saleGramPrice : values.saleUnitPrice,
+    saleGramPrice: values.saleGramPrice,
+    saleChildUnitPrice: values.unit === 'STRAND' ? values.saleChildUnitPrice : null,
+    saleUnitManual: values.unit === 'GRAM' ? values.saleGramManual : values.saleUnitManual,
+    saleGramManual: values.saleGramManual,
+    saleChildManual: values.unit === 'STRAND' && values.saleChildManual,
+  };
+}
+
+/** Round upward to cents, with integer arithmetic and the database price limit. */
+export function lossCompensatedPrice(price: MaterialAmount, rate: MaterialAmount) {
+  const amount = minor(price);
+  const percentage = rate === null ? BigInt(0) : minor(rate);
+  if (amount === null || percentage === null || percentage >= BigInt(10000)) return null;
+  const remaining = BigInt(10000) - percentage;
+  const result = (amount * BigInt(10000) + remaining - BigInt(1)) / remaining;
+  return result <= BigInt('999999999999') ? fixed(result) : null;
+}
+
+export function materialPriceDifference(left: MaterialAmount, right: MaterialAmount) {
+  const a = minor(left);
+  const b = minor(right);
+  return a !== null && b !== null && a >= b ? fixed(a - b) : null;
+}
+
 export function editMaterial(
   current: MaterialValues,
   field: keyof MaterialValues,
   value: string | number | null,
 ): MaterialValues {
   const next = { ...current, [field]: value } as MaterialValues;
+  if (
+    field === 'baseSaleUnitPrice' ||
+    field === 'baseSaleGramPrice' ||
+    field === 'baseSaleChildUnitPrice'
+  ) {
+    next.saleRule = 'CUSTOM_AMOUNT';
+    next.saleRuleValue = null;
+  }
   if (field === 'purchaseGramPrice') next.purchaseGramManual = value !== null;
   if (field === 'saleUnitPrice') next.saleUnitManual = value !== null;
   if (field === 'saleGramPrice') next.saleGramManual = value !== null;
