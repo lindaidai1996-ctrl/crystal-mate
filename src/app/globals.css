@@ -38,7 +38,7 @@
   }
   .mobile-record-metrics dd {
     margin: 4px 0 0;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
   }
   .mobile-record-actions {
@@ -64,6 +64,28 @@ body {
   margin: 0;
   background: var(--ant-color-bg-layout, #f7f8f2);
   color: var(--ant-color-text, #30483e);
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-size: 12px;
+  line-height: 1.6;
+}
+/* Native elements share the scale used by the Ant Design theme. */
+:where(button, input, select, textarea) {
+  font: inherit;
+}
+:where(h1) {
+  font-size: 18px;
+}
+:where(h2) {
+  font-size: 16px;
+}
+:where(h3, h4) {
+  font-size: 14px;
+}
+:where(h5, h6) {
+  font-size: 12px;
+}
+:where(h1, h2, h3, h4, h5, h6) {
+  line-height: 1.5;
 }
 .page-heading {
   display: flex;
@@ -98,12 +120,12 @@ body {
 .page-heading p {
   margin: 0;
   color: var(--ant-color-text-secondary);
-  font-size: 13px;
+  font-size: 12px;
 }
 .back-link {
   display: inline-block;
   color: var(--ant-color-link);
-  font-size: 13px;
+  font-size: 12px;
   margin-bottom: 12px;
 }
 .row-actions {
@@ -156,7 +178,7 @@ body {
 }
 .cabochon-filter-label {
   color: var(--ant-color-text);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1.4;
   overflow-wrap: anywhere;
@@ -179,7 +201,7 @@ body {
   padding-right: 10px;
   border-right: 1px solid var(--ant-color-border-secondary);
   color: var(--ant-color-text-secondary);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 20px;
   white-space: nowrap;
@@ -254,7 +276,7 @@ body {
 .catalog-empty-state h2 {
   margin: 0 0 24px;
   color: var(--ant-color-text);
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.5;
 }
@@ -380,7 +402,7 @@ body {
 }
 .editor-block h2 {
   margin: 0 0 18px;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.4;
 }
 .editor-fields {
@@ -429,12 +451,12 @@ body {
   align-items: center;
   gap: 6px;
   min-width: 0;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1.5;
 }
 .editor-tag-help-icon {
   color: var(--ant-color-text-tertiary);
-  font-size: 13px;
+  font-size: 12px;
   cursor: help;
 }
 .editor-tag-actions {
@@ -624,7 +646,7 @@ body {
   align-items: center;
   align-self: end;
   min-height: 32px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   white-space: normal;
@@ -635,7 +657,7 @@ body {
   gap: 7px;
   min-width: 0;
   color: var(--ant-color-text-secondary);
-  font-size: 13px;
+  font-size: 12px;
 }
 .source-field .ant-select,
 .source-field .ant-input-number {
@@ -675,7 +697,7 @@ body {
 }
 .source-material-details strong {
   color: var(--ant-color-text);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
 }
 .source-material-details > span {
@@ -712,7 +734,7 @@ body {
   border: 1px solid var(--ant-color-border-secondary);
   background: var(--ant-color-fill-tertiary);
   color: var(--ant-color-text-secondary);
-  font-size: 10px;
+  font-size: 12px;
 }
 .source-material-toggle.ant-btn:hover,
 .source-material-toggle.ant-btn[aria-expanded='true'] {
@@ -736,7 +758,7 @@ body {
   align-items: center;
   gap: 5px;
   color: var(--ant-color-primary);
-  font-size: 14px;
+  font-size: 12px;
 }
 .source-material-detail-link:hover {
   color: var(--ant-color-primary-hover);
@@ -842,11 +864,11 @@ body {
   flex: 1 1 180px;
   gap: 8px;
   text-align: right;
-  font-size: 13px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 .product-source-summary-column > strong {
-  font-size: 20px;
+  font-size: 16px;
 }
 .product-source-summary-run {
   display: flex;
@@ -868,7 +890,7 @@ body {
 }
 .product-source-totals {
   justify-content: flex-end;
-  font-size: 13px;
+  font-size: 12px;
 }
 .product-source-actions {
   justify-content: flex-start;
@@ -886,7 +908,7 @@ body {
   display: grid;
   gap: 8px;
   margin-top: 20px;
-  font-size: 13px;
+  font-size: 12px;
 }
 .product-source-adjustments > div {
   display: grid;
@@ -926,7 +948,7 @@ body {
 }
 .editor-section h2 {
   margin: 0 0 18px;
-  font-size: 16px;
+  font-size: 14px;
 }
 .measurement-fields {
   display: grid;
@@ -1060,7 +1082,7 @@ body {
   display: block;
   margin-bottom: 6px;
   color: var(--ant-color-text-secondary);
-  font-size: 13px;
+  font-size: 12px;
 }
 .marketing-config-name {
   overflow-wrap: anywhere;
@@ -1123,7 +1145,7 @@ body {
   flex: none;
 }
 .material-subheading {
-  font-size: 14px;
+  font-size: 12px;
   margin: 4px 0 16px;
 }
 .material-source-label {
@@ -1232,7 +1254,7 @@ body {
 }
 .distributor-item-total strong {
   color: var(--ant-color-primary);
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
@@ -1290,7 +1312,7 @@ body {
   margin-top: 24px;
 }
 .batch-detail-attachments h2 {
-  font-size: 16px;
+  font-size: 14px;
   margin: 0 0 14px;
 }
 .batch-detail-attachment-list {
@@ -1759,7 +1781,7 @@ body {
 .product-pricing-cost > span,
 .product-pricing-help {
   color: var(--ant-color-text-secondary);
-  font-size: 13px;
+  font-size: 12px;
 }
 .product-pricing-help {
   margin: 0;
@@ -1770,14 +1792,14 @@ body {
   border-radius: var(--ant-border-radius-lg, 8px);
   background: var(--ant-color-success-bg);
   color: var(--ant-color-success-text);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
 .product-pricing-profit strong {
   margin-inline-start: 6px;
-  font-size: 26px;
+  font-size: 18px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -1788,7 +1810,7 @@ body {
 .product-pricing-profit.is-pending {
   background: var(--ant-color-fill-quaternary);
   color: var(--ant-color-text-secondary);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
 }
 
@@ -2062,7 +2084,7 @@ body {
 }
 .material-loss-suggestion strong {
   color: var(--ant-color-primary);
-  font-size: 20px;
+  font-size: 16px;
   font-variant-numeric: tabular-nums;
 }
 .material-loss-warning {
@@ -2082,5 +2104,5 @@ body {
   line-height: 1.7;
 }
 .material-loss-profit strong {
-  font-size: 18px;
+  font-size: 16px;
 }

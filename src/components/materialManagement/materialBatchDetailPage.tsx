@@ -3,10 +3,10 @@
 import { RecordAuditPanel } from '@/components/audit-history';
 
 import { ArrowLeftOutlined, EditOutlined } from '@ant-design/icons';
-import { App, Button, Descriptions, Result, Segmented, Skeleton } from 'antd';
+import { Alert, App, Button, Descriptions, Result, Segmented, Skeleton } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter, usePathname } from '@/i18n/navigation';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { MaterialBatchDetail } from '@/lib/client-types';
 import { CreatePurchaseButton } from '@/components/purchaseCreation/createPurchaseButton';
@@ -16,7 +16,19 @@ import { BatchDetailEntriesTable, type BatchEntryType } from './batchDetailEntri
 import { useSessionListState } from '@/components/useSessionListState';
 import { withAdminReturnTo } from '@/lib/admin-return-path';
 
-export function MaterialBatchDetailPage({ id, returnTo }: { id: string; returnTo?: string }) {
+export function MaterialBatchDetailPage({
+  id,
+  returnTo,
+  distributorId,
+  initialView,
+}: {
+  id: string;
+  returnTo?: string;
+  distributorId?: string;
+  initialView?: 'attachments';
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
   const t = useTranslations('materialBatches');
   const common = useTranslations('common');
   const { message } = App.useApp();
@@ -27,11 +39,23 @@ export function MaterialBatchDetailPage({ id, returnTo }: { id: string; returnTo
   const [editingImage, setEditingImage] = useState(false);
   const [tab, setTab] = useSessionListState<BatchEntryType | 'attachments'>(
     `material-batch-detail:${id}:tab`,
-    'all',
+    initialView ?? 'all',
+    // An explicit supplier link opens its entries even if attachments were previously selected.
+    !distributorId && !initialView,
   );
-  const detailPath = returnTo
-    ? withAdminReturnTo(`/admin/materials/batches/${id}`, returnTo)
-    : `/admin/materials/batches/${id}`;
+  const batchPath = `/admin/materials/batches/${id}`;
+  const baseDetailPath = distributorId
+    ? `${batchPath}?distributorId=${encodeURIComponent(distributorId)}`
+    : batchPath;
+  const detailPath = returnTo ? withAdminReturnTo(baseDetailPath, returnTo) : baseDetailPath;
+  const matchedDistributor =
+    batch &&
+    [...batch.entries, ...batch.productEntries].find(
+      (entry) => entry.distributor.id === distributorId,
+    )?.distributor;
+  function clearDistributor() {
+    router.replace(returnTo ? withAdminReturnTo(pathname, returnTo) : pathname, { scroll: false });
+  }
 
   async function remove(entry: MaterialBatchDetail['entries'][number]) {
     try {
@@ -97,6 +121,22 @@ export function MaterialBatchDetailPage({ id, returnTo }: { id: string; returnTo
         <Descriptions.Item label={t('date')}>{batch.receivedAt.slice(0, 10)}</Descriptions.Item>
         <Descriptions.Item label={t('notes')}>{batch.notes || '—'}</Descriptions.Item>
       </Descriptions>
+      {distributorId && (
+        <Alert
+          type={matchedDistributor ? 'info' : 'warning'}
+          showIcon
+          message={
+            matchedDistributor
+              ? t('distributorFilter', { name: matchedDistributor.name })
+              : t('distributorFilterEmpty')
+          }
+          action={
+            <Button size="small" onClick={clearDistributor}>
+              {t('showAllDistributors')}
+            </Button>
+          }
+        />
+      )}
       <div className="distributor-detail-type-filter">
         <Segmented<BatchEntryType | 'attachments'>
           value={tab}
@@ -124,6 +164,7 @@ export function MaterialBatchDetailPage({ id, returnTo }: { id: string; returnTo
       ) : (
         <BatchDetailEntriesTable
           batch={batch}
+          distributorId={distributorId}
           type={tab}
           returnTo={detailPath}
           onRemove={remove}

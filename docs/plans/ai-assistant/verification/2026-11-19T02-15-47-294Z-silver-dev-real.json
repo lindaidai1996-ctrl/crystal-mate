@@ -1,0 +1,335 @@
+{
+  "checkedAt": "2026-11-19T02:15:47.294Z",
+  "database": "isolated-development",
+  "realModel": true,
+  "businessWrites": false,
+  "policyRevision": "v2",
+  "promptVersion": "relevance-v4",
+  "success": true,
+  "checks": [
+    {
+      "repeat": 1,
+      "status": "completed",
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "complete",
+        "countBasis": "purchase_entry",
+        "totalCandidates": 44,
+        "readCandidates": 44,
+        "uniqueCatalogItems": 44,
+        "evaluatedCandidates": 44,
+        "included": 16,
+        "excluded": 28,
+        "uncertain": 0,
+        "notEvaluated": 0,
+        "unreadCandidates": 0,
+        "stopReason": null
+      },
+      "attempts": [
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 3880,
+            "completionTokens": 466
+          },
+          "errorCode": null
+        },
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 3880,
+            "completionTokens": 386
+          },
+          "errorCode": null
+        },
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 4165,
+            "completionTokens": 338
+          },
+          "errorCode": null
+        },
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 3839,
+            "completionTokens": 426
+          },
+          "errorCode": null
+        },
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 1871,
+            "completionTokens": 158
+          },
+          "errorCode": null
+        }
+      ],
+      "usage": {
+        "calls": 5,
+        "reservedTokens": 99358,
+        "knownPromptTokens": 17635,
+        "knownCompletionTokens": 1774,
+        "unknownUsageCalls": 0
+      },
+      "count": 16,
+      "total": [
+        {
+          "currency": "CNY",
+          "knownAmount": "946.80",
+          "unknownAmountEntryCount": 0,
+          "businessDefaultCurrencyEntryCount": 16
+        }
+      ],
+      "mingfa": {
+        "purchaseEntryCount": 15,
+        "catalogItemCount": 15,
+        "amounts": [
+          {
+            "currency": "CNY",
+            "knownAmount": "911.80",
+            "unknownAmountEntryCount": 0,
+            "businessDefaultCurrencyEntryCount": 15
+          }
+        ],
+        "quantities": [
+          {
+            "unit": "BEAD",
+            "knownQuantity": "82.00",
+            "unknownQuantityEntryCount": 0
+          },
+          {
+            "unit": "GRAM",
+            "knownQuantity": "35.65",
+            "unknownQuantityEntryCount": 0
+          }
+        ]
+      },
+      "pendingCount": 0
+    },
+    {
+      "repeat": 2,
+      "status": "completed",
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "complete",
+        "countBasis": "purchase_entry",
+        "totalCandidates": 44,
+        "readCandidates": 44,
+        "uniqueCatalogItems": 44,
+        "evaluatedCandidates": 44,
+        "included": 16,
+        "excluded": 28,
+        "uncertain": 0,
+        "notEvaluated": 0,
+        "unreadCandidates": 0,
+        "stopReason": null
+      },
+      "attempts": [
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 3880,
+            "completionTokens": 478
+          },
+          "errorCode": null
+        },
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 3880,
+            "completionTokens": 386
+          },
+          "errorCode": null
+        },
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 4165,
+            "completionTokens": 339
+          },
+          "errorCode": null
+        },
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 3839,
+            "completionTokens": 426
+          },
+          "errorCode": null
+        },
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 1871,
+            "completionTokens": 158
+          },
+          "errorCode": null
+        }
+      ],
+      "usage": {
+        "calls": 5,
+        "reservedTokens": 99358,
+        "knownPromptTokens": 17635,
+        "knownCompletionTokens": 1787,
+        "unknownUsageCalls": 0
+      },
+      "count": 16,
+      "total": [
+        {
+          "currency": "CNY",
+          "knownAmount": "946.80",
+          "unknownAmountEntryCount": 0,
+          "businessDefaultCurrencyEntryCount": 16
+        }
+      ],
+      "mingfa": {
+        "purchaseEntryCount": 15,
+        "catalogItemCount": 15,
+        "amounts": [
+          {
+            "currency": "CNY",
+            "knownAmount": "911.80",
+            "unknownAmountEntryCount": 0,
+            "businessDefaultCurrencyEntryCount": 15
+          }
+        ],
+        "quantities": [
+          {
+            "unit": "BEAD",
+            "knownQuantity": "82.00",
+            "unknownQuantityEntryCount": 0
+          },
+          {
+            "unit": "GRAM",
+            "knownQuantity": "35.65",
+            "unknownQuantityEntryCount": 0
+          }
+        ]
+      },
+      "pendingCount": 0
+    },
+    {
+      "repeat": 3,
+      "status": "completed",
+      "completeness": {
+        "scope": "resolved",
+        "traversal": "complete",
+        "evaluation": "complete",
+        "countBasis": "purchase_entry",
+        "totalCandidates": 44,
+        "readCandidates": 44,
+        "uniqueCatalogItems": 44,
+        "evaluatedCandidates": 44,
+        "included": 16,
+        "excluded": 28,
+        "uncertain": 0,
+        "notEvaluated": 0,
+        "unreadCandidates": 0,
+        "stopReason": null
+      },
+      "attempts": [
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 3880,
+            "completionTokens": 477
+          },
+          "errorCode": null
+        },
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 3880,
+            "completionTokens": 386
+          },
+          "errorCode": null
+        },
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 4165,
+            "completionTokens": 338
+          },
+          "errorCode": null
+        },
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 3839,
+            "completionTokens": 426
+          },
+          "errorCode": null
+        },
+        {
+          "outcome": "success",
+          "model": "deepseek-flash",
+          "usage": {
+            "promptTokens": 1871,
+            "completionTokens": 158
+          },
+          "errorCode": null
+        }
+      ],
+      "usage": {
+        "calls": 5,
+        "reservedTokens": 99358,
+        "knownPromptTokens": 17635,
+        "knownCompletionTokens": 1785,
+        "unknownUsageCalls": 0
+      },
+      "count": 16,
+      "total": [
+        {
+          "currency": "CNY",
+          "knownAmount": "946.80",
+          "unknownAmountEntryCount": 0,
+          "businessDefaultCurrencyEntryCount": 16
+        }
+      ],
+      "mingfa": {
+        "purchaseEntryCount": 15,
+        "catalogItemCount": 15,
+        "amounts": [
+          {
+            "currency": "CNY",
+            "knownAmount": "911.80",
+            "unknownAmountEntryCount": 0,
+            "businessDefaultCurrencyEntryCount": 15
+          }
+        ],
+        "quantities": [
+          {
+            "unit": "BEAD",
+            "knownQuantity": "82.00",
+            "unknownQuantityEntryCount": 0
+          },
+          {
+            "unit": "GRAM",
+            "knownQuantity": "35.65",
+            "unknownQuantityEntryCount": 0
+          }
+        ]
+      },
+      "pendingCount": 0
+    }
+  ]
+}

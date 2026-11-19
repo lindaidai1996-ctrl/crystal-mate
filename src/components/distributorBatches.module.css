@@ -1,0 +1,26 @@
+.views {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.views > :global(.ant-segmented) {
+  flex: none;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.entriesLoading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 160px;
+  color: var(--ant-color-text-secondary);
+  font-size: 13px;
+}

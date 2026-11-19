@@ -26,6 +26,7 @@ import {
   RELEVANCE_SYSTEM_PROMPT,
   type RelevanceModel,
 } from './relevance-model';
+import { SEMANTIC_POLICY_REVISION } from './semantic-policy';
 
 type StopReason =
   | 'running'
@@ -129,7 +130,13 @@ export class RelevanceRuns {
     }
     const fingerprint = createHash('sha256')
       .update(
-        JSON.stringify({ query, source, promptVersion: RELEVANCE_PROMPT_VERSION, modelIdentity }),
+        JSON.stringify({
+          query,
+          source,
+          promptVersion: RELEVANCE_PROMPT_VERSION,
+          policyRevision: SEMANTIC_POLICY_REVISION,
+          modelIdentity,
+        }),
       )
       .digest('hex');
     const page = await this.recall.query(accountId, query, async () => source);
@@ -264,7 +271,7 @@ export class RelevanceRuns {
         }
         if (calls >= limits.maxCallsPerStep) {
           run.stopReason = 'budget';
-          run.lastErrorCode = 'EXECUTION_BUDGET_EXCEEDED';
+          run.lastErrorCode = 'STEP_CALL_LIMIT';
           break;
         }
         if (!pending.length) {

@@ -5,8 +5,11 @@ import { LazyPreviewImage } from '@/components/loadingImage';
 import { imageThumbnailUrl } from '@/lib/image-storage';
 
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { App, Button, Input, Spin, Tag, Tooltip } from 'antd';
+import { App, Alert, Button, Collapse, Input, Spin, Tag, Tooltip } from 'antd';
 import { useState } from 'react';
+import { AttachmentTargets } from '../imageUpload/attachmentTargets';
+import { AttachmentRelations, attachmentLocations } from '../imageUpload/attachmentRelations';
+import type { AttachmentTarget } from '@/lib/shared-attachment-contracts';
 import type { MaterialBatchAttachment } from '@/lib/client-types';
 import { useTranslations } from 'next-intl';
 import { ImageUploadChoiceDialog } from '@/components/imageUpload/imageUploadChoiceDialog';
@@ -21,11 +24,13 @@ export function BatchAttachmentPicker({
   onChange,
   onUploadingChange,
   owner,
+  ownerType,
   coverObjectKey,
   onCoverChange,
   disabled = false,
 }: {
   owner?: AttachmentOwner;
+  ownerType: AttachmentOwner['type'];
   coverObjectKey?: string | null;
   onCoverChange: (key: string | null) => void;
   disabled?: boolean;
@@ -37,6 +42,8 @@ export function BatchAttachmentPicker({
   const imageT = useTranslations('imageUpload');
   const attachmentT = useTranslations('attachments');
   const common = useTranslations('common');
+  const sharedT = useTranslations('sharedAttachments');
+  const [uploadTargets, setUploadTargets] = useState<AttachmentTarget[]>([]);
   const { message, modal } = App.useApp();
   const [uploading, setUploading] = useState(false);
   const [choosing, setChoosing] = useState(false);
@@ -65,7 +72,14 @@ export function BatchAttachmentPicker({
       onChange(
         attachments.map((attachment) =>
           attachment.objectKey === objectKey
-            ? { ...replacement, notes: attachment.notes, position: attachment.position }
+            ? {
+                ...attachment,
+                ...replacement,
+                source: undefined,
+                targets: attachment.targets,
+                notes: attachment.notes,
+                position: attachment.position,
+              }
             : attachment,
         ),
       );
@@ -84,6 +98,7 @@ export function BatchAttachmentPicker({
       fileName: file.name.slice(0, 255),
       notes: '',
       position: 0,
+      targets: uploadTargets,
     };
   }
 
@@ -123,6 +138,24 @@ export function BatchAttachmentPicker({
 
   return (
     <div className="batch-attachments">
+      <Collapse
+        size="small"
+        items={[
+          {
+            key: 'targets',
+            label: sharedT('uploadTargets'),
+            children: (
+              <AttachmentTargets
+                type={ownerType === 'batch' ? 'distributor' : 'batch'}
+                owner={owner}
+                value={uploadTargets}
+                onChange={setUploadTargets}
+                disabled={busy}
+              />
+            ),
+          },
+        ]}
+      />
       {filePicker}
       {choosing && owner && (
         <AttachmentCandidateDialog
@@ -149,6 +182,7 @@ export function BatchAttachmentPicker({
                   source: item.source,
                   notes: '',
                   position: 0,
+                  targets: uploadTargets,
                 })),
               ].map((item, position) => ({ ...item, position })),
             );
@@ -205,6 +239,14 @@ export function BatchAttachmentPicker({
                 </Button>
               )}
             </div>
+            <AttachmentRelations item={attachment} />
+            {attachment.asset &&
+              attachment.asset.distributors.length + attachment.asset.batches.length > 1 && (
+                <Alert
+                  type="info"
+                  message={sharedT('sharedEdit', { locations: attachmentLocations(attachment) })}
+                />
+              )}
             <Input.TextArea
               aria-label={`${attachment.fileName} ${t('attachmentNotes')}`}
               placeholder={t('attachmentNotes')}
@@ -243,8 +285,8 @@ export function BatchAttachmentPicker({
               aria-label={`${t('removeAttachment')} ${attachment.fileName}`}
               onClick={async () => {
                 const confirmed = await modal.confirm({
-                  title: imageT('deleteConfirm'),
-                  content: attachment.fileName,
+                  title: sharedT('unlink'),
+                  content: sharedT('unlinkHelp'),
                   okText: common('delete'),
                   cancelText: common('cancel'),
                   okButtonProps: { danger: true },

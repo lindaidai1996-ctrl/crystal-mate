@@ -8,7 +8,7 @@
 .root legend {
   margin-bottom: 14px;
   color: var(--ant-color-text-secondary);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .root .legendHidden {
@@ -63,7 +63,7 @@
 }
 
 .dateEndpoints strong {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -117,7 +117,7 @@
 }
 
 .calendarSelect :global(.ant-select-selection-item) {
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -217,7 +217,7 @@
   gap: 8px;
   min-height: 48px;
   color: var(--ant-color-text-secondary);
-  font-size: 13px;
+  font-size: 12px;
   cursor: pointer;
   list-style: none;
 }

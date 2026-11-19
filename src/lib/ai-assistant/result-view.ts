@@ -10,6 +10,11 @@ import { catalogDisplaySchema, type CatalogDisplay } from './display-data';
 import { catalogRefSchema } from './contracts';
 import { locationResolutionSchema, type LocationResolution } from './reference-contracts';
 
+const uncertainPurchasesSchema = z.object({
+  items: z.array(purchaseEntrySchema.extend({ reason: z.string().max(500) })).max(5000),
+  summary: purchaseSummarySchema,
+});
+
 export type AssistantBrowserResults = {
   kind: 'purchases' | 'catalog' | 'stock' | 'distributors';
   stockMode?: StockResult['request']['mode'];
@@ -24,6 +29,7 @@ export type AssistantBrowserResults = {
   summary: PurchaseSummary | null;
   legacyDetails: boolean;
   selectionIsPartial?: boolean;
+  uncertainPurchases?: z.infer<typeof uncertainPurchasesSchema>;
 };
 
 const purchaseFacts = z.object({
@@ -117,7 +123,11 @@ export function assistantResultView(
   const fallbackRefs = catalog.success
     ? catalog.data.items
     : (stock?.catalogStock.map((row) => row.item) ?? []);
+  const uncertain = z.object({ uncertainPurchases: uncertainPurchasesSchema }).safeParse(raw);
   return {
+    ...(!privacy && purchases.success && uncertain.success
+      ? { uncertainPurchases: uncertain.data.uncertainPurchases }
+      : {}),
     selectionIsPartial: z
       .object({
         relevance: z.object({ completeness: z.object({ uncertain: z.number().positive() }) }),

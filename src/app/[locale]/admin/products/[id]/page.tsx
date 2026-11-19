@@ -14,14 +14,16 @@ export default async function Page({
   const distributorId =
     id === 'new' && typeof query.distributorId === 'string' ? query.distributorId : undefined;
   const draftId = id === 'new' && typeof query.draftId === 'string' ? query.draftId : undefined;
+  const sourceId = id !== 'new' && typeof query.sourceId === 'string' ? query.sourceId : undefined;
   const returnTo = adminReturnPath(query.returnTo);
   return (
     <ProductEditor
-      key={JSON.stringify([id, batchId, distributorId])}
+      key={JSON.stringify([id, batchId, distributorId, sourceId])}
       id={id}
       initialBatchId={batchId}
       initialDistributorId={distributorId}
       initialDraftId={draftId}
+      initialSourceId={sourceId}
       initialReturnTo={returnTo}
     />
   );

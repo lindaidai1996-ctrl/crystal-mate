@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Alert, Button, Checkbox, Input, Select, Tag } from 'antd';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import type { AssistantBrowserConversation } from '@/lib/ai-assistant/browser-contracts';
 import type { AssistantFeedbackInput } from '@/lib/ai-assistant/feedback-contracts';
 import { assistantRecordHref } from '@/lib/ai-assistant/result-view';
 import { assistantFetch } from './useAssistantConversation';
 import assistantStyles from './assistantPage.module.css';
+import { formatAssistantTime } from './displayTime';
 
 export function AssistantFeedback({
   snapshot,
@@ -20,6 +21,7 @@ export function AssistantFeedback({
   onSaved: () => void;
 }) {
   const t = useTranslations('assistant');
+  const locale = useLocale();
   const [kind, setKind] = useState<AssistantFeedbackInput['kind']>('misunderstood');
   const [selected, setSelected] = useState<string>();
   const [manual, setManual] = useState(false);
@@ -259,7 +261,8 @@ export function AssistantFeedback({
               )}
               {!privacy && row.note && <p>{row.note}</p>}
               <small>
-                {t('questionReference')}: {row.questionMessageId} · {row.createdAt}
+                {t('questionReference')}: {row.questionMessageId} ·{' '}
+                {formatAssistantTime(row.createdAt, locale)}
               </small>
             </article>
           ))}

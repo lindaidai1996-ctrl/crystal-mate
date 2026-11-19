@@ -15,6 +15,25 @@
   min-width: 0;
 }
 
+.assistantLayout {
+  --shell-menu-font: 12px;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  font-size: 12px;
+}
+
+.assistantLayout .workspace {
+  min-height: 0;
+}
+
+.assistantLayout .content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-block: 12px;
+}
+
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -92,7 +111,7 @@
 .sidebar :global(.ant-menu-item) {
   padding-inline: 8px;
   width: 100%;
-  font-size: 13px;
+  font-size: var(--shell-menu-font, 12px);
 }
 
 .sidebar :global(.ant-menu-item-selected) {
@@ -178,7 +197,7 @@
 
 .context {
   min-width: 0;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1.5;
   overflow: hidden;
@@ -297,4 +316,41 @@
   .language {
     min-width: 78px;
   }
+}
+
+.assistantSettings {
+  margin-top: 16px;
+}
+.assistantSettings .actions {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.assistantSettings .privacyToggle {
+  width: 100%;
+  justify-content: space-between;
+  font-size: 12px;
+}
+.assistantSettings .privacyLabel {
+  display: inline;
+}
+.assistantSettings .language {
+  flex: 1;
+  min-width: 0;
+}
+@media (max-width: 800px) {
+  .assistantSettings .actions :global(.ant-btn),
+  .assistantSettings .actions :global(.ant-select) {
+    height: 44px;
+  }
+  .assistantSettings .privacyToggle {
+    min-height: 44px;
+  }
+  .assistantLayout .content {
+    padding: 8px 12px;
+  }
+}
+
+.assistantLayout > .workspace > footer {
+  padding-block: 8px;
+  font-size: 10px;
 }

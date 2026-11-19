@@ -143,7 +143,9 @@ export function renderAnswerDocument(
     ...new Set(
       [...used.values()].flatMap((s) =>
         namesOnly
-          ? s.warnings.filter((w) => w.includes('待确认') || w.includes('未完成'))
+          ? s.warnings.filter(
+              (w) => (w.includes('待确认') || w.includes('未完成')) && !/[\p{N}]/u.test(w),
+            )
           : s.warnings,
       ),
     ),

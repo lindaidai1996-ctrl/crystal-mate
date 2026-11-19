@@ -2,15 +2,17 @@
 
 import { useState } from 'react';
 import { Alert, Pagination, Tag, Typography } from 'antd';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import type { AssistantBrowserConversation } from '@/lib/ai-assistant/browser-contracts';
 import type { QueryState, Plan } from '@/lib/ai-assistant/orchestration-contracts';
 import { assistantRecordHref } from '@/lib/ai-assistant/result-view';
 import assistantStyles from './assistantPage.module.css';
+import { formatAssistantTime, formatAssistantTimeText } from './displayTime';
 
 function Conditions({ state, patch }: { state?: QueryState | null; patch?: Plan }) {
   const t = useTranslations('assistant');
+  const locale = useLocale();
   const query = state?.query;
   const hard = query?.hard ?? patch?.hard;
   const semantic =
@@ -25,13 +27,20 @@ function Conditions({ state, patch }: { state?: QueryState | null; patch?: Plan 
       )}
       {hard?.purchaseDate && (
         <li>
-          {t('purchaseDate')}: [{hard.purchaseDate.from}, {hard.purchaseDate.to})
+          {t('purchaseDate')}:{' '}
+          {t('dateRange', {
+            from: formatAssistantTime(hard.purchaseDate.from, locale),
+            to: formatAssistantTime(hard.purchaseDate.to, locale),
+          })}
         </li>
       )}
       {hard?.createdAt && (
         <li>
-          {t('createdAt')}: {t(`createdEntity.${hard.createdAt.entity}`)} [{hard.createdAt.from},{' '}
-          {hard.createdAt.to})
+          {t('createdAt')}: {t(`createdEntity.${hard.createdAt.entity}`)}{' '}
+          {t('dateRange', {
+            from: formatAssistantTime(hard.createdAt.from, locale),
+            to: formatAssistantTime(hard.createdAt.to, locale),
+          })}
         </li>
       )}
       {hard?.location && (
@@ -110,6 +119,7 @@ export function AssistantScope({
   privacy: boolean;
 }) {
   const t = useTranslations('assistant');
+  const locale = useLocale();
   const [page, setPage] = useState(1);
   const latest = snapshot.latest;
   if (!latest) return null;
@@ -196,7 +206,7 @@ export function AssistantScope({
               </Link>
               {!privacy && (
                 <>
-                  <p>{decision.reason}</p>
+                  <p>{formatAssistantTimeText(decision.reason ?? t('unknown'), locale)}</p>
                   <ul>
                     {decision.evidence.map((entry, index) => (
                       <li key={index}>
@@ -204,8 +214,9 @@ export function AssistantScope({
                         {entry.value === null
                           ? t('unknown')
                           : Array.isArray(entry.value)
-                            ? entry.value.join(' / ') || t('emptyField')
-                            : entry.value || t('emptyField')}{' '}
+                            ? formatAssistantTimeText(entry.value.join(' / '), locale) ||
+                              t('emptyField')
+                            : formatAssistantTimeText(entry.value, locale) || t('emptyField')}{' '}
                         <small>
                           ({entry.entity.type} · {entry.entity.id})
                         </small>

@@ -1,0 +1,121 @@
+.targets {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.targetList {
+  display: grid;
+  gap: 12px;
+  padding: 12px 0;
+  min-height: 90px;
+  max-height: 240px;
+  overflow: auto;
+}
+.targetList :global(.ant-checkbox-wrapper) {
+  min-height: 36px;
+  margin-inline-start: 0;
+  align-items: start;
+  overflow-wrap: anywhere;
+}
+.secondary {
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+.uploadTargets {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+.receipts {
+  display: grid;
+  gap: 16px;
+}
+.receipt {
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 8px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.receiptHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: 12px;
+  overflow-wrap: anywhere;
+}
+.evidence {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.impact {
+  font-size: 12px;
+  color: var(--ant-color-text-secondary);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  .toolbar,
+  .uploadTargets {
+    padding: 12px 16px;
+  }
+  .targetList :global(.ant-checkbox-wrapper) {
+    min-height: 44px;
+  }
+  .receipt {
+    padding: 12px;
+  }
+}
+
+.links > a {
+  max-width: 100%;
+  min-width: 0;
+}
+.links :global(.ant-tag) {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  .actions :global(.ant-btn) {
+    min-height: 44px;
+  }
+}
+
+.suggestions {
+  max-width: 100%;
+}
+.suggestions :global(.ant-space-item) {
+  max-width: 100%;
+  min-width: 0;
+}
+.suggestions :global(.ant-btn) {
+  height: auto;
+  min-height: 44px;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: start;
+}

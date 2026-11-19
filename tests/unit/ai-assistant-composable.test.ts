@@ -295,7 +295,11 @@ describe('composable factual operations', () => {
       Array.from({ length: 75 }, (_, i) => row(`p${i}`, { item: `MATERIAL:${fixtureId(i + 1)}` })),
       false,
     );
-    s.warnings = ['部分记录待确认，以下只包含已确定记录。', '采购币种采用 CNY 业务默认值。'];
+    s.warnings = [
+      '部分记录待确认，以下只包含已确定记录。',
+      '采购币种采用 CNY 业务默认值。',
+      '另有 1 条采购记录待确认，待确认记录的已知金额合计 276.70 CNY。',
+    ];
     expect(factPreview(s, false).rows).toHaveLength(50);
     const doc = renderAnswerDocument([data(s)], [s], names, false);
     expect(doc.warnings).toEqual([s.warnings[0]]);

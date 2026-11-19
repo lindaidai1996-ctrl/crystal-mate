@@ -1,0 +1,196 @@
+.page {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  text-wrap: pretty;
+}
+
+.heading,
+.filters,
+.panelHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.heading h1 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.heading p,
+.hint {
+  margin: 4px 0 0;
+  color: var(--ant-color-text-secondary);
+}
+
+.filters {
+  justify-content: flex-start;
+}
+
+.distributor {
+  min-width: 200px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.metric,
+.panel {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 12px;
+  background: var(--ant-color-bg-container);
+}
+
+.metric dt,
+.readout span {
+  color: var(--ant-color-text-secondary);
+}
+
+.metric dd {
+  margin: 8px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.metric small {
+  display: block;
+  margin-top: 4px;
+  color: var(--ant-color-text-secondary);
+}
+
+.charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.charts > :only-child {
+  grid-column: 1 / -1;
+}
+
+.panelHeading h2 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.readout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 16px;
+  min-height: 36px;
+  overflow-wrap: anywhere;
+}
+
+.readout strong {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart {
+  width: 100%;
+  height: 250px;
+  touch-action: pan-y;
+  color: var(--ant-color-primary);
+  border-radius: 6px;
+}
+
+.chart:focus-visible {
+  outline: 2px solid var(--ant-color-primary);
+  outline-offset: 2px;
+}
+
+.gridLine {
+  stroke: var(--ant-color-border-secondary);
+  stroke-width: 1;
+}
+
+.axisLabel {
+  fill: var(--ant-color-text-secondary);
+  font-size: 12px;
+}
+
+.chartLine {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.bar,
+.dot {
+  fill: currentColor;
+}
+
+.crosshair {
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  opacity: 0.4;
+}
+
+.details {
+  display: grid;
+  gap: 12px;
+}
+
+.source {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  background: var(--ant-color-fill-alter);
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 767px) {
+  .charts,
+  .metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .panel,
+  .metric {
+    padding: 12px;
+  }
+
+  .metric {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 4px 12px;
+  }
+
+  .metric dd {
+    margin: 0;
+  }
+
+  .metric small {
+    grid-column: 1 / -1;
+  }
+
+  .filters > *,
+  .distributor {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .heading :global(.ant-btn),
+  .page :global(.ant-select-selector) {
+    min-height: 44px;
+  }
+}

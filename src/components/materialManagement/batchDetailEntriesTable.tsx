@@ -23,12 +23,14 @@ type BatchEntryRow =
 
 export function BatchDetailEntriesTable({
   batch,
+  distributorId,
   type,
   returnTo,
   onRemove,
   onStockSaved,
 }: {
   batch: MaterialBatchDetail;
+  distributorId?: string;
   type: BatchEntryType;
   returnTo: string;
   onRemove: (entry: MaterialBatchDetail['entries'][number]) => Promise<void>;
@@ -39,9 +41,12 @@ export function BatchDetailEntriesTable({
   const privacyMode = usePrivacyMode();
   const inventory = useTranslations('inventory');
   const editor = useTranslations('materialEditor');
-  const [page, setPage] = useSessionListState(`material-batch-detail:${batch.id}:${type}:page`, 1);
+  const [page, setPage] = useSessionListState(
+    `material-batch-detail:${batch.id}:${distributorId ?? 'all-distributors'}:${type}:page`,
+    1,
+  );
   const [pageSize, setPageSize] = useSessionListState(
-    `material-batch-detail:${batch.id}:${type}:pageSize`,
+    `material-batch-detail:${batch.id}:${distributorId ?? 'all-distributors'}:${type}:pageSize`,
     20,
   );
   const price = (value: string | null, suffix: string) =>
@@ -60,7 +65,11 @@ export function BatchDetailEntriesTable({
     ...batch.productEntries.map((entry) => ({ type: 'product' as const, entry })),
     ...batch.entries.map((entry) => ({ type: 'material' as const, entry })),
   ]
-    .filter((row) => type === 'all' || row.type === type)
+    .filter(
+      (row) =>
+        (type === 'all' || row.type === type) &&
+        (!distributorId || row.entry.distributor.id === distributorId),
+    )
     .sort(
       (a, b) =>
         b.entry.createdAt.localeCompare(a.entry.createdAt) ||
@@ -76,7 +85,10 @@ export function BatchDetailEntriesTable({
       render: (_, row) => {
         const product = row.type === 'product' ? row.entry.product : null;
         const name = row.type === 'product' ? row.entry.product.name : row.entry.material.name;
-        const itemId = row.type === 'product' ? row.entry.productId : row.entry.materialId;
+        const editPath =
+          row.type === 'product'
+            ? `/admin/products/${row.entry.productId}?sourceId=${row.entry.id}`
+            : `/admin/materials/${row.entry.materialId}/batches/${row.entry.id}`;
         return (
           <div className="product-cell">
             <ImageHoverPreview
@@ -84,13 +96,7 @@ export function BatchDetailEntriesTable({
               name={name}
             />
             <div>
-              <Link
-                className="product-name"
-                href={withAdminReturnTo(
-                  `/admin/${row.type === 'product' ? 'products' : 'materials'}/${itemId}`,
-                  returnTo,
-                )}
-              >
+              <Link className="product-name" href={withAdminReturnTo(editPath, returnTo)}>
                 {name}
               </Link>
               <div>
@@ -256,7 +262,7 @@ export function BatchDetailEntriesTable({
           <Link
             href={withAdminReturnTo(
               row.type === 'product'
-                ? `/admin/products/${row.entry.productId}`
+                ? `/admin/products/${row.entry.productId}?sourceId=${row.entry.id}`
                 : `/admin/materials/${row.entry.materialId}/batches/${row.entry.id}`,
               returnTo,
             )}

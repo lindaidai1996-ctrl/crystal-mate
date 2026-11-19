@@ -12,7 +12,7 @@
 }
 .choiceGroup legend {
   margin-bottom: 12px;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
 }
 .choices {
@@ -75,22 +75,6 @@
   outline: 2px solid var(--ant-color-primary);
   outline-offset: 2px;
 }
-.recordList {
-  display: grid;
-  gap: 12px;
-  min-width: 0;
-}
-.record {
-  padding: 16px;
-  border: 1px solid var(--ant-color-border-secondary);
-  border-radius: 10px;
-  background: var(--ant-color-bg-container);
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.recordList :global(.ant-pagination) {
-  justify-content: center;
-}
 
 @media (max-width: 767px) {
   .desktop {
@@ -117,7 +101,7 @@
     min-width: 0;
     gap: 6px;
     padding-inline: 8px;
-    font-size: 13px;
+    font-size: 12px;
   }
   .filterLabel {
     overflow: hidden;
@@ -196,9 +180,80 @@
   }
 }
 
+/* Card contents also serve the custom summaries without duplicating price formatting. */
+.tableFields {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  min-width: 0;
+}
+.tableField {
+  display: grid;
+  grid-template-columns: minmax(72px, 30%) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+}
+.tableLabel {
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.tableValue {
+  min-width: 0;
+  margin: 0;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.tableValue:only-child {
+  grid-column: 1 / -1;
+}
+.recordMetrics {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.recordMetrics > .tableField {
+  display: block;
+}
+.recordMetrics .tableValue {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.recordIdentity {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+.recordIdentity > :last-child {
+  flex: 1;
+  min-width: 0;
+}
+.recordIdentity :global(.product-name) {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 767px) {
+  :global(.table-surface):has(> .stackedTable) {
+    border: 0;
+    background: transparent;
+    overflow: visible;
+  }
+  :global(.table-surface) > .stackedTable {
+    overflow: visible;
+  }
   .stackedTable :global(.ant-table) {
     min-width: 0 !important;
+    background: transparent;
+  }
+  .stackedTable :global(.ant-table-container) {
+    border: 0 !important;
   }
   .stackedTable :global(table) {
     display: block;
@@ -218,60 +273,185 @@
   .stackedTable :global(.ant-table-thead > tr) {
     display: flex;
     flex-wrap: wrap;
+    gap: 4px;
   }
   .stackedTable :global(.ant-table-thead > tr > th) {
     display: none;
   }
   .stackedTable :global(.ant-table-thead > tr > th:has(.ant-table-column-sorters)),
-  .stackedTable :global(.ant-table-thead > tr > th:has(.ant-table-filter-trigger)) {
+  .stackedTable :global(.ant-table-thead > tr > th:has(.ant-table-filter-trigger)),
+  .stackedTable :global(.ant-table-thead > tr > th.ant-table-selection-column) {
     display: block;
     flex: 1;
     min-width: 100px;
     width: auto !important;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 8px;
   }
-  .stackedTable :global(.ant-table-tbody > tr) {
-    display: block;
-    padding-block: 8px;
-    border-bottom: 1px solid var(--ant-color-border-secondary);
+  .stackedTable :global(.ant-table-filter-trigger) {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .stackedTable :global(.ant-table-tbody > .ant-table-row) {
+    display: flex;
+    flex-direction: column;
+    margin-top: 12px;
+    padding: 16px;
+    border: 1px solid var(--ant-color-border-secondary);
+    border-radius: 10px;
+    background: var(--ant-color-bg-container);
+    overflow-wrap: anywhere;
   }
   .stackedTable :global(.ant-table-tbody > tr > td) {
     display: block;
-    padding: 8px 12px;
     width: 100%;
+    padding: 0 !important;
     border: 0;
+    background: transparent !important;
+  }
+  .stackedTable :global(.ant-table-tbody > tr.ant-table-row-selected) {
+    background: var(--ant-color-primary-bg);
+  }
+  .stackedTable :global(.ant-table-tbody > tr > td.ant-table-selection-column) {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+  }
+  .stackedTable :global(.ant-checkbox-wrapper),
+  .stackedTable :global(.ant-radio-wrapper) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .stackedTable :global(.ant-table-tbody > tr > td.ant-table-row-expand-icon-cell) {
+    order: 1;
+    margin-top: 12px;
+    border-top: 1px solid var(--ant-color-border-secondary);
+  }
+  .stackedTable .expandButton {
+    display: flex;
+    gap: 6px;
+    width: fit-content;
+    margin-inline-start: auto;
+    padding-inline: 8px;
+    background: transparent;
+    color: var(--ant-color-primary);
+  }
+  .stackedTable .expandButton:global(.ant-btn):hover,
+  .stackedTable .expandButton:global(.ant-btn):active {
+    background: var(--ant-color-primary-bg);
+    color: var(--ant-color-primary);
+  }
+  .expandButton :global(.ant-btn-icon) {
+    font-size: 10px;
+    transition: transform 160ms ease;
+  }
+  .expandButton[aria-expanded='true'] :global(.ant-btn-icon) {
+    transform: rotate(180deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .expandButton :global(.ant-btn-icon) {
+      transition: none;
+    }
+  }
+  .stackedTable :global(.ant-table-expanded-row) {
+    display: block;
+    padding: 12px;
+    border: 1px solid var(--ant-color-border-secondary);
+    border-top: 0;
+    border-radius: 0 0 10px 10px;
+    background: var(--ant-color-fill-quaternary);
+  }
+  .stackedTable
+    :global(.ant-table-row:has(+ .ant-table-expanded-row:not([style*='display: none']))) {
+    border-radius: 10px 10px 0 0;
+  }
+  .stackedTable :global(.ant-table-expanded-row .ant-table-wrapper .ant-table) {
+    margin: 0 !important;
   }
   .stackedTable :global(.ant-table-measure-row) {
     display: none !important;
   }
+  .stackedTable :global(.ant-table-row-indent) {
+    max-width: 25%;
+  }
+  .stackedTable :global(.ant-table-row-indent + .ant-table-row-expand-icon) {
+    display: inline-block;
+    float: none;
+    min-width: 44px;
+    min-height: 44px;
+    margin-bottom: 8px;
+    vertical-align: middle;
+  }
+  .stackedTable :global(.ant-table-row-indent + .ant-table-row-expand-icon)::before,
+  .stackedTable :global(.ant-table-row-indent + .ant-table-row-expand-icon)::after {
+    inset: auto;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 1px;
+    transform: translate(-50%, -50%);
+  }
+  .stackedTable :global(.ant-table-row-indent + .ant-table-row-expand-icon-collapsed)::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
   .stackedTable :global(.product-cell) {
     min-width: 0;
-    flex-wrap: wrap;
   }
-  .stackedTable :global(.row-actions) {
+  .stackedTable :global(.product-cell > :last-child) {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .stackedTable :global(.row-actions),
+  .stackedTable :global(.product-source-row-actions) {
     display: flex;
     flex-wrap: wrap;
+    gap: 8px;
     white-space: normal;
   }
   .stackedTable :global(.ant-btn) {
+    min-width: 44px;
     min-height: 44px;
     height: auto;
     white-space: normal;
   }
-  .tableField {
-    display: grid;
-    grid-template-columns: minmax(64px, 28%) minmax(0, 1fr);
-    align-items: baseline;
-    gap: 12px;
+  .stackedTable :global(.ant-pagination) {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 8px;
   }
-  .tableLabel {
-    color: var(--ant-color-text-secondary);
-    font-size: 12px;
-    overflow-wrap: anywhere;
+  .stackedTable :global(.ant-pagination-item-link),
+  .stackedTable :global(.ant-pagination-simple-pager) {
+    min-width: 44px;
+    height: 44px;
+    line-height: 44px;
   }
-  .tableValue {
-    min-width: 0;
-    font-size: 14px;
-    overflow-wrap: anywhere;
+  .stackedTable .tableField[data-column='actions'] {
+    display: block;
+    padding-top: 10px;
+    border-top: 1px solid var(--ant-color-border-secondary);
+  }
+  .stackedTable .tableField[data-column='actions'] > .tableLabel {
+    display: none;
+  }
+  .stackedTable .tableField[data-column='actions'] > .tableValue > a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .stackedTable .tableField[data-column='actions'] > .tableValue > :global(.row-actions) {
+    justify-content: flex-end;
+  }
+  .stackedTable .tableFields > .tableField:first-child:has(.product-cell) {
+    display: block;
+    margin-bottom: 4px;
+  }
+  .stackedTable .tableField:first-child:has(.product-cell) > .tableLabel {
+    display: none;
   }
 }
 

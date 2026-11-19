@@ -3,13 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { apiError, requireAdmin } from '@/lib/api';
 import { distributorInclude, createDistributor } from '@/lib/distributors';
+import { getDistributorBatchStats } from '@/lib/distributor-batches';
 import { getDistributorItemCounts } from '@/lib/distributor-purchases';
 import { distributorSchema } from '@/lib/validation';
 
 export async function GET(request: NextRequest) {
   try {
     await requireAdmin(request);
-    const [items, areas, areaCounts, itemCounts] = await Promise.all([
+    const [items, areas, areaCounts, itemCounts, batchStats] = await Promise.all([
       db.distributor.findMany({
         include: distributorInclude,
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
@@ -17,11 +18,13 @@ export async function GET(request: NextRequest) {
       db.distributorArea.findMany({ orderBy: { name: 'asc' }, select: { id: true, name: true } }),
       db.distributor.groupBy({ by: ['area'], _count: { _all: true } }),
       getDistributorItemCounts(),
+      getDistributorBatchStats(),
     ]);
     const counts = new Map(areaCounts.map(({ area, _count }) => [area, _count._all]));
     return NextResponse.json({
       items: items.map((item) => ({
         ...item,
+        ...(batchStats.get(item.id) ?? { batchCount: 0, latestReceivedAt: null }),
         itemCounts: itemCounts.get(item.id) ?? { total: 0, products: 0, materials: 0 },
       })),
       areas: areas.map((area) => area.name),

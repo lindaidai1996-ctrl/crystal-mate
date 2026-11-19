@@ -1,4 +1,5 @@
 'use client';
+import { attachmentWriteFields } from '@/lib/attachments';
 
 import { AttachmentGallery } from '@/components/imageUpload/attachmentGallery';
 import { apiFetch } from '@/lib/client-api';
@@ -18,6 +19,11 @@ export function DistributorAttachmentGallery({
       owner={{ type: 'distributor', id: distributor.id }}
       attachments={distributor.attachments}
       onUploadingChange={onUploadingChange}
+      onRefresh={async () => {
+        onSaved(
+          (await apiFetch<DistributorDetailResponse>(`/api/distributors/${distributor.id}`)).item,
+        );
+      }}
       onSave={async (update) => {
         const { item: current } = await apiFetch<DistributorDetailResponse>(
           `/api/distributors/${distributor.id}`,
@@ -33,12 +39,8 @@ export function DistributorAttachmentGallery({
             phone: current.phone,
             notes: current.notes,
             coverObjectKey: next.coverObjectKey,
-            attachments: next.attachments.map(({ objectKey, fileName, notes, source }) => ({
-              objectKey,
-              fileName,
-              notes,
-              source,
-            })),
+            attachmentsVersion: current.attachmentsVersion,
+            attachments: next.attachments.map(attachmentWriteFields),
           }),
         });
         onSaved(saved);

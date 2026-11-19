@@ -2,12 +2,13 @@
 
 import { imageFramings } from '@/lib/image-framing';
 
+import { BatchComparisonButton } from '@/components/batchComparison/batchComparisonButton';
 import { RecordAuditPanel } from '@/components/audit-history';
 
 import { EditorActions } from '@/components/responsive/editorActions';
 
 import { ArrowLeftOutlined, FileTextOutlined, SaveOutlined } from '@ant-design/icons';
-import { App, Button, Form, Result, Skeleton, Space } from 'antd';
+import { App, Button, Form, Result, Select, Skeleton, Space } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -69,6 +70,7 @@ function readNewMaterialDraft(storageKey: string): NewMaterialDraft | null {
 export function MaterialEditor({
   id,
   entryId,
+  basicOnly = false,
   initialBatchId,
   initialDistributorId,
   initialDraftId,
@@ -76,6 +78,7 @@ export function MaterialEditor({
 }: {
   id: string;
   entryId?: string;
+  basicOnly?: boolean;
   initialBatchId?: string;
   initialDistributorId?: string;
   initialDraftId?: string;
@@ -126,6 +129,7 @@ export function MaterialEditor({
         : receivedQty;
   const purchaseResult = calculatePurchase(inputDraft, purchase, effectiveQuantity);
   const draft = purchaseResult.values;
+  const [activeEntryId, setActiveEntryId] = useState(entryId);
   const [linkedEntries, setLinkedEntries] = useState<MaterialBatchEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -149,7 +153,7 @@ export function MaterialEditor({
     : returnDistributorId
       ? common('backToDistributor')
       : t('back');
-  const isMasterEdit = !isNew && !entryId;
+  const isMasterEdit = !isNew && !activeEntryId;
   const isAddingEntry = entryId === 'new';
 
   useEffect(() => {
@@ -209,7 +213,15 @@ export function MaterialEditor({
               ? material.batchEntries.find((item) => item.id === entryId)
               : isAddingEntry
                 ? material.batchEntries[0]
-                : null;
+                : basicOnly
+                  ? null
+                  : [...material.batchEntries].sort(
+                      (a, b) =>
+                        b.batch.receivedAt.localeCompare(a.batch.receivedAt) ||
+                        b.createdAt.localeCompare(a.createdAt) ||
+                        b.id.localeCompare(a.id),
+                    )[0];
+          setActiveEntryId(entryId ?? entry?.id);
           if (entryId && !isAddingEntry && !entry) throw new Error('NOT_FOUND');
           const source = entry ?? material;
           const values = Object.fromEntries(
@@ -251,7 +263,7 @@ export function MaterialEditor({
     return () => {
       active = false;
     };
-  }, [id, entryId, isNew, isAddingEntry, revision]);
+  }, [id, entryId, basicOnly, isNew, isAddingEntry, revision]);
 
   useEffect(() => {
     if (!isNew || !initialDraftId) return;
@@ -394,13 +406,13 @@ export function MaterialEditor({
       message.error(t('required'));
       return;
     }
-    if (!isMasterEdit && (!entryId || isAddingEntry) && !selection) {
+    if (!isMasterEdit && (!activeEntryId || isAddingEntry) && !selection) {
       message.error(t('batchRequired'));
       return;
     }
     if (
       !isMasterEdit &&
-      (!entryId || isAddingEntry) &&
+      (!activeEntryId || isAddingEntry) &&
       selection?.newBatch &&
       (!selection.newBatch.name.trim() || !selection.newBatch.receivedAt)
     ) {
@@ -490,7 +502,7 @@ export function MaterialEditor({
           }),
         });
       } else {
-        await apiFetch(`/api/materials/${id}/batches/${entryId}`, {
+        await apiFetch(`/api/materials/${id}/batches/${activeEntryId}`, {
           method: 'PUT',
           body: JSON.stringify({
             values,
@@ -609,8 +621,49 @@ export function MaterialEditor({
                   ? batchText('add')
                   : batchText('edit')}
           </h1>
+          {!isNew && (
+            <BatchComparisonButton
+              kind="material"
+              id={id}
+              entries={linkedEntries}
+              returnTo={withAdminReturnTo(
+                activeEntryId
+                  ? `/admin/materials/${id}/batches/${activeEntryId}`
+                  : `/admin/materials/${id}?view=basics`,
+                returnPath,
+              )}
+            />
+          )}
         </div>
       </div>
+      {!isNew && !isAddingEntry && linkedEntries.length > 0 && (
+        <Form layout="vertical">
+          <Form.Item label={batchText('batch')}>
+            <Select
+              aria-label={batchText('batch')}
+              value={isMasterEdit ? 'basics' : activeEntryId}
+              disabled={saving || uploadingImages}
+              onChange={(value: string) =>
+                router.push(
+                  withAdminReturnTo(
+                    value === 'basics'
+                      ? `/admin/materials/${id}?view=basics`
+                      : `/admin/materials/${id}/batches/${value}`,
+                    returnPath,
+                  ),
+                )
+              }
+              options={[
+                ...linkedEntries.map((entry) => ({
+                  value: entry.id,
+                  label: `${entry.batch.name} · ${entry.distributor.name}`,
+                })),
+                { value: 'basics', label: t('basics') },
+              ]}
+            />
+          </Form.Item>
+        </Form>
+      )}
       {!isNew && <RecordAuditPanel entityType="Material" entityId={id} />}
       <Form layout="vertical" onFinish={save}>
         <div className="editor-surface material-editor">
@@ -636,10 +689,10 @@ export function MaterialEditor({
             unitLocked={!isNew && linkedEntries.length > 0}
             submitted={submitted}
           />
-          {!isMasterEdit && (!entryId || isAddingEntry) && (
+          {!isMasterEdit && (!activeEntryId || isAddingEntry) && (
             <BatchSelector selection={selection} onChange={setSelection} batches={batches} />
           )}
-          {!isMasterEdit && entryId && !isAddingEntry && (
+          {!isMasterEdit && activeEntryId && !isAddingEntry && (
             <section className="editor-block">
               <h2>{batchText('batch')}</h2>
               <p>{batches.find((batch) => batch.id === selection?.batchId)?.name}</p>
@@ -688,7 +741,7 @@ export function MaterialEditor({
             onUploadingChange={setUploadingImages}
             disabled={saving}
             showDetails={!isMasterEdit}
-            showNotes={!entryId}
+            showNotes={isMasterEdit || isNew}
           />
           <EditorActions>
             <Link href={returnPath} replace>

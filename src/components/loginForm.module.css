@@ -94,7 +94,7 @@
 }
 
 .brandName strong {
-  font-size: 17px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 3px;
 }
@@ -240,7 +240,7 @@
 .storyTitle {
   margin: 0;
   font-family: 'Songti SC', 'STSong', 'SimSun', Georgia, serif;
-  font-size: clamp(25px, 2.3vw, 32px);
+  font-size: 18px;
   font-weight: 400;
   line-height: 1.6;
   letter-spacing: 2px;
@@ -250,7 +250,7 @@
 .storyNote {
   margin: 12px 0 0;
   color: var(--login-muted);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.8;
   letter-spacing: 1.5px;
   text-wrap: pretty;
@@ -284,7 +284,7 @@
 .panel h1 {
   margin: 0;
   color: var(--login-ink);
-  font-size: 26px;
+  font-size: 18px;
   font-weight: 500;
   line-height: 1.5;
   letter-spacing: 2px;
@@ -293,7 +293,7 @@
 .description {
   margin: 6px 0 0;
   color: var(--login-muted);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.8;
   text-wrap: pretty;
 }
@@ -318,7 +318,7 @@
 }
 
 .panel :global(.ant-input) {
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .panel .remember {
@@ -330,7 +330,7 @@
   min-height: 26px;
   align-items: center;
   color: var(--login-muted);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .panel .submit {
@@ -338,7 +338,7 @@
   gap: 16px;
   height: 46px;
   border-radius: 12px;
-  font-size: 15px;
+  font-size: 12px;
   box-shadow: 0 6px 16px rgb(84 117 102 / 13%);
   transition:
     background 180ms ease,
@@ -356,7 +356,7 @@
 }
 
 .submit > :global(.anticon) {
-  font-size: 13px;
+  font-size: 12px;
   transition: transform 180ms ease;
 }
 
@@ -478,7 +478,7 @@
     padding: 26px 28px;
   }
   .storyTitle {
-    font-size: 26px;
+    font-size: 18px;
     letter-spacing: 2px;
   }
   .storyEyebrow {
@@ -501,7 +501,7 @@
     gap: 0;
   }
   .brandName strong {
-    font-size: 15px;
+    font-size: 14px;
     letter-spacing: 2px;
   }
   .brandName > span {
@@ -578,7 +578,7 @@
     border-radius: 22px;
   }
   .panel h1 {
-    font-size: 24px;
+    font-size: 18px;
     letter-spacing: 1px;
   }
   .brandName strong {

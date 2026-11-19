@@ -4,7 +4,7 @@ import { newAssistantExecution, runAssistantLoop } from '@/lib/ai-assistant/orch
 import type { ToolModel } from '@/lib/ai-assistant/orchestration-model';
 import { createAssistantToolModel } from '@/lib/ai-assistant/orchestration-model';
 import { createAssistantFacts } from '@/lib/ai-assistant/orchestration-facts';
-import { RelevanceRuns } from '@/lib/ai-assistant/relevance-runs';
+import { RelevanceRuns, type RelevanceCheckpoint } from '@/lib/ai-assistant/relevance-runs';
 import { semanticQuery } from '../fixtures/ai-assistant-semantics';
 import {
   frozenEvaluationDetails,
@@ -225,6 +225,100 @@ describe('P2/P3 fact adapter', () => {
     expect(purchases.mock.calls[0][0].selectedPurchases!.map((r) => r.id).sort()).toEqual(
       [...baseline.goldenCase.includedEntryIds].sort(),
     );
+  });
+  it.each([
+    [100, 5],
+    [5, 9],
+  ])(
+    'processes all 44 candidates across automatic steps with page size %i',
+    async (pageSize, calls) => {
+      const model = vi.fn(judge);
+      const purchases = vi.fn(async () => ({ rows: [], candidates: [], scopeCandidateCount: 44 }));
+      const checkpoints: RelevanceCheckpoint[] = [];
+      const result = await createAssistantFacts({
+        accountId: 'account-a',
+        recall,
+        purchases,
+        stock: vi.fn(),
+        model,
+      })(
+        { query: { ...semanticQuery, pagination: { limit: pageSize } }, view: 'details' },
+        null,
+        new AbortController().signal,
+        async (_event, checkpoint) => {
+          if (checkpoint)
+            checkpoints.push(structuredClone(checkpoint) as (typeof checkpoints)[number]);
+        },
+      );
+      expect(result.status).toBe('completed');
+      expect(model).toHaveBeenCalledTimes(calls);
+      const keys = model.mock.calls.flatMap(([input]) => input.candidates.map((row) => row.key));
+      expect(keys).toHaveLength(44);
+      expect(new Set(keys).size).toBe(44);
+      const last = checkpoints.at(-1)!;
+      expect(last.decisions).toHaveLength(44);
+      expect(last.attempts).toHaveLength(calls);
+      expect(last.reservedTokens).toBeGreaterThan(checkpoints[0].reservedTokens);
+      expect(purchases.mock.calls).toHaveLength(1);
+    },
+  );
+  it.each([
+    [{ maxCalls: 3 }, 3, 30],
+    [{ maxReservedTokens: 1 }, 0, 0],
+    [{ maxCandidates: 25 }, 3, 25],
+  ] as const)(
+    'retains cumulative relevance limits across automatic steps: %j',
+    async (budget, calls, decisions) => {
+      const model = vi.fn(judge);
+      const purchases = vi.fn();
+      const result = await createAssistantFacts({
+        accountId: 'account-a',
+        recall,
+        purchases,
+        stock: vi.fn(),
+        model,
+        relevanceBudget: budget,
+      })(
+        { query: { ...semanticQuery, pagination: { limit: 100 } }, view: 'details' },
+        null,
+        new AbortController().signal,
+        async () => {},
+      );
+      expect(result.status).toBe('budget');
+      expect(result.errorCode).toBe('EXECUTION_BUDGET_EXCEEDED');
+      expect(model).toHaveBeenCalledTimes(calls);
+      expect((result.checkpoint as RelevanceCheckpoint).decisions).toHaveLength(decisions);
+      expect(purchases).not.toHaveBeenCalled();
+    },
+  );
+  it('stops automatic continuation when cancelled at a step boundary', async () => {
+    const controller = new AbortController();
+    const model = vi.fn(judge);
+    const purchases = vi.fn();
+    const result = await createAssistantFacts({
+      accountId: 'account-a',
+      recall,
+      purchases,
+      stock: vi.fn(),
+      model,
+    })(
+      { query: { ...semanticQuery, pagination: { limit: 100 } }, view: 'details' },
+      null,
+      controller.signal,
+      async (event) => {
+        if (
+          event.stage === 'judgment' &&
+          event.completeness &&
+          typeof event.completeness === 'object' &&
+          'coverage' in event.completeness
+        ) {
+          controller.abort();
+        }
+      },
+    );
+    expect(result.status).toBe('cancelled');
+    expect(model).toHaveBeenCalledTimes(2);
+    expect(purchases).not.toHaveBeenCalled();
   });
   it('continues a persisted checkpoint in a fresh process-local executor without resetting costs', async () => {
     const first = new RelevanceRuns();

@@ -35,6 +35,7 @@ import { useCallback, useDeferredValue, useEffect, useState, type ReactElement }
 import { Link } from '@/i18n/navigation';
 import { PaginatedTable, useTablePagination } from '@/components/paginated-table';
 import { TextTag } from '@/components/text-tag';
+import { BatchComparisonButton } from '@/components/batchComparison/batchComparisonButton';
 import { MaterialStockButton } from '@/components/inventory/materialStockButton';
 import { MaterialStockSummary } from '@/components/inventory/materialStockSummary';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
@@ -299,33 +300,15 @@ function MaterialIdentity({ item }: { item: Material }) {
 }
 
 function MaterialEditLink({ item, children }: { item: Material; children?: ReactElement }) {
-  const t = useTranslations('materials');
-  if (item.batchEntries.length > 1)
-    return (
-      <Popover
-        title={t('chooseEditBatch')}
-        content={
-          <div className="material-edit-batch-options">
-            {item.batchEntries.map((entry) => (
-              <Link key={entry.id} href={`/admin/materials/${item.id}/batches/${entry.id}`}>
-                {entry.batch.name}
-              </Link>
-            ))}
-          </div>
-        }
-        trigger="click"
-      >
-        {children ?? (
-          <button type="button" className="product-name material-edit-name">
-            {item.name}
-          </button>
-        )}
-      </Popover>
-    );
   return (
     <Link
       className={children ? undefined : 'product-name'}
-      href={`/admin/materials/${item.id}/batches/${item.batchEntries[0]?.id ?? 'new'}`}
+      href={withAdminReturnTo(
+        item.batchEntries.length
+          ? `/admin/materials/${item.id}`
+          : `/admin/materials/${item.id}/batches/new`,
+        '/admin/materials',
+      )}
     >
       {children ?? item.name}
     </Link>
@@ -369,6 +352,12 @@ function MaterialActions({ item, onRemove }: { item: Material; onRemove: (id: st
   return (
     <span className={`row-actions ${materialStyles.actions}`}>
       <MaterialEditLink item={item}>{editButton}</MaterialEditLink>
+      <BatchComparisonButton
+        kind="material"
+        id={item.id}
+        entries={item.batchEntries}
+        returnTo="/admin/materials"
+      />
       <Link href={`/admin/materials/${item.id}/batches/new`}>
         <Tooltip title={t('addBatch')}>
           <Button size="small" icon={<PlusOutlined />} aria-label={t('addBatch')}>
@@ -778,19 +767,6 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
             rowKey="id"
             mobileRender={(item) => (
               <>
-                {bulkMode && (
-                  <Checkbox
-                    checked={selectedIds.includes(item.id)}
-                    disabled={loading}
-                    onChange={(event) =>
-                      setSelectedIds((ids) =>
-                        togglePageSelection(ids, [item.id], event.target.checked),
-                      )
-                    }
-                  >
-                    {bulk('selectMaterial', { name: item.name })}
-                  </Checkbox>
-                )}
                 <MaterialIdentity item={item} />
                 <p className="mobile-record-meta">
                   {categoryPath(item.categoryId, categories)
@@ -822,7 +798,10 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
                     selectedRowKeys: selectedIds,
                     preserveSelectedRowKeys: true,
                     onChange: (keys) => setSelectedIds(keys.map(String)),
-                    getCheckboxProps: () => ({ disabled: loading }),
+                    getCheckboxProps: (item) => ({
+                      disabled: loading,
+                      'aria-label': bulk('selectMaterial', { name: item.name }),
+                    }),
                   }
                 : undefined
             }

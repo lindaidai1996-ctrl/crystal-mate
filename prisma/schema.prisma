@@ -72,6 +72,7 @@ model Distributor {
   materialBatchEntries   MaterialBatchEntry[]
   productPurchaseEntries ProductPurchaseEntry[]
   coverObjectKey         String?
+  attachmentsVersion     Int                     @default(0)
   attachments            DistributorAttachment[]
 
   @@index([area])
@@ -79,16 +80,19 @@ model Distributor {
 }
 
 model DistributorAttachment {
-  id            String      @id @default(cuid())
+  assetId       String
+  asset         SharedAttachment @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  id            String           @id @default(cuid())
   distributorId String
-  distributor   Distributor @relation(fields: [distributorId], references: [id], onDelete: Cascade)
+  distributor   Distributor      @relation(fields: [distributorId], references: [id], onDelete: Cascade)
   objectKey     String
   url           String
   fileName      String
-  notes         String      @default("") @db.Text
+  notes         String           @default("") @db.Text
   position      Int
-  createdAt     DateTime    @default(now())
+  createdAt     DateTime         @default(now())
 
+  @@unique([distributorId, assetId])
   @@unique([distributorId, position])
   @@unique([distributorId, objectKey])
 }
@@ -539,16 +543,17 @@ model MaterialTag {
 }
 
 model MaterialBatch {
-  id             String                    @id @default(cuid())
-  name           String                    @unique
-  receivedAt     DateTime                  @db.Date
-  notes          String                    @default("") @db.Text
-  entries        MaterialBatchEntry[]
-  productEntries ProductPurchaseEntry[]
-  coverObjectKey String?
-  attachments    MaterialBatchAttachment[]
-  createdAt      DateTime                  @default(now())
-  updatedAt      DateTime                  @updatedAt
+  id                 String                    @id @default(cuid())
+  name               String                    @unique
+  receivedAt         DateTime                  @db.Date
+  notes              String                    @default("") @db.Text
+  entries            MaterialBatchEntry[]
+  productEntries     ProductPurchaseEntry[]
+  coverObjectKey     String?
+  attachmentsVersion Int                       @default(0)
+  attachments        MaterialBatchAttachment[]
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
 
   @@index([receivedAt])
 }
@@ -623,16 +628,19 @@ model MaterialStockAdjustment {
 }
 
 model MaterialBatchAttachment {
-  id        String        @id @default(cuid())
+  assetId   String
+  asset     SharedAttachment @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  id        String           @id @default(cuid())
   batchId   String
-  batch     MaterialBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  batch     MaterialBatch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
   objectKey String
   url       String
   fileName  String
-  notes     String        @default("") @db.Text
+  notes     String           @default("") @db.Text
   position  Int
-  createdAt DateTime      @default(now())
+  createdAt DateTime         @default(now())
 
+  @@unique([batchId, assetId])
   @@unique([batchId, position])
   @@unique([batchId, objectKey])
 }
@@ -829,4 +837,42 @@ model DiyRecentCabochon {
 
   @@id([ownerId, productId])
   @@index([ownerId, usedAt(sort: Desc)])
+}
+
+// Owner tables retain display projections for existing list queries. Only the shared
+// attachment service writes these fields; image and notes are authoritative here.
+model SharedAttachment {
+  id           String                    @id @default(cuid())
+  objectKey    String
+  url          String
+  fileName     String
+  notes        String                    @default("") @db.Text
+  version      Int                       @default(1)
+  imageVersion Int                       @default(1)
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @default(now()) @updatedAt
+  distributors DistributorAttachment[]
+  batches      MaterialBatchAttachment[]
+  recognitions AttachmentRecognition[]
+
+  @@index([objectKey])
+}
+
+model AttachmentRecognition {
+  id            String           @id
+  assetId       String
+  asset         SharedAttachment @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  ownerId       String
+  imageVersion  Int
+  promptVersion String
+  provider      String
+  model         String
+  status        String
+  result        Json?
+  usage         Json?
+  errorCode     String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @default(now()) @updatedAt
+
+  @@index([assetId, imageVersion, createdAt])
 }

@@ -10,10 +10,17 @@ import {
   PictureOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import { App, Button, Input, Modal, Space } from 'antd';
+import { App, Alert, Button, Checkbox, Collapse, Input, Modal, Space } from 'antd';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
-import { attachmentCoverKey, MAX_ATTACHMENTS, type AttachmentOwner } from '@/lib/attachments';
+import { useEffect, useState } from 'react';
+import { apiFetch } from '@/lib/client-api';
+import type { AttachmentTarget } from '@/lib/shared-attachment-contracts';
+import { AttachmentRelations, attachmentLocations } from './attachmentRelations';
+import { AttachmentTargets } from './attachmentTargets';
+import { AttachmentLinkDialog } from './attachmentLinkDialog';
+import { ReceiptAssociationDialog } from './receiptAssociationDialog';
+import sharedStyles from './sharedAttachments.module.css';
+import { MAX_ATTACHMENTS, type AttachmentOwner } from '@/lib/attachments';
 import { ClientApiError } from '@/lib/client-api';
 import type { MaterialBatchAttachment } from '@/lib/client-types';
 import { imageThumbnailUrl } from '@/lib/image-storage';
@@ -35,10 +42,12 @@ export function AttachmentGallery({
   owner,
   attachments,
   onSave,
+  onRefresh,
   onUploadingChange,
 }: {
   owner: AttachmentOwner;
   attachments: MaterialBatchAttachment[];
+  onRefresh: () => Promise<void>;
   onSave: (update: AttachmentUpdate) => Promise<void>;
   onUploadingChange: (busy: boolean) => void;
 }) {
@@ -46,11 +55,16 @@ export function AttachmentGallery({
   const batchT = useTranslations('materialBatches');
   const imageT = useTranslations('imageUpload');
   const common = useTranslations('common');
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
+  const sharedT = useTranslations('sharedAttachments');
+  const [selected, setSelected] = useState<string[]>([]);
+  const [association, setAssociation] = useState<'manual' | 'smart' | null>(null);
+  const [uploadTargets, setUploadTargets] = useState<AttachmentTarget[]>([]);
   const [busy, setBusy] = useState(false);
   const [saving, setSaving] = useState(false);
   const [choosing, setChoosing] = useState(false);
   const [files, setFiles] = useState<File[] | null>(null);
+  const [pendingAdd, setPendingAdd] = useState<MaterialBatchAttachment[]>([]);
   const [editing, setEditing] = useState<MaterialBatchAttachment | null>(null);
   const [notesAttachment, setNotesAttachment] = useState<MaterialBatchAttachment | null>(null);
   const [notes, setNotes] = useState('');
@@ -65,6 +79,79 @@ export function AttachmentGallery({
       setFiles(selected);
     },
   });
+
+  useEffect(() => {
+    const refresh = () => {
+      if (!busy && document.visibilityState === 'visible') void onRefresh().catch(() => {});
+    };
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+    };
+  }, [busy, onRefresh]);
+  const selectedItems = attachments.filter((a) => a.assetId && selected.includes(a.assetId));
+  async function command(operation: 'unlink' | 'delete', item: MaterialBatchAttachment) {
+    const confirmed = await modal.confirm({
+      title: sharedT(operation === 'unlink' ? 'unlink' : 'deleteEverywhere'),
+      content:
+        operation === 'unlink'
+          ? sharedT('unlinkHelp')
+          : sharedT('deleteHelp', { locations: attachmentLocations(item) }),
+      okText: common('delete'),
+      cancelText: common('cancel'),
+      okButtonProps: { danger: true },
+    });
+    if (!confirmed) return;
+    changeBusy(true);
+    setSaving(true);
+    try {
+      await apiFetch('/api/attachments', {
+        method: 'POST',
+        body: JSON.stringify({
+          operation,
+          assets: [{ id: item.assetId, version: item.asset?.version }],
+          ...(operation === 'unlink' ? { owner } : {}),
+        }),
+      });
+      await onRefresh();
+    } catch (error) {
+      message.error(
+        sharedT.has(error instanceof ClientApiError ? error.code : '')
+          ? sharedT((error as ClientApiError).code as never)
+          : sharedT('saveFailed'),
+      );
+    } finally {
+      setSaving(false);
+      changeBusy(false);
+    }
+  }
+  async function sharedUpdate(item: MaterialBatchAttachment, data: Record<string, unknown>) {
+    setSaving(true);
+    try {
+      await apiFetch('/api/attachments', {
+        method: 'POST',
+        body: JSON.stringify({
+          operation: 'update',
+          asset: { id: item.assetId, version: item.asset?.version },
+          ...data,
+        }),
+      });
+      await onRefresh();
+      message.success(common('saved'));
+      finish();
+      return true;
+    } catch (error) {
+      message.error(
+        sharedT.has(error instanceof ClientApiError ? error.code : '')
+          ? sharedT((error as ClientApiError).code as never)
+          : sharedT('saveFailed'),
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
 
   function changeBusy(value: boolean) {
     setBusy(value);
@@ -96,13 +183,15 @@ export function AttachmentGallery({
         );
       }
       if (!keepNotesOnError) finish();
+      return false;
     } finally {
       setSaving(false);
     }
   }
 
   async function add(items: MaterialBatchAttachment[]) {
-    await save((current) => {
+    changeBusy(true);
+    const succeeded = await save((current) => {
       const keys = new Set(current.attachments.map((item) => item.objectKey));
       const added = items.filter((item) => {
         if (keys.has(item.objectKey)) return false;
@@ -119,6 +208,7 @@ export function AttachmentGallery({
         })),
       };
     });
+    setPendingAdd(succeeded ? [] : items);
   }
 
   async function upload(selected: File[]) {
@@ -132,6 +222,7 @@ export function AttachmentGallery({
           fileName: file.name.slice(0, 255),
           notes: '',
           position: 0,
+          targets: uploadTargets,
         });
       } catch {
         message.error(batchT('uploadFailed'));
@@ -146,30 +237,15 @@ export function AttachmentGallery({
 
   async function replaceImage(file: File) {
     if (!editing) return;
-    const objectKey = editing.objectKey;
-    setEditing(null);
     setSaving(true);
     try {
       const replacement = await uploadImage(file);
-      await save((current) => {
-        if (!current.attachments.some((item) => item.objectKey === objectKey))
-          throw new ClientApiError('NOT_FOUND');
-        return {
-          coverObjectKey:
-            attachmentCoverKey(current.attachments, current.coverObjectKey) === objectKey
-              ? replacement.objectKey
-              : current.coverObjectKey,
-          attachments: current.attachments.map((item) =>
-            item.objectKey === objectKey
-              ? { ...item, ...replacement, source: undefined, fileName: file.name.slice(0, 255) }
-              : item,
-          ),
-        };
+      await sharedUpdate(editing, {
+        replacement: { objectKey: replacement.objectKey, fileName: file.name.slice(0, 255) },
       });
     } catch {
       message.error(batchT('uploadFailed'));
       setSaving(false);
-      finish();
     }
   }
 
@@ -206,6 +282,82 @@ export function AttachmentGallery({
             </Space>
           )}
         </div>
+        {!!pendingAdd.length && (
+          <Alert
+            type="warning"
+            message={sharedT('pendingUpload', { count: pendingAdd.length })}
+            action={
+              <Space>
+                <Button
+                  disabled={busy}
+                  onClick={() =>
+                    void add(pendingAdd.map((item) => ({ ...item, targets: uploadTargets })))
+                  }
+                >
+                  {sharedT('retry')}
+                </Button>
+                <Button disabled={busy} onClick={() => setPendingAdd([])}>
+                  {sharedT('cancel')}
+                </Button>
+              </Space>
+            }
+          />
+        )}
+        <div className={sharedStyles.toolbar}>
+          <Checkbox
+            disabled={busy || !attachments.length}
+            checked={!!attachments.length && selectedItems.length === attachments.length}
+            indeterminate={!!selectedItems.length && selectedItems.length < attachments.length}
+            onChange={(event) =>
+              setSelected(
+                event.target.checked
+                  ? attachments.flatMap((a) => (a.assetId ? [a.assetId] : []))
+                  : [],
+              )
+            }
+          >
+            {sharedT('selectAll')}
+          </Checkbox>
+          <span>{sharedT('selectedCount', { count: selectedItems.length })}</span>
+          <Button
+            disabled={busy || !selectedItems.length}
+            onClick={() => {
+              changeBusy(true);
+              setAssociation('manual');
+            }}
+          >
+            {sharedT(owner.type === 'batch' ? 'linkDistributors' : 'linkBatches')}
+          </Button>
+          <Button
+            disabled={busy || !selectedItems.length}
+            onClick={() => {
+              changeBusy(true);
+              setAssociation('smart');
+            }}
+          >
+            {sharedT('smartLink')}
+          </Button>
+        </div>
+        <div className={sharedStyles.uploadTargets}>
+          <Collapse
+            size="small"
+            items={[
+              {
+                key: 'targets',
+                label: sharedT('uploadTargets'),
+                children: (
+                  <AttachmentTargets
+                    owner={owner}
+                    type={owner.type === 'batch' ? 'distributor' : 'batch'}
+                    value={uploadTargets}
+                    onChange={setUploadTargets}
+                    disabled={busy}
+                  />
+                ),
+              },
+            ]}
+          />
+        </div>
         {attachments.length ? (
           <ImagePreviewGroup
             items={attachments.map((attachment) => ({
@@ -228,14 +380,38 @@ export function AttachmentGallery({
                     height={110}
                   />
                   <div className="batch-detail-attachment-content">
+                    <Checkbox
+                      disabled={busy}
+                      checked={!!attachment.assetId && selected.includes(attachment.assetId)}
+                      onChange={(event) =>
+                        setSelected((current) =>
+                          event.target.checked
+                            ? [...current, attachment.assetId!]
+                            : current.filter((id) => id !== attachment.assetId),
+                        )
+                      }
+                    >
+                      {attachment.fileName}
+                    </Checkbox>
+                    <AttachmentRelations item={attachment} />
+
                     {attachment.notes?.trim() && <p>{attachment.notes}</p>}
-                    <Space wrap size="small">
+                    <Space wrap size="small" className={sharedStyles.actions}>
                       <Button
                         size="small"
                         icon={<EditOutlined />}
                         disabled={busy}
                         aria-label={`${imageT('editImage')} ${attachment.fileName}`}
-                        onClick={() => {
+                        onClick={async () => {
+                          const confirmed = await modal.confirm({
+                            title: imageT('editImage'),
+                            content: sharedT('sharedEdit', {
+                              locations: attachmentLocations(attachment),
+                            }),
+                            okText: common('save'),
+                            cancelText: common('cancel'),
+                          });
+                          if (!confirmed) return;
                           changeBusy(true);
                           setEditing(attachment);
                         }}
@@ -253,6 +429,32 @@ export function AttachmentGallery({
                         }}
                       >
                         {t('editNotes')}
+                      </Button>
+                      <Button
+                        size="small"
+                        disabled={busy}
+                        onClick={() => {
+                          setSelected([attachment.assetId!]);
+                          changeBusy(true);
+                          setAssociation('manual');
+                        }}
+                      >
+                        {sharedT('link')}
+                      </Button>
+                      <Button
+                        size="small"
+                        disabled={busy}
+                        onClick={() => void command('unlink', attachment)}
+                      >
+                        {sharedT('unlink')}
+                      </Button>
+                      <Button
+                        size="small"
+                        danger
+                        disabled={busy}
+                        onClick={() => void command('delete', attachment)}
+                      >
+                        {sharedT('deleteEverywhere')}
                       </Button>
                     </Space>
                   </div>
@@ -303,6 +505,30 @@ export function AttachmentGallery({
           </div>
         )}
       </div>
+      {association === 'manual' && (
+        <AttachmentLinkDialog
+          owner={owner}
+          items={selectedItems}
+          onSaved={onRefresh}
+          onClose={() => {
+            setAssociation(null);
+            setSelected([]);
+            changeBusy(false);
+          }}
+        />
+      )}
+      {association === 'smart' && (
+        <ReceiptAssociationDialog
+          owner={owner}
+          items={selectedItems}
+          onSaved={onRefresh}
+          onClose={() => {
+            setAssociation(null);
+            setSelected([]);
+            changeBusy(false);
+          }}
+        />
+      )}
       {choosing && (
         <AttachmentCandidateDialog
           owner={owner}
@@ -310,7 +536,9 @@ export function AttachmentGallery({
           onClose={finish}
           onAdd={(items) => {
             setChoosing(false);
-            void add(items.map((item) => ({ ...item, notes: '', position: 0 })));
+            void add(
+              items.map((item) => ({ ...item, notes: '', position: 0, targets: uploadTargets })),
+            );
           }}
         />
       )}
@@ -344,18 +572,13 @@ export function AttachmentGallery({
           confirmLoading={saving}
           onOk={() => {
             if (saving) return;
-            void save((current) => {
-              if (!current.attachments.some((item) => item.objectKey === notesAttachment.objectKey))
-                throw new ClientApiError('NOT_FOUND');
-              return {
-                ...current,
-                attachments: current.attachments.map((item) =>
-                  item.objectKey === notesAttachment.objectKey ? { ...item, notes } : item,
-                ),
-              };
-            }, true);
+            void sharedUpdate(notesAttachment, { notes });
           }}
         >
+          <Alert
+            type="info"
+            message={sharedT('sharedEdit', { locations: attachmentLocations(notesAttachment) })}
+          />
           <Input.TextArea
             aria-label={batchT('attachmentNotes')}
             placeholder={batchT('attachmentNotes')}

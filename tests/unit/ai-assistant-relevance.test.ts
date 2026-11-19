@@ -23,6 +23,7 @@ import {
   semanticFixture,
   fixtureId,
 } from '../fixtures/ai-assistant-semantics';
+import { platedSilverFixture, platedSilverNames } from '../fixtures/ai-assistant-silver';
 const load = async () => annotateRecall(structuredClone(frozenDetails), semanticQuery);
 const command = (run: { runId: string; revision: number }, budget = {}) => ({
   runId: run.runId,
@@ -54,6 +55,19 @@ afterEach(() => {
 });
 
 describe('controlled model decisions', () => {
+  it.each(platedSilverNames)('preserves an evidence-backed silver inclusion: %s', (name) => {
+    const candidate = platedSilverFixture(name);
+    const conditions = [{ concept: 'material', text: '银', relation: 'is' }] as const;
+    expect(
+      validateRelevanceOutput(
+        {
+          decisions: [{ ...valid, key: candidateKey(candidate), reason: '银本体，表面镀金' }],
+        },
+        [candidate],
+        [...conditions],
+      )[0].status,
+    ).toBe('include');
+  });
   it('reconstructs exact evidence and distinguishes uncertainty and absence', () => {
     expect(
       validateRelevanceOutput({ decisions: [valid] }, [candidate], semanticQuery.semantic)[0]

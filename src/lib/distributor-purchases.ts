@@ -9,7 +9,7 @@ import type {
   DistributorPurchaseSummary,
 } from '@/lib/client-types';
 
-export async function getDistributorItemCounts() {
+export async function getDistributorItemCounts(distributorId?: string) {
   // Count catalog identities, not purchase rows or quantities, just like the detail page.
   const rows = await db.$queryRaw<
     { distributorId: string; products: number; materials: number }[]
@@ -24,6 +24,7 @@ export async function getDistributorItemCounts() {
       SELECT "distributorId", "materialId", 'MATERIAL'
       FROM "MaterialBatchEntry"
     ) purchases
+    WHERE ${distributorId ? Prisma.sql`"distributorId" = ${distributorId}` : Prisma.sql`true`}
     GROUP BY "distributorId"
   `);
   return new Map<string, DistributorItemCounts>(

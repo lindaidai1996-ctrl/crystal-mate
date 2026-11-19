@@ -1,8 +1,9 @@
 'use client';
 
-import { Empty, Pagination, Skeleton, Spin, Table } from 'antd';
+import { Button, Grid, Table } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import type { TableProps } from 'antd';
-import type { ColumnType } from 'antd/es/table';
+import type { ColumnType, ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { isValidElement, type ReactNode } from 'react';
 import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
@@ -19,6 +20,61 @@ export function useTablePagination() {
   };
 }
 
+/** Reuse the table's formatting and privacy wrappers in a mobile summary. */
+export function MobileTableFields<RecordType extends object>({
+  columns,
+  record,
+  index = 0,
+  className,
+}: {
+  columns: ColumnsType<RecordType>;
+  record: RecordType;
+  index?: number;
+  className?: string;
+}) {
+  return (
+    <dl className={[mobileStyles.tableFields, className].filter(Boolean).join(' ')}>
+      {columns.map((column, columnIndex) => {
+        if ('children' in column || column.hidden) return null;
+        const path = Array.isArray(column.dataIndex) ? column.dataIndex : [column.dataIndex];
+        const value = path.reduce<unknown>(
+          (current, key) =>
+            key === undefined || current === null || typeof current !== 'object'
+              ? undefined
+              : (current as Record<string, unknown>)[String(key)],
+          record,
+        );
+        const result = column.render ? column.render(value, record, index) : (value as ReactNode);
+        const cell =
+          result &&
+          typeof result === 'object' &&
+          !isValidElement(result) &&
+          !('$$typeof' in result) &&
+          'children' in result
+            ? result
+            : null;
+        if (cell?.props?.colSpan === 0 || cell?.props?.rowSpan === 0) return null;
+        return (
+          <div
+            className={mobileStyles.tableField}
+            key={String(column.key ?? columnIndex)}
+            data-column={
+              column.key ?? (typeof column.dataIndex === 'string' ? column.dataIndex : undefined)
+            }
+          >
+            {column.title && typeof column.title !== 'function' && (
+              <dt className={mobileStyles.tableLabel}>{column.title}</dt>
+            )}
+            <dd className={mobileStyles.tableValue}>
+              {cell ? cell.children : (result as ReactNode)}
+            </dd>
+          </div>
+        );
+      })}
+    </dl>
+  );
+}
+
 export function PaginatedTable<RecordType extends object>({
   pagination,
   dataSource,
@@ -29,114 +85,85 @@ export function PaginatedTable<RecordType extends object>({
   mobileLayout = 'cards',
   ...props
 }: TableProps<RecordType> & {
-  /** Optional summary layout for server-paginated records. Desktop table behavior is retained. */
+  /** Mobile card content. Ant Design still handles sorting, selection, expansion and pagination. */
   mobileRender?: (record: RecordType, index: number) => ReactNode;
   mobileLayout?: 'cards' | 'scroll';
 }) {
   const defaults = useTablePagination();
+  const mobileText = useTranslations('mobile');
   const mobile = useMobile();
+  const screens = Grid.useBreakpoint();
   const total = pagination === false ? undefined : (pagination?.total ?? dataSource?.length ?? 0);
   const isLoading = typeof loading === 'object' ? (loading.spinning ?? true) : loading;
-  // Let Ant Design retain client sorting, filtering and pagination for ordinary tables.
-  // Expansion, selection and grouped headers retain their dedicated table layout.
   const stacked =
     mobile &&
     mobileLayout === 'cards' &&
-    !props.expandable &&
-    !props.rowSelection &&
     !props.virtual &&
     !props.components &&
     !props.summary &&
     !props.columns?.some((column) => 'children' in column);
-  const columns = stacked
-    ? props.columns?.map((column) => {
-        const cellColumn = column as ColumnType<RecordType>;
-        return {
-          ...cellColumn,
+  const visibleColumns = props.columns?.filter(
+    (column) =>
+      !column.hidden &&
+      (!column.responsive || column.responsive.some((breakpoint) => screens[breakpoint])),
+  );
+  // Keep original columns in Ant Design's pipeline so their sorters and filters still work.
+  // Only their body cells are hidden; the first column contains the complete mobile card.
+  const columns: ColumnsType<RecordType> | undefined = stacked
+    ? [
+        {
+          key: '__mobile_record',
+          render: (_, record, index) =>
+            mobileRender ? (
+              mobileRender(record, index)
+            ) : (
+              <MobileTableFields columns={visibleColumns ?? []} record={record} index={index} />
+            ),
+        },
+        ...(props.columns ?? []).map((column) => ({
+          ...(column as ColumnType<RecordType>),
           width: undefined,
           minWidth: undefined,
           fixed: undefined,
           ellipsis: false,
-          render: (value: unknown, record: RecordType, index: number) => {
-            const result = cellColumn.render
-              ? cellColumn.render(value, record, index)
-              : (value as ReactNode);
-            const cell =
-              result &&
-              typeof result === 'object' &&
-              !isValidElement(result) &&
-              !('$$typeof' in result) &&
-              'children' in result
-                ? result
-                : null;
-            const content = (
-              <div className={mobileStyles.tableField}>
-                <div className={mobileStyles.tableLabel}>
-                  {typeof cellColumn.title === 'function' ? null : cellColumn.title}
-                </div>
-                <div className={mobileStyles.tableValue}>
-                  {cell ? cell.children : (result as ReactNode)}
-                </div>
-              </div>
-            );
-            return cell ? { ...cell, children: content } : content;
-          },
-        };
-      })
+          onCell: () => ({ style: { display: 'none' } }),
+          render: () => null,
+        })),
+      ]
     : props.columns;
-
-  if (mobile && mobileRender) {
-    return (
-      <Spin
-        spinning={Boolean(isLoading && dataSource?.length)}
-        indicator={<ListLoadingIndicator />}
-      >
-        <div className={mobileStyles.recordList} aria-busy={Boolean(isLoading)}>
-          {dataSource?.length ? (
-            dataSource.map((record, index) => (
-              <article
-                className={mobileStyles.record}
-                key={
-                  typeof props.rowKey === 'function'
-                    ? props.rowKey(record, index)
-                    : String(record[(props.rowKey ?? 'key') as keyof RecordType] ?? index)
-                }
-              >
-                {mobileRender(record, index)}
-              </article>
-            ))
-          ) : isLoading ? (
-            <Skeleton active paragraph={{ rows: 6 }} />
-          ) : props.locale?.emptyText && typeof props.locale.emptyText !== 'function' ? (
-            props.locale.emptyText
-          ) : (
-            <Empty />
-          )}
-          {pagination !== false &&
-            (total === 0 ? (
-              <span>{defaults.showTotal(0)}</span>
-            ) : (
-              <Pagination
-                {...defaults}
-                {...pagination}
-                total={total}
-                simple
-                showSizeChanger={false}
-                showQuickJumper={false}
-                disabled={Boolean(isLoading)}
-              />
-            ))}
-          {footer?.([...(dataSource ?? [])])}
-        </div>
-      </Spin>
-    );
-  }
 
   return (
     <Table<RecordType>
       {...props}
       columns={columns}
       scroll={stacked ? undefined : props.scroll}
+      expandable={
+        stacked && props.expandable?.expandedRowRender
+          ? {
+              ...props.expandable,
+              fixed: undefined,
+              columnWidth: undefined,
+              columnTitle: undefined,
+              expandIcon: ({ expanded, expandable, onExpand, record }) =>
+                expandable ? (
+                  <Button
+                    type="text"
+                    className={mobileStyles.expandButton}
+                    icon={<DownOutlined />}
+                    iconPosition="end"
+                    aria-label={mobileText(expanded ? 'collapseRows' : 'expandRows')}
+                    aria-expanded={expanded}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onExpand(record, event);
+                    }}
+                  >
+                    {mobileText(expanded ? 'collapseRows' : 'expandRows')}
+                  </Button>
+                ) : null,
+            }
+          : props.expandable
+      }
       className={[
         motionStyles.surface,
         motionStyles.table,
@@ -160,7 +187,14 @@ export function PaginatedTable<RecordType extends object>({
           : {
               ...defaults,
               ...pagination,
-              ...(mobile ? { simple: true, showSizeChanger: false, showQuickJumper: false } : {}),
+              ...(mobile
+                ? {
+                    simple: true,
+                    showSizeChanger: false,
+                    showQuickJumper: false,
+                    disabled: Boolean(isLoading),
+                  }
+                : {}),
             }
       }
       // Ant Design omits pagination when total is zero, so keep the count in the footer.

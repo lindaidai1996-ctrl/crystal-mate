@@ -39,6 +39,8 @@ function transaction(remaining: number, entryId: string | null = null) {
     archivedAt: null as Date | null,
   };
   const tx = {
+    $queryRaw: vi.fn().mockResolvedValue([]),
+    materialBatch: { update: vi.fn().mockResolvedValue({}) },
     materialImageImportItem: {
       findFirst: vi.fn().mockResolvedValue(row),
       update: vi.fn(async ({ data }) => Object.assign(row, data)),

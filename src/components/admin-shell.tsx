@@ -17,7 +17,17 @@ import {
   EyeInvisibleOutlined,
   CommentOutlined,
 } from '@ant-design/icons';
-import { Avatar, Button, Drawer, Layout, Menu, Select, Switch, Tooltip } from 'antd';
+import {
+  Avatar,
+  Button,
+  ConfigProvider,
+  Drawer,
+  Layout,
+  Menu,
+  Select,
+  Switch,
+  Tooltip,
+} from 'antd';
 import { signOut } from 'next-auth/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/navigation';
@@ -29,6 +39,8 @@ import type { AccountProfile } from '@/lib/account';
 import { imageThumbnailUrl } from '@/lib/image-storage';
 import { setPrivacyMode, usePrivacyMode } from './privacyMode';
 import { MobileBackToTop } from './responsive/mobileBackToTop';
+import { AssistantNavigationContext } from './assistant/assistantNavigation';
+import { assistantTheme } from '@/lib/ui-theme';
 
 const { Header, Sider, Content } = Layout;
 
@@ -212,6 +224,52 @@ function AdminShellContent({
       ]}
     />
   );
+  const actions = (
+    <div className={shellStyles.actions}>
+      <Tooltip title={t('privacyModeHint')}>
+        <label className={shellStyles.privacyToggle}>
+          <EyeInvisibleOutlined />
+          <span className={shellStyles.privacyLabel}>{t('privacyMode')}</span>
+          <Switch
+            size="small"
+            checked={privacyMode}
+            onChange={setPrivacyMode}
+            aria-label={t('privacyMode')}
+          />
+        </label>
+      </Tooltip>
+      {selected !== 'assistant' && (
+        <Tooltip title={t('account')}>
+          <Button
+            icon={<UserOutlined />}
+            onClick={() => navigate(() => router.push('/admin/account'))}
+            aria-label={t('account')}
+          />
+        </Tooltip>
+      )}
+      <Select
+        aria-label={t('language')}
+        value={locale}
+        onChange={(value) => navigate(() => router.replace(pathname, { locale: value }))}
+        options={[
+          { value: 'zh', label: '中文' },
+          { value: 'en', label: 'English' },
+        ]}
+        className={shellStyles.language}
+      />
+      <Tooltip title={t('logout')}>
+        <Button
+          icon={<LogoutOutlined />}
+          onClick={() =>
+            navigate(() => {
+              void signOut({ callbackUrl: `/${locale}/login` });
+            })
+          }
+          aria-label={t('logout')}
+        />
+      </Tooltip>
+    </div>
+  );
   const sidebar = (
     <div className={shellStyles.sidebar}>
       <div className={shellStyles.brand}>
@@ -243,86 +301,60 @@ function AdminShellContent({
             <span>{t('account')}</span>
           </span>
         </button>
+        {selected === 'assistant' && <div className={shellStyles.assistantSettings}>{actions}</div>}
       </div>
     </div>
   );
 
   return (
-    <Layout className={shellStyles.layout}>
-      <Sider width={216} className={shellStyles.desktopSidebar}>
-        {sidebar}
-      </Sider>
-      <Layout className={shellStyles.workspace}>
-        <Header className={shellStyles.header}>
-          <Button
-            className={shellStyles.mobileMenu}
-            icon={<MenuOutlined />}
-            aria-label={t('menu')}
-            ref={menuButton}
-            onClick={() => setOpen(true)}
-          />
-          <div className={shellStyles.context}>{t(selected)}</div>
-          <div className={shellStyles.actions}>
-            <Tooltip title={t('privacyModeHint')}>
-              <label className={shellStyles.privacyToggle}>
-                <EyeInvisibleOutlined />
-                <span className={shellStyles.privacyLabel}>{t('privacyMode')}</span>
-                <Switch
-                  size="small"
-                  checked={privacyMode}
-                  onChange={setPrivacyMode}
-                  aria-label={t('privacyMode')}
-                />
-              </label>
-            </Tooltip>
-            <Tooltip title={t('account')}>
-              <Button
-                icon={<UserOutlined />}
-                onClick={() => navigate(() => router.push('/admin/account'))}
-                aria-label={t('account')}
-              />
-            </Tooltip>
-            <Select
-              aria-label={t('language')}
-              value={locale}
-              onChange={(value) => navigate(() => router.replace(pathname, { locale: value }))}
-              options={[
-                { value: 'zh', label: '中文' },
-                { value: 'en', label: 'English' },
-              ]}
-              className={shellStyles.language}
-            />
-            <Tooltip title={t('logout')}>
-              <Button
-                icon={<LogoutOutlined />}
-                onClick={() =>
-                  navigate(() => {
-                    void signOut({ callbackUrl: `/${locale}/login` });
-                  })
-                }
-                aria-label={t('logout')}
-              />
-            </Tooltip>
-          </div>
-        </Header>
-        <Content className={shellStyles.content}>{children}</Content>
-        {footer}
-      </Layout>
-      <MobileBackToTop key={pathname} />
-      <Drawer
-        title={t('menu')}
-        placement="left"
-        open={open}
-        onClose={() => setOpen(false)}
-        width={216}
-        afterOpenChange={(visible) => {
-          if (!visible) menuButton.current?.focus();
-        }}
-        styles={{ body: { padding: 0 } }}
-        className={shellStyles.drawer}
+    <ConfigProvider theme={selected === 'assistant' ? assistantTheme : undefined}>
+      <Layout
+        className={`${shellStyles.layout} ${selected === 'assistant' ? shellStyles.assistantLayout : ''}`}
       >
-        {sidebar}
-      </Drawer>
-    </Layout>
+        <Sider width={216} className={shellStyles.desktopSidebar}>
+          {sidebar}
+        </Sider>
+        <Layout className={shellStyles.workspace}>
+          {selected !== 'assistant' && (
+            <Header className={shellStyles.header}>
+              <Button
+                className={shellStyles.mobileMenu}
+                icon={<MenuOutlined />}
+                aria-label={t('menu')}
+                ref={menuButton}
+                onClick={() => setOpen(true)}
+              />
+              <div className={shellStyles.context}>{t(selected)}</div>
+              {actions}
+            </Header>
+          )}
+          <Content className={shellStyles.content}>
+            <AssistantNavigationContext.Provider
+              value={{ menu: sidebar, open, setOpen, buttonRef: menuButton }}
+            >
+              {children}
+            </AssistantNavigationContext.Provider>
+          </Content>
+          {footer}
+        </Layout>
+        <MobileBackToTop key={pathname} />
+        {selected !== 'assistant' && (
+          <Drawer
+            title={t('menu')}
+            placement="left"
+            open={open}
+            onClose={() => setOpen(false)}
+            width={216}
+            afterOpenChange={(visible) => {
+              if (!visible) menuButton.current?.focus();
+            }}
+            styles={{ body: { padding: 0 } }}
+            className={shellStyles.drawer}
+          >
+            {sidebar}
+          </Drawer>
+        )}
+      </Layout>
+    </ConfigProvider>
   );
 }

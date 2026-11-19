@@ -4,7 +4,7 @@ import { App, Button, Form, Input } from 'antd';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DateInput } from '@/components/date-input';
-import { attachmentCoverKey } from '@/lib/attachments';
+import { attachmentWriteFields, attachmentCoverKey } from '@/lib/attachments';
 import { ResponsiveDrawer as Drawer } from '@/components/responsive/responsiveDialog';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { MaterialBatch, MaterialBatchAttachment } from '@/lib/client-types';
@@ -61,12 +61,8 @@ export function BatchEditorDrawer({
             receivedAt: draft.receivedAt,
             notes: draft.notes,
             coverObjectKey: attachmentCoverKey(draft.attachments, coverObjectKey),
-            attachments: draft.attachments.map(({ objectKey, fileName, notes, source }) => ({
-              source,
-              objectKey,
-              fileName,
-              notes,
-            })),
+            attachmentsVersion: batch?.attachmentsVersion,
+            attachments: draft.attachments.map(attachmentWriteFields),
           }),
         },
       );
@@ -139,6 +135,7 @@ export function BatchEditorDrawer({
         </Form.Item>
         <Form.Item label={t('attachments')}>
           <BatchAttachmentPicker
+            ownerType="batch"
             owner={batch ? { type: 'batch', id: batch.id } : undefined}
             coverObjectKey={coverObjectKey}
             onCoverChange={setCoverObjectKey}

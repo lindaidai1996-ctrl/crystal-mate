@@ -48,3 +48,15 @@ export function coverFirstAttachments<T extends { objectKey: string }>(
     ...attachments.filter((item) => item.objectKey !== key),
   ];
 }
+
+export function attachmentWriteFields(item: MaterialBatchAttachment) {
+  return {
+    assetId: item.assetId,
+    version: item.asset?.version,
+    objectKey: item.objectKey,
+    fileName: item.fileName,
+    notes: item.notes,
+    source: item.source,
+    targets: item.targets?.map(({ type, id }) => ({ type, id })),
+  };
+}

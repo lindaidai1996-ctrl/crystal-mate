@@ -9,6 +9,11 @@ vi.mock('@/lib/api', () => ({
     }
   },
 }));
+import {
+  getDistributorBatches,
+  getDistributorBatchEntries,
+  getDistributorStats,
+} from '../../src/lib/distributor-batches';
 import { db } from '../../src/lib/db';
 import {
   getDistributorItemCounts,
@@ -231,6 +236,62 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
           },
         },
       });
+      const batchOptions = { q: '', page: 1, pageSize: 20 };
+      expect(await getDistributorStats(supplier.id)).toEqual({
+        itemCounts: { total: 24, products: 22, materials: 2 },
+        batchCount: 3,
+        latestReceivedAt: '2026-10-03T00:00:00.000Z',
+      });
+      expect(await getDistributorStats(other.id)).toMatchObject({ batchCount: 1 });
+      const batchPage = await getDistributorBatches(supplier.id, batchOptions);
+      expect(batchPage.total).toBe(3);
+      expect(batchPage.items.map((row) => row.id)).toEqual(
+        [...batches].reverse().map((row) => row.id),
+      );
+      expect(batchPage.items.find((row) => row.id === batches[0].id)).toMatchObject({
+        itemCounts: { products: 8, materials: 2, total: 10 },
+        totalAmount: '4.00',
+        hasUnknownAmount: false,
+      });
+      expect(batchPage.items.find((row) => row.id === batches[1].id)).toMatchObject({
+        totalAmount: '3.11',
+        hasUnknownAmount: false,
+      });
+      expect(batchPage.items[0]).toMatchObject({ totalAmount: '2.20', hasUnknownAmount: true });
+      const boundary = await getDistributorBatches(supplier.id, {
+        ...batchOptions,
+        receivedFrom: '2026-10-02',
+        receivedTo: '2026-10-02',
+      });
+      expect(boundary.items.map((row) => row.id)).toEqual([batches[1].id]);
+      expect((await getDistributorBatches(supplier.id, { ...batchOptions, q: '%' })).total).toBe(0);
+      expect(await getDistributorBatches(supplier.id, { ...batchOptions, page: 99 })).toMatchObject(
+        { total: 3, items: [] },
+      );
+      const mixed = await getDistributorBatchEntries(supplier.id, batches[0].id, {
+        page: 1,
+        pageSize: 50,
+      });
+      expect(mixed.total).toBe(11);
+      expect(mixed.items.filter((row) => row.type === 'PRODUCT')).toHaveLength(9);
+      expect(mixed.items.find((row) => row.itemId === unknownMaterial.id)).toMatchObject({
+        amount: '0.00',
+        quantity: null,
+      });
+      expect(
+        (await getDistributorBatchEntries(supplier.id, batches[0].id, { page: 2, pageSize: 10 }))
+          .items,
+      ).toHaveLength(1);
+      expect(
+        await getDistributorBatchEntries(supplier.id, batches[0].id, { page: 99, pageSize: 10 }),
+      ).toMatchObject({ total: 11, items: [] });
+      expect(
+        (await getDistributorBatchEntries(other.id, batches[1].id, { page: 1, pageSize: 20 }))
+          .items,
+      ).toMatchObject([{ amount: '998001.00' }]);
+      await expect(
+        getDistributorBatchEntries(other.id, batches[0].id, { page: 1, pageSize: 20 }),
+      ).rejects.toMatchObject({ status: 404 });
       const first = await getDistributorPurchaseSummary(supplier.id, defaults);
       const counts = await getDistributorItemCounts();
       expect(counts.get(supplier.id)).toEqual({ total: 24, products: 22, materials: 2 });
@@ -366,6 +427,51 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
           })
         ).total,
       ).toBe(0);
+      // Change only test fixtures to cover fully unknown/zero totals and same-day ordering.
+      await db.productPurchaseEntry.deleteMany({ where: { distributorId: other.id } });
+      expect(await getDistributorStats(other.id)).toEqual({
+        itemCounts: { total: 0, products: 0, materials: 0 },
+        batchCount: 0,
+        latestReceivedAt: null,
+      });
+      expect(await getDistributorBatches(other.id, batchOptions)).toMatchObject({
+        total: 0,
+        items: [],
+      });
+      await db.materialBatchEntry.update({
+        where: { materialId_batchId: { materialId: material.id, batchId: batches[2].id } },
+        data: { distributorId: other.id },
+      });
+      expect((await getDistributorBatches(other.id, batchOptions)).items[0]).toMatchObject({
+        totalAmount: null,
+        hasUnknownAmount: true,
+      });
+      await db.materialBatchEntry.update({
+        where: { materialId_batchId: { materialId: material.id, batchId: batches[2].id } },
+        data: { purchaseTotalAmount: '0' },
+      });
+      expect((await getDistributorBatches(other.id, batchOptions)).items[0]).toMatchObject({
+        totalAmount: '0.00',
+        hasUnknownAmount: false,
+      });
+      await db.materialBatch.update({
+        where: { id: batches[0].id },
+        data: { receivedAt: batches[1].receivedAt },
+      });
+      const sameDate = await getDistributorBatches(supplier.id, {
+        ...batchOptions,
+        receivedTo: '2026-10-02',
+        pageSize: 1,
+      });
+      const sameDateNext = await getDistributorBatches(supplier.id, {
+        ...batchOptions,
+        receivedTo: '2026-10-02',
+        pageSize: 1,
+        page: 2,
+      });
+      expect([...sameDate.items, ...sameDateNext.items].map((row) => row.id)).toEqual(
+        [batches[0].id, batches[1].id].sort().reverse(),
+      );
       await expect(
         getDistributorPurchaseSummary('cmissingdistributor0000000', defaults),
       ).rejects.toMatchObject({ status: 404 });

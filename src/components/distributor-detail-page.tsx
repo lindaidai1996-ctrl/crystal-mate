@@ -1,5 +1,8 @@
 'use client';
 
+import styles from './distributorBatches.module.css';
+import { DistributorBatches } from './distributor-batches';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import { formatAmount } from '@/lib/format-money';
 
 import { RecordAuditPanel } from '@/components/audit-history';
@@ -27,7 +30,9 @@ import { useTranslations } from 'next-intl';
 import { Sensitive } from '@/components/privacyMode';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from '@/i18n/navigation';
-import { PaginatedTable } from '@/components/paginated-table';
+import { MobileTableFields, PaginatedTable } from '@/components/paginated-table';
+import { MobileDetails } from '@/components/responsive/mobileDetails';
+import mobileStyles from '@/components/responsive/responsive.module.css';
 import { ListPageActions } from '@/components/responsive/listPageActions';
 import { SearchFilterRow } from '@/components/responsive/searchFilterRow';
 import { ResetFiltersButton } from '@/components/responsive/resetFiltersButton';
@@ -35,6 +40,7 @@ import { CreatePurchaseButton } from '@/components/purchaseCreation/createPurcha
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type {
   Distributor,
+  DistributorStats,
   DistributorDetailResponse,
   DistributorPurchaseEntriesPage,
   DistributorPurchaseEntry,
@@ -56,12 +62,21 @@ function dateLabel(value: string) {
   return value.slice(0, 10);
 }
 
-export function DistributorDetailPage({ id }: { id: string }) {
+export function DistributorDetailPage({
+  id,
+  requestedView,
+}: {
+  id: string;
+  requestedView?: string;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
   const listStateKey = `distributor-detail:${id}`;
   const t = useTranslations('distributorDetail');
   const distributorT = useTranslations('distributors');
   const common = useTranslations('common');
   const { message } = App.useApp();
+  const [stats, setStats] = useState<DistributorStats | null>(null);
   const [distributor, setDistributor] = useState<Distributor | null>(null);
   const [areas, setAreas] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,10 +84,21 @@ export function DistributorDetailPage({ id }: { id: string }) {
   const [notFound, setNotFound] = useState(false);
   const [detailAttempt, setDetailAttempt] = useState(0);
   const [editing, setEditing] = useState(false);
-  const [showAttachments, setShowAttachments] = useSessionListState(
-    `${listStateKey}:showAttachments`,
-    false,
+  const [savedView, setSavedView] = useSessionListState<'purchases' | 'batches' | 'attachments'>(
+    `${listStateKey}:view`,
+    'purchases',
   );
+  const view =
+    requestedView === 'batches' || requestedView === 'purchases' || requestedView === 'attachments'
+      ? requestedView
+      : savedView;
+  const showAttachments = view === 'attachments';
+  function changeView(next: 'purchases' | 'batches' | 'attachments') {
+    setSavedView(next);
+    const params = new URLSearchParams();
+    params.set('view', next);
+    router.replace(`${pathname}?${params}`, { scroll: false });
+  }
   const [editingAttachment, setEditingAttachment] = useState(false);
   const [type, setType] = useSessionListState<PurchaseType>(`${listStateKey}:type`, 'all');
   const [query, setQuery] = useSessionListState(`${listStateKey}:query`, '');
@@ -101,6 +127,7 @@ export function DistributorDetailPage({ id }: { id: string }) {
       .then((data) => {
         if (!active) return;
         setDistributor(data.item);
+        setStats(data.stats);
         setAreas(data.areas);
       })
       .catch((error) => {
@@ -199,15 +226,15 @@ export function DistributorDetailPage({ id }: { id: string }) {
         render: (_, entry) => (
           <Link
             href={withAdminReturnTo(
-              `/admin/materials/batches/${entry.batchId}`,
-              `/admin/distributors/${id}`,
+              `/admin/materials/batches/${entry.batchId}?distributorId=${id}`,
+              `/admin/distributors/${id}?view=purchases`,
             )}
           >
             {entry.batchName}
           </Link>
         ),
       },
-      { title: t('receivedAt'), dataIndex: 'receivedAt', render: dateLabel },
+      { title: t('receivedAt'), key: 'receivedAt', dataIndex: 'receivedAt', render: dateLabel },
       {
         title: t('quantity'),
         key: 'quantity',
@@ -218,12 +245,14 @@ export function DistributorDetailPage({ id }: { id: string }) {
       },
       {
         title: t('unitPrice'),
+        key: 'unitPrice',
         dataIndex: 'unitPrice',
         render: (value: string | null) => <Sensitive>{formatAmount(value)}</Sensitive>,
       },
       ...distributorPurchasePriceColumns<DistributorPurchaseEntry>(t),
       {
         title: t('amount'),
+        key: 'amount',
         dataIndex: 'amount',
         render: (value: string | null) => (
           <Sensitive>{formatAmount(value, t('unknownValue'))}</Sensitive>
@@ -233,16 +262,19 @@ export function DistributorDetailPage({ id }: { id: string }) {
         ? ([
             {
               title: t('weightGrams'),
+              key: 'weightGrams',
               dataIndex: 'weightGrams',
               render: (value: string | null) => (value ? `${value} g` : t('unknownValue')),
             },
             {
               title: t('gramPrice'),
+              key: 'gramPrice',
               dataIndex: 'gramPrice',
               render: (value: string | null) => formatAmount(value, t('unknownValue')),
             },
             {
               title: t('priceSource'),
+              key: 'priceSource',
               dataIndex: 'priceSource',
               render: (value: string | null) =>
                 value && value !== 'UNIT' ? t(`priceSource_${value}` as never) : '—',
@@ -253,6 +285,32 @@ export function DistributorDetailPage({ id }: { id: string }) {
     return (
       <PaginatedTable
         rowKey="id"
+        mobileRender={(entry) => (
+          <>
+            <MobileTableFields
+              columns={columns.filter(
+                (column) => column.key === 'batch' || column.key === 'receivedAt',
+              )}
+              record={entry}
+            />
+            <MobileTableFields
+              className={mobileStyles.recordMetrics}
+              columns={columns.filter(
+                (column) => column.key === 'quantity' || column.key === 'amount',
+              )}
+              record={entry}
+            />
+            <MobileDetails>
+              <MobileTableFields
+                columns={columns.filter(
+                  (column) =>
+                    !['batch', 'receivedAt', 'quantity', 'amount'].includes(String(column.key)),
+                )}
+                record={entry}
+              />
+            </MobileDetails>
+          </>
+        )}
         size="small"
         loading={entryLoading[key]}
         dataSource={data?.items ?? []}
@@ -286,6 +344,18 @@ export function DistributorDetailPage({ id }: { id: string }) {
     visibleRows.length > 0 &&
     visibleRows.every((row) => expandedKeys.includes(`${row.type}:${row.itemId}`));
 
+  function toggleAllEntries() {
+    if (allExpanded) {
+      setExpandedKeys([]);
+      return;
+    }
+    setExpandedKeys(visibleRows.map((row) => `${row.type}:${row.itemId}`));
+    visibleRows.forEach((row) => {
+      const key = `${row.type}:${row.itemId}`;
+      if (!entryPages[key] && !entryLoading[key]) loadEntries(row);
+    });
+  }
+
   const columns: ColumnsType<DistributorPurchaseSummary> = [
     {
       title: (
@@ -298,17 +368,7 @@ export function DistributorDetailPage({ id }: { id: string }) {
               icon={allExpanded ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
               aria-label={t(allExpanded ? 'collapseAll' : 'expandAll')}
               disabled={purchaseLoading || visibleRows.length === 0}
-              onClick={() => {
-                if (allExpanded) {
-                  setExpandedKeys([]);
-                  return;
-                }
-                setExpandedKeys(visibleRows.map((row) => `${row.type}:${row.itemId}`));
-                visibleRows.forEach((row) => {
-                  const key = `${row.type}:${row.itemId}`;
-                  if (!entryPages[key] && !entryLoading[key]) loadEntries(row);
-                });
-              }}
+              onClick={toggleAllEntries}
             />
           </Tooltip>
         </span>
@@ -332,7 +392,7 @@ export function DistributorDetailPage({ id }: { id: string }) {
             className="product-name"
             href={withAdminReturnTo(
               `/admin/${row.type === 'PRODUCT' ? 'products' : 'materials'}/${row.itemId}`,
-              `/admin/distributors/${id}`,
+              `/admin/distributors/${id}?view=purchases`,
             )}
           >
             {row.name}
@@ -416,7 +476,6 @@ export function DistributorDetailPage({ id }: { id: string }) {
             <ArrowLeftOutlined /> {t('back')}
           </Link>
           <h1 className="page-record-name">{distributor.name}</h1>
-          <p>{t('count', { count: purchasePage?.total ?? 0 })}</p>
         </div>
         <ListPageActions primary={<CreatePurchaseButton distributorId={distributor.id} />}>
           <Button
@@ -429,6 +488,17 @@ export function DistributorDetailPage({ id }: { id: string }) {
         </ListPageActions>
       </div>
       <RecordAuditPanel entityType="Distributor" entityId={id} revision={distributor.updatedAt} />
+      <Descriptions className="distributor-detail-summary" size="small" column={{ xs: 1, sm: 3 }}>
+        <Descriptions.Item label={t('relatedBatches')}>
+          {stats?.batchCount ?? '—'}
+        </Descriptions.Item>
+        <Descriptions.Item label={distributorT('itemCounts')}>
+          {stats?.itemCounts.total ?? '—'}
+        </Descriptions.Item>
+        <Descriptions.Item label={t('latestReceivedAt')}>
+          {stats ? (stats.latestReceivedAt?.slice(0, 10) ?? t('noPurchases')) : '—'}
+        </Descriptions.Item>
+      </Descriptions>
       <Descriptions
         className="material-batch-summary distributor-detail-summary"
         size="small"
@@ -456,50 +526,62 @@ export function DistributorDetailPage({ id }: { id: string }) {
           {distributor.notes || '—'}
         </Descriptions.Item>
       </Descriptions>
-      <div className="distributor-detail-type-filter distributor-detail-toolbar">
-        <Segmented<PurchaseType | 'attachments'>
-          value={showAttachments ? 'attachments' : type}
+      <div className={`distributor-detail-type-filter distributor-detail-toolbar ${styles.views}`}>
+        <Segmented
+          value={view}
           disabled={editingAttachment}
-          onChange={(value) => {
-            setShowAttachments(value === 'attachments');
-            if (value !== 'attachments' && value !== type) resetList(value);
-          }}
-          style={{ background: 'var(--ant-color-fill-tertiary)' }}
+          onChange={changeView}
           options={[
-            { value: 'all', label: t('all') },
-            { value: 'product', label: t('productsOnly') },
-            { value: 'material', label: t('materialsOnly') },
+            { value: 'purchases', label: t('purchaseView') },
+            { value: 'batches', label: `${t('relatedBatches')} (${stats?.batchCount ?? '—'})` },
             { value: 'attachments', label: distributorT('attachments') },
           ]}
         />
-        {!showAttachments && (
-          <SearchFilterRow>
-            <Input.Search
-              className="filter-search"
-              aria-label={t('search')}
-              placeholder={t('search')}
-              value={query}
-              maxLength={200}
-              onChange={(event) => {
-                setPurchaseLoading(true);
-                setQuery(event.target.value);
-                setPage(1);
-                clearExpanded();
-              }}
-              allowClear
-            />
-            <ResetFiltersButton
-              onReset={() => {
-                setQuery('');
-                resetList('all');
-                setPurchaseAttempt((attempt) => attempt + 1);
-              }}
-            />
-          </SearchFilterRow>
-        )}
       </div>
+      {view === 'purchases' && (
+        <div className="distributor-detail-type-filter distributor-detail-toolbar">
+          <Segmented<PurchaseType>
+            value={type}
+            onChange={(value) => {
+              if (value !== type) resetList(value);
+            }}
+            options={[
+              { value: 'all', label: t('all') },
+              { value: 'product', label: t('productsOnly') },
+              { value: 'material', label: t('materialsOnly') },
+            ]}
+          />
+          {!showAttachments && (
+            <SearchFilterRow>
+              <Input.Search
+                className="filter-search"
+                aria-label={t('search')}
+                placeholder={t('search')}
+                value={query}
+                maxLength={200}
+                onChange={(event) => {
+                  setPurchaseLoading(true);
+                  setQuery(event.target.value);
+                  setPage(1);
+                  clearExpanded();
+                }}
+                allowClear
+              />
+              <ResetFiltersButton
+                onReset={() => {
+                  setQuery('');
+                  resetList('all');
+                  setPurchaseAttempt((attempt) => attempt + 1);
+                }}
+              />
+            </SearchFilterRow>
+          )}
+        </div>
+      )}
 
-      {showAttachments ? (
+      {view === 'batches' ? (
+        <DistributorBatches id={id} />
+      ) : showAttachments ? (
         <section aria-label={distributorT('attachments')}>
           <DistributorAttachmentGallery
             distributor={distributor}
@@ -512,6 +594,16 @@ export function DistributorDetailPage({ id }: { id: string }) {
         </section>
       ) : (
         <div className="table-surface">
+          <div className={mobileStyles.mobile}>
+            <Button
+              disabled={purchaseLoading || visibleRows.length === 0 || purchaseFailed}
+              onClick={toggleAllEntries}
+              aria-label={t(allExpanded ? 'collapseAll' : 'expandAll')}
+              icon={allExpanded ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
+            >
+              {t(allExpanded ? 'collapseAll' : 'expandAll')}
+            </Button>
+          </div>
           {purchaseFailed ? (
             <Result
               status="error"
@@ -531,6 +623,54 @@ export function DistributorDetailPage({ id }: { id: string }) {
           ) : (
             <PaginatedTable
               rowKey={(row) => `${row.type}:${row.itemId}`}
+              mobileRender={(row) => (
+                <>
+                  <div className={mobileStyles.recordIdentity}>
+                    <ImageHoverPreview
+                      images={row.image ? [row.image] : []}
+                      name={row.name}
+                      hoverPreview={false}
+                    />
+                    <div>
+                      <Link
+                        className="product-name"
+                        href={withAdminReturnTo(
+                          `/admin/${row.type === 'PRODUCT' ? 'products' : 'materials'}/${row.itemId}`,
+                          `/admin/distributors/${id}`,
+                        )}
+                      >
+                        {row.name}
+                      </Link>
+                      {row.code && <div className="product-code">{row.code}</div>}
+                      <Tag color={row.type === 'PRODUCT' ? 'blue' : 'gold'}>
+                        {t(row.type === 'PRODUCT' ? 'product' : 'material')}
+                      </Tag>
+                    </div>
+                  </div>
+                  <MobileTableFields
+                    className={mobileStyles.recordMetrics}
+                    columns={columns.filter((column) =>
+                      ['quantity', 'amount', 'batchCount', 'latestReceivedAt'].includes(
+                        String(column.key),
+                      ),
+                    )}
+                    record={row}
+                  />
+                  <MobileDetails>
+                    <MobileTableFields
+                      columns={columns.filter((column) =>
+                        [
+                          'saleUnitPrice',
+                          'childUnitPrice',
+                          'saleChildUnitPrice',
+                          'weightGrams',
+                        ].includes(String(column.key)),
+                      )}
+                      record={row}
+                    />
+                  </MobileDetails>
+                </>
+              )}
               dataSource={purchasePage?.items ?? []}
               columns={columns}
               loading={purchaseLoading}

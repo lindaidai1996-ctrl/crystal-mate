@@ -1,17 +1,23 @@
 .page {
   min-width: 0;
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   color: var(--ant-color-text);
+  font-size: 12px;
 }
 .heading {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 4px 16px;
+  margin-bottom: 8px;
 }
 .heading h2 {
-  margin: 0 0 8px;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.5;
 }
 .heading p,
 .muted {
@@ -19,23 +25,30 @@
 }
 .heading p {
   margin: 0;
+  font-size: 11px;
+  text-wrap: pretty;
 }
 .workspace {
+  min-height: 0;
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
   gap: 24px;
-  align-items: start;
+  align-items: stretch;
 }
 .sessions {
   min-width: 0;
-  display: grid;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 .sessionList {
   display: grid;
   gap: 4px;
-  max-height: 560px;
+  min-height: 0;
+  align-content: start;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .sessionRow {
   display: flex;
@@ -94,7 +107,8 @@
   overflow-wrap: anywhere;
 }
 .conversationLoading {
-  min-height: 400px;
+  min-height: 0;
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -105,7 +119,7 @@
   align-items: center;
   gap: 12px;
   color: var(--ant-color-text-secondary);
-  font-size: 14px;
+  font-size: 12px;
 }
 .loadingIcon {
   display: grid;
@@ -115,7 +129,7 @@
   border-radius: 12px;
   background: var(--ant-color-primary-bg);
   color: var(--ant-color-primary);
-  font-size: 18px;
+  font-size: 16px;
 }
 .loadingPreview {
   display: flex;
@@ -181,12 +195,34 @@
 }
 .conversation {
   min-width: 0;
-  padding: 24px;
+  min-height: 0;
+  padding: 16px;
   border: 1px solid var(--ant-color-border-secondary);
   border-radius: 12px;
   background: var(--ant-color-bg-container);
-  display: grid;
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+.chatScroll {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.chatScroll > * {
+  flex-shrink: 0;
+}
+.chatScroll > .welcome,
+.chatScroll > .conversationLoading {
+  flex: 1;
 }
 .conversation p {
   white-space: pre-wrap;
@@ -195,7 +231,7 @@
   line-height: 1.7;
 }
 .welcome {
-  min-height: 400px;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -204,7 +240,7 @@
   padding: 24px;
 }
 .welcomeIcon {
-  font-size: 36px;
+  font-size: 34px;
   color: var(--ant-color-primary);
 }
 .welcome p {
@@ -214,8 +250,8 @@
 .messages {
   display: grid;
   gap: 16px;
-  max-height: 440px;
-  overflow-y: auto;
+  min-width: 0;
+  align-content: start;
 }
 .messages article {
   max-width: 94%;
@@ -229,6 +265,15 @@
   background: var(--ant-color-fill-alter);
   justify-self: end;
 }
+.messages .userMessage p {
+  margin: 0;
+}
+.deliveryStatus {
+  display: block;
+  margin-top: 6px;
+  color: var(--ant-color-text-secondary);
+  font-size: 11px;
+}
 .assistantMessage {
   justify-self: start;
   min-width: 0;
@@ -237,9 +282,37 @@
 .answer {
   min-width: 0;
   display: grid;
-  gap: 12px;
+  gap: 8px;
   line-height: 1.8;
   overflow-wrap: anywhere;
+}
+.answerNotices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ant-color-warning-text);
+}
+.messages .answerNotices p,
+.answerNotices ul {
+  margin: 0;
+}
+.answerNotices summary {
+  min-height: 32px;
+  padding: 6px 0;
+  cursor: pointer;
+}
+.answerNotices details[open] {
+  flex-basis: 100%;
+}
+.answerNotices ul {
+  padding-left: 20px;
+}
+.answerCaption {
+  font-size: 12px;
+  color: var(--ant-color-text-secondary);
 }
 .answerList {
   padding-left: 22px;
@@ -256,10 +329,10 @@
 }
 .answerTable th,
 .answerTable td {
-  padding: 10px 12px;
+  padding: 8px 10px;
   text-align: left;
   vertical-align: top;
-  min-width: 90px;
+  min-width: 80px;
   border-bottom: 1px solid var(--ant-color-border-secondary);
 }
 .answerTable th {
@@ -271,28 +344,56 @@
 }
 .answerSources {
   min-width: 0;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--ant-color-text-secondary);
 }
 .answerSources summary,
-.execution summary {
-  min-height: 44px;
-  padding: 10px 0;
+.queryDetails > summary {
+  min-height: 32px;
+  padding: 6px 0;
   cursor: pointer;
+}
+.conversationMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 4px 20px;
+}
+.conversationMeta > .queryDetails[open],
+.conversationMeta > .feedback:has(> details[open]) {
+  flex-basis: 100%;
+}
+.conversationMeta > .controls {
+  flex-basis: 100%;
+  order: -1;
 }
 .answerSources time {
   display: block;
   overflow-wrap: anywhere;
 }
 .execution {
-  padding-top: 16px;
-  border-top: 1px solid var(--ant-color-border-secondary);
   min-width: 0;
+  color: var(--ant-color-text-secondary);
+  font-size: 11px;
+}
+.progressLine {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+}
+.progressLine :global(.anticon) {
+  color: var(--ant-color-primary);
+}
+.queryDetails {
+  min-width: 0;
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
 }
 .trace {
   padding-left: 20px;
   color: var(--ant-color-text-secondary);
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.9;
 }
 .controls {
@@ -301,21 +402,61 @@
   flex-wrap: wrap;
 }
 .composer {
+  flex: none;
   display: grid;
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 4px 8px;
   min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--ant-color-border);
+  border-radius: 12px;
+  background: var(--ant-color-bg-container);
+}
+.composer:focus-within {
+  border-color: var(--ant-color-primary);
+}
+.composer :global(textarea.ant-input) {
+  grid-column: 1;
+  grid-row: 1;
+  padding: 6px 0;
+  font-size: 12px;
+  line-height: 20px;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+  resize: none;
+}
+.composer .composerAction {
+  flex: none;
+  grid-column: 2;
+  grid-row: 1;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  font-size: 14px;
+}
+.stopIcon {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: currentColor;
 }
 .results {
   min-width: 0;
 }
 .feedback {
   min-width: 0;
-  border-top: 1px solid var(--ant-color-border-secondary);
+  font-size: 12px;
+  color: var(--ant-color-text-secondary);
 }
 .feedback summary {
   cursor: pointer;
-  min-height: 44px;
-  padding: 12px 0;
+  min-height: 32px;
+  padding: 6px 0;
 }
 .feedback form,
 .feedback label {
@@ -326,6 +467,8 @@
 .feedback form {
   gap: 16px;
   margin: 12px 0;
+  font-size: 12px;
+  color: var(--ant-color-text);
 }
 .feedback :global(.ant-select) {
   min-width: 0;
@@ -386,7 +529,7 @@
 }
 .coverage dd {
   margin: 6px 0 0;
-  font-size: 20px;
+  font-size: 16px;
   font-variant-numeric: tabular-nums;
 }
 .summary {
@@ -462,7 +605,7 @@
   border-radius: 6px;
   background: var(--ant-color-fill-alter);
   color: var(--ant-color-text-secondary);
-  font-size: 10px;
+  font-size: 11px;
 }
 .mobileResults {
   display: none;
@@ -476,7 +619,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
   gap: 8px 12px;
   margin: 16px 0 0;
-  font-size: 13px;
+  font-size: 11px;
 }
 .resultCard dt {
   color: var(--ant-color-text-secondary);
@@ -494,13 +637,12 @@
   }
 }
 .composerFooter {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
+  display: contents;
 }
 .composerFooter > span {
-  font-size: 12px;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  font-size: 11px;
   line-height: 1.6;
   color: var(--ant-color-text-secondary);
 }
@@ -511,33 +653,118 @@
   }
 }
 @media (max-width: 800px) {
+  .answerNotices summary,
+  .answerSources summary,
+  .queryDetails > summary,
+  .feedback summary {
+    min-height: 44px;
+    padding: 12px 0;
+  }
   .workspace {
     grid-template-columns: minmax(0, 1fr);
   }
-  .sessions {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .sessionList {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    max-height: 160px;
-  }
   .conversation {
-    padding: 16px;
+    padding: 10px;
+    gap: 8px;
   }
   .welcome {
-    min-height: 280px;
     padding: 12px;
   }
-  .conversationLoading {
-    min-height: 280px;
+  .heading p {
+    display: none;
+  }
+  .heading {
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .heading h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+  .sessions {
+    gap: 8px;
+  }
+  .sessionSelect {
+    padding: 10px;
+  }
+  .composer {
+    padding: 4px 8px;
+  }
+  .composerFooter > span {
+    display: none;
+  }
+  .composer .composerAction {
+    width: 44px;
+    height: 44px;
+    padding: 6px;
+    background-clip: content-box;
+    box-shadow: none;
+  }
+  .messages article {
+    max-width: 100%;
+    padding: 10px 12px;
   }
 }
-@media (max-width: 420px) {
-  .sessionList {
-    grid-template-columns: minmax(0, 1fr);
-    max-height: 140px;
+
+.desktopSessions {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+.desktopSessions > .sessions {
+  flex: 1;
+}
+.mobileNavigationButton,
+.mobileNewConversation {
+  display: none;
+}
+.navigationDrawer :global(.ant-drawer-body) {
+  min-height: 0;
+}
+.navigationTabs {
+  height: 100%;
+}
+.navigationTabs > :global(.ant-tabs-nav) {
+  margin: 0;
+  padding-inline: 16px;
+}
+.navigationTabs > :global(.ant-tabs-content-holder) {
+  min-height: 0;
+}
+.navigationTabs :global(.ant-tabs-content),
+.navigationTabs :global(.ant-tabs-tabpane) {
+  height: 100%;
+}
+.navigationSessions {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  padding: 16px;
+}
+.navigationSessions > .sessions {
+  flex: 1;
+}
+.navigationSessions .sessions > :global(.ant-btn) {
+  min-height: 44px;
+}
+.navigationMenu {
+  --shell-menu-font: 12px;
+  height: 100%;
+  min-height: 0;
+}
+@media (max-width: 800px) {
+  .desktopSessions {
+    display: none;
   }
-  .composerFooter {
-    align-items: flex-end;
+  .heading .mobileNavigationButton,
+  .heading .mobileNewConversation {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    font-size: 16px;
+  }
+  .mobileNewConversation {
+    margin-left: auto;
   }
 }

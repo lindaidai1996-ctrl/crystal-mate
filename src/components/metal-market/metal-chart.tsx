@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
+import type { PointerEvent } from 'react';
 import type { MetalPoint } from '@/lib/metal-market';
 import type { MarketCopy } from './copy';
 import marketStyles from './metal-market.module.css';
@@ -53,6 +54,16 @@ export function MetalChart({ points, copy }: { points: MetalPoint[]; copy: Marke
     ),
   );
 
+  function selectPoint(event: PointerEvent<SVGSVGElement>) {
+    if (!event.isPrimary) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - bounds.left) / bounds.width) * width;
+    let index = 0;
+    for (let i = 1; i < coordinates.length; i++)
+      if (Math.abs(coordinates[i].x - x) < Math.abs(coordinates[index].x - x)) index = i;
+    setSelected(index);
+  }
+
   return (
     <div className={marketStyles.chart}>
       <div className={marketStyles.chartReadout} aria-live="polite" aria-atomic="true">
@@ -66,15 +77,20 @@ export function MetalChart({ points, copy }: { points: MetalPoint[]; copy: Marke
         role="group"
         aria-label={copy.chartLabel}
         tabIndex={0}
-        onPointerMove={(event) => {
-          const bounds = event.currentTarget.getBoundingClientRect();
-          const x = ((event.clientX - bounds.left) / bounds.width) * width;
-          let index = 0;
-          for (let i = 1; i < coordinates.length; i++)
-            if (Math.abs(coordinates[i].x - x) < Math.abs(coordinates[index].x - x)) index = i;
-          setSelected(index);
+        onPointerDown={(event) => {
+          if (!event.isPrimary || event.button !== 0) return;
+          event.currentTarget.setPointerCapture(event.pointerId);
+          selectPoint(event);
         }}
-        onPointerLeave={() => setSelected(null)}
+        onPointerMove={selectPoint}
+        onPointerLeave={(event) => {
+          if (
+            event.pointerType === 'mouse' &&
+            !event.currentTarget.hasPointerCapture(event.pointerId)
+          )
+            setSelected(null);
+        }}
+        onPointerCancel={() => setSelected(null)}
         onKeyDown={(event) => {
           if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
           event.preventDefault();

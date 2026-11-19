@@ -8,7 +8,7 @@ import {
   EyeOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { App, Button, Drawer, Empty, Form, Input, Modal, Popconfirm, Tooltip } from 'antd';
+import { App, Button, Drawer, Empty, Form, Input, Modal, Popconfirm, Tooltip, Select } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -28,12 +28,22 @@ import { CLIENT_TABLE_PAGINATION } from '@/lib/table-pagination';
 import { coverFirstAttachments } from '@/lib/attachments';
 import { ImageHoverPreview } from './materialManagement/imageHoverPreview';
 import { DistributorEditorDrawer } from './distributor-editor-drawer';
+import {
+  compareDistributorHistory,
+  type DistributorHistorySort,
+} from '@/lib/distributor-list-sort';
+import { useMobile } from './responsive/useMobile';
 import { useSessionListState } from './useSessionListState';
 
 const pagination = { ...CLIENT_TABLE_PAGINATION, defaultPageSize: 20 };
 
 export function DistributorsPage() {
   const t = useTranslations('distributors');
+  const mobile = useMobile();
+  const [cooperationSort, setCooperationSort] = useSessionListState<DistributorHistorySort | null>(
+    'distributors:cooperationSort',
+    null,
+  );
   const common = useTranslations('common');
   const { message } = App.useApp();
   const [areaForm] = Form.useForm<{ name: string }>();
@@ -93,13 +103,17 @@ export function DistributorsPage() {
   );
   const visibleItems = useMemo(() => {
     const term = query.trim().toLocaleLowerCase();
-    if (!term) return items;
-    return items.filter((item) =>
-      [item.name, item.area, areaLabel(item.area), item.address, item.wechat, item.phone].some(
-        (value) => value.toLocaleLowerCase().includes(term),
-      ),
+    const filtered = items.filter(
+      (item) =>
+        !term ||
+        [item.name, item.area, areaLabel(item.area), item.address, item.wechat, item.phone].some(
+          (value) => value.toLocaleLowerCase().includes(term),
+        ),
     );
-  }, [items, query, areaLabel]);
+    return cooperationSort
+      ? filtered.sort((a, b) => compareDistributorHistory(a, b, cooperationSort))
+      : filtered;
+  }, [items, query, areaLabel, cooperationSort]);
 
   function open(item: Distributor | null) {
     setEditing(item);
@@ -230,7 +244,7 @@ export function DistributorsPage() {
       key: 'itemCounts',
       width: 190,
       sorter: (a, b) => a.itemCounts.total - b.itemCounts.total,
-      sortOrder: countSort,
+      sortOrder: cooperationSort ? null : countSort,
       render: (_, { itemCounts }) => (
         <div className="distributor-item-counts">
           <div className="distributor-item-total">
@@ -247,6 +261,36 @@ export function DistributorsPage() {
           </div>
         </div>
       ),
+    },
+    {
+      title: t('batchCount'),
+      key: 'batchCount',
+      width: mobile ? 170 : 110,
+      sorter: true,
+      sortOrder: cooperationSort?.key === 'batchCount' ? cooperationSort.order : null,
+      render: (_, item) => (
+        <div>
+          <Link href={`/admin/distributors/${item.id}?view=batches`}>
+            {t('batchCountValue', { count: item.batchCount })}
+          </Link>
+          {mobile && (
+            <div>
+              {item.latestReceivedAt
+                ? `${t('latestReceivedAt')} ${item.latestReceivedAt.slice(5, 10)}`
+                : t('noPurchases')}
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: t('latestReceivedAt'),
+      key: 'latestReceivedAt',
+      width: 135,
+      responsive: ['md'],
+      sorter: true,
+      sortOrder: cooperationSort?.key === 'latestReceivedAt' ? cooperationSort.order : null,
+      render: (_, item) => item.latestReceivedAt?.slice(0, 10) ?? t('noPurchases'),
     },
     {
       title: (
@@ -369,10 +413,37 @@ export function DistributorsPage() {
             onReset={() => {
               setQuery('');
               setCountSort(null);
+              setCooperationSort(null);
               setPage(1);
             }}
           />
         </SearchFilterRow>
+        {mobile && (
+          <Select
+            className="filter-select"
+            aria-label={t('cooperationSort')}
+            value={cooperationSort ? `${cooperationSort.key}:${cooperationSort.order}` : 'default'}
+            options={[
+              { value: 'default', label: t('defaultSort') },
+              { value: 'batchCount:descend', label: t('mostBatches') },
+              { value: 'batchCount:ascend', label: t('fewestBatches') },
+              { value: 'latestReceivedAt:descend', label: t('newestPurchase') },
+              { value: 'latestReceivedAt:ascend', label: t('oldestPurchase') },
+            ]}
+            onChange={(value) => {
+              if (value === 'default') setCooperationSort(null);
+              else {
+                const [key, order] = value.split(':');
+                setCooperationSort({
+                  key: key as 'batchCount' | 'latestReceivedAt',
+                  order: order as 'ascend' | 'descend',
+                });
+              }
+              setCountSort(null);
+              setPage(1);
+            }}
+          />
+        )}
       </div>
 
       <div className="table-surface">
@@ -383,11 +454,24 @@ export function DistributorsPage() {
           loading={loading}
           onChange={(_, __, sorter, extra) => {
             if (extra.action !== 'sort') return;
-            const order = Array.isArray(sorter) ? sorter[0]?.order : sorter.order;
-            setCountSort(order === 'ascend' || order === 'descend' ? order : null);
+            const active = Array.isArray(sorter) ? sorter[0] : sorter;
+            const order = active?.order;
+            const key = active?.columnKey;
+            if (
+              (key === 'batchCount' || key === 'latestReceivedAt') &&
+              (order === 'ascend' || order === 'descend')
+            ) {
+              setCooperationSort({ key, order });
+              setCountSort(null);
+            } else {
+              setCooperationSort(null);
+              setCountSort(
+                key === 'itemCounts' && (order === 'ascend' || order === 'descend') ? order : null,
+              );
+            }
             setPage(1);
           }}
-          scroll={{ x: 1200 }}
+          scroll={{ x: mobile ? 1200 : 1440 }}
           pagination={{
             ...pagination,
             current: page,

@@ -40,7 +40,7 @@
 .help {
   margin: 0 0 20px;
   color: var(--ant-color-text-secondary, #667085);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.7;
   text-wrap: pretty;
 }
@@ -82,7 +82,7 @@
   flex: 1;
   min-width: 0;
   color: var(--ant-color-text, #223047);
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
@@ -92,7 +92,7 @@
   grid-template-columns: minmax(76px, max-content) minmax(0, 1fr);
   gap: 12px 16px;
   margin: 0;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.7;
 }
 
@@ -125,7 +125,7 @@
   min-height: 32px;
   padding: 4px 12px;
   color: var(--ant-color-text, #223047);
-  font-size: 14px;
+  font-size: 12px;
   line-height: 22px;
   text-align: center;
   border: 1px solid var(--ant-color-border, #d9d9d9);
@@ -143,7 +143,7 @@
   gap: 4px;
   min-height: 32px;
   margin-left: auto;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.6;
 }
 

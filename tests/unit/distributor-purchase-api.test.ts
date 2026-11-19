@@ -9,6 +9,12 @@ const mocks = vi.hoisted(() => ({
   list: vi.fn(),
   areaCounts: vi.fn(),
   itemCounts: vi.fn(),
+  batchStats: vi.fn(),
+  stats: vi.fn(),
+}));
+vi.mock('@/lib/distributor-batches', () => ({
+  getDistributorBatchStats: mocks.batchStats,
+  getDistributorStats: mocks.stats,
 }));
 vi.mock('@/auth', () => ({ auth: mocks.auth }));
 vi.mock('@/lib/db', () => ({
@@ -40,6 +46,14 @@ const request = (suffix = '') =>
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.batchStats.mockResolvedValue(
+    new Map([[id, { batchCount: 3, latestReceivedAt: '2026-10-03T00:00:00.000Z' }]]),
+  );
+  mocks.stats.mockResolvedValue({
+    itemCounts: { total: 5, products: 2, materials: 3 },
+    batchCount: 3,
+    latestReceivedAt: '2026-10-03T00:00:00.000Z',
+  });
   mocks.auth.mockResolvedValue({ user: { id: 'admin-id', name: 'admin', nickname: '' } });
   mocks.summary.mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 20 });
   mocks.entries.mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 20 });
@@ -59,8 +73,17 @@ describe('distributor read APIs', () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
       items: [
-        { id, name: '已有进货', attachments, itemCounts: { total: 5, products: 2, materials: 3 } },
         {
+          id,
+          name: '已有进货',
+          attachments,
+          batchCount: 3,
+          latestReceivedAt: '2026-10-03T00:00:00.000Z',
+          itemCounts: { total: 5, products: 2, materials: 3 },
+        },
+        {
+          batchCount: 0,
+          latestReceivedAt: null,
           id: 'empty',
           name: '暂无进货',
           attachments: [],
@@ -134,6 +157,14 @@ describe('distributor read APIs', () => {
     const item = { id, name: '渠道商', attachments: [{ objectKey: 'receipt.png', notes: '凭证' }] };
     mocks.detail.mockResolvedValue(item);
     mocks.areas.mockResolvedValue([{ name: '东海' }]);
-    expect(await (await detail(request(), context)).json()).toEqual({ item, areas: ['东海'] });
+    expect(await (await detail(request(), context)).json()).toEqual({
+      item,
+      areas: ['东海'],
+      stats: {
+        itemCounts: { total: 5, products: 2, materials: 3 },
+        batchCount: 3,
+        latestReceivedAt: '2026-10-03T00:00:00.000Z',
+      },
+    });
   });
 });

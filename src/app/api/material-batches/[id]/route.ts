@@ -1,3 +1,4 @@
+import { attachmentListInclude } from '@/lib/shared-attachment-query';
 import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest, { params }: Context) {
     const batch = await db.materialBatch.findUnique({
       where: { id: (await params).id },
       include: {
-        attachments: { orderBy: { position: 'asc' } },
+        attachments: attachmentListInclude,
         entries: { include: { ...entryInclude, material: true }, orderBy: { createdAt: 'desc' } },
         productEntries: {
           include: {

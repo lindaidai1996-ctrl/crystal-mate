@@ -1,11 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import {
-  acceptAssistantSnapshot,
   type AssistantBrowserConversation,
   type AssistantSessionList,
 } from '@/lib/ai-assistant/browser-contracts';
+import { conversationViewReducer, emptyConversationView } from './conversationView';
 
 const endpoint = '/api/assistant/conversations';
 export async function assistantFetch<T>(
@@ -30,8 +30,12 @@ export async function assistantFetch<T>(
 export function useAssistantConversation(initialId: string | null, privacy: boolean) {
   const [selectedId, setSelectedId] = useState(initialId);
   const [sessions, setSessions] = useState<AssistantSessionList>({ items: [], nextCursor: null });
-  const [snapshot, setSnapshot] = useState<AssistantBrowserConversation | null>(null);
+  const [{ snapshot, pendingMessage }, dispatchView] = useReducer(
+    conversationViewReducer,
+    emptyConversationView,
+  );
   const [pending, setPending] = useState(false);
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [managingId, setManagingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
@@ -53,7 +57,7 @@ export function useAssistantConversation(initialId: string | null, privacy: bool
     commandRequest.current?.abort();
     currentId.current = id;
     setSelectedId(id);
-    setSnapshot(null);
+    dispatchView({ type: 'reset' });
     setPending(false);
     setError(null);
     const url = new URL(window.location.href);
@@ -102,7 +106,7 @@ export function useAssistantConversation(initialId: string | null, privacy: bool
       if (epoch.current !== version || order < applied.current || currentId.current !== value.id)
         return;
       applied.current = order;
-      setSnapshot((old) => (acceptAssistantSnapshot(old, value, currentId.current!) ? value : old));
+      dispatchView({ type: 'snapshot', value, selectedId: currentId.current! });
     },
     [],
   );
@@ -115,7 +119,7 @@ export function useAssistantConversation(initialId: string | null, privacy: bool
     const privacyEpoch = ++epoch.current;
     commandRequest.current?.abort();
     setPending(false);
-    setSnapshot(null);
+    dispatchView({ type: 'reset' });
     setRefresh((n) => n + 1);
     if (!id || (!inFlight && !snapshot?.active)) return;
     // A server-side CAS cancellation prevents another model request with the old privacy input.
@@ -237,13 +241,22 @@ export function useAssistantConversation(initialId: string | null, privacy: bool
       relevanceBudget: { maxCalls: number; maxReservedTokens: number };
     },
   ) => {
-    if (!selectedId || !snapshot || (pending && action !== 'cancel')) return;
+    if (!selectedId || !snapshot || ((pending || commandRequest.current) && action !== 'cancel'))
+      return;
     const id = selectedId;
     const version = ++epoch.current;
+    if (action === 'cancel' && pendingMessage) {
+      dispatchView({ type: 'unconfirmed', id: pendingMessage.id });
+    }
     commandRequest.current?.abort();
     const controller = new AbortController();
     commandRequest.current = controller;
+    const localMessageId = action === 'message' ? `local-${version}` : null;
+    if (localMessageId) {
+      dispatchView({ type: 'send', id: localMessageId, text: text ?? '', privacy });
+    }
     setPending(true);
+    setPendingAction(action);
     setError(null);
     setRefresh((n) => n + 1);
     try {
@@ -266,8 +279,10 @@ export function useAssistantConversation(initialId: string | null, privacy: bool
       // The POST response may have been projected before the privacy preference changed.
       // Read again with the live preference and never install the old response directly.
     } catch (cause) {
-      if (epoch.current === version && !controller.signal.aborted)
+      if (epoch.current === version && !controller.signal.aborted) {
         setError((cause as Error).message);
+        if (localMessageId) dispatchView({ type: 'unconfirmed', id: localMessageId });
+      }
     } finally {
       if (commandRequest.current === controller) commandRequest.current = null;
       if (epoch.current === version && currentId.current === id) {
@@ -282,7 +297,9 @@ export function useAssistantConversation(initialId: string | null, privacy: bool
     selectedId,
     sessions,
     snapshot,
+    pendingMessage,
     pending,
+    cancelling: pending && pendingAction === 'cancel',
     managingId,
     error,
     select,

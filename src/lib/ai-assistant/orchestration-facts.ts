@@ -144,60 +144,68 @@ export function createAssistantFacts(deps: {
         stage = 'judgment';
         began = Date.now();
         const budget = executionBudgetSchema.parse(deps.relevanceBudget ?? {});
-        relevance = await runs.advance(
-          deps.accountId,
-          { runId: relevance.runId, revision: relevance.revision, budget },
-          (input, options) =>
-            deps.model(input, { ...options, signal: AbortSignal.any([signal, options.signal]) }),
-          async (progress) => {
-            retained = progress;
-            const attempt = progress.attempts.at(-1);
-            await event(
-              {
-                stage: 'judgment',
-                outcome:
-                  attempt?.outcome === 'running'
-                    ? 'started'
-                    : attempt?.outcome === 'success'
-                      ? 'success'
-                      : 'failed',
-                durationMs: attempt?.durationMs ?? 0,
-                code: attempt?.errorCode ?? null,
-                model: attempt?.model ?? null,
-                usage: attempt?.usage ?? null,
-                completeness: {
-                  attempt: attempt?.number,
-                  keys: attempt?.keys,
-                  evaluated: progress.decisions.length,
-                  reservedTokens: progress.reservedTokens,
+        // A step boundary only yields the internal worker; keep the same run and
+        // cumulative reservations while the conversation command is still active.
+        do {
+          relevance = await runs.advance(
+            deps.accountId,
+            { runId: relevance.runId, revision: relevance.revision, budget },
+            (input, options) =>
+              deps.model(input, { ...options, signal: AbortSignal.any([signal, options.signal]) }),
+            async (progress) => {
+              retained = progress;
+              const attempt = progress.attempts.at(-1);
+              await event(
+                {
+                  stage: 'judgment',
+                  outcome:
+                    attempt?.outcome === 'running'
+                      ? 'started'
+                      : attempt?.outcome === 'success'
+                        ? 'success'
+                        : 'failed',
+                  durationMs: attempt?.durationMs ?? 0,
+                  code: attempt?.errorCode ?? null,
+                  model: attempt?.model ?? null,
+                  usage: attempt?.usage ?? null,
+                  completeness: {
+                    attempt: attempt?.number,
+                    keys: attempt?.keys,
+                    evaluated: progress.decisions.length,
+                    reservedTokens: progress.reservedTokens,
+                  },
                 },
-              },
-              progress,
-            );
-          },
-        );
-        retained = runs.checkpoint(deps.accountId, relevance.runId);
-        // Persist evidence-bound judgments, cumulative costs and completeness before facts.
-        await event(
-          {
-            stage,
-            outcome: relevance.completeness.stopReason === null ? 'success' : 'failed',
-            durationMs: Date.now() - began,
-            code: relevance.lastErrorCode,
-            model: relevance.attempts.at(-1)?.model ?? null,
-            usage: null,
-            completeness: {
-              completeness: relevance.completeness,
-              coverage: relevance.coverage,
-              attempts: relevance.attempts,
-              usage: relevance.usage,
-              ruleVersion: relevance.ruleVersion,
-              promptVersion: relevance.promptVersion,
+                progress,
+              );
             },
-          },
-          retained,
-        );
-        if (signal.aborted) throw new CandidateQueryError('EXECUTION_ABORTED');
+          );
+          retained = runs.checkpoint(deps.accountId, relevance.runId);
+          // Persist evidence-bound judgments, cumulative costs and completeness before facts.
+          await event(
+            {
+              stage,
+              outcome:
+                relevance.completeness.stopReason === null ||
+                relevance.lastErrorCode === 'STEP_CALL_LIMIT'
+                  ? 'success'
+                  : 'failed',
+              durationMs: Date.now() - began,
+              code: relevance.lastErrorCode === 'STEP_CALL_LIMIT' ? null : relevance.lastErrorCode,
+              model: relevance.attempts.at(-1)?.model ?? null,
+              usage: null,
+              completeness: {
+                completeness: relevance.completeness,
+                coverage: relevance.coverage,
+                attempts: relevance.attempts,
+                usage: relevance.usage,
+                ruleVersion: relevance.ruleVersion,
+                promptVersion: relevance.promptVersion,
+              },
+            },
+            retained,
+          );
+          if (signal.aborted) throw new CandidateQueryError('EXECUTION_ABORTED');
+        } while (relevance.lastErrorCode === 'STEP_CALL_LIMIT');
         if (relevance.completeness.stopReason !== null) {
           const stop = relevance.completeness.stopReason;
           return {
@@ -259,13 +267,44 @@ export function createAssistantFacts(deps: {
           stock,
         };
       });
+      // Read uncertain purchase facts separately. They are review material, never
+      // part of the confirmed selection passed to calculations or stock readers.
+      const uncertain = relevance?.decisions.filter((row) => row.status === 'uncertain') ?? [];
+      const uncertainPurchases =
+        query.subject === 'purchases' &&
+        state.view !== 'stock' &&
+        state.view !== 'purchase_remaining' &&
+        uncertain.length
+          ? await measured('facts', async () => {
+              const source = await deps.purchases(
+                purchaseQuerySchema.parse({
+                  query,
+                  selectedPurchases: uncertain.flatMap((row) =>
+                    row.purchase ? [row.purchase] : [],
+                  ),
+                }),
+              );
+              const reasons = new Map(uncertain.map((row) => [row.purchase?.id, row.reason]));
+              return {
+                items: source.rows.map((row) => ({
+                  ...row,
+                  reason: reasons.get(row.purchase.id)!,
+                })),
+                summary: summarizeAssistantPurchases(
+                  source.rows,
+                  source.scopeCandidateCount,
+                  'selected_purchases',
+                ),
+              };
+            })
+          : undefined;
       return {
         status: relevance?.completeness.uncertain
           ? 'needs_confirmation'
           : selection.length
             ? 'completed'
             : 'no_results',
-        result: { relevance, facts },
+        result: { relevance, facts, ...(uncertainPurchases ? { uncertainPurchases } : {}) },
         checkpoint: retained,
         ...(relevance?.completeness.uncertain
           ? { clarification: '部分记录的语义依据待确认；汇总仅包含已确定记录，待确认项未计入。' }

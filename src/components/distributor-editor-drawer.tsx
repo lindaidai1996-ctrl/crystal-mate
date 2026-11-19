@@ -3,7 +3,7 @@
 import { App, AutoComplete, Button, Form, Input, Space } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { attachmentCoverKey } from '@/lib/attachments';
+import { attachmentWriteFields, attachmentCoverKey } from '@/lib/attachments';
 import { ResponsiveDrawer as Drawer } from '@/components/responsive/responsiveDialog';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { Distributor, DistributorValues } from '@/lib/client-types';
@@ -56,12 +56,8 @@ export function DistributorEditorDrawer({
           body: JSON.stringify({
             ...values,
             coverObjectKey: attachmentCoverKey(attachments, coverObjectKey),
-            attachments: attachments.map(({ objectKey, fileName, notes, source }) => ({
-              source,
-              objectKey,
-              fileName,
-              notes,
-            })),
+            attachmentsVersion: distributor?.attachmentsVersion,
+            attachments: attachments.map(attachmentWriteFields),
           }),
         },
       );
@@ -149,6 +145,7 @@ export function DistributorEditorDrawer({
         </Form.Item>
         <Form.Item label={t('attachments')}>
           <BatchAttachmentPicker
+            ownerType="distributor"
             owner={distributor ? { type: 'distributor', id: distributor.id } : undefined}
             coverObjectKey={coverObjectKey}
             onCoverChange={setCoverObjectKey}

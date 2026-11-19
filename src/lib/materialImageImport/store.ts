@@ -1,3 +1,4 @@
+import { lockAttachments } from '@/lib/shared-attachments';
 import { MAX_ATTACHMENTS } from '@/lib/attachments';
 import { Prisma } from '@prisma/client';
 import { normalizeAliases } from '@/lib/catalog-aliases';
@@ -271,6 +272,7 @@ export async function commitImageImportItem(id: string, input: z.infer<typeof co
           return serialize(
             await tx.materialImageImport.findUniqueOrThrow({ where: { id }, include }),
           );
+        await lockAttachments(tx);
         const locked = await tx.materialImageImport.updateMany({
           where: { id, version: input.version, archivedAt: null, status: { not: 'PROCESSING' } },
           data: { version: { increment: 1 } },
@@ -326,7 +328,15 @@ export async function commitImageImportItem(id: string, input: z.infer<typeof co
             throw new ApiError(400, 'ATTACHMENT_LIMIT_EXCEEDED');
           await tx.materialBatchAttachment.create({
             data: {
-              batchId,
+              batch: { connect: { id: batchId } },
+              asset: {
+                create: {
+                  objectKey: job.sourceKey,
+                  url: job.sourceUrl,
+                  fileName: job.fileName,
+                  notes: '图片批量录入原图',
+                },
+              },
               objectKey: job.sourceKey,
               url: job.sourceUrl,
               fileName: job.fileName,
@@ -335,6 +345,10 @@ export async function commitImageImportItem(id: string, input: z.infer<typeof co
             },
           });
         }
+        await tx.materialBatch.update({
+          where: { id: batchId },
+          data: { attachmentsVersion: { increment: 1 } },
+        });
         await tx.materialImageImportItem.update({
           where: { id: input.itemId },
           data: { materialId, entryId },

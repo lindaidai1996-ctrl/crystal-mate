@@ -17,9 +17,29 @@ const brand = {
   selected: '#e8efe7',
 };
 
+// Share the same text scale across the app and nested login/assistant themes.
+const typography = {
+  fontSize: 12,
+  fontSizeSM: 12,
+  fontSizeLG: 14,
+  fontSizeXL: 16,
+  fontSizeHeading1: 18,
+  fontSizeHeading2: 16,
+  fontSizeHeading3: 14,
+  fontSizeHeading4: 14,
+  fontSizeHeading5: 12,
+  lineHeight: 1.6,
+  lineHeightHeading1: 1.5,
+  lineHeightHeading2: 1.5,
+  lineHeightHeading3: 1.5,
+  lineHeightHeading4: 1.5,
+  lineHeightHeading5: 1.5,
+};
+
 export const uiTheme: ThemeConfig = {
   cssVar: { key: 'crystal-mate' },
   token: {
+    ...typography,
     colorPrimary: brand.primary,
     colorInfo: brand.primary,
     colorLink: brand.primary,
@@ -39,7 +59,6 @@ export const uiTheme: ThemeConfig = {
     borderRadiusSM: 6,
     controlHeight: 44,
     controlHeightSM: 32,
-    fontSize: 14,
     fontFamily: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
     motionDurationMid: '0.16s',
     motionDurationSlow: '0.16s',
@@ -63,7 +82,14 @@ export const uiTheme: ThemeConfig = {
       borderRadiusLG: 6,
       defaultPadding: '12px 16px',
     },
-    Button: { primaryShadow: 'none', defaultShadow: 'none', paddingInline: 20 },
+    Button: {
+      primaryShadow: 'none',
+      defaultShadow: 'none',
+      paddingInline: 20,
+      contentFontSize: 12,
+      contentFontSizeSM: 12,
+      contentFontSizeLG: 12,
+    },
     Menu: {
       itemBg: 'transparent',
       itemColor: '#52685a',
@@ -84,9 +110,14 @@ export const uiTheme: ThemeConfig = {
       rowHoverBg: '#f4f7f0',
       borderColor: '#e5eae2',
     },
-    Input: { activeShadow: '0 0 0 3px rgb(84 117 102 / 10%)' },
-    InputNumber: { activeShadow: '0 0 0 3px rgb(84 117 102 / 10%)' },
-    Select: { optionSelectedBg: brand.selected, activeOutlineColor: 'rgb(84 117 102 / 10%)' },
+    Input: { activeShadow: '0 0 0 3px rgb(84 117 102 / 10%)', inputFontSizeLG: 12 },
+    InputNumber: { activeShadow: '0 0 0 3px rgb(84 117 102 / 10%)', inputFontSizeLG: 12 },
+    Select: {
+      optionSelectedBg: brand.selected,
+      activeOutlineColor: 'rgb(84 117 102 / 10%)',
+      fontSizeLG: 12,
+    },
+    DatePicker: { inputFontSizeLG: 12 },
     Tooltip: {
       colorBgSpotlight: '#ffffff',
       colorTextLightSolid: brand.ink,
@@ -103,14 +134,32 @@ export const uiTheme: ThemeConfig = {
       itemSelectedColor: brand.primary,
     },
     Pagination: { itemActiveBg: brand.selected },
-    Modal: { titleFontSize: 16 },
+    Modal: { titleFontSize: 14 },
+    Card: { headerFontSize: 14, headerFontSizeSM: 14 },
+    Tabs: { titleFontSize: 12, titleFontSizeSM: 12, titleFontSizeLG: 14 },
+    Statistic: { contentFontSize: 18 },
     Form: { labelColor: brand.ink, verticalLabelPadding: '0 0 10px' },
+  },
+};
+
+export const assistantTheme: ThemeConfig = {
+  cssVar: { key: 'assistant-compact' },
+  token: {
+    ...typography,
+    controlHeight: 32,
+    controlHeightSM: 28,
+  },
+  components: {
+    Button: { paddingInline: 12 },
+    Menu: { itemHeight: 40 },
+    Modal: { titleFontSize: 14 },
   },
 };
 
 export const loginTheme: ThemeConfig = {
   cssVar: { key: 'crystal-login' },
   token: {
+    ...typography,
     colorPrimary: brand.primary,
     colorInfo: brand.primary,
     colorText: brand.ink,
@@ -120,7 +169,6 @@ export const loginTheme: ThemeConfig = {
     colorError: '#b8625e',
     borderRadius: 12,
     controlHeightLG: 46,
-    fontSize: 14,
   },
   components: {
     Input: { borderRadiusLG: 10, activeShadow: '0 0 0 3px rgb(84 117 102 / 10%)' },

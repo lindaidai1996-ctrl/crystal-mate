@@ -66,6 +66,7 @@ import { CategoryFilterRow } from './categoryFilterRow';
 import { useCategoryCounts } from './useCategoryCounts';
 import categoryStyles from './categoryFilter.module.css';
 import catalogStyles from './productCatalog.module.css';
+import { BatchComparisonButton } from '@/components/batchComparison/batchComparisonButton';
 import { ProductGallery } from './productGallery';
 import { CatalogNote } from './catalogNote';
 import { underlinedTheme } from '@/lib/ui-theme';
@@ -406,6 +407,12 @@ export function ProductsPage({
           : `row-actions ${catalogStyles.standardActions}`
       }
     >
+      <BatchComparisonButton
+        kind="product"
+        id={item.id}
+        entries={item.purchaseEntries}
+        returnTo={listPath}
+      />
       {item.origin === 'DIY' && (
         <Link href={`/admin/products/${item.id}/cards?returnTo=${encodeURIComponent(listPath)}`}>
           <Button type="text" icon={<FileTextOutlined />}>

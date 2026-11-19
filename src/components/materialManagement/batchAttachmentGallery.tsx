@@ -1,4 +1,5 @@
 'use client';
+import { attachmentWriteFields } from '@/lib/attachments';
 
 import { AttachmentGallery } from '@/components/imageUpload/attachmentGallery';
 import { apiFetch } from '@/lib/client-api';
@@ -18,6 +19,9 @@ export function BatchAttachmentGallery({
       owner={{ type: 'batch', id: batch.id }}
       attachments={batch.attachments ?? []}
       onUploadingChange={onUploadingChange}
+      onRefresh={async () => {
+        onSaved(await apiFetch<MaterialBatch>(`/api/material-batches/${batch.id}`));
+      }}
       onSave={async (update) => {
         // Apply only this operation to freshly loaded attachments and metadata.
         const current = await apiFetch<MaterialBatch>(`/api/material-batches/${batch.id}`);
@@ -29,12 +33,8 @@ export function BatchAttachmentGallery({
             receivedAt: current.receivedAt.slice(0, 10),
             notes: current.notes,
             coverObjectKey: next.coverObjectKey,
-            attachments: next.attachments.map(({ objectKey, fileName, notes, source }) => ({
-              objectKey,
-              fileName,
-              notes,
-              source,
-            })),
+            attachmentsVersion: current.attachmentsVersion,
+            attachments: next.attachments.map(attachmentWriteFields),
           }),
         });
         onSaved(saved);

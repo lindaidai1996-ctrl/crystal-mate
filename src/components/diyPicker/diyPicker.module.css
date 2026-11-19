@@ -144,7 +144,7 @@
 }
 .stock {
   color: var(--ant-color-primary);
-  font-size: 13px;
+  font-size: 12px;
 }
 .stock[data-empty='true'] {
   color: var(--ant-color-text-tertiary);
@@ -181,7 +181,7 @@
   grid-column: 2;
   gap: 4px;
   line-height: 1.6;
-  font-size: 13px;
+  font-size: 12px;
 }
 .batchInfo:first-child {
   grid-column: 1 / -1;
@@ -203,7 +203,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 6px 16px;
-  font-size: 13px;
+  font-size: 12px;
 }
 .batchSummary {
   padding: 8px 10px;
@@ -286,7 +286,7 @@
     gap: 12px;
   }
   .materialInfo {
-    font-size: 14px;
+    font-size: 12px;
   }
   .batches {
     padding: 0 12px;
@@ -334,7 +334,7 @@
   }
   .cardBody {
     padding: 10px;
-    font-size: 13px;
+    font-size: 12px;
   }
   .cardBody :global(.ant-checkbox-wrapper) {
     min-height: 44px;
@@ -359,7 +359,7 @@
   }
   .selectedList {
     max-height: 72px;
-    font-size: 13px;
+    font-size: 12px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

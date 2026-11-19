@@ -189,6 +189,16 @@ export function factSetFromResult(raw: unknown, state: QueryState): FactSet {
     parents: [],
     warnings: [
       ...(result.selectionIsPartial ? ['部分记录待确认，以下只包含已确定记录。'] : []),
+      ...(result.uncertainPurchases
+        ? [
+            `另有 ${result.uncertainPurchases.items.length} 条采购记录待确认，未计入确定金额。${result.uncertainPurchases.summary.totals.amounts
+              .map(
+                (amount) =>
+                  `待确认记录的已知金额合计 ${amount.knownAmount} ${amount.currency ?? '未知币种'}（金额未知 ${amount.unknownAmountEntryCount} 条）。`,
+              )
+              .join('')}名称、原因及各行金额单独列在待确认采购中。`,
+          ]
+        : []),
       ...(result.purchases.some((r) => r.currencyBasis === 'business_default')
         ? ['采购币种采用 CNY 业务默认值。']
         : []),
@@ -208,7 +218,7 @@ export function factPreview(set: FactSet, privacy: boolean, fields?: FactField[]
     totalRows: set.rows.length,
     complete: set.complete,
     observations: set.observations,
-    warnings: set.warnings,
+    warnings: privacy ? (set.complete ? [] : ['部分记录待确认或查询未完成。']) : set.warnings,
     offset,
     hasMore: offset + 50 < set.rows.length,
     rows: set.rows.slice(offset, offset + 50).map((r) => ({

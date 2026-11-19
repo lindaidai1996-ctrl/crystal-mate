@@ -9,12 +9,26 @@ import {
 } from './contracts';
 
 export const SEMANTIC_POLICY_VERSION = 'v1' as const;
+// The wire contract remains v1; revisions identify changes to its business rules.
+export const SEMANTIC_POLICY_REVISION = 'v2' as const;
 export const SEMANTIC_POLICY = {
   version: SEMANTIC_POLICY_VERSION,
+  revision: SEMANTIC_POLICY_REVISION,
   purposeAliases: ['配件', '配饰', '制作配件', '制作物料', '制作配件（含配饰、圆珠）'],
   makingForms: ['圆珠', '散珠', '桶珠', '药片', '随形', '提溜', '勒子', '藏扣', '隔片', '直切'],
   // These are explicit material labels, not a mapping of every category to a material.
-  materialLabels: ['绿松石', '玻璃', '树脂', '和田玉', '翡翠', '绿幽灵', 'S925银', '银', '18K金'],
+  materialLabels: [
+    '绿松石',
+    '玻璃',
+    '树脂',
+    '和田玉',
+    '翡翠',
+    '绿幽灵',
+    'S925银',
+    '银',
+    '18K金',
+    '铜',
+  ],
   ambiguousTerms: ['松石'],
 } as const;
 type Condition = z.infer<typeof semanticConditionSchema>;
@@ -64,6 +78,20 @@ const values = (e: Evidence): string[] =>
   e.value === null ? [] : Array.isArray(e.value) ? e.value : [e.value];
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const narrative = (e: Evidence) => e.field === 'notes' || e.field === 'description';
+const explicitOwnMaterial = (before: string) =>
+  /(?:材质|材料|本体)\s*(?:是|为|[:：])\s*(?:天然)?\s*$/.test(before);
+const platingPattern = new RegExp(
+  [
+    String.raw`(?:\d{1,2}\s*K\s*)?(?:电镀|镀)\s*(?:\d{1,2}\s*K\s*)?(?:金|S?925\s*银|银|铜|铑|铂)`,
+    String.raw`(?:\d{1,2}\s*K\s*)?(?:金|S?925\s*银|银|铜|铑|铂)\s*(?:电镀层|镀层)`,
+  ].join('|'),
+  'giu',
+);
+function withoutPlating(text: string) {
+  // Remove only explicit surface treatments from the matching text. Citations
+  // still use the unmodified field; plating alone cannot establish a base metal.
+  return text.replace(platingPattern, ' ');
+}
 function materialSignals(candidate: QueryCandidate, target: string) {
   const positive: Evidence[] = [],
     negative: Evidence[] = [],
@@ -77,7 +105,8 @@ function materialSignals(candidate: QueryCandidate, target: string) {
         /(?:材质|材料|本体).{0,8}(?:待核对|待确认|不确定|存疑|需核对)/.test(value)
       )
         ambiguous.push(e);
-      for (const clause of value.split(/[，,。；;\n]/)) {
+      for (const originalClause of value.split(/[，,。；;\n]/)) {
+        const clause = withoutPlating(originalClause);
         const matches = [...clause.matchAll(new RegExp(escapeRegExp(target), 'giu'))];
         for (const match of matches) {
           const before = clause.slice(0, match.index);
@@ -101,22 +130,20 @@ function materialSignals(candidate: QueryCandidate, target: string) {
             )
           ) {
             negative.push(e);
-          } else if (
-            !narrative(e) ||
-            /(?:材质|材料|本体)\s*(?:是|为|[:：])\s*(?:天然)?\s*$/.test(before)
-          ) {
+          } else if (!narrative(e) || explicitOwnMaterial(before)) {
             positive.push(e);
           } else ambiguous.push(e);
         }
         // Separate material labels can conflict even inside one field. Overlapping
         // labels such as 银 / S925银 are not competing material assertions.
         if (
-          !narrative(e) &&
           SEMANTIC_POLICY.materialLabels.some(
             (other) =>
               !other.includes(target) &&
               !target.includes(other) &&
-              clause.toLowerCase().includes(other.toLowerCase()),
+              [...clause.matchAll(new RegExp(escapeRegExp(other), 'giu'))].some(
+                (match) => !narrative(e) || explicitOwnMaterial(clause.slice(0, match.index)),
+              ),
           )
         )
           negative.push(e);

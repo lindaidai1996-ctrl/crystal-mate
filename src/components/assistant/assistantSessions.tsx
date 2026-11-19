@@ -6,6 +6,7 @@ import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined } from '@ant-d
 import { useLocale, useTranslations } from 'next-intl';
 import type { AssistantSessionList } from '@/lib/ai-assistant/browser-contracts';
 import assistantStyles from './assistantPage.module.css';
+import { formatAssistantTime } from './displayTime';
 
 type Props = {
   sessions: AssistantSessionList;
@@ -64,11 +65,7 @@ export function AssistantSessions(props: Props) {
                 onClick={() => props.onSelect(session.id)}
               >
                 <strong title={name}>{name}</strong>
-                <span>
-                  {new Date(session.updatedAt).toLocaleString(locale, {
-                    timeZone: 'Asia/Shanghai',
-                  })}
-                </span>
+                <span>{formatAssistantTime(session.updatedAt, locale)}</span>
               </button>
               <Dropdown
                 trigger={['click']}

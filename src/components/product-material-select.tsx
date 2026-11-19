@@ -274,7 +274,7 @@ export function MaterialSourceSummary({
           <>
             <MaterialDimensions option={option} />
             <Link
-              href={{ pathname: '/admin/materials', query: { q: option.material.name } }}
+              href={`/admin/materials/${option.material.id}/batches/${option.entry.id}`}
               target="_blank"
               rel="noopener noreferrer"
               className="source-material-detail-link"

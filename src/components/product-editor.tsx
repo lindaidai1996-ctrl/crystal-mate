@@ -61,6 +61,7 @@ import { ProductPricingFields } from './product-pricing-fields';
 import { CabochonCostFields } from './cabochonCost/cabochonCostFields';
 import { ImagePicker } from './image-picker';
 import { MissingCategoryState } from './missing-category-state';
+import { BatchComparisonButton } from '@/components/batchComparison/batchComparisonButton';
 import { initialSource, ProductSourceSection } from './product-source-section';
 import { Sensitive, usePrivacyMode } from './privacyMode';
 import type { ProductSourceInput } from '@/lib/client-types';
@@ -105,6 +106,7 @@ export function ProductEditor({
   initialBatchId,
   initialDistributorId,
   initialDraftId,
+  initialSourceId,
   initialReturnTo,
 }: {
   id: string;
@@ -112,6 +114,7 @@ export function ProductEditor({
   initialBatchId?: string;
   initialDistributorId?: string;
   initialDraftId?: string;
+  initialSourceId?: string;
   initialReturnTo?: string;
 }) {
   const t = useTranslations('editor');
@@ -650,6 +653,14 @@ export function ProductEditor({
             <ArrowLeftOutlined /> {returnLabel}
           </Link>
           <h1>{isNew ? t('newTitle') : t('editTitle')}</h1>
+          {!isNew && product && (
+            <BatchComparisonButton
+              kind="product"
+              id={id}
+              entries={product.purchaseEntries}
+              returnTo={withAdminReturnTo(`${listPath}/${id}`, returnPath)}
+            />
+          )}
         </div>
         {process.env.NODE_ENV !== 'production' &&
           !isCabochon &&
@@ -989,6 +1000,7 @@ export function ProductEditor({
               </section>
             )}
             <ProductSourceSection
+              initialSourceId={initialSourceId}
               product={product}
               value={sourceDraft}
               onChange={(next) => {

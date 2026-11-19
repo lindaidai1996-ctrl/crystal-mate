@@ -15,7 +15,7 @@
 .label {
   padding-top: 5px;
   color: var(--ant-color-text-secondary);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 22px;
   overflow-wrap: anywhere;
 }

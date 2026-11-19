@@ -3,7 +3,7 @@
 import { Alert, Pagination, Table, Typography } from 'antd';
 import { useState } from 'react';
 import type { ColumnsType } from 'antd/es/table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LoadingImage } from '@/components/loadingImage';
 import { imageStorageUrl, imageThumbnailUrl } from '@/lib/image-storage';
@@ -13,7 +13,9 @@ import type { CatalogDisplay } from '@/lib/ai-assistant/display-data';
 import type { SourceStock } from '@/lib/ai-assistant/stock-contracts';
 import type { PurchaseEntry } from '@/lib/ai-assistant/purchase-contracts';
 import assistantStyles from './assistantPage.module.css';
+import { formatAssistantTime } from './displayTime';
 import { AssistantSummary } from './assistantSummary';
+import { AssistantUncertainPurchases } from './assistantUncertainPurchases';
 
 export function AssistantResults({
   result,
@@ -25,6 +27,7 @@ export function AssistantResults({
   grouped?: boolean;
 }) {
   const t = useTranslations('assistant');
+  const locale = useLocale();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const key = (item: CatalogDisplay['item']) => `${item.type}:${item.id}`;
@@ -122,7 +125,10 @@ export function AssistantResults({
           {
             title: t('purchaseDate'),
             key: 'date',
-            render: (_: unknown, row: Row) => row.purchase?.batch.receivedAt,
+            render: (_: unknown, row: Row) =>
+              row.purchase
+                ? formatAssistantTime(row.purchase.batch.receivedAt, locale)
+                : t('unknown'),
           },
           {
             title: t('distributor'),
@@ -195,7 +201,7 @@ export function AssistantResults({
       <section className={assistantStyles.results} aria-label={t('results')}>
         <Typography.Title level={4}>{t('distributorResults')}</Typography.Title>
         <p className={assistantStyles.muted}>
-          {t('observedAt')} {result.queriedAt}
+          {t('observedAt')} {formatAssistantTime(result.queriedAt, locale)}
         </p>
         {result.selectionIsPartial && <Alert type="warning" message={t('uncertainDistributors')} />}
         {group(t('confirmedDistributors'), result.distributors?.confirmed ?? [])}
@@ -208,8 +214,12 @@ export function AssistantResults({
       <Typography.Title level={4}>{t('results')}</Typography.Title>
       {result.selectionIsPartial && <Alert type="warning" message={t('uncertainSummary')} />}
       <AssistantSummary result={result} privacy={privacy} grouped={grouped} />
+      {result.uncertainPurchases && (
+        <AssistantUncertainPurchases pending={result.uncertainPurchases} privacy={privacy} />
+      )}
       <p className={assistantStyles.muted}>
-        {t('resultCount', { count: rows.length })} · {t('observedAt')} {result.queriedAt}
+        {t('resultCount', { count: rows.length })} · {t('observedAt')}{' '}
+        {formatAssistantTime(result.queriedAt, locale)}
       </p>
       {result.legacyDetails && <Alert type="info" message={t('legacyDetails')} />}
       <div className={assistantStyles.desktopResults}>
@@ -231,7 +241,7 @@ export function AssistantResults({
               {row.purchase && (
                 <>
                   <dt>{t('purchaseDate')}</dt>
-                  <dd>{row.purchase.batch.receivedAt}</dd>
+                  <dd>{formatAssistantTime(row.purchase.batch.receivedAt, locale)}</dd>
                   <dt>{t('distributor')}</dt>
                   <dd>
                     <Link href={`/admin/distributors/${row.purchase.distributor.id}`}>
@@ -276,7 +286,7 @@ export function AssistantResults({
       />
       <p className={assistantStyles.muted}>
         {t(result.stockMode === 'purchase_remaining' ? 'sourceStockBasis' : 'stockBasis')}
-        {result.stock ? ` · ${result.stock.queriedAt}` : ''}
+        {result.stock ? ` · ${formatAssistantTime(result.stock.queriedAt, locale)}` : ''}
       </p>
     </section>
   );

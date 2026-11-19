@@ -27,7 +27,7 @@ it('records rule/prompt/transport versions and a failed parse without arbitrary 
   });
   expect(result.metadata.ruleVersion).toBe('v1');
   expect(result.metadata.promptVersion).toBe('orchestration-v5');
-  expect(result.metadata.relevancePromptVersion).toBe('relevance-v3');
+  expect(result.metadata.relevancePromptVersion).toBe('relevance-v4');
   expect(result.trace[0]).toMatchObject({
     stage: 'parse',
     outcome: 'failed',

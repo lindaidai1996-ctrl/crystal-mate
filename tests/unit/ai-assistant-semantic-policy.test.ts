@@ -7,6 +7,7 @@ import {
 } from '../../src/lib/ai-assistant/semantic-policy';
 import { decisionsForCandidatesSchema } from '../../src/lib/ai-assistant/contracts';
 import { frozenDetails, semanticFixture, semanticQuery } from '../fixtures/ai-assistant-semantics';
+import { platedSilverFixture, platedSilverNames } from '../fixtures/ai-assistant-silver';
 const conditions = semanticQuery.semantic;
 const fixtures = [
   ['SEM-01', semanticFixture('绿松石圆珠', '绿松石'), 'include'],
@@ -26,6 +27,71 @@ const fixtures = [
   ['SEM-13', semanticFixture('绿色圆珠', '绿幽灵', ['绿幽灵']), 'exclude'],
 ] as const;
 describe('versioned semantic policy', () => {
+  it.each(platedSilverNames)('includes the silver base despite its gold plating: %s', (name) => {
+    const candidate = platedSilverFixture(name);
+    for (const text of name.includes('S925银') ? ['银', 'S925银'] : ['银']) {
+      const result = assessSemanticCandidate(candidate, [
+        { concept: 'material', text, relation: 'is' },
+      ]);
+      expect(result.decision?.status).toBe('include');
+      expect(result.decision?.evidence).toContainEqual(candidate.evidence[0]);
+      expect(decisionsForCandidatesSchema([candidate]).safeParse([result.decision]).success).toBe(
+        true,
+      );
+    }
+    expect(
+      assessSemanticCandidate(candidate, [{ concept: 'material', text: '18K金', relation: 'is' }])
+        .decision?.status,
+    ).toBe('exclude');
+  });
+  it.each(['镀18K金', '18K镀金', '18k电镀金', '镀 18K 金', '18K金镀层'])(
+    'recognizes an explicit coating without changing the silver base: %s',
+    (coating) => {
+      expect(
+        assessSemanticCandidate(semanticFixture(`${coating}S925银圆珠`, '银配饰'), [
+          { concept: 'material', text: '银', relation: 'is' },
+        ]).decision?.status,
+      ).toBe('include');
+    },
+  );
+  it.each([
+    ['铜镀银配件', '铜配饰', 'exclude'],
+    ['铜镀金配件', '铜配饰', 'exclude'],
+    ['银色配件', '未分类', 'exclude'],
+    ['仿银配件', '未分类', 'exclude'],
+    ['镀银配件', '未分类', 'uncertain'],
+    ['18K镀金配件', '未分类', 'uncertain'],
+    ['18K金S925银配件', '未分类', 'uncertain'],
+    ['铜本体S925银配件', '未分类', 'uncertain'],
+  ])('does not infer a silver base or hide real conflicts: %s', (name, category, status) => {
+    expect(
+      assessSemanticCandidate(semanticFixture(name, category), [
+        { concept: 'material', text: '银', relation: 'is' },
+      ]).decision?.status,
+    ).toBe(status);
+  });
+  it('retains real field conflicts and unresolved notes for plated silver', () => {
+    for (const candidate of [
+      semanticFixture('18K镀金S925银配件', '铜配饰'),
+      semanticFixture('18K镀金S925银配件', '银配饰', [], [], '本体材质待核对'),
+      semanticFixture('18K镀金S925银配件', '银配饰', ['非银']),
+      semanticFixture('18K镀金S925银配件', '银配饰', [], [], '本体为铜'),
+    ]) {
+      expect(
+        assessSemanticCandidate(candidate, [{ concept: 'material', text: '银', relation: 'is' }])
+          .decision?.status,
+      ).toBe('uncertain');
+    }
+  });
+  it('distinguishes an explicit base-metal note from a coating or usage note', () => {
+    for (const notes of ['本体为银，表面镀18K金', '适合搭配铜配饰，表面镀18K金']) {
+      expect(
+        assessSemanticCandidate(semanticFixture('S925银配件', '银配饰', [], [], notes), [
+          { concept: 'material', text: '银', relation: 'is' },
+        ]).decision?.status,
+      ).toBe('include');
+    }
+  });
   it.each(fixtures)('%s follows the supplied semantic case', (id, candidate, status) => {
     const result = assessSemanticCandidate(candidate, conditions);
     expect(result.decision?.status).toBe(status);

@@ -1,21 +1,27 @@
 'use client';
 
 import { Fragment, useState } from 'react';
-import { Alert, Pagination } from 'antd';
-import { useTranslations } from 'next-intl';
+import { Pagination } from 'antd';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import type { AnswerDocument } from '@/lib/ai-assistant/answer-document';
 import assistantStyles from './assistantPage.module.css';
+import { formatAssistantTime, formatAssistantTimeText } from './displayTime';
 
 type DataBlock = Extract<AnswerDocument['blocks'][number], { type: 'data' }>;
 function AnswerData({ block }: { block: DataBlock }) {
   const t = useTranslations('assistant');
+  const locale = useLocale();
   const [page, setPage] = useState(1);
   const pageSize = 100;
   const currentPage = Math.min(page, Math.max(1, Math.ceil(block.rows.length / pageSize)));
   const rows = block.rows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
   const value = (cell: DataBlock['rows'][number]['cells'][number]) =>
-    cell.href ? <Link href={cell.href}>{cell.text}</Link> : cell.text;
+    cell.href ? (
+      <Link href={cell.href}>{cell.text}</Link>
+    ) : (
+      formatAssistantTimeText(cell.text, locale)
+    );
   return (
     <>
       {!rows.length ? (
@@ -90,13 +96,34 @@ function AnswerData({ block }: { block: DataBlock }) {
 }
 export function AssistantAnswer({ answer, privacy }: { answer: AnswerDocument; privacy: boolean }) {
   const t = useTranslations('assistant');
+  const locale = useLocale();
   if (privacy) return <p>{t('privateText')}</p>;
+  // Keep completeness limits visible even when other source notes are collapsed.
+  const primaryNoteIndex = Math.max(
+    0,
+    answer.warnings.findIndex(
+      (warning) => warning.includes('待确认') || warning.includes('未完成'),
+    ),
+  );
+  const otherNotes = answer.warnings.filter((_, index) => index !== primaryNoteIndex);
   return (
     <div className={assistantStyles.answer}>
-      {answer.warnings.map((warning, i) => (
-        <Alert key={i} type="warning" message={warning} />
-      ))}
-      {answer.fallback && <p className={assistantStyles.muted}>{t('answerFallback')}</p>}
+      {answer.warnings.length > 0 && (
+        <aside className={assistantStyles.answerNotices} aria-label={t('resultNotes')}>
+          <p role="note">{formatAssistantTimeText(answer.warnings[primaryNoteIndex], locale)}</p>
+          {otherNotes.length > 0 && (
+            <details>
+              <summary>{t('moreResultNotes', { count: otherNotes.length })}</summary>
+              <ul>
+                {otherNotes.map((warning, i) => (
+                  <li key={i}>{formatAssistantTimeText(warning, locale)}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </aside>
+      )}
+      {answer.fallback && <p className={assistantStyles.answerCaption}>{t('answerFallback')}</p>}
       {answer.blocks.map((block, i) =>
         block.type === 'data' ? (
           <AnswerData key={i} block={block} />
@@ -109,7 +136,7 @@ export function AssistantAnswer({ answer, privacy }: { answer: AnswerDocument; p
                   {cell.text}
                 </Link>
               ) : (
-                <Fragment key={j}>{cell.text}</Fragment>
+                <Fragment key={j}>{formatAssistantTimeText(cell.text, locale)}</Fragment>
               ),
             )}
           </p>
@@ -120,7 +147,7 @@ export function AssistantAnswer({ answer, privacy }: { answer: AnswerDocument; p
           <summary>{t('answerSources')}</summary>
           {answer.observations.map((time) => (
             <time key={time} dateTime={time}>
-              {time}
+              {formatAssistantTime(time, locale)}
             </time>
           ))}
           <p>{t('historicalAnswer')}</p>

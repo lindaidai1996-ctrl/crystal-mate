@@ -1,9 +1,11 @@
+import { attachmentListInclude } from '@/lib/shared-attachment-query';
 import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { apiError, ApiError, requireAdmin } from '@/lib/api';
 import { distributorSchema } from '@/lib/validation';
 import { updateDistributor } from '@/lib/distributors';
+import { getDistributorStats } from '@/lib/distributor-batches';
 import { distributorIdSchema } from '@/lib/distributor-purchases';
 
 type Context = { params: Promise<{ id: string }> };
@@ -16,14 +18,18 @@ export async function GET(request: NextRequest, { params }: Context) {
       db.distributor.findUnique({
         where: { id },
         include: {
-          attachments: { orderBy: { position: 'asc' } },
+          attachments: attachmentListInclude,
           _count: { select: { attachments: true } },
         },
       }),
       db.distributorArea.findMany({ orderBy: { name: 'asc' }, select: { name: true } }),
     ]);
     if (!item) throw new ApiError(404, 'NOT_FOUND');
-    return NextResponse.json({ item, areas: areas.map((area) => area.name) });
+    return NextResponse.json({
+      item,
+      areas: areas.map((area) => area.name),
+      stats: await getDistributorStats(id),
+    });
   } catch (error) {
     return apiError(error);
   }

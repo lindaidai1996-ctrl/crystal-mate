@@ -17,8 +17,9 @@ export default async function Page({
   const returnTo = adminReturnPath(query.returnTo);
   return (
     <MaterialEditor
-      key={JSON.stringify([id, batchId, distributorId])}
+      key={JSON.stringify([id, batchId, distributorId, query.view])}
       id={id}
+      basicOnly={query.view === 'basics'}
       initialBatchId={batchId}
       initialDistributorId={distributorId}
       initialDraftId={draftId}

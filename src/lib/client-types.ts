@@ -1,3 +1,4 @@
+import type { SharedAssetView, AttachmentTarget } from './shared-attachment-contracts';
 import type { ImageFraming } from './image-framing';
 import type { AttachmentSource } from './attachments';
 import type { MaterialPurchase } from './material-purchase';
@@ -26,6 +27,7 @@ export type Distributor = {
   wechat: string;
   phone: string;
   notes: string;
+  attachmentsVersion?: number;
   attachments: DistributorAttachment[];
   coverObjectKey?: string | null;
   _count?: { attachments: number };
@@ -39,13 +41,55 @@ export type DistributorValues = Pick<
 >;
 export type DistributorArea = { id: string; name: string; distributorCount: number };
 export type DistributorItemCounts = { total: number; products: number; materials: number };
-export type DistributorListItem = Distributor & { itemCounts: DistributorItemCounts };
+export type DistributorStats = {
+  itemCounts: DistributorItemCounts;
+  batchCount: number;
+  latestReceivedAt: string | null;
+};
+export type DistributorListItem = Distributor & DistributorStats;
+export type DistributorBatchSummary = {
+  id: string;
+  name: string;
+  receivedAt: string;
+  itemCounts: DistributorItemCounts;
+  totalAmount: string | null;
+  hasUnknownAmount: boolean;
+  coverObjectKey: string | null;
+  attachments: MaterialBatchAttachment[];
+};
+export type DistributorBatchEntry = {
+  id: string;
+  type: 'PRODUCT' | 'MATERIAL';
+  itemId: string;
+  name: string;
+  code: string | null;
+  unit: string;
+  quantity: number | null;
+  unitPrice: string | null;
+  amount: string | null;
+};
+export type DistributorBatchPage = {
+  items: DistributorBatchSummary[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
+export type DistributorBatchEntriesPage = {
+  items: DistributorBatchEntry[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
 export type DistributorPage = {
   items: DistributorListItem[];
   areas: string[];
   areaItems: DistributorArea[];
 };
-export type DistributorDetailResponse = { item: Distributor; areas: string[] };
+export type DistributorDetailResponse = {
+  item: Distributor;
+  areas: string[];
+  stats: DistributorStats;
+};
 export type DistributorPriceRange = {
   min: string | null;
   max: string | null;
@@ -344,12 +388,16 @@ export type MaterialBatch = {
   name: string;
   receivedAt: string;
   notes: string;
+  attachmentsVersion?: number;
   attachments?: MaterialBatchAttachment[];
   coverObjectKey?: string | null;
   createdAt: string;
   _count?: { entries: number; productEntries: number; attachments: number };
 };
 export type MaterialBatchAttachment = {
+  assetId?: string;
+  asset?: SharedAssetView;
+  targets?: AttachmentTarget[];
   source?: AttachmentSource;
   id?: string;
   objectKey: string;

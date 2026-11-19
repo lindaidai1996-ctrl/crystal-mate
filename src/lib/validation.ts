@@ -1,3 +1,4 @@
+import { ownerSchema } from './shared-attachment-contracts';
 import { imageFramingsSchema } from './image-framing';
 import { z } from 'zod';
 import { amountToCents, calculateCostTotal } from './cabochon-cost';
@@ -42,6 +43,9 @@ export const settingStyleSchema = z.strictObject({
 const coverObjectKeySchema = z.string().regex(imageObjectKeyPattern).nullable().optional();
 
 const imageAttachmentSchema = z.strictObject({
+  assetId: z.string().min(1).max(150).optional(),
+  version: z.number().int().positive().optional(),
+  targets: z.array(ownerSchema).max(50).optional(),
   source: z
     .strictObject({
       kind: z.enum(['MATERIAL_BATCH_IMAGE', 'MATERIAL_IMAGE', 'PRODUCT_IMAGE']),
@@ -60,6 +64,7 @@ export const distributorSchema = z.strictObject({
   wechat: z.string().trim().max(100),
   phone: z.string().trim().max(50),
   notes: z.string().trim().max(10000),
+  attachmentsVersion: z.number().int().nonnegative().optional(),
   attachments: z.array(imageAttachmentSchema).max(MAX_ATTACHMENTS).optional(),
   coverObjectKey: coverObjectKeySchema,
 });
@@ -362,6 +367,7 @@ const batchHeaderSchema = z.strictObject({
 
 export const materialBatchHeaderSchema = batchHeaderSchema;
 export const materialBatchWriteSchema = batchHeaderSchema.extend({
+  attachmentsVersion: z.number().int().nonnegative().optional(),
   attachments: z.array(imageAttachmentSchema).max(MAX_ATTACHMENTS).default([]),
   coverObjectKey: coverObjectKeySchema,
 });

@@ -11,10 +11,45 @@ vi.mock('@/lib/api', () => ({
 }));
 import { db } from '@/lib/db';
 import { getAttachmentCandidates } from '@/lib/attachment-candidates';
-import { createBatch, updateBatch } from '@/lib/material-batches';
-import { createDistributor, updateDistributor } from '@/lib/distributors';
+import { createBatch, updateBatch as saveBatch } from '@/lib/material-batches';
+import { createDistributor, updateDistributor as saveDistributor } from '@/lib/distributors';
 import type { AttachmentCandidate } from '@/lib/attachments';
 import { materialBatchWriteSchema } from '@/lib/validation';
+
+// Simulate the versioned payload produced by the current editors; stale-write cases
+// are tested separately in shared-attachments.test.ts.
+async function updateBatch(id: string, input: Parameters<typeof saveBatch>[1]) {
+  const current = await db.materialBatch.findUniqueOrThrow({
+    where: { id },
+    include: { attachments: { include: { asset: true } } },
+  });
+  return saveBatch(id, {
+    ...input,
+    attachmentsVersion: current.attachmentsVersion,
+    attachments: input.attachments.map((item) => {
+      const existing = current.attachments.find((a) => a.objectKey === item.objectKey);
+      return existing
+        ? { ...item, assetId: existing.assetId, version: existing.asset.version }
+        : item;
+    }),
+  });
+}
+async function updateDistributor(id: string, input: Parameters<typeof saveDistributor>[1]) {
+  const current = await db.distributor.findUniqueOrThrow({
+    where: { id },
+    include: { attachments: { include: { asset: true } } },
+  });
+  return saveDistributor(id, {
+    ...input,
+    attachmentsVersion: current.attachmentsVersion,
+    attachments: input.attachments?.map((item) => {
+      const existing = current.attachments.find((a) => a.objectKey === item.objectKey);
+      return existing
+        ? { ...item, assetId: existing.assetId, version: existing.asset.version }
+        : item;
+    }),
+  });
+}
 
 const databaseName = process.env.DATABASE_URL
   ? new URL(process.env.DATABASE_URL).pathname.slice(1)

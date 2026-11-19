@@ -6,7 +6,9 @@ const globalDb = globalThis as unknown as { prisma?: PrismaClient };
 const cached = globalDb.prisma;
 // A dev server can retain a client generated before audit or assistant models existed.
 const client =
-  cached?.auditLog &&
+  cached?.sharedAttachment &&
+  cached.attachmentRecognition &&
+  cached.auditLog &&
   cached.recordAttribution &&
   cached.assistantConversation &&
   cached.assistantExecution &&

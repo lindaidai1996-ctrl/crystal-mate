@@ -791,6 +791,7 @@ export function ProductSourceSection({
   categories,
   onProductChanged,
   quickEdit = false,
+  initialSourceId,
   onEditorClose,
 }: {
   product: Product | null;
@@ -799,6 +800,7 @@ export function ProductSourceSection({
   categories: Category[];
   onProductChanged: (product: Product) => void;
   quickEdit?: boolean;
+  initialSourceId?: string;
   onEditorClose?: () => void;
 }) {
   const t = useTranslations('productSources');
@@ -806,7 +808,12 @@ export function ProductSourceSection({
   const { message } = App.useApp();
   const [batches, setBatches] = useState<MaterialBatch[]>([]);
   const [distributors, setDistributors] = useState<DistributorPage['items']>([]);
-  const initialRun = quickEdit ? product?.diyRuns[0] : undefined;
+  const initialPurchase = product?.purchaseEntries.find((entry) => entry.id === initialSourceId);
+  const initialRun = initialSourceId
+    ? product?.diyRuns.find((run) => run.id === initialSourceId)
+    : quickEdit
+      ? product?.diyRuns[0]
+      : undefined;
   const [materials, setMaterials] = useState<MaterialOption[]>(() =>
     initialRun ? diyMaterialOptions(initialRun) : [],
   );
@@ -851,11 +858,24 @@ export function ProductSourceSection({
     ]);
   }
   const [mode, setMode] = useState<EditorMode | null>(
-    quickEdit ? (initialRun ? 'edit' : 'add') : null,
+    initialRun || initialPurchase ? 'edit' : quickEdit ? 'add' : null,
   );
-  const [sourceId, setSourceId] = useState<string | null>(initialRun?.id ?? null);
+  const [sourceId, setSourceId] = useState<string | null>(
+    initialRun?.id ?? initialPurchase?.id ?? null,
+  );
   const [draft, setDraft] = useState<ProductSourceInput>(() =>
-    initialRun ? diySourceDraft(initialRun) : initialSource(quickEdit ? 'DIY' : 'PURCHASED'),
+    initialRun
+      ? diySourceDraft(initialRun)
+      : initialPurchase
+        ? {
+            origin: 'PURCHASED',
+            selection: { batchId: initialPurchase.batchId },
+            distributorId: initialPurchase.distributorId,
+            quantity: initialPurchase.quantity,
+            unitCost: initialPurchase.unitCost,
+            notes: initialPurchase.notes,
+          }
+        : initialSource(quickEdit ? 'DIY' : 'PURCHASED'),
   );
   const [saving, setSaving] = useState(false);
   const [adjustOpen, setAdjustOpen] = useState(false);
@@ -1092,6 +1112,11 @@ export function ProductSourceSection({
             <>
               <div className="product-source-actions">
                 <span>{t('currentStock', { count: product.stock })}</span>
+                {records.length > 0 && (
+                  <Button icon={<EditOutlined />} onClick={() => open('edit', records[0].id)}>
+                    {product.origin === 'DIY' ? t('diyConfiguration') : t('editRecord')}
+                  </Button>
+                )}
                 <Button icon={<PlusOutlined />} onClick={() => open('add')}>
                   {t('addRecord')}
                 </Button>
