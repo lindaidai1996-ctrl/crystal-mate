@@ -36,6 +36,7 @@ import {
 import { BatchSelector } from './batchSelector';
 import { DistributorSelect } from '@/components/distributorSelect/distributorSelect';
 import { MaterialBasicFields } from './materialBasicFields';
+import { MaterialUnitCorrection } from './materialUnitCorrection';
 import { MaterialDetailFields } from './materialDetailFields';
 import { MaterialLossRateField } from './materialLossRateField';
 import {
@@ -131,6 +132,17 @@ export function MaterialEditor({
   const draft = purchaseResult.values;
   const [activeEntryId, setActiveEntryId] = useState(entryId);
   const [linkedEntries, setLinkedEntries] = useState<MaterialBatchEntry[]>([]);
+  const [savedEditorState, setSavedEditorState] = useState('');
+  const editorState = JSON.stringify({
+    inputDraft,
+    tagIds,
+    images,
+    selection,
+    distributorId,
+    receivedQty,
+    purchase,
+    quantityUnknown,
+  });
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [revision, setRevision] = useState(0);
@@ -236,12 +248,11 @@ export function MaterialEditor({
                 : (source as Partial<MaterialValues>)[field as keyof MaterialValues],
             ]),
           ) as MaterialValues;
-          setDraft(
-            initializeMaterialPricing({
-              ...values,
-              lossRate: isAddingEntry ? (material.lossRate ?? null) : values.lossRate,
-            }),
-          );
+          const nextDraft = initializeMaterialPricing({
+            ...values,
+            lossRate: isAddingEntry ? (material.lossRate ?? null) : values.lossRate,
+          });
+          setDraft(nextDraft);
           if (material.unit === 'GRAM' && isAddingEntry)
             setPurchase({ ...emptyPurchase(), mode: 'BATCH' });
           setImages(source.images);
@@ -252,6 +263,24 @@ export function MaterialEditor({
             setPurchase(entry.purchase ?? emptyPurchase());
             setQuantityUnknown(entry.receivedQty === null && entry.purchase?.mode === 'BATCH');
           }
+          setSavedEditorState(
+            JSON.stringify({
+              inputDraft: nextDraft,
+              tagIds: material.tags.map((tag) => tag.id),
+              images: source.images,
+              selection: entry && !isAddingEntry ? { batchId: entry.batchId } : null,
+              distributorId: entry && !isAddingEntry ? entry.distributorId : undefined,
+              receivedQty: entry && !isAddingEntry ? entry.receivedQty : null,
+              purchase:
+                entry && !isAddingEntry ? (entry.purchase ?? emptyPurchase()) : emptyPurchase(),
+              quantityUnknown: !!(
+                entry &&
+                !isAddingEntry &&
+                entry.receivedQty === null &&
+                entry.purchase?.mode === 'BATCH'
+              ),
+            }),
+          );
         }
       })
       .catch(() => {
@@ -687,8 +716,29 @@ export function MaterialEditor({
             isAddingEntry={isAddingEntry}
             isMasterEdit={isMasterEdit}
             unitLocked={!isNew && linkedEntries.length > 0}
+            unitCorrection={
+              !isNew && !isAddingEntry ? (
+                <MaterialUnitCorrection
+                  id={id}
+                  unit={inputDraft.unit}
+                  dirty={editorState !== savedEditorState}
+                  disabled={saving || uploadingImages}
+                  onCorrected={() => {
+                    setLoading(true);
+                    setLoadError(false);
+                    setRevision((value) => value + 1);
+                    router.refresh();
+                  }}
+                />
+              ) : undefined
+            }
             submitted={submitted}
           />
+          {isNew && (
+            <p aria-live="polite">
+              {t('unitSummary', { quantity: effectiveQuantity ?? '—', unit: t(draft.unit) })}
+            </p>
+          )}
           {!isMasterEdit && (!activeEntryId || isAddingEntry) && (
             <BatchSelector selection={selection} onChange={setSelection} batches={batches} />
           )}

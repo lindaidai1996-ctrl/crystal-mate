@@ -30,6 +30,7 @@ export function MaterialBasicFields({
   isAddingEntry = false,
   isMasterEdit = false,
   unitLocked = false,
+  unitCorrection,
   submitted = false,
 }: {
   values: MaterialValues;
@@ -47,6 +48,7 @@ export function MaterialBasicFields({
   isAddingEntry?: boolean;
   isMasterEdit?: boolean;
   unitLocked?: boolean;
+  unitCorrection?: React.ReactNode;
   submitted?: boolean;
 }) {
   const t = useTranslations('materialEditor');
@@ -249,7 +251,14 @@ export function MaterialBasicFields({
           <Form.Item
             label={t('unit')}
             className="material-full-width"
-            extra={unitLocked ? t('unitLocked') : undefined}
+            extra={
+              unitLocked ? (
+                <>
+                  {t('unitLocked')}
+                  {unitCorrection}
+                </>
+              ) : undefined
+            }
           >
             <Radio.Group
               value={draft.unit}
@@ -266,30 +275,45 @@ export function MaterialBasicFields({
         </div>
         {!isMasterEdit && (
           <>
-            <div className="compact-field-heading">
+            <div className="compact-field-heading material-dimension-heading">
               <h3 className="material-subheading">{t('dimensions')}</h3>
-              <Button
-                type="link"
-                size="small"
-                htmlType="button"
-                disabled={
-                  componentDisabled ||
-                  !Number.isFinite(Number(draft.lengthMm)) ||
-                  Number(draft.lengthMm) <= 0
-                }
-                onClick={() =>
-                  onValuesChange({
-                    ...draft,
-                    widthMm: draft.lengthMm,
-                    heightMm: draft.lengthMm,
-                  })
-                }
-              >
-                {common('applyToWidthHeight')}
-              </Button>
             </div>
             <CompactFields className="material-field-grid material-three-columns" columns={3}>
-              <Form.Item label={t('lengthMm')}>{amount('lengthMm', 'mm', true)}</Form.Item>
+              <Form.Item
+                label={
+                  <span className="material-dimension-label">
+                    {t('lengthMm')}
+                    <Button
+                      type="link"
+                      size="small"
+                      htmlType="button"
+                      aria-label={common('applyToWidthHeight')}
+                      title={common('applyToWidthHeight')}
+                      disabled={
+                        componentDisabled ||
+                        !Number.isFinite(Number(draft.lengthMm)) ||
+                        Number(draft.lengthMm) <= 0
+                      }
+                      onClick={() =>
+                        onValuesChange({
+                          ...draft,
+                          widthMm: draft.lengthMm,
+                          heightMm: draft.lengthMm,
+                        })
+                      }
+                    >
+                      <span className="material-dimension-apply-full">
+                        {common('applyToWidthHeight')}
+                      </span>
+                      <span className="material-dimension-apply-short">
+                        {common('applyToWidthHeightShort')}
+                      </span>
+                    </Button>
+                  </span>
+                }
+              >
+                {amount('lengthMm', 'mm', true)}
+              </Form.Item>
               <Form.Item label={t('widthMm')}>{amount('widthMm', 'mm', true)}</Form.Item>
               <Form.Item label={t('heightMm')}>{amount('heightMm', 'mm', true)}</Form.Item>
             </CompactFields>

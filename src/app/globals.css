@@ -1992,6 +1992,24 @@ body {
   padding: 0;
   height: auto;
 }
+.material-dimension-heading {
+  /* Retain the heading row's height after moving its action beside the length label. */
+  min-height: calc(1.6em + 2px);
+}
+.material-dimension-label {
+  position: relative;
+}
+.material-dimension-label > .ant-btn-link {
+  position: absolute;
+  inset-inline-start: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding-inline: 0;
+  white-space: nowrap;
+}
+.material-dimension-apply-short {
+  display: none;
+}
 
 @media (max-width: 767px) {
   .mobile-numeric-grid,
@@ -2051,6 +2069,21 @@ body {
   .compact-field-heading > .ant-btn-link {
     min-height: 44px;
   }
+  .material-dimension-heading {
+    min-height: 44px;
+  }
+  .material-dimension-label > .ant-btn-link {
+    inset-inline-start: calc(100% + 4px);
+    top: calc(50% - 2px);
+    min-height: 44px;
+    font-size: 12px;
+  }
+  .material-dimension-apply-full {
+    display: none;
+  }
+  .material-dimension-apply-short {
+    display: inline;
+  }
 }
 @media (max-width: 359px) {
   .mobile-numeric-grid[data-columns='3'],
@@ -2094,6 +2127,12 @@ body {
 }
 .material-pricing-column {
   min-width: 0;
+}
+.material-loss-pricing-grid > .material-pricing-column {
+  /* Share the suggestion row height without fixing card heights or reordering mobile fields. */
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 2;
 }
 
 .material-loss-profit {

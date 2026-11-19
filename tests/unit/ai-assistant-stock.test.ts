@@ -125,6 +125,20 @@ describe('stock contracts', () => {
 });
 
 describe('current stock facts', () => {
+  it('reads corrected material units again without converting stored stock numbers', async () => {
+    mocks.material.findMany.mockResolvedValue([{ id: item.id, name: '物料', unit: 'STRAND' }]);
+    const before = await readAssistantStock(tx, current);
+    mocks.material.findMany.mockResolvedValue([{ id: item.id, name: '物料', unit: 'BEAD' }]);
+    const after = await readAssistantStock(tx, current);
+    expect(before.quantities[0]).toMatchObject({ unit: 'STRAND', knownStock: '6.00' });
+    expect(after.quantities[0]).toMatchObject({ unit: 'BEAD', knownStock: '6.00' });
+    mocks.materialBatchEntry.findMany.mockResolvedValue([entry(11, 2)]);
+    expect((await readAssistantStock(tx, source)).sourceStock[0]).toMatchObject({
+      unit: 'BEAD',
+      purchasedQuantity: '10.00',
+      remainingQuantity: '2.00',
+    });
+  });
   it('keeps purchased 10, source remaining 2, all stock 6 and one unknown distinct', async () => {
     const all = await readAssistantStock(tx, current);
     expect(all.catalogStock[0]).toMatchObject({

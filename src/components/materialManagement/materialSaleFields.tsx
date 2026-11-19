@@ -157,7 +157,9 @@ export function MaterialSaleFields({
           />
         </>
       )}
-      <div className="material-field-grid material-three-columns">
+      <div
+        className={`material-field-grid material-three-columns${privacyMode ? '' : ' material-loss-pricing-grid'}`}
+      >
         {fields.map((field) => {
           const basis = base[field.actual];
           const suggestion = lossCompensatedPrice(basis, lossRate);
