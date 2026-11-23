@@ -1,7 +1,8 @@
 'use client';
 
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { App, Button, Empty, Input, Popconfirm, Tooltip } from 'antd';
+import { App, Button, Empty, Input, Popconfirm, Tooltip, Select } from 'antd';
+import { isPricingOnlyBatch } from '@/lib/material-pricing/batch-visibility';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState } from 'react';
@@ -42,15 +43,21 @@ export function MaterialBatchesPage() {
     order: 'descend',
   });
   const [loading, setLoading] = useState(true);
+  const [purpose, setPurpose] = useSessionListState<'GENERAL' | 'PRICING' | 'ALL'>(
+    'material-batches:purpose',
+    'GENERAL',
+  );
   const [editing, setEditing] = useState<MaterialBatch | null | undefined>(undefined);
   const visible = useMemo(() => {
     const term = query.trim().toLocaleLowerCase();
     return items.filter(
       (item) =>
+        (purpose === 'ALL' ||
+          (purpose === 'PRICING' ? isPricingOnlyBatch(item) : !isPricingOnlyBatch(item))) &&
         (!term || item.name.toLocaleLowerCase().includes(term)) &&
         inDateRange(item.receivedAt, receivedRange),
     );
-  }, [items, query, receivedRange]);
+  }, [items, query, receivedRange, purpose]);
 
   function showError(error: unknown) {
     message.error(
@@ -184,6 +191,19 @@ export function MaterialBatchesPage() {
       </div>
       <div className="filter-bar">
         <SearchFilterRow>
+          <Select
+            aria-label={t('purpose')}
+            value={purpose}
+            style={{ minWidth: 160 }}
+            options={['GENERAL', 'PRICING', 'ALL'].map((value) => ({
+              value,
+              label: t(`purpose_${value}`),
+            }))}
+            onChange={(value) => {
+              setPurpose(value);
+              setPage(1);
+            }}
+          />
           <Input.Search
             className="filter-search"
             value={query}
@@ -198,6 +218,7 @@ export function MaterialBatchesPage() {
           <ResetFiltersButton
             onReset={() => {
               setQuery('');
+              setPurpose('GENERAL');
               setReceivedRange(null);
               setSort({ key: 'date', order: 'descend' });
               setPage(1);

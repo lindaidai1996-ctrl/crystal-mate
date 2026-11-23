@@ -89,7 +89,7 @@ describe.skipIf(!enabled)('persisted material loss pricing', () => {
       );
       expect(updated).toMatchObject({
         baseSaleUnitPrice: '130.00',
-        saleUnitPrice: '144.45',
+        saleUnitPrice: '162.50',
         lossRate: '20.00',
         remainingQty: 100,
       });
@@ -133,7 +133,7 @@ describe.skipIf(!enabled)('persisted material loss pricing', () => {
       expect(reloaded.batchEntries.find((e) => e.id === first.id)?.lossRate).toBe('20.00');
       expect(reloaded.lossRate).toBe('15.00');
       expect(suggestedMaterialQuote({ material: { unit: 'BEAD' }, entry: second }, 'BEAD')).toBe(
-        '144.45',
+        '162.50',
       );
     } finally {
       if (materialId) {

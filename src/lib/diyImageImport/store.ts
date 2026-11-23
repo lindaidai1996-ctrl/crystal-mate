@@ -109,13 +109,6 @@ export async function createDiyImport(input: z.infer<typeof diyCreateSchema>) {
     const existing = await tx.diyImageImport.findUnique({ where: { id: input.id } });
     if (existing) return serializeDiyImport(existing);
     const data = emptyDiyData();
-    const silver = await tx.silverPricing.findUnique({ where: { id: 'default' } });
-    if (silver)
-      data.silverCost = {
-        weightGrams: '0',
-        costGramPrice: silver.costGramPrice.toFixed(2),
-        quoteGramPrice: silver.quoteGramPrice.toFixed(2),
-      };
     if (input.targetProductId) {
       const product = await tx.product.findUnique({ where: { id: input.targetProductId } });
       if (!product || (product.origin !== null && product.origin !== 'DIY'))

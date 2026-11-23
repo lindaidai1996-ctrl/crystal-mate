@@ -31,7 +31,7 @@ import {
 import { signOut } from 'next-auth/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/navigation';
-import { useRef, useState } from 'react';
+import { startTransition, useRef, useState } from 'react';
 import shellStyles from './adminShell.module.css';
 import { catalogPath } from '@/lib/catalog-scopes';
 import { NavigationGuardProvider, useNavigationGuard } from './navigationGuard';
@@ -41,6 +41,7 @@ import { setPrivacyMode, usePrivacyMode } from './privacyMode';
 import { MobileBackToTop } from './responsive/mobileBackToTop';
 import { AssistantNavigationContext } from './assistant/assistantNavigation';
 import { assistantTheme } from '@/lib/ui-theme';
+import { resetListVisit } from '@/lib/session-list-state';
 
 const { Header, Sider, Content } = Layout;
 
@@ -79,32 +80,46 @@ function AdminShellContent({
   const privacyMode = usePrivacyMode();
   const menuButton = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
+  const [listVisit, setListVisit] = useState(0);
+  function navigateFromMenu(href: string) {
+    navigate(() => {
+      startTransition(() => {
+        resetListVisit();
+        // Reset local table state too, including when clicking the current menu item.
+        setListVisit((visit) => visit + 1);
+        router.push(href);
+      });
+      setOpen(false);
+    });
+  }
   const selected = pathname.startsWith('/admin/assistant')
     ? 'assistant'
-    : pathname.startsWith('/admin/audit-logs')
-      ? 'auditLogs'
-      : pathname.startsWith('/admin/account')
-        ? 'account'
-        : pathname.startsWith('/admin/setting-styles')
-          ? 'settingStyles'
-          : pathname.startsWith('/admin/categories')
-            ? 'categories'
-            : pathname.startsWith('/admin/distributors')
-              ? 'distributors'
-              : pathname === '/admin/materials/batches' ||
-                  pathname.startsWith('/admin/materials/batches/')
-                ? 'materialBatches'
-                : pathname.startsWith('/admin/materials')
-                  ? 'materials'
-                  : pathname.startsWith('/admin/tags')
-                    ? 'tags'
-                    : pathname === catalogPath('cabochons') ||
-                        pathname.startsWith(`${catalogPath('cabochons')}/`)
-                      ? 'cabochons'
-                      : pathname === catalogPath('finished-strands') ||
-                          pathname.startsWith(`${catalogPath('finished-strands')}/`)
-                        ? 'finishedStrands'
-                        : 'products';
+    : pathname.startsWith('/admin/material-pricing')
+      ? 'materialPricing'
+      : pathname.startsWith('/admin/audit-logs')
+        ? 'auditLogs'
+        : pathname.startsWith('/admin/account')
+          ? 'account'
+          : pathname.startsWith('/admin/setting-styles')
+            ? 'settingStyles'
+            : pathname.startsWith('/admin/categories')
+              ? 'categories'
+              : pathname.startsWith('/admin/distributors')
+                ? 'distributors'
+                : pathname === '/admin/materials/batches' ||
+                    pathname.startsWith('/admin/materials/batches/')
+                  ? 'materialBatches'
+                  : pathname.startsWith('/admin/materials')
+                    ? 'materials'
+                    : pathname.startsWith('/admin/tags')
+                      ? 'tags'
+                      : pathname === catalogPath('cabochons') ||
+                          pathname.startsWith(`${catalogPath('cabochons')}/`)
+                        ? 'cabochons'
+                        : pathname === catalogPath('finished-strands') ||
+                            pathname.startsWith(`${catalogPath('finished-strands')}/`)
+                          ? 'finishedStrands'
+                          : 'products';
   const menu = (
     <Menu
       theme="light"
@@ -118,46 +133,31 @@ function AdminShellContent({
               key: 'assistant',
               icon: <CommentOutlined />,
               label: t('assistant'),
-              onClick: () => {
-                navigate(() => router.push('/admin/assistant'));
-                setOpen(false);
-              },
+              onClick: () => navigateFromMenu('/admin/assistant'),
             },
             {
               key: 'products',
               icon: <AppstoreOutlined />,
               label: t('products'),
-              onClick: () => {
-                navigate(() => router.push('/admin/products'));
-                setOpen(false);
-              },
+              onClick: () => navigateFromMenu('/admin/products'),
             },
             {
               key: 'cabochons',
               icon: <GoldOutlined />,
               label: t('cabochons'),
-              onClick: () => {
-                navigate(() => router.push(catalogPath('cabochons')));
-                setOpen(false);
-              },
+              onClick: () => navigateFromMenu(catalogPath('cabochons')),
             },
             {
               key: 'finishedStrands',
               icon: <DeploymentUnitOutlined />,
               label: t('finishedStrands'),
-              onClick: () => {
-                navigate(() => router.push(catalogPath('finished-strands')));
-                setOpen(false);
-              },
+              onClick: () => navigateFromMenu(catalogPath('finished-strands')),
             },
             {
               key: 'materials',
               icon: <ExperimentOutlined />,
               label: t('materials'),
-              onClick: () => {
-                navigate(() => router.push('/admin/materials'));
-                setOpen(false);
-              },
+              onClick: () => navigateFromMenu('/admin/materials'),
             },
           ],
         },
@@ -169,55 +169,43 @@ function AdminShellContent({
               key: 'auditLogs',
               icon: <HistoryOutlined />,
               label: t('auditLogs'),
-              onClick: () => {
-                navigate(() => router.push('/admin/audit-logs'));
-                setOpen(false);
-              },
+              onClick: () => navigateFromMenu('/admin/audit-logs'),
             },
             {
               key: 'distributors',
               icon: <TeamOutlined />,
               label: t('distributors'),
-              onClick: () => {
-                navigate(() => router.push('/admin/distributors'));
-                setOpen(false);
-              },
+              onClick: () => navigateFromMenu('/admin/distributors'),
+            },
+            {
+              key: 'materialPricing',
+              icon: <GoldOutlined />,
+              label: t('materialPricing'),
+              onClick: () => navigateFromMenu('/admin/material-pricing'),
             },
             {
               key: 'materialBatches',
               icon: <ContainerOutlined />,
               label: t('materialBatches'),
-              onClick: () => {
-                navigate(() => router.push('/admin/materials/batches'));
-                setOpen(false);
-              },
+              onClick: () => navigateFromMenu('/admin/materials/batches'),
             },
             {
               key: 'settingStyles',
               icon: <ToolOutlined />,
               label: t('settingStyles'),
-              onClick: () => {
-                navigate(() => router.push('/admin/setting-styles'));
-                setOpen(false);
-              },
+              onClick: () => navigateFromMenu('/admin/setting-styles'),
             },
             {
               key: 'categories',
               icon: <FolderOutlined />,
               label: t('categories'),
-              onClick: () => {
-                navigate(() => router.push('/admin/categories'));
-                setOpen(false);
-              },
+              onClick: () => navigateFromMenu('/admin/categories'),
             },
             {
               key: 'tags',
               icon: <TagsOutlined />,
               label: t('tags'),
-              onClick: () => {
-                navigate(() => router.push('/admin/tags'));
-                setOpen(false);
-              },
+              onClick: () => navigateFromMenu('/admin/tags'),
             },
           ],
         },
@@ -242,7 +230,7 @@ function AdminShellContent({
         <Tooltip title={t('account')}>
           <Button
             icon={<UserOutlined />}
-            onClick={() => navigate(() => router.push('/admin/account'))}
+            onClick={() => navigateFromMenu('/admin/account')}
             aria-label={t('account')}
           />
         </Tooltip>
@@ -284,10 +272,7 @@ function AdminShellContent({
         <button
           type="button"
           className={shellStyles.accountButton}
-          onClick={() => {
-            navigate(() => router.push('/admin/account'));
-            setOpen(false);
-          }}
+          onClick={() => navigateFromMenu('/admin/account')}
           aria-label={t('account')}
           aria-current={selected === 'account' ? 'page' : undefined}
         >
@@ -330,6 +315,7 @@ function AdminShellContent({
           )}
           <Content className={shellStyles.content}>
             <AssistantNavigationContext.Provider
+              key={listVisit}
               value={{ menu: sidebar, open, setOpen, buttonRef: menuButton }}
             >
               {children}

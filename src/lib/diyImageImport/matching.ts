@@ -65,6 +65,7 @@ export async function matchDiyParts(
 ) {
   const [materials, cabochons] = await Promise.all([
     db.material.findMany({
+      where: { NOT: { pricingGroup: { is: { enabled: true } } } },
       take: 5001,
       orderBy: { createdAt: 'desc' },
       select: {

@@ -13,11 +13,15 @@ export function BatchTrendChart({
   label,
   suffix,
   bars = false,
+  calendarScale = false,
+  hint,
 }: {
   points: BatchTrendPoint[];
   label: string;
   suffix: string;
   bars?: boolean;
+  calendarScale?: boolean;
+  hint?: string;
 }) {
   const t = useTranslations('batchComparison');
   const [selected, setSelected] = useState<number | null>(null);
@@ -41,10 +45,33 @@ export function BatchTrendChart({
   const maximum = Math.max(...points.map((point) => Number(point.value ?? 0)));
   const ceiling = maximum > 0 ? maximum * 1.15 : 1;
   const step = (right - left) / Math.max(1, points.length);
+  const dates = points.map((point) =>
+    Date.parse(
+      point.date.length === 4
+        ? `${point.date}-01-01`
+        : point.date.length === 7
+          ? `${point.date}-01`
+          : point.date,
+    ),
+  );
+  const firstDate = Math.min(...dates),
+    lastDate = Math.max(...dates);
   const coordinates = points.map((point, index) => ({
-    x: left + (index + 0.5) * step,
+    x:
+      calendarScale && lastDate > firstDate
+        ? left +
+          step / 2 +
+          ((dates[index] - firstDate) / (lastDate - firstDate)) * (right - left - step)
+        : left + (index + 0.5) * step,
     y: point.value === null ? null : bottom - (Number(point.value) / ceiling) * (bottom - top),
   }));
+  const barWidth = Math.min(
+    36,
+    step * 0.6,
+    ...(calendarScale
+      ? coordinates.slice(1).map((point, index) => (point.x - coordinates[index].x) * 0.6)
+      : []),
+  );
   const focusIndex = Math.min(selected ?? points.length - 1, points.length - 1);
   const focus = points[focusIndex];
   const ticks = [
@@ -66,7 +93,11 @@ export function BatchTrendChart({
     if (!event.isPrimary) return;
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - bounds.left) / bounds.width) * width;
-    setSelected(Math.max(0, Math.min(points.length - 1, Math.floor((x - left) / step))));
+    let nearest = 0;
+    for (let index = 1; index < coordinates.length; index++)
+      if (Math.abs(coordinates[index].x - x) < Math.abs(coordinates[nearest].x - x))
+        nearest = index;
+    setSelected(nearest);
   }
   return (
     <div>
@@ -134,9 +165,9 @@ export function BatchTrendChart({
           point.y === null ? null : bars ? (
             <rect
               key={points[index].id}
-              x={point.x - Math.min(36, step * 0.6) / 2}
+              x={point.x - barWidth / 2}
               y={point.y}
-              width={Math.min(36, step * 0.6)}
+              width={barWidth}
               height={Math.max(0, bottom - point.y)}
               className={comparisonStyles.bar}
               opacity={focusIndex === index ? 1 : 0.55}
@@ -170,7 +201,7 @@ export function BatchTrendChart({
           </text>
         ))}
       </svg>
-      <p className={comparisonStyles.hint}>{t('chartHint')}</p>
+      <p className={comparisonStyles.hint}>{hint ?? t('chartHint')}</p>
     </div>
   );
 }

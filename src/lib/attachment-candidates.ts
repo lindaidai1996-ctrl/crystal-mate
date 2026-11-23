@@ -19,7 +19,8 @@ type CandidateRow = Omit<AttachmentCandidate, 'source' | 'fileName'> & {
 };
 
 // Choose the latest purchase *within this owner* before selecting its first image.
-// A latest purchase with no image falls back to the material, not an older purchase.
+// Fall back to the material image, then the latest pictured purchase of the same
+// material. The owner's purchases still determine which materials are eligible.
 function candidateSql(owner: AttachmentOwner) {
   const materialScope =
     owner.type === 'batch'
@@ -39,11 +40,12 @@ function candidateSql(owner: AttachmentOwner) {
     ), candidates AS (
       SELECT m.id AS "itemId", 'MATERIAL'::text AS type, m.name, NULL::text AS code,
         m.aliases,
-        COALESCE(bi."objectKey", mi."objectKey") AS "objectKey",
-        COALESCE(bi.url, mi.url) AS url,
-        CASE WHEN bi.id IS NOT NULL THEN 'MATERIAL_BATCH_IMAGE' ELSE 'MATERIAL_IMAGE' END
+        COALESCE(bi."objectKey", mi."objectKey", fi."objectKey") AS "objectKey",
+        COALESCE(bi.url, mi.url, fi.url) AS url,
+        CASE WHEN bi.id IS NOT NULL THEN 'MATERIAL_BATCH_IMAGE'
+          WHEN mi.id IS NOT NULL THEN 'MATERIAL_IMAGE' ELSE 'MATERIAL_BATCH_IMAGE' END
           AS "sourceKind",
-        COALESCE(bi.id, mi.id) AS "sourceId"
+        COALESCE(bi.id, mi.id, fi.id) AS "sourceId"
       FROM latest_material_entries e
       JOIN "Material" m ON m.id = e."materialId"
       LEFT JOIN LATERAL (
@@ -54,7 +56,15 @@ function candidateSql(owner: AttachmentOwner) {
         SELECT id, "objectKey", url FROM "MaterialImage"
         WHERE "materialId" = m.id ORDER BY position ASC LIMIT 1
       ) mi ON true
-      WHERE bi.id IS NOT NULL OR mi.id IS NOT NULL
+      LEFT JOIN LATERAL (
+        SELECT image.id, image."objectKey", image.url FROM "MaterialBatchImage" image
+        JOIN "MaterialBatchEntry" entry ON entry.id = image."entryId"
+        JOIN "MaterialBatch" batch ON batch.id = entry."batchId"
+        WHERE entry."materialId" = m.id AND bi.id IS NULL AND mi.id IS NULL
+        ORDER BY batch."receivedAt" DESC, image.position ASC, image."objectKey" ASC
+        LIMIT 1
+      ) fi ON true
+      WHERE bi.id IS NOT NULL OR mi.id IS NOT NULL OR fi.id IS NOT NULL
       UNION ALL
       SELECT p.id, 'PRODUCT', p.name, p.code, p.aliases,
         pi."objectKey", pi.url, 'PRODUCT_IMAGE', pi.id

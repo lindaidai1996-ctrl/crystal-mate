@@ -1,9 +1,10 @@
 'use client';
 
-import { Form, Input, Select } from 'antd';
+import { Form, Input } from 'antd';
 import { useTranslations } from 'next-intl';
 import { DateInput } from '@/components/date-input';
 import type { MaterialBatch, MaterialBatchSelection } from '@/lib/client-types';
+import { PurchaseBatchSelect } from './purchaseBatchSelect';
 
 export function todayInChina() {
   return new Intl.DateTimeFormat('sv-SE', {
@@ -44,19 +45,14 @@ export function BatchSelector({
       <h2>{t('batch')}</h2>
       <div className="material-field-grid">
         <Form.Item label={t('choose')} required>
-          <Select
+          <PurchaseBatchSelect
             aria-label={t('choose')}
             showSearch
             optionFilterProp="label"
             value={value}
             placeholder={t('choose')}
-            options={[
-              ...batches.map((batch) => ({
-                value: batch.id,
-                label: batch.name,
-              })),
-              { value: '__new__', label: t('create') },
-            ]}
+            batches={batches}
+            createLabel={t('create')}
             onChange={(next) =>
               onChange(
                 next === '__new__'

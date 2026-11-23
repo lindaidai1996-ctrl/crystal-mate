@@ -25,6 +25,15 @@ export type WorkbookRow = {
   cells: Record<string, string>;
   images: WorkbookImage[];
   imageErrors: string[];
+  cellMetadata?: Record<
+    string,
+    {
+      type: string;
+      formula: string | null;
+      cached: string;
+      formulaAttributes?: Record<string, string>;
+    }
+  >;
 };
 export type WorkbookSheet = {
   name: string;
@@ -32,7 +41,7 @@ export type WorkbookSheet = {
   headerRow: number;
   mapping: ColumnMapping;
 };
-export type ParsedWorkbook = { sheets: WorkbookSheet[] };
+export type ParsedWorkbook = { sheets: WorkbookSheet[]; date1904?: boolean };
 type Relationship = { path: string; external: boolean };
 
 function resolvePart(base: string, target: string) {
@@ -192,6 +201,7 @@ function parseFiles(files: Unzipped): ParsedWorkbook {
   };
 
   return {
+    date1904: ['1', 'true'].includes(attr(child(workbook, 'workbookPr'), 'date1904')),
     sheets: sheets.map((sheet) => {
       const relation = workbookRels.get(attr(sheet, 'id'));
       if (!relation || relation.external) throw new Error('EXCEL_INVALID_FILE');
@@ -235,6 +245,17 @@ function parseFiles(files: Unzipped): ParsedWorkbook {
                     : '否'
                   : text(cell.v);
           const formula = text(cell.f);
+          row.cellMetadata ??= {};
+          row.cellMetadata[column] = {
+            type: attr(cell, 't'),
+            formula: cell.f === undefined ? null : formula,
+            cached: text(cell.v),
+            formulaAttributes: Object.fromEntries(
+              Object.entries(object(cell.f))
+                .filter(([key]) => key.startsWith('@_'))
+                .map(([key, value]) => [key.slice(2), text(value)]),
+            ),
+          };
           const dispimg = /(?:_xlfn\.)?DISPIMG\s*\(\s*"([^"]+)"/i.exec(formula);
           const vm = attr(cell, 'vm');
           let picture: WorkbookImage | null = null;

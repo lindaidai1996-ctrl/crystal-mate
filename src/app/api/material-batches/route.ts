@@ -8,11 +8,20 @@ import { materialBatchWriteSchema } from '@/lib/validation';
 export async function GET(request: NextRequest) {
   try {
     await requireAdmin(request);
+    const batches = await db.materialBatch.findMany({
+      include: {
+        ...batchInclude,
+        entries: {
+          where: {
+            OR: [{ material: { pricingGroupId: null } }, { material: { unit: { not: 'GRAM' } } }],
+          },
+          select: { id: true },
+        },
+      },
+      orderBy: [{ receivedAt: 'desc' }, { createdAt: 'desc' }],
+    });
     return NextResponse.json(
-      await db.materialBatch.findMany({
-        include: batchInclude,
-        orderBy: [{ receivedAt: 'desc' }, { createdAt: 'desc' }],
-      }),
+      batches.map(({ entries, ...batch }) => ({ ...batch, ordinaryEntryCount: entries.length })),
     );
   } catch (error) {
     return apiError(error);

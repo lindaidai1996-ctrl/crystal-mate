@@ -1,3 +1,4 @@
+import type { PricingLineInput, PricingCostBasis } from './material-pricing/contracts';
 import type { SharedAssetView, AttachmentTarget } from './shared-attachment-contracts';
 import type { ImageFraming } from './image-framing';
 import type { AttachmentSource } from './attachments';
@@ -241,6 +242,13 @@ export type DiyQuoteSnapshot = {
   widthMm: string | null;
   heightMm: string | null;
 };
+export type ProductDiyPricingLine = PricingLineInput & {
+  id: string;
+  name: string;
+  lineCost: string;
+  quoteLineTotal: string;
+  costSnapshot: PricingCostBasis;
+};
 export type ProductDiyRun = {
   id: string;
   quantity: number;
@@ -249,7 +257,9 @@ export type ProductDiyRun = {
   perUnitQuote: string | null;
   totalQuote: string | null;
   craftDesignFee: CraftDesignFee;
+  legacySilver?: boolean;
   silverCost: SilverCost;
+  pricingLines?: ProductDiyPricingLine[];
   extraCosts: DiyExtraCost[];
   notes: string;
   materialLines: ProductDiyMaterial[];
@@ -285,6 +295,7 @@ export type ProductSourceInput =
       origin: 'DIY';
       // null marks a new form waiting for its database defaults; it cannot be saved.
       silverCost?: SilverCost | null;
+      pricingLines?: PricingLineInput[];
       quantity: number;
       notes: string;
       materials: {
@@ -357,6 +368,8 @@ export type MaterialValues = {
   notes: string;
 };
 export type Material = MaterialValues & {
+  pricingGroupId?: string | null;
+  pricingGroup?: { id: string; name: string; enabled: boolean } | null;
   imageImportCount?: number;
   knownStock: number;
   unknownStockBatchCount: number;
@@ -384,6 +397,8 @@ export type MaterialImageImportSource = {
 };
 
 export type MaterialBatch = {
+  purpose?: string;
+  ordinaryEntryCount?: number;
   id: string;
   name: string;
   receivedAt: string;

@@ -31,6 +31,16 @@
   min-width: 0;
 }
 
+.pricingGroupSummary {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--ant-color-fill-alter);
+  overflow-wrap: anywhere;
+}
+
 .actionBar {
   margin-top: auto;
   padding-block: 10px;
@@ -63,10 +73,33 @@
   min-width: 0;
 }
 
-.batchGroup > a {
+.batchHeading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
   line-height: 1.6;
-  overflow-wrap: anywhere;
-  text-wrap: pretty;
+}
+
+.batchName {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weightSummary {
+  flex: 0 1 auto;
+  max-width: 65%;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .batchGroup > :global(.ant-btn) {
@@ -160,11 +193,21 @@
 
 @container (max-width: 240px) {
   .priceRow {
-    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
   }
 
-  .priceCell[data-sale='true'] {
-    grid-column: 1;
+  .priceCell dt,
+  .priceCell small {
+    font-size: 11px;
+  }
+
+  .priceCell strong,
+  .priceCell[data-sale='true'] strong {
+    font-size: 14px;
+  }
+
+  .priceCell dd span {
+    font-size: 10px;
   }
 }
 

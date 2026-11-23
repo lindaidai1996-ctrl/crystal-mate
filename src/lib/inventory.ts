@@ -15,7 +15,7 @@ export function correctedRemainingQuantity(
   current: { receivedQty: number | null; remainingQty: number | null },
   receivedQty: number | null,
 ) {
-  if (current.remainingQty === null) return receivedQty;
+  if (current.remainingQty === null) return null;
   if (current.receivedQty === null || receivedQty === null) return current.remainingQty;
   return Math.round((current.remainingQty + receivedQty - current.receivedQty) * 100) / 100;
 }

@@ -163,6 +163,22 @@ model CabochonExcelImport {
   @@index([updatedAt])
 }
 
+/// Reviewed silver procurement drafts; receipts and purchases commit atomically per source row.
+model MaterialPricingImport {
+  id        String   @id @db.Uuid
+  fileHash  String
+  fileName  String
+  sheetName String
+  rows      Json
+  execution Json?
+  version   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([fileHash, sheetName])
+  @@index([updatedAt])
+}
+
 enum ProductOrigin {
   PURCHASED
   DIY
@@ -207,24 +223,26 @@ model ProductPurchaseEntry {
 model ProductDiyRun {
   imageImport          DiyImageImport?
   cards                ProductCard[]
-  id                   String               @id @default(cuid())
+  id                   String                  @id @default(cuid())
   productId            String
-  product              Product              @relation(fields: [productId], references: [id], onDelete: Restrict)
+  product              Product                 @relation(fields: [productId], references: [id], onDelete: Restrict)
   quantity             Int
-  perUnitCost          Decimal              @db.Decimal(12, 2)
-  totalCost            Decimal?             @db.Decimal(22, 2)
-  perUnitQuote         Decimal?             @db.Decimal(22, 2)
-  totalQuote           Decimal?             @db.Decimal(22, 2)
-  craftDesignFee       Json                 @default("{\"unitAmount\":\"0\",\"accumulateByQuantity\":false,\"totalAmount\":null}")
-  silverWeightGrams    Decimal              @default(0) @db.Decimal(12, 2)
-  silverCostGramPrice  Decimal              @default(20) @db.Decimal(12, 2)
-  silverQuoteGramPrice Decimal              @default(30) @db.Decimal(12, 2)
-  extraCosts           Json                 @default("[]")
-  notes                String               @default("") @db.Text
+  perUnitCost          Decimal                 @db.Decimal(12, 2)
+  totalCost            Decimal?                @db.Decimal(22, 2)
+  perUnitQuote         Decimal?                @db.Decimal(22, 2)
+  totalQuote           Decimal?                @db.Decimal(22, 2)
+  craftDesignFee       Json                    @default("{\"unitAmount\":\"0\",\"accumulateByQuantity\":false,\"totalAmount\":null}")
+  legacySilver         Boolean                 @default(true)
+  silverWeightGrams    Decimal                 @default(0) @db.Decimal(12, 2)
+  silverCostGramPrice  Decimal                 @default(20) @db.Decimal(12, 2)
+  silverQuoteGramPrice Decimal                 @default(30) @db.Decimal(12, 2)
+  extraCosts           Json                    @default("[]")
+  notes                String                  @default("") @db.Text
   materialLines        ProductDiyMaterial[]
+  pricingLines         ProductDiyPricingLine[]
   cabochonLines        ProductDiyCabochon[]
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
 
   @@index([productId, createdAt])
 }
@@ -273,6 +291,61 @@ model SilverPricing {
   costGramPrice  Decimal  @default(20) @db.Decimal(12, 2)
   quoteGramPrice Decimal  @default(30) @db.Decimal(12, 2)
   updatedAt      DateTime @updatedAt
+}
+
+model MaterialPricingGroup {
+  id                String                       @id @default(cuid())
+  name              String                       @unique
+  lossRate          Decimal                      @default(0) @db.Decimal(5, 2)
+  marketLinked      Boolean                      @default(true)
+  marketCoefficient Decimal                      @default(1) @db.Decimal(8, 4)
+  pricingRule       String                       @default("CUSTOM")
+  pricingValue      Decimal?                     @db.Decimal(12, 2)
+  enabled           Boolean                      @default(false)
+  version           Int                          @default(1)
+  materials         Material[]
+  publications      MaterialPricingPublication[]
+  diyLines          ProductDiyPricingLine[]
+  createdAt         DateTime                     @default(now())
+  updatedAt         DateTime                     @updatedAt
+}
+
+model MaterialPricingPublication {
+  id            String                  @id @default(cuid())
+  groupId       String
+  group         MaterialPricingGroup    @relation(fields: [groupId], references: [id], onDelete: Restrict)
+  version       Int
+  saleGramPrice Decimal                 @db.Decimal(12, 2)
+  costBasis     Json
+  fingerprint   String
+  createdAt     DateTime                @default(now())
+  diyLines      ProductDiyPricingLine[]
+
+  @@unique([groupId, version])
+  @@index([groupId, createdAt])
+}
+
+model ProductDiyPricingLine {
+  id             String                     @id @default(cuid())
+  runId          String
+  run            ProductDiyRun              @relation(fields: [runId], references: [id], onDelete: Cascade)
+  groupId        String
+  group          MaterialPricingGroup       @relation(fields: [groupId], references: [id], onDelete: Restrict)
+  publicationId  String
+  publication    MaterialPricingPublication @relation(fields: [publicationId], references: [id], onDelete: Restrict)
+  name           String
+  quantity       Decimal                    @db.Decimal(12, 2)
+  unitCost       Decimal                    @db.Decimal(12, 2)
+  lineCost       Decimal                    @db.Decimal(12, 2)
+  quoteUnitPrice Decimal                    @db.Decimal(12, 2)
+  quoteLineTotal Decimal                    @db.Decimal(22, 2)
+  costSnapshot   Json
+  costBasisToken String                     @db.Text
+  position       Int
+
+  @@unique([runId, position])
+  @@index([groupId])
+  @@index([publicationId])
 }
 
 model DiyCommonFeeSettings {
@@ -492,6 +565,8 @@ model MaterialCategory {
 
 model Material {
   id                     String                    @id @default(cuid())
+  pricingGroupId         String?
+  pricingGroup           MaterialPricingGroup?     @relation(fields: [pricingGroupId], references: [id], onDelete: Restrict)
   name                   String
   aliases                String[]                  @default([])
   categoryId             String
@@ -529,6 +604,7 @@ model Material {
   updatedAt              DateTime                  @updatedAt
 
   @@index([categoryId])
+  @@index([pricingGroupId])
   @@index([createdAt])
 }
 
@@ -544,6 +620,7 @@ model MaterialTag {
 
 model MaterialBatch {
   id                 String                    @id @default(cuid())
+  purpose            String                    @default("GENERAL")
   name               String                    @unique
   receivedAt         DateTime                  @db.Date
   notes              String                    @default("") @db.Text
@@ -574,6 +651,7 @@ model MaterialBatchEntry {
   purchaseTotalWeightGrams Decimal?                  @db.Decimal(12, 2)
   purchaseTotalAmount      Decimal?                  @db.Decimal(12, 2)
   purchaseQuotedGramPrice  Decimal?                  @db.Decimal(12, 2)
+  purchaseQuotePurpose     String                    @default("LEGACY")
   purchaseAutoField        String?
   sampleWeightGrams        Decimal?                  @db.Decimal(12, 2)
   manualPurchaseUnitPrice  Decimal?                  @db.Decimal(12, 2)

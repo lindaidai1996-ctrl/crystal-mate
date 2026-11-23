@@ -1,10 +1,11 @@
 'use client';
 
-import { Button, Form, Radio } from 'antd';
+import { Button, ConfigProvider, Form, Radio, Tooltip } from 'antd';
 import { CompactFields } from '@/components/responsive/compactFields';
 import { useTranslations } from 'next-intl';
 import type { MaterialSaleRule, MaterialUnit, MaterialValues } from '@/lib/client-types';
 import {
+  baseSalePricesFromGram,
   lossCompensatedPrice,
   materialBaseValues,
   materialPriceDifference,
@@ -33,8 +34,14 @@ export function MaterialSaleFields({
 }) {
   const t = useTranslations('materialEditor');
   const privacyMode = usePrivacyMode();
+  const { componentDisabled } = ConfigProvider.useConfig();
   const base = materialBaseValues(values);
+  const gramSuggestions = baseSalePricesFromGram({
+    ...base,
+    baseSaleGramPrice: base.saleGramPrice,
+  });
   const lossRate = values.lossRate ?? null;
+  const hasLoss = lossRate !== null && Number(lossRate) > 0;
   const gram = values.unit === 'GRAM';
   const ruleValueLabel =
     values.saleRule === 'FIXED_AMOUNT'
@@ -128,8 +135,16 @@ export function MaterialSaleFields({
           )}
           <CompactFields className="material-field-grid material-three-columns">
             {fields.map((field) => {
+              const basis = base[field.actual];
+              const suggestion = lossCompensatedPrice(basis, lossRate);
+              const increase = materialPriceDifference(suggestion, basis);
               const rounding = percentageSalePrice(values[field.cost], base);
               const label = t('basePriceLabel', { label: field.label });
+              const fromGram =
+                field.base === 'baseSaleUnitPrice'
+                  ? gramSuggestions.unitPrice
+                  : gramSuggestions.childPrice;
+              const child = field.base === 'baseSaleChildUnitPrice';
               return (
                 <Form.Item key={field.base} label={label}>
                   <MaterialAmountInput
@@ -138,6 +153,27 @@ export function MaterialSaleFields({
                     suffix={field.suffix}
                     label={label}
                   />
+                  {hasLoss && (
+                    <Tooltip
+                      title={
+                        suggestion !== null && increase !== null ? (
+                          <>
+                            <div>{t('lossIncrease', { amount: increase, unit: field.suffix })}</div>
+                            <div>{t('lossFormula', { price: basis!, rate: lossRate! })}</div>
+                          </>
+                        ) : (
+                          t(basis === null ? 'lossPricePending' : 'lossPriceOverflow')
+                        )
+                      }
+                    >
+                      <div className="material-loss-suggestion">
+                        {t('lossSuggestionCompact')}{' '}
+                        <strong>
+                          {suggestion === null ? '—' : `${suggestion} ${field.suffix}`}
+                        </strong>
+                      </div>
+                    </Tooltip>
+                  )}
                   {rounding && (
                     <div className="material-source-label">
                       {t(rounding.roundedUp ? 'saleRoundedUp' : 'saleAlreadyWhole', {
@@ -146,52 +182,67 @@ export function MaterialSaleFields({
                       })}
                     </div>
                   )}
+                  {field.base !== 'baseSaleGramPrice' && (
+                    <div className="material-price-suggestions" aria-live="polite">
+                      <div>
+                        <span>
+                          {fromGram === null
+                            ? t(child ? 'baseBeadFromGramPending' : 'baseUnitFromGramPending')
+                            : t(
+                                child && gramSuggestions.childUsesAverageWeight
+                                  ? 'basePriceFromGramAverage'
+                                  : 'basePriceFromGram',
+                                { price: fromGram, unit: field.suffix },
+                              )}
+                        </span>
+                        <Button
+                          type="link"
+                          size="small"
+                          htmlType="button"
+                          disabled={
+                            componentDisabled ||
+                            fromGram === null ||
+                            fromGram === base[field.actual]
+                          }
+                          onClick={() => onChange(field.base, fromGram)}
+                        >
+                          {t('useBasePrice')}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </Form.Item>
               );
             })}
           </CompactFields>
-          <h3 className="material-subheading">{t('lossCompensation')}</h3>
-          <MaterialLossRateField
-            value={lossRate}
-            onChange={(value) => onChange('lossRate', value)}
-          />
+          <div className="material-loss-toolbar">
+            <MaterialLossRateField
+              value={lossRate}
+              onChange={(value) => onChange('lossRate', value)}
+              compact
+            />
+          </div>
         </>
       )}
-      <div
-        className={`material-field-grid material-three-columns${privacyMode ? '' : ' material-loss-pricing-grid'}`}
-      >
+      <h3 className="material-subheading">{t('finalSalePrices')}</h3>
+      <p className="material-input-help">
+        {t(privacyMode ? 'salePriceManualHelp' : 'salePriceHelp')}
+      </p>
+      <div className="material-field-grid material-three-columns">
         {fields.map((field) => {
-          const basis = base[field.actual];
-          const suggestion = lossCompensatedPrice(basis, lossRate);
-          const increase = materialPriceDifference(suggestion, basis);
+          const suggestion = lossCompensatedPrice(base[field.actual], lossRate);
           const below =
             suggestion !== values[field.actual] &&
             materialPriceDifference(suggestion, values[field.actual]) !== null;
-          const label = t('actualPriceLabel', { label: field.label });
+          const label = t(
+            field.actual === 'saleGramPrice'
+              ? 'sellingGramPrice'
+              : field.unit === 'STRAND'
+                ? 'sellingStrandPrice'
+                : 'sellingBeadPrice',
+          );
           return (
             <div key={field.actual} className="material-pricing-column">
-              {!privacyMode && (
-                <div className="material-loss-suggestion" role="status" aria-live="polite">
-                  <span>{t('lossSuggestedPrice', { label: field.label })}</span>
-                  <strong>{suggestion === null ? '—' : `${suggestion} ${field.suffix}`}</strong>
-                  {suggestion !== null && increase !== null ? (
-                    <>
-                      <span>{t('lossIncrease', { amount: increase, unit: field.suffix })}</span>
-                      <span>{t('lossFormula', { price: basis!, rate: lossRate ?? '0' })}</span>
-                    </>
-                  ) : (
-                    <span>{t(basis === null ? 'lossPricePending' : 'lossPriceOverflow')}</span>
-                  )}
-                  <Button
-                    size="small"
-                    htmlType="button"
-                    disabled={suggestion === null || suggestion === values[field.actual]}
-                    onClick={() => onChange(field.actual, suggestion)}
-                  >
-                    {t('adoptActualPrice')}
-                  </Button>
-                </div>
-              )}
               <Form.Item label={label}>
                 <MaterialAmountInput
                   value={values[field.actual]}
@@ -199,7 +250,7 @@ export function MaterialSaleFields({
                   suffix={field.suffix}
                   label={label}
                 />
-                {!privacyMode && below && (
+                {!privacyMode && hasLoss && below && (
                   <div className="material-loss-warning">{t('belowLossSuggestion')}</div>
                 )}
                 {field.actual === 'saleUnitPrice' && strandPrice !== null && (
@@ -208,8 +259,14 @@ export function MaterialSaleFields({
                       <span>
                         {t('saleFromBeads')}: {strandPrice} {field.suffix}
                       </span>
-                      <Button type="link" size="small" htmlType="button" onClick={onAdopt}>
-                        {t('adopt')}
+                      <Button
+                        type="link"
+                        size="small"
+                        htmlType="button"
+                        disabled={componentDisabled || strandPrice === values.saleUnitPrice}
+                        onClick={onAdopt}
+                      >
+                        {t('useSuggestedSalePrice')}
                       </Button>
                     </div>
                   </div>
@@ -224,10 +281,12 @@ export function MaterialSaleFields({
                         type="link"
                         size="small"
                         htmlType="button"
-                        disabled={recommendedGramPrice === values.saleGramPrice}
+                        disabled={
+                          componentDisabled || recommendedGramPrice === values.saleGramPrice
+                        }
                         onClick={() => onChange('saleGramPrice', recommendedGramPrice)}
                       >
-                        {t('adopt')}
+                        {t('useSuggestedSalePrice')}
                       </Button>
                     </div>
                   </div>
@@ -236,14 +295,13 @@ export function MaterialSaleFields({
                   cost={lossCompensatedPrice(values[field.cost], lossRate)}
                   salePrice={values[field.actual]}
                   unit={field.unit}
-                  lossAdjusted
+                  lossAdjusted={hasLoss}
                 />
               </Form.Item>
             </div>
           );
         })}
       </div>
-      {!privacyMode && <p className="material-input-help">{t('actualPriceHelp')}</p>}
     </section>
   );
 }

@@ -1,0 +1,61 @@
+.section {
+  min-width: 0;
+  padding-block: 12px;
+}
+.heading,
+.lineTitle,
+.totals,
+.add {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.heading,
+.lineTitle {
+  justify-content: space-between;
+}
+.help {
+  color: var(--muted, #666);
+  font-size: 13px;
+  margin: 8px 0 16px;
+  text-wrap: pretty;
+}
+.line {
+  border: 1px solid var(--border, #e8e8e8);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.fields {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.fields label {
+  display: grid;
+  gap: 6px;
+  flex: 1 1 130px;
+  min-width: 0;
+}
+.fields :global(.ant-input-number) {
+  width: 100%;
+}
+.totals {
+  margin-top: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.add :global(.ant-select) {
+  flex: 1;
+  min-width: 120px;
+}
+@media (max-width: 480px) {
+  .fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .fields label {
+    min-width: 0;
+  }
+}

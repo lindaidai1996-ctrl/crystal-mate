@@ -82,6 +82,14 @@ export async function materialListWhere(
   }
   const aliasIds = await findAliasIds('material', filters.q ?? '');
   const where: Prisma.MaterialWhereInput = {
+    ...(filters.unit ? { unit: filters.unit } : {}),
+    ...(filters.pricing === 'GROUPED'
+      ? { pricingGroupId: { not: null } }
+      : filters.pricing === 'ORDINARY'
+        ? { pricingGroupId: null }
+        : filters.pricing === 'DIY'
+          ? { NOT: { pricingGroup: { is: { enabled: true } } } }
+          : {}),
     ...createdTimeWhere(filters),
     ...(filters.q
       ? {

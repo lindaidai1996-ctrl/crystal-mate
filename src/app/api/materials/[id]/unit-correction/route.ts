@@ -10,7 +10,9 @@ export async function POST(request: NextRequest, { params }: Context) {
   try {
     await requireAdmin(request);
     const input = unitCorrectionPreviewSchema.parse(await request.json());
-    return NextResponse.json(await previewUnitCorrection((await params).id, input.unit));
+    return NextResponse.json(
+      await previewUnitCorrection((await params).id, input.unit, input.edits),
+    );
   } catch (error) {
     return apiError(error);
   }
@@ -21,7 +23,7 @@ async function handlePATCH(request: NextRequest, { params }: Context) {
     await requireAdmin(request);
     const input = unitCorrectionSchema.parse(await request.json());
     return NextResponse.json(
-      await correctMaterialUnit((await params).id, input.unit, input.snapshot),
+      await correctMaterialUnit((await params).id, input.unit, input.snapshot, input.edits),
     );
   } catch (error) {
     return apiError(error);

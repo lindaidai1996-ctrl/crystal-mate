@@ -1,3 +1,4 @@
+import { pricingLineSchema } from './material-pricing/contracts';
 import { ownerSchema } from './shared-attachment-contracts';
 import { imageFramingsSchema } from './image-framing';
 import { z } from 'zod';
@@ -338,6 +339,8 @@ export const materialListSchema = z
     categoryId: z.string().cuid().optional(),
     categoryGroup: z.enum(['silver', 'hetian']).optional(),
     source: z.enum(['IMAGE_IMPORT', 'OTHER']).optional(),
+    pricing: z.enum(['GROUPED', 'ORDINARY', 'DIY']).optional(),
+    unit: z.enum(['STRAND', 'BEAD', 'GRAM']).optional(),
     page: z.coerce.number().int().min(1).default(1),
     pageSize: z.coerce.number().int().min(1).max(50).default(20),
   })
@@ -392,6 +395,7 @@ export const productDiySchema = z
   .strictObject({
     origin: z.literal('DIY'),
     silverCost: silverCostSchema.optional(),
+    pricingLines: z.array(pricingLineSchema).max(50).optional(),
     quantity,
     notes: z.string().trim().max(10000).default(''),
     materials: z
@@ -528,6 +532,7 @@ export const productStockAdjustmentSchema = z.union([
 
 export const materialPurchaseSchema = z
   .strictObject({
+    quotePurpose: z.enum(['LEGACY', 'BEFORE_DISCOUNT']).optional(),
     mode: z.enum(['UNIT', 'BATCH']).default('UNIT'),
     quotedGramPrice: nullableAmount.default(null),
     totalWeightGrams: positiveAmount.default(null),
@@ -601,6 +606,7 @@ function validateMaterialPurchase(
 }
 
 const materialCreateObject = z.strictObject({
+  initialStock: z.enum(['FULL', 'UNKNOWN']).optional(),
   values: materialSchema,
   tagIds: z
     .array(z.string().cuid())

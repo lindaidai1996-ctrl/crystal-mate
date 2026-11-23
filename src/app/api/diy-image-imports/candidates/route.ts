@@ -18,13 +18,16 @@ export async function GET(request: NextRequest) {
     const aliasIds = id ? [] : await findAliasIds(kind === 'MATERIAL' ? 'material' : 'product', q);
     if (kind === 'MATERIAL') {
       const items = await db.material.findMany({
-        where: id
-          ? { id }
-          : q
-            ? {
-                OR: [{ name: { contains: q, mode: 'insensitive' } }, { id: { in: aliasIds } }],
-              }
-            : {},
+        where: {
+          NOT: { pricingGroup: { is: { enabled: true } } },
+          ...(id
+            ? { id }
+            : q
+              ? {
+                  OR: [{ name: { contains: q, mode: 'insensitive' } }, { id: { in: aliasIds } }],
+                }
+              : {}),
+        },
         include: materialInclude,
         orderBy: { createdAt: 'desc' },
         take: 20,

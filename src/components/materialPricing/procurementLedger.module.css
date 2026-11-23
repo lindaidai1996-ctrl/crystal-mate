@@ -1,0 +1,128 @@
+.workspace {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  gap: 16px;
+}
+.importProgress {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--ant-color-border, #dce4dc);
+  border-radius: 10px;
+  background: var(--ant-color-bg-container, #fff);
+  display: grid;
+  gap: 8px;
+}
+.importProgress p {
+  margin: 0;
+}
+.importFailures {
+  margin: 8px 0 0;
+  padding-inline-start: 20px;
+  max-height: 160px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+.workspace > nav {
+  margin-bottom: 0;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.toolbar > :global(.ant-select) {
+  min-width: 150px;
+  max-width: 100%;
+}
+.form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.form label,
+.line label,
+.mapping label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  min-width: 0;
+}
+.form :global(.ant-select),
+.line :global(.ant-select),
+.line :global(.ant-input-number),
+.mapping :global(.ant-select) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+.line {
+  padding: 16px;
+  border: 1px solid var(--ant-color-border, #dce4dc);
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+.lineFields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.muted {
+  color: var(--ant-color-text-secondary, #607266);
+  font-size: 13px;
+}
+.metrics {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-variant-numeric: tabular-nums;
+}
+.table {
+  min-width: 0;
+  overflow: hidden;
+}
+.mapping {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.source {
+  max-height: 280px;
+  overflow: auto;
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+.heading > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.heading h1 {
+  font-size: clamp(22px, 3vw, 28px);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .form,
+  .mapping,
+  .lineFields {
+    grid-template-columns: 1fr;
+  }
+  .toolbar > :global(.ant-select) {
+    flex: 1 1 140px;
+  }
+  .line {
+    padding: 12px;
+  }
+}

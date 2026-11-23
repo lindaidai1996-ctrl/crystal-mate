@@ -9,10 +9,12 @@ export function MaterialLossRateField({
   value,
   onChange,
   isDefault = false,
+  compact = false,
 }: {
   value: MaterialAmount;
   onChange: (value: MaterialAmount) => void;
   isDefault?: boolean;
+  compact?: boolean;
 }) {
   const t = useTranslations('materialEditor');
   const privacyMode = usePrivacyMode();
@@ -20,8 +22,9 @@ export function MaterialLossRateField({
   return (
     <Form.Item
       className="material-loss-rate"
-      label={t(isDefault ? 'defaultLossRate' : 'lossRate')}
-      extra={t(isDefault ? 'defaultLossRateHelp' : 'lossRateHelp')}
+      label={t(compact ? 'lossRateOptional' : isDefault ? 'defaultLossRate' : 'lossRate')}
+      tooltip={compact ? t('lossRateHelp') : undefined}
+      extra={compact ? undefined : t(isDefault ? 'defaultLossRateHelp' : 'lossRateHelp')}
     >
       <InputNumber<string>
         stringMode
@@ -33,7 +36,7 @@ export function MaterialLossRateField({
         step="0.01"
         precision={2}
         suffix="%"
-        placeholder={t('lossRateEmpty')}
+        placeholder={t(compact ? 'lossRateCompactEmpty' : 'lossRateEmpty')}
         aria-label={t(isDefault ? 'defaultLossRate' : 'lossRate')}
         style={{ width: '100%' }}
       />

@@ -381,6 +381,7 @@ export function AttachmentGallery({
                   />
                   <div className="batch-detail-attachment-content">
                     <Checkbox
+                      className={galleryStyles.attachmentName}
                       disabled={busy}
                       checked={!!attachment.assetId && selected.includes(attachment.assetId)}
                       onChange={(event) =>

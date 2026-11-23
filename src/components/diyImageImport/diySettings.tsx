@@ -1,5 +1,7 @@
 'use client';
 
+import { PricingGroupFields } from '@/components/productEditor/pricingGroupFields';
+
 import { Sensitive } from '@/components/privacyMode';
 
 import { useEffect, useState } from 'react';
@@ -135,30 +137,36 @@ export function DiySettings({
           />
         </label>
       </div>
+      <PricingGroupFields
+        value={data.pricingLines ?? []}
+        onChange={(pricingLines) => onPatch({ pricingLines })}
+        disabled={disabled}
+      />
       <details style={{ marginTop: 16 }}>
         <summary>{t('extraSettings')}</summary>
-        <p className={styles.muted}>{t('silverHint')}</p>
+        {data.legacySilver !== false && <p className={styles.muted}>{t('silverHint')}</p>}
         <div className={styles.fields}>
-          {(['weightGrams', 'costGramPrice', 'quoteGramPrice'] as const)
-            .filter((field) => !privacyMode || field !== 'costGramPrice')
-            .map((field) => (
-              <label className={styles.field} key={field}>
-                <span>{t(field)}</span>
-                <InputNumber<string>
-                  stringMode
-                  min="0"
-                  max="9999999999.99"
-                  precision={2}
-                  disabled={disabled}
-                  value={data.silverCost[field] || null}
-                  onChange={(value) =>
-                    onPatch({
-                      silverCost: { ...data.silverCost, [field]: value ?? '' },
-                    })
-                  }
-                />
-              </label>
-            ))}
+          {data.legacySilver !== false &&
+            (['weightGrams', 'costGramPrice', 'quoteGramPrice'] as const)
+              .filter((field) => !privacyMode || field !== 'costGramPrice')
+              .map((field) => (
+                <label className={styles.field} key={field}>
+                  <span>{t(field)}</span>
+                  <InputNumber<string>
+                    stringMode
+                    min="0"
+                    max="9999999999.99"
+                    precision={2}
+                    disabled={disabled}
+                    value={data.silverCost[field] || null}
+                    onChange={(value) =>
+                      onPatch({
+                        silverCost: { ...data.silverCost, [field]: value ?? '' },
+                      })
+                    }
+                  />
+                </label>
+              ))}
           <label className={`${styles.field} ${styles.wide}`}>
             <span>{t('notes')}</span>
             <Input.TextArea

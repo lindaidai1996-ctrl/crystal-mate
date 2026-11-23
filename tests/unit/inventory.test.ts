@@ -17,7 +17,7 @@ describe('inventory counts', () => {
   it.each([
     [10, 7, 12, 9],
     [10, 7, 10, 7],
-    [null, null, 10, 10],
+    [null, null, 10, null],
     [null, 7, 10, 7],
     [10, 7, null, 7],
     [null, null, null, null],

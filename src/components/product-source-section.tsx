@@ -1,5 +1,7 @@
 'use client';
 
+import { PricingGroupFields } from '@/components/productEditor/pricingGroupFields';
+
 import { DiyPicker, type PickerPreferences } from '@/components/diyPicker/diyPicker';
 import { applyPickerSelection, preferredMaterialUsageUnit } from '@/lib/diy-picker/draft';
 import type { PickerKind, PickerSelection } from '@/lib/diy-picker/contracts';
@@ -56,6 +58,7 @@ import {
   emptyCraftDesignFee,
 } from '@/lib/product-diy-cost';
 import { todayInChina } from './materialManagement/batchSelector';
+import { PurchaseBatchSelect } from './materialManagement/purchaseBatchSelect';
 import diyStyles from './productDiyEntry.module.css';
 import {
   MaterialSourceSelect,
@@ -84,7 +87,7 @@ export function initialSource(
         quantity: 1,
         notes: '',
         materials: [],
-        silverCost: null,
+        pricingLines: [],
         cabochons: [],
         extraCosts: [],
         craftDesignFee: { ...emptyCraftDesignFee(), unitAmount: '100' },
@@ -298,9 +301,10 @@ function SourceFields({
       </CompactFields>
       {value.origin === 'PURCHASED' ? (
         <CompactFields className="product-source-grid">
-          <label className="source-field source-field-wide">
+          <div className="source-field source-field-wide">
             <span>{t('batch')}</span>
-            <Select
+            <PurchaseBatchSelect
+              aria-label={t('batch')}
               showSearch
               optionFilterProp="label"
               value={
@@ -314,12 +318,10 @@ function SourceFields({
                       : { batchId: id },
                 })
               }
-              options={[
-                ...batches.map((batch) => ({ value: batch.id, label: batch.name })),
-                { value: '__new__', label: t('newBatch') },
-              ]}
+              batches={batches}
+              createLabel={t('newBatch')}
             />
-          </label>
+          </div>
           <label className="source-field source-field-wide">
             <span>{t('distributor')}</span>
             <DistributorSelect
@@ -518,10 +520,16 @@ function SourceFields({
               </div>
             );
           })}
-          <SilverCostFields
-            value={value.silverCost ?? null}
-            onChange={(silverCost) => update({ silverCost })}
+          <PricingGroupFields
+            value={value.pricingLines ?? []}
+            onChange={(pricingLines) => update({ pricingLines })}
           />
+          {value.silverCost !== undefined && (
+            <SilverCostFields
+              value={value.silverCost}
+              onChange={(silverCost) => update({ silverCost })}
+            />
+          )}
           <div className="product-source-subheading">
             <strong>{t('cabochons')}</strong>
             <Button icon={<PlusOutlined />} onClick={() => setPicker({ kind: 'cabochons' })}>
@@ -760,8 +768,20 @@ function diySourceDraft(run: Product['diyRuns'][number]): ProductSourceInput {
       unitCost: line.unitCost,
       quoteUnitPrice: line.quoteUnitPrice,
     })),
+    pricingLines: (run.pricingLines ?? []).map((line) => ({
+      id: line.id,
+      groupId: line.groupId,
+      publicationId: line.publicationId,
+      costBasisToken: line.costBasisToken,
+      quantity: line.quantity,
+      unitCost: line.unitCost,
+      quoteUnitPrice: line.quoteUnitPrice,
+    })),
     extraCosts: run.extraCosts,
-    silverCost: run.silverCost ?? { weightGrams: '0', ...DEFAULT_SILVER_PRICING },
+    silverCost:
+      run.legacySilver === false
+        ? undefined
+        : (run.silverCost ?? { weightGrams: '0', ...DEFAULT_SILVER_PRICING }),
     craftDesignFee: run.craftDesignFee ?? emptyCraftDesignFee(),
   };
 }
@@ -886,7 +906,9 @@ export function ProductSourceSection({
   const searchMaterials = useCallback(
     (query: string) => {
       const request = ++materialRequest.current;
-      apiFetch<MaterialPage>(`/api/materials?pageSize=50&q=${encodeURIComponent(query)}`)
+      apiFetch<MaterialPage>(
+        `/api/materials?pricing=DIY&pageSize=50&q=${encodeURIComponent(query)}`,
+      )
         .then((page) => {
           if (request !== materialRequest.current) return;
           const options = page.items.flatMap((material) =>
@@ -1079,7 +1101,7 @@ export function ProductSourceSection({
           quantity: run.quantity,
           unitCost: run.perUnitCost,
           quote: run.totalQuote,
-          detail: `${run.materialLines.length} ${t('materials')} · ${run.cabochonLines.length} ${t('cabochons')}`,
+          detail: `${run.materialLines.length + (run.pricingLines?.length ?? 0)} ${t('materials')} · ${run.cabochonLines.length} ${t('cabochons')}`,
           createdAt: run.createdAt,
         })),
       ].sort((a, b) => b.createdAt.localeCompare(a.createdAt))

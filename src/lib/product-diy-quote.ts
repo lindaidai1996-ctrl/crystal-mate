@@ -49,6 +49,12 @@ export function customerDiyDetails(run: ProductDiyRun) {
       unitPrice: line.quoteUnitPrice,
       subtotalPerItem: line.quoteLineTotal,
     })),
+    pricingMaterials: (run.pricingLines ?? []).map((line) => ({
+      name: line.name,
+      quantityPerItem: line.quantity,
+      unitPrice: line.quoteUnitPrice,
+      subtotalPerItem: line.quoteLineTotal,
+    })),
     silver: run.silverCost
       ? {
           weightGrams: run.silverCost.weightGrams,

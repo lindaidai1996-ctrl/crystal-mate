@@ -114,6 +114,20 @@
 .gallery {
   padding: 20px;
 }
+.attachmentName {
+  align-items: flex-start;
+  min-width: 0;
+  max-width: 100%;
+}
+.attachmentName :global(.ant-checkbox) {
+  flex: none;
+  align-self: flex-start;
+}
+.attachmentName :global(.ant-checkbox-label) {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 @media (max-width: 640px) {
   .header {
     padding: 14px 16px;

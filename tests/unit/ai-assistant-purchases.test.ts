@@ -112,6 +112,30 @@ beforeEach(() => {
 });
 
 describe('Decimal purchase summaries', () => {
+  it('reads re-entered quantities, gram prices and amounts after unit correction', async () => {
+    const row = golden[0];
+    mocks.scope.mockResolvedValue(details([row]));
+    mocks.materialBatchEntry.findMany.mockResolvedValue([
+      {
+        id: row.purchase.id,
+        materialId: row.item.id,
+        batchId: row.batch.id,
+        distributorId: row.distributor.id,
+        material: { unit: 'GRAM' },
+        receivedQty: new Prisma.Decimal('12.50'),
+        purchaseUnitPrice: new Prisma.Decimal('6.50'),
+        purchaseTotalAmount: new Prisma.Decimal('81.25'),
+      },
+    ]);
+    const result = await readAssistantPurchases(tx, { query });
+    expect(result.rows[0]).toMatchObject({
+      unit: 'GRAM',
+      quantity: '12.50',
+      unitPrice: '6.50',
+      amount: '81.25',
+      amountBasis: 'recorded_total',
+    });
+  });
   it('uses a corrected unit on fresh purchase reads while preserving quantities and amounts', async () => {
     const row = golden[0];
     mocks.scope.mockResolvedValue(details([row]));

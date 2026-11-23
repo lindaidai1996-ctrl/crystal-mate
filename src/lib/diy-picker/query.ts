@@ -52,6 +52,7 @@ export async function listPickerMaterials(ownerId: string, filters: PickerFilter
       );
       const where: Prisma.MaterialWhereInput = {
         ...base,
+        NOT: { pricingGroup: { is: { enabled: true } } },
         ...(filters.tagId ? { tags: { some: { tagId: filters.tagId } } } : {}),
         batchEntries: { some: entryFilter },
       };

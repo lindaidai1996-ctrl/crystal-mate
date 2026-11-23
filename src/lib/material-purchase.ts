@@ -3,6 +3,7 @@ import { recalculateMaterial } from './material-calculations';
 
 export type PurchaseTotalField = 'quotedGramPrice' | 'totalWeightGrams' | 'totalAmount';
 export type MaterialPurchase = {
+  quotePurpose?: 'LEGACY' | 'BEFORE_DISCOUNT';
   mode: 'UNIT' | 'BATCH';
   quotedGramPrice: MaterialAmount;
   totalWeightGrams: MaterialAmount;
@@ -63,6 +64,7 @@ const totalFields: PurchaseTotalField[] = ['quotedGramPrice', 'totalWeightGrams'
 
 export function resolvePurchase(input: MaterialPurchase) {
   const next = { ...input };
+  if (next.quotePurpose === 'BEFORE_DISCOUNT') return { ...next, autoField: null };
   const missing = totalFields.filter((field) => next[field] === null);
   const target = next.autoField ?? (missing.length === 1 ? missing[0] : null);
   if (target) {

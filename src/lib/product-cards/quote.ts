@@ -18,6 +18,7 @@ function dimensions(line: {
 export function cardMainMaterials(run: ProductDiyRun) {
   return [
     ...new Set([
+      ...(run.pricingLines ?? []).map((line) => line.name),
       ...run.materialLines.map(
         (line) => line.quoteSnapshot?.name ?? line.materialBatchEntry.material.name,
       ),
@@ -52,6 +53,15 @@ export function cardQuote(run: ProductDiyRun, currency = 'CNY'): CardQuote | nul
       subtotal: line.subtotalPerItem!,
     })),
   ];
+  rows.push(
+    ...details.pricingMaterials.map((line) => ({
+      name: line.name,
+      specification: '按克计价',
+      quantity: `${line.quantityPerItem} 克`,
+      unitPrice: line.unitPrice,
+      subtotal: line.subtotalPerItem,
+    })),
+  );
   if (details.silver && Number(details.silver.weightGrams) > 0) {
     if (details.silver.subtotalPerItem === null) return null;
     rows.push({

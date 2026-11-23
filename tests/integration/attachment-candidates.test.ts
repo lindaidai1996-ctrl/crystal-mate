@@ -332,6 +332,52 @@ describe.skipIf(!enabled)('attachment candidates and saves', () => {
     ).toBeNull();
   });
 
+  it('falls back to another purchase image of an owned material and validates it on save', async () => {
+    const f = await fixture();
+    await db.materialImage.deleteMany({ where: { materialId: f.material.id } });
+    await db.materialBatchImage.deleteMany({
+      where: { entry: { materialId: f.material.id, distributorId: f.a.id } },
+    });
+    const otherPurchase = f.material.batchEntries.find(
+      (entry) => entry.batchId === f.batches[2].id,
+    )!;
+    // The owner's latest purchase has no image; the only image belongs to
+    // another distributor's purchase of the same material.
+    const expected = otherPurchase.images[0];
+    for (const owner of [
+      { type: 'distributor' as const, id: f.a.id },
+      { type: 'batch' as const, id: f.batches[1].id },
+    ]) {
+      const page = await getAttachmentCandidates(owner, { ...queries, q: '青玉别名' });
+      expect(page.items).toMatchObject([
+        {
+          itemId: f.material.id,
+          objectKey: expected.objectKey,
+          source: { kind: 'MATERIAL_BATCH_IMAGE', id: expected.id },
+        },
+      ]);
+    }
+    const candidate = (
+      await getAttachmentCandidates({ type: 'distributor', id: f.a.id }, queries)
+    ).items.find((item) => item.itemId === f.material.id)!;
+    const attachments = [asAttachment(candidate)];
+    expect(
+      (await updateDistributor(f.a.id, { ...distributorHeader(f.a.name), attachments }))
+        .attachments,
+    ).toMatchObject([{ objectKey: expected.objectKey }]);
+    expect(
+      (await updateBatch(f.batches[1].id, { ...batchHeader(f.batches[1].name), attachments }))
+        .attachments,
+    ).toMatchObject([{ objectKey: expected.objectKey }]);
+    const unrelated = await createDistributor(distributorHeader(`${prefix}-unrelated`));
+    expect(
+      await getAttachmentCandidates({ type: 'distributor', id: unrelated.id }, queries),
+    ).toMatchObject({ items: [], total: 0 });
+    await expect(
+      updateDistributor(unrelated.id, { ...distributorHeader(unrelated.name), attachments }),
+    ).rejects.toThrow('INVALID_IMAGE');
+  });
+
   it('rejects foreign, changed, second-image and duplicate selections atomically', async () => {
     const f = await fixture();
     const candidates = (await getAttachmentCandidates({ type: 'distributor', id: f.a.id }, queries))

@@ -72,6 +72,7 @@ type MaterialFilters = {
   query: string;
   categoryId?: string;
   source?: 'IMAGE_IMPORT' | 'OTHER';
+  pricing?: 'GROUPED' | 'ORDINARY';
   createdRange: DateRange;
   page: number;
   pageSize: number;
@@ -85,6 +86,24 @@ function BatchPrices({ item, card = false }: { item: Material; card?: boolean })
   const t = useTranslations('materialBatches');
   const privacyMode = usePrivacyMode();
   const editor = useTranslations('materialEditor');
+  const materials = useTranslations('materials');
+  if (item.pricingGroup) {
+    return (
+      <div className={materialStyles.pricingGroupSummary}>
+        <Link href={`/admin/material-pricing?group=${item.pricingGroup.id}`}>
+          {item.pricingGroup.name}
+        </Link>
+        <span className={materialStyles.sectionLabel}>
+          {materials(
+            item.pricingGroup.enabled ? 'unifiedPricingEnabled' : 'unifiedPricingConfigured',
+          )}
+        </span>
+        <Link href={`/admin/material-pricing/purchases?group=${item.pricingGroup.id}`}>
+          {materials('viewProcurementLedger')}
+        </Link>
+      </div>
+    );
+  }
   const entries = item.batchEntries;
   const unitSuffix = editor(
     item.unit === 'GRAM' ? 'yuanPerGram' : item.unit === 'STRAND' ? 'yuanPerStrand' : 'yuanPerBead',
@@ -108,28 +127,38 @@ function BatchPrices({ item, card = false }: { item: Material; card?: boolean })
       value.unitPriceSource === 'ESTIMATED' || value.unitPriceSource === 'MANUAL'
         ? t(`priceSource_${value.unitPriceSource}`)
         : undefined;
+    const hasGramPrice =
+      (!privacyMode && value.purchaseGramPrice !== null) || value.saleGramPrice !== null;
+    const hasBeadPrice =
+      (!privacyMode && (value.childCount ?? 0) > 0 && value.childUnitPrice !== null) ||
+      value.saleChildUnitPrice !== null;
+    const showUnitPrices = item.unit !== 'STRAND' || (!hasGramPrice && !hasBeadPrice);
     return [
-      [
-        ...(!privacyMode
-          ? [
+      ...(showUnitPrices
+        ? [
+            [
+              ...(!privacyMode
+                ? [
+                    {
+                      label: t('purchaseUnitPrice'),
+                      value:
+                        item.unit === 'GRAM' ? value.purchaseGramPrice : value.purchaseUnitPrice,
+                      suffix: unitSuffix,
+                      source,
+                      sale: false,
+                    },
+                  ]
+                : []),
               {
-                label: t('purchaseUnitPrice'),
-                value: item.unit === 'GRAM' ? value.purchaseGramPrice : value.purchaseUnitPrice,
+                label: t('salePrice'),
+                value: item.unit === 'GRAM' ? value.saleGramPrice : value.saleUnitPrice,
                 suffix: unitSuffix,
-                source,
-                sale: false,
+                sale: true,
               },
-            ]
-          : []),
-        {
-          label: t('salePrice'),
-          value: item.unit === 'GRAM' ? value.saleGramPrice : value.saleUnitPrice,
-          suffix: unitSuffix,
-          sale: true,
-        },
-      ],
-      ...(item.unit !== 'GRAM' &&
-      (!card || (!privacyMode && value.purchaseGramPrice !== null) || value.saleGramPrice !== null)
+            ],
+          ]
+        : []),
+      ...(item.unit !== 'GRAM' && ((!card && item.unit !== 'STRAND') || hasGramPrice)
         ? [
             [
               ...(!privacyMode
@@ -212,10 +241,65 @@ function BatchPrices({ item, card = false }: { item: Material; card?: boolean })
     ) : (
       <span className="material-price-summary">{priceText(value)}</span>
     );
+  const batchHeading = (value: Material | MaterialBatchEntry, name: string, href?: string) => {
+    const entry = 'purchase' in value ? value : null;
+    const weights: { text: string; detail: string }[] = [];
+    if (item.unit !== 'GRAM' && value.weightGrams !== null) {
+      const unit = editor(item.unit);
+      const label =
+        entry?.purchase.mode === 'BATCH'
+          ? editor(entry.receivedQty === null ? 'estimatedUnitWeight' : 'averageUnitWeight', {
+              unit,
+            })
+          : editor('unitWeight', { unit });
+      const weight = formatAmount(value.weightGrams);
+      const estimated = entry?.purchase.mode === 'BATCH' && entry.receivedQty === null;
+      weights.push({
+        text: `${weight} g/${unit}${estimated ? ` (${editor('priceSource_ESTIMATED')})` : ''}`,
+        detail: `${label} ${weight} g`,
+      });
+    }
+    if (item.unit === 'STRAND' && value.childWeightGrams !== null) {
+      const weight = formatAmount(value.childWeightGrams);
+      weights.push({
+        text: `${weight} g/${editor('BEAD')}`,
+        detail: `${editor('childWeightGrams')} ${weight} g`,
+      });
+    }
+    if (
+      (item.unit === 'GRAM' || value.weightGrams === null) &&
+      entry?.purchase.totalWeightGrams != null
+    ) {
+      const totalWeight = `${editor('totalWeightGrams')} ${formatAmount(entry.purchase.totalWeightGrams)} g`;
+      weights.unshift({ text: totalWeight, detail: totalWeight });
+    }
+    const weightSummary = weights.map((weight) => weight.text).join(' · ');
+    return (
+      <div className={materialStyles.batchHeading} key={value.id}>
+        {href ? (
+          <Link href={href} className={materialStyles.batchName} title={name}>
+            {name}
+          </Link>
+        ) : (
+          <span className={materialStyles.batchName} title={name}>
+            {name}
+          </span>
+        )}
+        {weightSummary && (
+          <span
+            className={materialStyles.weightSummary}
+            title={weights.map((weight) => weight.detail).join(' · ')}
+          >
+            {weightSummary}
+          </span>
+        )}
+      </div>
+    );
+  };
   if (!entries.length)
     return (
       <div className={card ? materialStyles.batchGroup : 'material-price-summary'}>
-        <span>{t('unassigned')}</span>
+        {batchHeading(item, t('unassigned'))}
         {priceDetails(item)}
       </div>
     );
@@ -224,15 +308,13 @@ function BatchPrices({ item, card = false }: { item: Material; card?: boolean })
       entry.unitPriceSource === entries[0].unitPriceSource &&
       priceText(entry) === priceText(entries[0]),
   );
-  const links = entries.map((entry) => (
-    <Link
-      key={entry.id}
-      href={withAdminReturnTo(`/admin/materials/batches/${entry.batchId}`, '/admin/materials')}
-      className="material-batch-link"
-    >
-      {entry.batch.name}
-    </Link>
-  ));
+  const links = entries.map((entry) =>
+    batchHeading(
+      entry,
+      entry.batch.name,
+      withAdminReturnTo(`/admin/materials/batches/${entry.batchId}`, '/admin/materials'),
+    ),
+  );
   if (samePrice)
     return (
       <div className={card ? materialStyles.batchGroup : 'material-batch-names'}>
@@ -255,14 +337,11 @@ function BatchPrices({ item, card = false }: { item: Material; card?: boolean })
     <div className={card ? materialStyles.batchList : 'material-batch-prices'}>
       {entries.map((entry) => (
         <div className={card ? materialStyles.batchGroup : 'material-batch-price'} key={entry.id}>
-          <Link
-            href={withAdminReturnTo(
-              `/admin/materials/batches/${entry.batchId}`,
-              '/admin/materials',
-            )}
-          >
-            {entry.batch.name}
-          </Link>
+          {batchHeading(
+            entry,
+            entry.batch.name,
+            withAdminReturnTo(`/admin/materials/batches/${entry.batchId}`, '/admin/materials'),
+          )}
           {priceDetails(entry)}
         </div>
       ))}
@@ -286,6 +365,11 @@ function MaterialIdentity({ item }: { item: Material }) {
       <div className={catalogStyles.identity}>
         <MaterialEditLink item={item} />
         <MaterialImportSources material={item} />
+        {item.pricingGroup && (
+          <Link href={`/admin/material-pricing?group=${item.pricingGroup.id}`}>
+            {item.pricingGroup.name}
+          </Link>
+        )}
         {!!item.tags.length && (
           <div className="product-tags">
             {item.tags.map((tag) => (
@@ -396,7 +480,8 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
     initialFilters(initialQuery),
     !initialQuery,
   );
-  const { query, categoryId, source, createdRange, page, pageSize } = filters;
+  const pricingText = useTranslations('materialPricing');
+  const { query, categoryId, source, pricing, createdRange, page, pageSize } = filters;
   const requestFilters = useDeferredValue(filters);
 
   const [revision, setRevision] = useState(0);
@@ -413,6 +498,7 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
   const countParams = new URLSearchParams();
   if (requestFilters.query) countParams.set('q', requestFilters.query);
   if (requestFilters.source) countParams.set('source', requestFilters.source);
+  if (requestFilters.pricing) countParams.set('pricing', requestFilters.pricing);
   if (requestFilters.createdRange) {
     countParams.set('createdFrom', requestFilters.createdRange[0]);
     countParams.set('createdTo', requestFilters.createdRange[1]);
@@ -510,7 +596,7 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
       render: (_, item) => <MaterialStock item={item} onSaved={refreshStock} />,
     },
     {
-      title: t('batchPrices'),
+      title: t('pricingOverview'),
       key: 'batchPrices',
       width: 350,
       render: (_, item) => <BatchPrices item={item} />,
@@ -556,6 +642,7 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
             query: '',
             categoryId: undefined,
             source: undefined,
+            pricing: undefined,
             createdRange: null,
           });
           setRevision((current) => current + 1);
@@ -580,19 +667,20 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
             </Link>
           }
         >
+          <Link href="/admin/material-pricing">
+            <Button>{pricingText('title')}</Button>
+          </Link>
           <EditorDraftBox kind="MATERIAL" returnTo="/admin/materials" />
-          {process.env.NODE_ENV !== 'production' && (
-            <Link href="/admin/materials/image-import">
-              <Button icon={<ScanOutlined />}>{t('imageImport')}</Button>
-            </Link>
-          )}
+          <Link href="/admin/materials/image-import">
+            <Button icon={<ScanOutlined />}>{t('imageImport')}</Button>
+          </Link>
           <Link href="/admin/materials/categories">
             <Button icon={<FolderOutlined />}>{t('manageCategories')}</Button>
           </Link>
         </ListPageActions>
       </div>
       <MaterialListFilters
-        value={{ categoryId, source, createdRange }}
+        value={{ categoryId, source, pricing, createdRange }}
         categories={categories}
         onApply={changeFilters}
         search={searchInput}
@@ -610,6 +698,18 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
               { value: 'OTHER', label: t('sourceOther') },
             ]}
             onChange={(value) => changeFilters({ source: value })}
+          />
+          <Select
+            className="filter-select"
+            aria-label={pricingText('pricingFilter')}
+            placeholder={pricingText('allPricing')}
+            value={pricing}
+            allowClear
+            options={[
+              { value: 'GROUPED', label: pricingText('grouped') },
+              { value: 'ORDINARY', label: pricingText('ordinary') },
+            ]}
+            onChange={(pricing) => changeFilters({ pricing })}
           />
           <DateRangeFilter
             kind="created"
@@ -734,6 +834,11 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
                   <MaterialEditLink item={item} />
                 </div>
                 <MaterialImportSources material={item} />
+                {item.pricingGroup && (
+                  <Link href={`/admin/material-pricing?group=${item.pricingGroup.id}`}>
+                    {item.pricingGroup.name}
+                  </Link>
+                )}
                 <div className={catalogStyles.cardMeta}>
                   <span>
                     {categoryPath(item.categoryId, categories)
@@ -751,7 +856,9 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
                 <CatalogNote text={item.notes} />
                 <MaterialStock item={item} onSaved={refreshStock} />
                 <div className={materialStyles.pricesSection}>
-                  <div className={materialStyles.sectionLabel}>{t('batchPrices')}</div>
+                  <div className={materialStyles.sectionLabel}>
+                    {t(item.pricingGroup ? 'unifiedPricing' : 'batchPrices')}
+                  </div>
                   <BatchPrices item={item} card />
                 </div>
                 <div className={materialStyles.actionBar}>
@@ -775,7 +882,9 @@ export function MaterialsPage({ initialQuery = '' }: { initialQuery?: string }) 
                 </p>
                 <MaterialStock item={item} onSaved={refreshStock} />
                 <div className={materialStyles.pricesSection}>
-                  <div className={materialStyles.sectionLabel}>{t('batchPrices')}</div>
+                  <div className={materialStyles.sectionLabel}>
+                    {t(item.pricingGroup ? 'unifiedPricing' : 'batchPrices')}
+                  </div>
                   <BatchPrices item={item} card />
                 </div>
                 <p className="mobile-record-meta">

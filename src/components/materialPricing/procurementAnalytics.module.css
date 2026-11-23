@@ -1,0 +1,223 @@
+.page {
+  --analysis-color-0: var(--ant-color-primary, #547566);
+  --analysis-color-1: oklch(from var(--analysis-color-0) calc(l + 0.15) c calc(h - 35));
+  --analysis-color-2: oklch(from var(--analysis-color-0) calc(l - 0.08) c calc(h + 35));
+  --analysis-color-3: oklch(from var(--analysis-color-0) calc(l + 0.25) c h);
+  --analysis-color-4: oklch(
+    from var(--analysis-color-0) calc(l + 0.05) calc(c + 0.02) calc(h - 65)
+  );
+  --analysis-color-5: oklch(from var(--analysis-color-0) calc(l + 0.2) c calc(h + 55));
+  --analysis-color-6: oklch(from var(--analysis-color-0) calc(l - 0.15) c calc(h - 40));
+  --analysis-color-7: var(--ant-color-text-quaternary, #aab5ac);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+  text-wrap: pretty;
+}
+.page > :global(.page-heading),
+.page > nav {
+  margin-bottom: 0;
+}
+.filters,
+.panelHeading,
+.chartControls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-width: 0;
+}
+.filters > :global(.ant-select),
+.chartControls > :global(.ant-select),
+.panelHeading > :global(.ant-select) {
+  width: 210px;
+  max-width: 100%;
+}
+.panelHeading {
+  justify-content: space-between;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.metric,
+.panel {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--ant-color-border-secondary, #dce4dc);
+  border-radius: 12px;
+  background: var(--ant-color-bg-container, #fff);
+}
+.metrics > div {
+  min-width: 0;
+}
+.metric {
+  height: 100%;
+  box-sizing: border-box;
+}
+.metric dt {
+  color: var(--ant-color-text-secondary);
+}
+.metric dd {
+  margin: 8px 0 0;
+  font-size: 24px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.panel h2,
+.sectionTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+.chartControls {
+  margin-top: 16px;
+}
+.hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ant-color-text-secondary);
+}
+.pies {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.pieLayout {
+  display: grid;
+  grid-template-columns: minmax(150px, 220px) minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+.pieCanvas {
+  position: relative;
+  min-width: 0;
+}
+.pieCanvas svg {
+  width: 100%;
+  display: block;
+}
+.pieSlice {
+  stroke: var(--slice-color);
+}
+.pieCenter {
+  position: absolute;
+  inset: 55px 38px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  gap: 4px;
+}
+.pieCenter span,
+.pieCenter small {
+  font-size: 12px;
+  color: var(--ant-color-text-secondary);
+  overflow-wrap: anywhere;
+}
+.pieCenter strong {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.legend {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+.legend button {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  gap: 4px 8px;
+  align-items: center;
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+  font: inherit;
+}
+.legend button:hover,
+.legend button[aria-pressed='true'] {
+  background: var(--ant-color-fill-alter);
+  border-color: var(--ant-color-border-secondary);
+}
+.legend button:focus-visible {
+  outline: 2px solid var(--ant-color-primary);
+  outline-offset: 1px;
+}
+.legend i {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--slice-color);
+}
+.legend span {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.legend strong {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.legend small {
+  grid-column: 2 / -1;
+  color: var(--ant-color-text-secondary);
+  overflow-wrap: anywhere;
+}
+.table {
+  min-width: 0;
+  margin-top: 16px;
+  overflow: hidden;
+}
+.method p {
+  margin-block: 0 12px;
+}
+.loading {
+  display: grid;
+  place-items: center;
+  min-height: 200px;
+}
+@media (max-width: 1100px) {
+  .pieLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pieCanvas {
+    width: 200px;
+    max-width: 100%;
+    justify-self: center;
+  }
+}
+@media (max-width: 767px) {
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pies {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .panel,
+  .metric {
+    padding: 14px;
+  }
+  .metric dd {
+    font-size: 20px;
+  }
+  .filters > :global(.ant-select),
+  .filters > :global(.ant-btn),
+  .chartControls > :global(.ant-select) {
+    width: 100%;
+  }
+}

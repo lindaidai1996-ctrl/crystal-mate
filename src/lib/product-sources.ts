@@ -1,3 +1,4 @@
+import { resolvePricingLines } from './material-pricing/diy-lines';
 import { recordSavedDiyUsage } from '@/lib/diy-picker/recent';
 import { sameOrderedRows } from './unchanged-relations';
 import { serializeImageFraming } from '@/lib/image-framing';
@@ -26,6 +27,7 @@ export const productSourceInclude = {
   },
   diyRuns: {
     include: {
+      pricingLines: { orderBy: { position: 'asc' } },
       materialLines: {
         include: {
           materialBatchEntry: {
@@ -64,6 +66,14 @@ export function serializeProductSources(product: ProductSources) {
           costGramPrice: silverCostGramPrice.toFixed(2),
           quoteGramPrice: silverQuoteGramPrice.toFixed(2),
         },
+        pricingLines: run.pricingLines.map((line) => ({
+          ...line,
+          quantity: line.quantity.toFixed(2),
+          unitCost: line.unitCost.toFixed(2),
+          lineCost: line.lineCost.toFixed(2),
+          quoteUnitPrice: line.quoteUnitPrice.toFixed(2),
+          quoteLineTotal: line.quoteLineTotal.toFixed(2),
+        })),
         perUnitCost: run.perUnitCost.toFixed(2),
         totalCost: run.totalCost?.toFixed(2) ?? null,
         perUnitQuote: run.perUnitQuote?.toFixed(2) ?? null,
@@ -159,9 +169,31 @@ async function diyValues(
   input: Extract<SourceInput, { origin: 'DIY' }>,
   previous?: {
     materialLines: { materialBatchEntryId: string; quoteSnapshot: Prisma.JsonValue }[];
+    pricingLines?: Prisma.ProductDiyPricingLineGetPayload<object>[];
     cabochonLines: { productId: string; quoteSnapshot: Prisma.JsonValue }[];
   },
 ) {
+  if (input.pricingLines === undefined && previous?.pricingLines?.length) {
+    input = {
+      ...input,
+      pricingLines: [...previous.pricingLines]
+        .sort((a, b) => a.position - b.position)
+        .map((line) => ({
+          id: line.id,
+          groupId: line.groupId,
+          publicationId: line.publicationId,
+          costBasisToken: line.costBasisToken,
+          quantity: line.quantity.toFixed(2),
+          unitCost: line.unitCost.toFixed(2),
+          quoteUnitPrice: line.quoteUnitPrice.toFixed(2),
+        })),
+    };
+  }
+  const pricingLines = await resolvePricingLines(
+    tx,
+    input.pricingLines ?? [],
+    previous?.pricingLines,
+  );
   const materialIds = input.materials.map((line) => line.materialBatchEntryId);
   const cabochonIds = input.cabochons.map((line) => line.productId);
   const [materials, cabochons] = await Promise.all([
@@ -169,7 +201,9 @@ async function diyValues(
       where: { id: { in: materialIds } },
       select: {
         id: true,
-        material: { select: { name: true, unit: true } },
+        material: {
+          select: { name: true, unit: true, pricingGroup: { select: { enabled: true } } },
+        },
         lengthMm: true,
         widthMm: true,
         heightMm: true,
@@ -187,6 +221,11 @@ async function diyValues(
 
   for (const line of input.materials) {
     const material = materials.find((item) => item.id === line.materialBatchEntryId)!;
+    if (
+      material.material.pricingGroup?.enabled &&
+      !previous?.materialLines.some((old) => old.materialBatchEntryId === line.materialBatchEntryId)
+    )
+      throw new ApiError(400, 'PRICING_USE_GROUP');
     if (material.material.unit === 'GRAM' && line.usageUnit !== 'GRAM')
       throw new ApiError(400, 'INVALID_INPUT');
   }
@@ -245,11 +284,13 @@ async function diyValues(
     perUnitQuote: quote?.perUnitQuote ?? null,
     totalQuote: quote?.totalQuote ?? null,
     craftDesignFee: input.craftDesignFee ?? emptyCraftDesignFee(),
+    legacySilver: input.silverCost !== undefined,
     silverWeightGrams: input.silverCost?.weightGrams ?? '0',
     silverCostGramPrice: input.silverCost?.costGramPrice ?? DEFAULT_SILVER_PRICING.costGramPrice,
     silverQuoteGramPrice: input.silverCost?.quoteGramPrice ?? DEFAULT_SILVER_PRICING.quoteGramPrice,
     extraCosts: input.extraCosts,
     notes: input.notes,
+    pricingLines: { create: pricingLines },
     materialLines: { create: materialLines },
     cabochonLines: { create: cabochonLines },
   };
@@ -322,11 +363,14 @@ export async function updateProductSource(productId: string, sourceId: string, i
       } else {
         const current = await tx.productDiyRun.findUnique({
           where: { id: sourceId },
-          include: { materialLines: true, cabochonLines: true },
+          include: { materialLines: true, cabochonLines: true, pricingLines: true },
         });
         if (!current || current.productId !== productId) throw new ApiError(404, 'NOT_FOUND');
         const values = await diyValues(tx, productId, input, current);
-        const { materialLines, cabochonLines, ...runValues } = values;
+        const { materialLines, cabochonLines, pricingLines, ...runValues } = values;
+        const pricingChanged = !sameOrderedRows(current.pricingLines, pricingLines.create);
+        if (pricingChanged)
+          await tx.productDiyPricingLine.deleteMany({ where: { runId: sourceId } });
         const materialsChanged = !sameOrderedRows(current.materialLines, materialLines.create);
         const cabochonsChanged = !sameOrderedRows(current.cabochonLines, cabochonLines.create);
         if (materialsChanged)
@@ -337,6 +381,7 @@ export async function updateProductSource(productId: string, sourceId: string, i
           where: { id: sourceId },
           data: {
             ...runValues,
+            ...(pricingChanged ? { pricingLines } : {}),
             ...(materialsChanged ? { materialLines } : {}),
             ...(cabochonsChanged ? { cabochonLines } : {}),
           },

@@ -44,6 +44,7 @@ import { MAX_STOCK } from '@/lib/inventory';
 import { DistributorSelect } from '@/components/distributorSelect/distributorSelect';
 import { categoryPath, categoryTree } from './categoryTree';
 import bulkStyles from './materialBulkDialog.module.css';
+import { PurchaseBatchSelect } from './purchaseBatchSelect';
 
 type Props = {
   intent: 'edit' | 'delete';
@@ -560,7 +561,7 @@ export function MaterialBulkDialog({ intent, materialIds, categories, onClose, o
                 {field('batchId', t('batch'))}
                 {enabled.batchId && (
                   <>
-                    <Select
+                    <PurchaseBatchSelect
                       aria-label={t('batch')}
                       className={bulkStyles.input}
                       showSearch
@@ -568,7 +569,7 @@ export function MaterialBulkDialog({ intent, materialIds, categories, onClose, o
                       value={batchId}
                       onChange={setBatchId}
                       placeholder={t('batch')}
-                      options={batches.map((batch) => ({ value: batch.id, label: batch.name }))}
+                      batches={batches}
                     />
                     <p className={bulkStyles.hint}>{t('batchHint')}</p>
                   </>

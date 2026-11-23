@@ -1,3 +1,4 @@
+import { pricingLineSchema } from '@/lib/material-pricing/contracts';
 import { z } from 'zod';
 import { importBoxSchema } from '@/lib/materialImageImport/contracts';
 import { importSourceKeyPattern } from '@/lib/image-storage';
@@ -48,6 +49,17 @@ export const diyDataSchema = z.strictObject({
   hint: z.string().max(2000),
   notes: z.string().max(10000),
   salePrice: moneyDraft,
+  pricingLines: z
+    .array(
+      pricingLineSchema.extend({
+        quantity: moneyDraft,
+        unitCost: moneyDraft,
+        quoteUnitPrice: moneyDraft,
+      }),
+    )
+    .max(50)
+    .optional(),
+  legacySilver: z.boolean().optional(),
   silverCost: z.strictObject({
     weightGrams: moneyDraft,
     costGramPrice: moneyDraft,
@@ -132,6 +144,8 @@ export function emptyDiyData(): DiyData {
     hint: '',
     notes: '',
     salePrice: '',
+    pricingLines: [],
+    legacySilver: false,
     silverCost: { weightGrams: '0', costGramPrice: '20', quoteGramPrice: '30' },
     extraCosts: [],
     parts: [],
@@ -171,14 +185,19 @@ export function patchDiyPart(part: DiyPart, patch: Partial<DiyPart>): DiyPart {
 
 export function diySource(data: DiyData, requireReviewed = true) {
   const parts = data.parts.filter((part) => !part.excluded);
-  if (!parts.length || (requireReviewed && parts.some((part) => !part.reviewed))) return null;
+  if (
+    (!parts.length && !data.pricingLines?.length) ||
+    (requireReviewed && parts.some((part) => !part.reviewed))
+  )
+    return null;
   if (parts.some((part) => !part.name.trim() || (part.kind === 'MATERIAL' && !part.materialId)))
     return null;
   const result = productDiySchema.safeParse({
     origin: 'DIY',
     quantity: data.quantity,
     notes: data.notes,
-    silverCost: data.silverCost,
+    silverCost: data.legacySilver === false ? undefined : data.silverCost,
+    pricingLines: data.pricingLines,
     materials: parts
       .filter((part) => part.kind === 'MATERIAL')
       .map((part) => ({

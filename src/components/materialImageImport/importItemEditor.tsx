@@ -10,6 +10,7 @@ import type {
   Tag as MaterialTag,
 } from '@/lib/client-types';
 import {
+  autoFillMaterialSalePrices,
   editMaterial,
   initializeMaterialPricing,
   recalculateMaterial,
@@ -62,7 +63,7 @@ export function ImportItemEditor({
   const material = importMaterialDraft(data);
   const quantity = importQuantity(data, material);
   const result = calculatePurchase(material.values, material.purchase, quantity);
-  const values = initializeMaterialPricing(result.values);
+  const values = autoFillMaterialSalePrices(initializeMaterialPricing(result.values));
 
   function update(next: ImportMaterialDraft, nextQuantity = data.quantity) {
     onChange({
@@ -144,7 +145,7 @@ export function ImportItemEditor({
   function changeRule(rule: MaterialSaleRule) {
     update({
       ...material,
-      values: recalculateMaterial(
+      values: autoFillMaterialSalePrices(
         {
           ...values,
           saleRule: rule,

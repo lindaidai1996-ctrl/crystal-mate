@@ -44,6 +44,7 @@ export const entryInclude = {
 } satisfies Prisma.MaterialBatchEntryInclude;
 
 export const materialInclude = {
+  pricingGroup: { select: { id: true, name: true, enabled: true } },
   _count: { select: { imageImportItems: { where: { entryId: { not: null } } } } },
   category: true,
   tags: { include: { tag: true } },
@@ -82,6 +83,7 @@ function amounts(record: MaterialWithRelations | EntryWithRelations) {
 export function serializeEntry(entry: EntryWithRelations) {
   const purchase: MaterialPurchase = {
     ...emptyPurchase(),
+    quotePurpose: entry.purchaseQuotePurpose as MaterialPurchase['quotePurpose'],
     mode: entry.purchaseInputMode as MaterialPurchase['mode'],
     totalWeightGrams: entry.purchaseTotalWeightGrams?.toFixed(2) ?? null,
     totalAmount: entry.purchaseTotalAmount?.toFixed(2) ?? null,
@@ -134,7 +136,7 @@ async function validateTags(tx: Tx, tagIds: string[]) {
   if (count !== tagIds.length) throw new ApiError(400, 'TAG_NOT_FOUND');
 }
 
-function detailValues(
+export function detailValues(
   input: CreateInput['values'],
   master: Pick<MaterialValues, 'name' | 'categoryId' | 'unit' | 'notes'>,
   purchaseInput: MaterialPurchase,
@@ -189,6 +191,7 @@ function detailValues(
       purchaseTotalWeightGrams: purchase.totalWeightGrams,
       purchaseTotalAmount: purchase.totalAmount,
       purchaseQuotedGramPrice: purchase.quotedGramPrice,
+      purchaseQuotePurpose: purchase.quotePurpose ?? 'LEGACY',
       purchaseAutoField: purchase.autoField,
       sampleWeightGrams: purchase.sampleWeightGrams,
       manualPurchaseUnitPrice: purchase.manualUnitPrice,
@@ -321,7 +324,7 @@ export async function createMaterialInTransaction(
       batchId: batch.id,
       distributorId: input.distributorId,
       receivedQty: input.receivedQty,
-      remainingQty: input.receivedQty,
+      remainingQty: input.initialStock === 'UNKNOWN' ? null : input.receivedQty,
     },
   });
   await replaceEntryImages(tx, entry.id, imageKeys, known, framings, imageFramings);
@@ -336,9 +339,11 @@ export async function createMaterialInTransaction(
 
 async function writeMaterialMaster(
   tx: Tx,
-  material: { id: string; unit: MaterialValues['unit'] },
+  material: { id: string; unit: MaterialValues['unit']; pricingGroupId?: string | null },
   input: MasterInput,
 ) {
+  if (material.pricingGroupId && input.unit !== 'GRAM')
+    throw new ApiError(400, 'PRICING_GRAM_ONLY');
   if (
     material.unit !== input.unit &&
     (await tx.materialBatchEntry.count({ where: { materialId: material.id } }))
@@ -432,7 +437,7 @@ export async function createMaterialEntryInTransaction(
       batchId: batch.id,
       distributorId: input.distributorId,
       receivedQty: input.receivedQty,
-      remainingQty: input.receivedQty,
+      remainingQty: input.initialStock === 'UNKNOWN' ? null : input.receivedQty,
     },
   });
   await replaceEntryImages(tx, entry.id, imageKeys, known, framings, imageFramings);
@@ -481,7 +486,12 @@ export async function updateMaterialEntry(
       const { detail, imageKeys, imageFramings } = detailValues(
         input.values,
         master,
-        input.purchase,
+        {
+          ...input.purchase,
+          quotePurpose:
+            input.purchase.quotePurpose ??
+            (current.purchaseQuotePurpose as MaterialPurchase['quotePurpose']),
+        },
         input.receivedQty,
       );
       const { known, fresh, framings } = await imageUrls(tx, materialId, imageKeys);

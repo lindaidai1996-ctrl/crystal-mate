@@ -40,7 +40,7 @@ export function calculateDiyCost(input: Extract<ProductSourceInput, { origin: 'D
     if (!silver) return null;
     perUnit += runAmountToCents(silver.cost)!;
   }
-  for (const line of [...input.materials, ...input.cabochons]) {
+  for (const line of [...input.materials, ...input.cabochons, ...(input.pricingLines ?? [])]) {
     const quantity = amountToCents(String(line.quantity));
     const cost = amountToCents(line.unitCost);
     if (quantity === null || cost === null) return null;
@@ -74,7 +74,7 @@ export function calculateDiyQuote(input: Extract<ProductSourceInput, { origin: '
     if (!silver) return null;
     perUnit += runAmountToCents(silver.quote)!;
   }
-  for (const line of [...input.materials, ...input.cabochons]) {
+  for (const line of [...input.materials, ...input.cabochons, ...(input.pricingLines ?? [])]) {
     const total = diyQuoteLineTotal(line.quantity, line.quoteUnitPrice);
     if (total === null) return null;
     perUnit += runAmountToCents(total)!;

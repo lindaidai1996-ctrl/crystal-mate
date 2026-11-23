@@ -8,7 +8,12 @@ import { categoryPath, categoryTree } from '@/components/materialManagement/cate
 import { FilterChoices, MobileFilters } from './mobileFilters';
 import { MobileDateRange, validMobileDateRange } from './mobileDateRange';
 
-type Values = { categoryId?: string; source?: 'IMAGE_IMPORT' | 'OTHER'; createdRange: DateRange };
+type Values = {
+  categoryId?: string;
+  source?: 'IMAGE_IMPORT' | 'OTHER';
+  pricing?: 'GROUPED' | 'ORDINARY';
+  createdRange: DateRange;
+};
 
 export function MaterialListFilters({
   value,
@@ -25,6 +30,7 @@ export function MaterialListFilters({
 }) {
   const t = useTranslations('materials');
   const mobile = useTranslations('mobile');
+  const pricing = useTranslations('materialPricing');
   function renderCategories(draft: Values, update: (patch: Partial<Values>) => void) {
     const path = categoryPath(draft.categoryId ?? null, categories);
     let options = categoryTree(categories);
@@ -85,6 +91,28 @@ export function MaterialListFilters({
                 update({
                   source: source === 'IMAGE_IMPORT' || source === 'OTHER' ? source : undefined,
                 })
+              }
+            />
+          ),
+        },
+        {
+          key: 'pricing',
+          label: value.pricing
+            ? pricing(value.pricing === 'GROUPED' ? 'grouped' : 'ordinary')
+            : pricing('pricingFilter'),
+          active: !!value.pricing,
+          reset: (draft) => ({ ...draft, pricing: undefined }),
+          render: (draft, update) => (
+            <FilterChoices
+              label={pricing('pricingFilter')}
+              value={draft.pricing ?? ''}
+              options={[
+                { value: '', label: pricing('allPricing') },
+                { value: 'GROUPED', label: pricing('grouped') },
+                { value: 'ORDINARY', label: pricing('ordinary') },
+              ]}
+              onChange={(value) =>
+                update({ pricing: value === 'GROUPED' || value === 'ORDINARY' ? value : undefined })
               }
             />
           ),

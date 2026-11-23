@@ -78,6 +78,39 @@ export function saleGramPriceFromUnit(values: MaterialValues): MaterialAmount {
   return gramPrice !== null && minor(gramPrice)! <= BigInt('999999999999') ? gramPrice : null;
 }
 
+/** Suggestions only: keep base prices and actual prices independently editable. */
+export function baseSalePricesFromGram(values: MaterialValues) {
+  const price = minor(values.baseSaleGramPrice ?? null);
+  const weight = minor(values.weightGrams);
+  const childWeight = minor(values.childWeightGrams);
+  const count = values.childCount;
+  const byCount =
+    values.childWeightGrams === null &&
+    weight !== null &&
+    weight > BigInt(0) &&
+    count !== null &&
+    Number.isSafeInteger(count) &&
+    count > 0;
+  const convert = (grams: bigint | null, divisor = BigInt(100)) => {
+    if (price === null || grams === null || grams <= BigInt(0)) return null;
+    const result = divide(price * grams, divisor);
+    if (result === null) return null;
+    const amount = minor(result)!;
+    if (amount > BigInt('999999999999') || (price > BigInt(0) && amount === BigInt(0))) return null;
+    return result;
+  };
+  return {
+    unitPrice: values.unit === 'GRAM' ? null : convert(weight),
+    childPrice:
+      values.unit !== 'STRAND'
+        ? null
+        : byCount
+          ? convert(weight, BigInt(100) * BigInt(count!))
+          : convert(childWeight),
+    childUsesAverageWeight: values.unit === 'STRAND' && byCount,
+  };
+}
+
 export function adoptSaleUnitPriceFromBeads(values: MaterialValues): MaterialValues {
   const price = saleUnitPriceFromBeads(values);
   if (price === null) return values;
@@ -234,6 +267,35 @@ export function recalculateMaterial(values: MaterialValues, resetSales = false):
   };
 }
 
+/** Editor pricing: automatically carry the pricing result into the saved selling prices. */
+export function autoFillMaterialSalePrices(
+  values: MaterialValues,
+  resetSales = false,
+): MaterialValues {
+  const next = recalculateMaterial(values, resetSales);
+  if (next.baseSaleUnitPrice === undefined) return next;
+  const fields = [
+    ['saleUnitPrice', 'baseSaleUnitPrice', 'saleUnitManual'],
+    ['saleGramPrice', 'baseSaleGramPrice', 'saleGramManual'],
+    ['saleChildUnitPrice', 'baseSaleChildUnitPrice', 'saleChildManual'],
+  ] as const;
+  for (const [actual, base, manual] of fields) {
+    if (resetSales || !next[manual] || next[actual] === null) {
+      next[actual] = lossCompensatedPrice(next[base] ?? null, next.lossRate ?? null);
+      next[manual] = false;
+    }
+  }
+  if (next.unit === 'GRAM') {
+    next.saleUnitPrice = next.saleGramPrice;
+    next.saleUnitManual = next.saleGramManual;
+  }
+  if (next.unit !== 'STRAND') {
+    next.saleChildUnitPrice = null;
+    next.saleChildManual = false;
+  }
+  return next;
+}
+
 /** Round upward to cents, with integer arithmetic and the database price limit. */
 export function lossCompensatedPrice(price: MaterialAmount, rate: MaterialAmount) {
   const amount = minor(price);
@@ -263,6 +325,9 @@ export function editMaterial(
   ) {
     next.saleRule = 'CUSTOM_AMOUNT';
     next.saleRuleValue = null;
+    if (field === 'baseSaleUnitPrice') next.saleUnitManual = false;
+    if (field === 'baseSaleGramPrice') next.saleGramManual = false;
+    if (field === 'baseSaleChildUnitPrice') next.saleChildManual = false;
   }
   if (field === 'purchaseGramPrice') next.purchaseGramManual = value !== null;
   if (field === 'saleUnitPrice') next.saleUnitManual = value !== null;
@@ -290,7 +355,10 @@ export function editMaterial(
     if (next.childPriceSource === 'COUNT') next.childUnitPrice = candidates.count;
     if (next.childPriceSource === 'WEIGHT') next.childUnitPrice = candidates.weight;
   }
-  return recalculateMaterial(next, field === 'saleRule' || field === 'saleRuleValue');
+  return autoFillMaterialSalePrices(
+    next,
+    field === 'saleRule' || field === 'saleRuleValue' || field === 'lossRate',
+  );
 }
 
 export function recognizeMaterialCategory(name: string, categories: MaterialCategory[]) {

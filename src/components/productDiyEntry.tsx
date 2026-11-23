@@ -36,6 +36,7 @@ export function ProductDiyEntry({
             <span>
               {t('diyLineCount', {
                 count:
+                  (latest.pricingLines?.length ?? 0) +
                   latest.materialLines.length +
                   latest.cabochonLines.length +
                   (Number(latest.silverCost?.weightGrams ?? 0) > 0 ? 1 : 0),

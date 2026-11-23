@@ -29,6 +29,7 @@ import type {
   Tag,
 } from '@/lib/client-types';
 import {
+  autoFillMaterialSalePrices,
   editMaterial,
   initializeMaterialPricing,
   recalculateMaterial,
@@ -129,7 +130,7 @@ export function MaterialEditor({
         ? null
         : receivedQty;
   const purchaseResult = calculatePurchase(inputDraft, purchase, effectiveQuantity);
-  const draft = purchaseResult.values;
+  const draft = autoFillMaterialSalePrices(purchaseResult.values);
   const [activeEntryId, setActiveEntryId] = useState(entryId);
   const [linkedEntries, setLinkedEntries] = useState<MaterialBatchEntry[]>([]);
   const [savedEditorState, setSavedEditorState] = useState('');
@@ -414,7 +415,7 @@ export function MaterialEditor({
 
   function changeRule(rule: MaterialSaleRule) {
     setDraft((current) =>
-      recalculateMaterial(
+      autoFillMaterialSalePrices(
         {
           ...calculatePurchase(current, purchase, effectiveQuantity).values,
           saleRule: rule,

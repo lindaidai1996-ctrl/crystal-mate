@@ -77,7 +77,13 @@ export function PurchaseFields({
   );
   const totalInput = (field: PurchaseTotalField, suffix: string, positive = false) =>
     privacyMode && field !== 'totalWeightGrams' ? null : (
-      <Form.Item label={t(field)}>
+      <Form.Item
+        label={
+          field === 'quotedGramPrice' && purchase.quotePurpose === 'BEFORE_DISCOUNT'
+            ? t('beforeDiscountPrice')
+            : t(field)
+        }
+      >
         <MaterialAmountInput
           value={result.purchase[field]}
           suffix={suffix}
@@ -127,15 +133,17 @@ export function PurchaseFields({
             {t('actualGramPrice')}: {result.values.purchaseGramPrice ?? '—'} {t('yuanPerGram')}
           </p>
         </Sensitive>
-        {result.difference !== null && result.difference !== '0.00' && (
-          <Sensitive>
-            <Alert
-              type="warning"
-              showIcon
-              message={t('purchaseDifference', { amount: result.difference })}
-            />
-          </Sensitive>
-        )}
+        {purchase.quotePurpose !== 'BEFORE_DISCOUNT' &&
+          result.difference !== null &&
+          result.difference !== '0.00' && (
+            <Sensitive>
+              <Alert
+                type="warning"
+                showIcon
+                message={t('purchaseDifference', { amount: result.difference })}
+              />
+            </Sensitive>
+          )}
         {result.belowPrecision && <Alert type="warning" showIcon message={t('belowPrecision')} />}
         {!result.valid && <div className="material-input-help">{t('gramValuesRequired')}</div>}
       </section>
