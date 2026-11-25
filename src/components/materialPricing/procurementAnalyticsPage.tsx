@@ -127,11 +127,13 @@ export function ProcurementAnalyticsPage({ initialGroupId }: { initialGroupId?: 
       <div className={analysisStyles.filters}>
         <Select
           aria-label={ledger('group')}
-          placeholder={t('allGroups')}
+          placeholder={loading ? common('loading') : t('allGroups')}
+          loading={loading}
+          disabled={loading && !data?.groups.length}
           allowClear
           showSearch
           optionFilterProp="label"
-          value={group || undefined}
+          value={data?.groups.find((item) => item.id === group)?.id}
           options={data?.groups.map((item) => ({ value: item.id, label: item.name })) ?? []}
           onChange={(value) => changeGroup(value ?? '')}
         />
@@ -315,6 +317,7 @@ export function ProcurementAnalyticsPage({ initialGroupId }: { initialGroupId?: 
                 <BatchTrendChart
                   hint={t('chartInteraction')}
                   bars
+                  categoryAxis
                   points={priceRows
                     .filter((item) => item[priceMetric] !== null)
                     .map((item) => ({
@@ -394,7 +397,9 @@ export function ProcurementAnalyticsPage({ initialGroupId }: { initialGroupId?: 
                               {key === 'discount'
                                 ? row.discount === null
                                   ? '—'
-                                  : ledger('discountValue', { value: row.discount })
+                                  : Number(row.discount) === 10
+                                    ? ledger('noDiscount')
+                                    : ledger('discountValue', { value: row.discount })
                                 : money(row[key])}
                             </Sensitive>
                           ),

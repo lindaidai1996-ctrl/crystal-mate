@@ -130,8 +130,12 @@
   gap: 8px;
   min-width: 0;
 }
+.form :global(.ant-switch) {
+  justify-self: start;
+}
 .form :global(.ant-select),
-.form :global(.ant-input-number) {
+.form :global(.ant-input-number),
+.form :global(.ant-input-number-affix-wrapper) {
   width: 100%;
 }
 .wide {
@@ -148,6 +152,39 @@
 }
 .history {
   padding: 12px 0;
+}
+.skeletonPrice {
+  display: grid;
+  gap: 6px;
+  max-width: 100%;
+}
+.skeletonHelp {
+  flex: 1 1 160px;
+  max-width: 360px;
+}
+.skeletonTable {
+  overflow-x: auto;
+}
+.skeletonTableBody {
+  display: grid;
+  min-width: 560px;
+}
+.skeletonRow {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  gap: 16px;
+  padding: 16px 12px;
+  border-bottom: 1px solid var(--ant-color-border-secondary, #eff3ed);
+}
+.skeletonRow:first-child {
+  background: var(--ant-color-fill-alter, #eff3ed);
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel :global(.ant-skeleton.ant-skeleton-active) :global(.ant-skeleton-input),
+  .panel :global(.ant-skeleton.ant-skeleton-active) :global(.ant-skeleton-button) {
+    animation: none;
+  }
 }
 @media (max-width: 540px) {
   .panel {

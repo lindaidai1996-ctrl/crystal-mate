@@ -360,6 +360,8 @@ export const materialMasterSchema = z.strictObject({
     .optional(),
   unit: z.enum(['STRAND', 'BEAD', 'GRAM']),
   notes: z.string().trim().max(10000),
+  imageKeys: materialSchema.shape.imageKeys.optional(),
+  imageFramings: imageFramingsSchema.optional(),
 });
 
 const batchHeaderSchema = z.strictObject({

@@ -146,21 +146,23 @@ export async function getDistributorPurchaseSummary(
     ) paged ON true
     LEFT JOIN LATERAL (
       SELECT "objectKey", url, framing FROM (
-        SELECT pi."objectKey", pi.url, pi.framing, 0 AS priority, NULL::timestamp AS "receivedAt", pi.position
+        SELECT pi."objectKey", pi.url, pi.framing, 0 AS priority, NULL::timestamp AS "receivedAt",
+          NULL::timestamp AS "entryCreatedAt", NULL::text AS "entryId", pi.position
         FROM "ProductImage" pi
         WHERE paged.type = 'PRODUCT' AND pi."productId" = paged."itemId"
         UNION ALL
-        SELECT mbi."objectKey", mbi.url, mbi.framing, 0, b."receivedAt", mbi.position
+        SELECT mbi."objectKey", mbi.url, mbi.framing, 1, b."receivedAt", e."createdAt", e.id, mbi.position
         FROM "MaterialBatchImage" mbi
         JOIN "MaterialBatchEntry" e ON e.id = mbi."entryId"
         JOIN "MaterialBatch" b ON b.id = e."batchId"
         WHERE paged.type = 'MATERIAL' AND e."materialId" = paged."itemId"
         UNION ALL
-        SELECT mi."objectKey", mi.url, mi.framing, 1, NULL::timestamp, mi.position
+        SELECT mi."objectKey", mi.url, mi.framing, 0, NULL, NULL, NULL, mi.position
         FROM "MaterialImage" mi
         WHERE paged.type = 'MATERIAL' AND mi."materialId" = paged."itemId"
       ) images
-      ORDER BY priority, "receivedAt" DESC NULLS LAST, position, "objectKey"
+      ORDER BY priority, "receivedAt" DESC NULLS LAST, "entryCreatedAt" DESC NULLS LAST,
+        "entryId" DESC NULLS LAST, position, "objectKey"
       LIMIT 1
     ) cover ON true
     ORDER BY "latestReceivedAt" DESC, type COLLATE "C", "itemId" COLLATE "C"

@@ -340,7 +340,7 @@ export async function createMaterialInTransaction(
 async function writeMaterialMaster(
   tx: Tx,
   material: { id: string; unit: MaterialValues['unit']; pricingGroupId?: string | null },
-  input: MasterInput,
+  input: Omit<MasterInput, 'imageKeys' | 'imageFramings'>,
 ) {
   if (material.pricingGroupId && input.unit !== 'GRAM')
     throw new ApiError(400, 'PRICING_GRAM_ONLY');
@@ -385,7 +385,31 @@ export async function updateMaterialMaster(id: string, input: MasterInput) {
     async (tx) => {
       const material = await tx.material.findUnique({ where: { id } });
       if (!material) throw new ApiError(404, 'NOT_FOUND');
-      await writeMaterialMaster(tx, material, input);
+      const { imageKeys, imageFramings, ...fields } = input;
+      await writeMaterialMaster(tx, material, fields);
+      if (imageKeys !== undefined) {
+        const existing = await tx.materialImage.findMany({ where: { materialId: id } });
+        const existingByKey = new Map(existing.map((image) => [image.objectKey, image]));
+        const { known, fresh, framings } = await imageUrls(tx, id, imageKeys);
+        const nextImages = imageKeys.map((objectKey, position) => {
+          const previous = existingByKey.get(objectKey);
+          return {
+            materialId: id,
+            objectKey,
+            url: previous?.url ?? known.get(objectKey)!,
+            position,
+            framing:
+              imageFramings?.[objectKey] ??
+              (previous ? readImageFraming(previous.framing) : framings.get(objectKey)) ??
+              Prisma.DbNull,
+          };
+        });
+        if (!sameOrderedRows(existing, nextImages)) {
+          await tx.materialImage.deleteMany({ where: { materialId: id } });
+          if (nextImages.length) await tx.materialImage.createMany({ data: nextImages });
+        }
+        await consumeGrants(tx, fresh);
+      }
       return serializeMaterial(
         await tx.material.findUniqueOrThrow({ where: { id }, include: materialInclude }),
       );

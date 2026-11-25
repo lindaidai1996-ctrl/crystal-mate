@@ -73,7 +73,7 @@ export async function readAssistantDisplay(
   const catalogRows = [
     ...materials.map((row) => ({
       ...row,
-      images: row.batchEntries[0]?.images.length ? row.batchEntries[0].images : row.images,
+      images: row.images.length ? row.images : (row.batchEntries[0]?.images ?? []),
       item: { type: 'MATERIAL' as const, id: row.id },
       code: null,
     })),

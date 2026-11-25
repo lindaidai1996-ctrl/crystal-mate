@@ -207,7 +207,11 @@ export function ProcurementLedger({
       title: t('discount'),
       render: (_: unknown, row: ProcurementRow) => (
         <Sensitive>
-          {row.discount === null ? '—' : t('discountValue', { value: row.discount })}
+          {row.discount === null
+            ? '—'
+            : Number(row.discount) === 10
+              ? t('noDiscount')
+              : t('discountValue', { value: row.discount })}
         </Sensitive>
       ),
     },
@@ -287,9 +291,11 @@ export function ProcurementLedger({
       <div className={ledgerStyles.toolbar}>
         <Select
           aria-label={t('group')}
-          placeholder={t('group')}
+          placeholder={loading ? common('loading') : t('group')}
+          loading={loading}
+          disabled={loading && !groups.length}
           allowClear
-          value={group || undefined}
+          value={groups.find((item) => item.value === group)?.value}
           options={groups}
           onChange={(value) => changeGroup(value ?? '')}
         />

@@ -11,7 +11,6 @@ import {
   Input,
   InputNumber,
   Select,
-  Spin,
   Switch,
   Table,
   Tag,
@@ -32,6 +31,7 @@ import {
 } from '@/lib/material-pricing/contracts';
 import pricingStyles from './materialPricingPage.module.css';
 import { MaterialPricingNavigation, type MaterialPricingView } from './materialPricingNavigation';
+import { MaterialPricingSkeleton } from './materialPricingSkeleton';
 
 type GroupList = {
   items: PricingGroup[];
@@ -91,6 +91,11 @@ export function MaterialPricingPage({
   const [historyFailed, setHistoryFailed] = useState(false);
   const historyKey = `${selected ?? ''}:${revision}:${historyPage}`;
   const history = loadedHistory.key === historyKey ? loadedHistory : { items: [], total: 0 };
+  const contentLoading =
+    loading ||
+    detailLoading ||
+    (view === 'history' && !!detail && loadedHistory.key !== historyKey && !historyFailed);
+  const publishAndEnable = !!detail && !detail.group.publication;
   const errorText = useCallback(
     (error: unknown) =>
       common(`errors.${error instanceof ClientApiError ? error.code : 'SERVER_ERROR'}` as never),
@@ -231,7 +236,7 @@ export function MaterialPricingPage({
         }),
       });
       refresh();
-      message.success(t('published'));
+      message.success(t(publishAndEnable ? 'publishedAndEnabled' : 'published'));
     } catch (error) {
       message.error(errorText(error));
     } finally {
@@ -252,6 +257,11 @@ export function MaterialPricingPage({
     );
     return sensitive ? <Sensitive key={label}>{element}</Sensitive> : element;
   };
+  const pricingValueLabel = editor ? t(`pricingValue_${editor.draft.pricingRule}`) : '';
+  const pricingValueUnit =
+    editor?.draft.pricingRule === 'PERCENT' || editor?.draft.pricingRule === 'MARGIN'
+      ? '%'
+      : t('pricePerGramUnit');
   return (
     <>
       <div className="page-heading">
@@ -328,9 +338,9 @@ export function MaterialPricingPage({
         </div>
       )}
       <div className={pricingStyles.layout}>
-        <main className={pricingStyles.panel}>
-          {loading || detailLoading ? (
-            <Spin />
+        <main className={pricingStyles.panel} aria-busy={contentLoading}>
+          {contentLoading ? (
+            <MaterialPricingSkeleton view={view} label={common('loading')} />
           ) : !detail ? (
             <Empty description={t(selected ? 'loadError' : 'empty')} />
           ) : (
@@ -381,9 +391,11 @@ export function MaterialPricingPage({
                       disabled={price === null || detail.preview.totals.adjustedCost === null}
                       onClick={() => void publish()}
                     >
-                      {t('publish')}
+                      {t(publishAndEnable ? 'publishAndEnable' : 'publish')}
                     </Button>
-                    <span className={pricingStyles.help}>{t('publishHelp')}</span>
+                    <span className={pricingStyles.help}>
+                      {t(publishAndEnable ? 'firstPublishHelp' : 'publishHelp')}
+                    </span>
                   </div>
                   {price !== null &&
                     detail.preview.suggestedPrice !== null &&
@@ -480,7 +492,6 @@ export function MaterialPricingPage({
                   <Table
                     size="small"
                     rowKey="id"
-                    loading={loadedHistory.key !== historyKey && !historyFailed}
                     dataSource={history.items}
                     scroll={{ x: 440 }}
                     pagination={{
@@ -572,6 +583,17 @@ export function MaterialPricingPage({
               />
               <span className={pricingStyles.help}>{t('gramOnly')}</span>
             </label>
+            <label>
+              <span>{t('enabled')}</span>
+              <Switch
+                checked={editor.draft.enabled}
+                disabled={
+                  !editor.id || !data.items.find((item) => item.id === editor.id)?.publication
+                }
+                onChange={(enabled) => patch({ enabled })}
+              />
+              <span className={pricingStyles.help}>{t('enableHelp')}</span>
+            </label>
             <Sensitive>
               <label>
                 <span>{t('lossRate')}</span>
@@ -586,17 +608,6 @@ export function MaterialPricingPage({
                 />
               </label>
             </Sensitive>
-            <label>
-              <span>{t('enabled')}</span>
-              <Switch
-                checked={editor.draft.enabled}
-                disabled={
-                  !editor.id || !data.items.find((item) => item.id === editor.id)?.publication
-                }
-                onChange={(enabled) => patch({ enabled })}
-              />
-              <span className={pricingStyles.help}>{t('enableHelp')}</span>
-            </label>
             <label>
               <span>{t('marketLinked')}</span>
               <Switch
@@ -632,12 +643,14 @@ export function MaterialPricingPage({
             </Sensitive>
             <Sensitive>
               <label>
-                <span>{t('pricingValue')}</span>
+                <span>{pricingValueLabel}</span>
                 <InputNumber<string>
+                  aria-label={`${pricingValueLabel} (${pricingValueUnit})`}
                   stringMode
                   min="0"
                   max={editor.draft.pricingRule === 'MARGIN' ? '99.99' : '9999999999.99'}
                   precision={2}
+                  suffix={pricingValueUnit}
                   value={editor.draft.pricingValue}
                   onChange={(pricingValue) => patch({ pricingValue })}
                 />

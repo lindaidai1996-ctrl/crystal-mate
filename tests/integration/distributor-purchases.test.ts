@@ -321,7 +321,7 @@ describe.skipIf(!enabled)('distributor purchase queries', () => {
         childUnitPrice: { min: null, max: null, hasUnknown: true },
       });
       expect(all.find((row) => row.itemId === material.id)).toMatchObject({
-        image: { objectKey: `${suffix}/batch.jpg`, url: 'https://example.test/batch.jpg' },
+        image: { objectKey: `${suffix}/material.jpg`, url: 'https://example.test/material.jpg' },
         batchCount: 3,
         knownQuantity: 2,
         hasUnknownQuantity: true,

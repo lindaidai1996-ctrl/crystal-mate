@@ -351,7 +351,7 @@ function BatchPrices({ item, card = false }: { item: Material; card?: boolean })
 
 function materialImages(item: Material) {
   const seen = new Set<string>();
-  return [...item.batchEntries.flatMap((entry) => entry.images), ...item.images].filter((image) => {
+  return [...item.images, ...item.batchEntries.flatMap((entry) => entry.images)].filter((image) => {
     if (seen.has(image.objectKey)) return false;
     seen.add(image.objectKey);
     return true;
@@ -390,7 +390,7 @@ function MaterialEditLink({ item, children }: { item: Material; children?: React
       href={withAdminReturnTo(
         item.batchEntries.length
           ? `/admin/materials/${item.id}`
-          : `/admin/materials/${item.id}/batches/new`,
+          : `/admin/materials/${item.id}?view=basics`,
         '/admin/materials',
       )}
     >

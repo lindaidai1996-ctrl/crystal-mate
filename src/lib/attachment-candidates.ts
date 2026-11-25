@@ -18,25 +18,25 @@ type CandidateRow = Omit<AttachmentCandidate, 'source' | 'fileName'> & {
   sourceId: string;
 };
 
-// Choose the latest purchase *within this owner* before selecting its first image.
-// Fall back to the material image, then the latest pictured purchase of the same
-// material. The owner's purchases still determine which materials are eligible.
+// Distributors use the material cover. A batch uses its own photo first.
 function candidateSql(owner: AttachmentOwner) {
-  const materialScope =
+  const scopedMaterials =
     owner.type === 'batch'
-      ? Prisma.sql`e."batchId" = ${owner.id}`
-      : Prisma.sql`e."distributorId" = ${owner.id}`;
+      ? Prisma.sql`
+          SELECT "materialId", id AS "batchEntryId" FROM "MaterialBatchEntry"
+          WHERE "batchId" = ${owner.id}
+        `
+      : Prisma.sql`
+          SELECT DISTINCT "materialId", NULL::text AS "batchEntryId" FROM "MaterialBatchEntry"
+          WHERE "distributorId" = ${owner.id}
+        `;
   const productScope =
     owner.type === 'batch'
       ? Prisma.sql`e."batchId" = ${owner.id}`
       : Prisma.sql`e."distributorId" = ${owner.id}`;
   return Prisma.sql`
-    WITH latest_material_entries AS (
-      SELECT DISTINCT ON (e."materialId") e.id, e."materialId"
-      FROM "MaterialBatchEntry" e
-      JOIN "MaterialBatch" b ON b.id = e."batchId"
-      WHERE ${materialScope}
-      ORDER BY e."materialId", b."receivedAt" DESC, e."createdAt" DESC, e.id DESC
+    WITH scoped_materials AS (
+      ${scopedMaterials}
     ), candidates AS (
       SELECT m.id AS "itemId", 'MATERIAL'::text AS type, m.name, NULL::text AS code,
         m.aliases,
@@ -46,22 +46,23 @@ function candidateSql(owner: AttachmentOwner) {
           WHEN mi.id IS NOT NULL THEN 'MATERIAL_IMAGE' ELSE 'MATERIAL_BATCH_IMAGE' END
           AS "sourceKind",
         COALESCE(bi.id, mi.id, fi.id) AS "sourceId"
-      FROM latest_material_entries e
+      FROM scoped_materials e
       JOIN "Material" m ON m.id = e."materialId"
-      LEFT JOIN LATERAL (
-        SELECT id, "objectKey", url FROM "MaterialBatchImage"
-        WHERE "entryId" = e.id ORDER BY position ASC LIMIT 1
-      ) bi ON true
       LEFT JOIN LATERAL (
         SELECT id, "objectKey", url FROM "MaterialImage"
         WHERE "materialId" = m.id ORDER BY position ASC LIMIT 1
       ) mi ON true
       LEFT JOIN LATERAL (
+        SELECT id, "objectKey", url FROM "MaterialBatchImage"
+        WHERE "entryId" = e."batchEntryId"
+        ORDER BY position ASC LIMIT 1
+      ) bi ON true
+      LEFT JOIN LATERAL (
         SELECT image.id, image."objectKey", image.url FROM "MaterialBatchImage" image
         JOIN "MaterialBatchEntry" entry ON entry.id = image."entryId"
         JOIN "MaterialBatch" batch ON batch.id = entry."batchId"
         WHERE entry."materialId" = m.id AND bi.id IS NULL AND mi.id IS NULL
-        ORDER BY batch."receivedAt" DESC, image.position ASC, image."objectKey" ASC
+        ORDER BY batch."receivedAt" DESC, entry."createdAt" DESC, entry.id DESC, image.position ASC
         LIMIT 1
       ) fi ON true
       WHERE bi.id IS NOT NULL OR mi.id IS NOT NULL OR fi.id IS NOT NULL

@@ -14,7 +14,10 @@ import { getAttachmentCandidates } from '@/lib/attachment-candidates';
 import { createBatch, updateBatch as saveBatch } from '@/lib/material-batches';
 import { createDistributor, updateDistributor as saveDistributor } from '@/lib/distributors';
 import type { AttachmentCandidate } from '@/lib/attachments';
-import { materialBatchWriteSchema } from '@/lib/validation';
+import { materialBatchWriteSchema, materialMasterSchema } from '@/lib/validation';
+import { updateMaterialMaster } from '@/lib/materials';
+import { getDistributorPurchaseSummary } from '@/lib/distributor-purchases';
+import { readAssistantDisplay } from '@/lib/ai-assistant/display-data';
 
 // Simulate the versioned payload produced by the current editors; stale-write cases
 // are tested separately in shared-attachments.test.ts.
@@ -115,7 +118,6 @@ async function fixture() {
       name: `${suffix}-material`,
       aliases: ['青玉别名'],
       categoryId: materialCategoryId,
-      images: { create: [photo(0), photo(1)] },
       batchEntries: {
         create: batches.map((batch, index) => ({
           batchId: batch.id,
@@ -127,7 +129,6 @@ async function fixture() {
       },
     },
     include: {
-      images: { orderBy: { position: 'asc' } },
       batchEntries: { include: { images: { orderBy: { position: 'asc' } } } },
     },
   });
@@ -206,14 +207,30 @@ describe.skipIf(!enabled)('attachment candidates and saves', () => {
     await db.$disconnect();
   });
 
-  it('chooses first images within the owner, deduplicates purchases, searches and paginates', async () => {
+  it('uses a shared material cover for distributors, keeps batch photos, and searches and paginates', async () => {
     const f = await fixture();
+    const newest = f.material.batchEntries.find((entry) => entry.batchId === f.batches[2].id)!;
+    const previous = f.material.batchEntries.find((entry) => entry.batchId === f.batches[1].id)!;
+    // Same purchase date: the later entry wins, regardless of the image key.
+    await db.materialBatch.update({
+      where: { id: f.batches[1].id },
+      data: { receivedAt: f.batches[2].receivedAt },
+    });
+    await db.materialBatchEntry.update({
+      where: { id: previous.id },
+      data: { createdAt: new Date(newest.createdAt.getTime() - 1000) },
+    });
     const page = await getAttachmentCandidates({ type: 'distributor', id: f.a.id }, queries);
     expect(page.total).toBe(3);
     expect(page.items.find((item) => item.itemId === f.material.id)?.objectKey).toBe(
-      f.material.batchEntries.find((entry) => entry.batchId === f.batches[1].id)!.images[0]
-        .objectKey,
+      newest.images[0].objectKey,
     );
+    const summary = await getDistributorPurchaseSummary(f.a.id, { ...queries, q: f.material.name });
+    expect(summary.items[0].image?.objectKey).toBe(newest.images[0].objectKey);
+    const display = await db.$transaction((tx) =>
+      readAssistantDisplay(tx, [{ item: { type: 'MATERIAL', id: f.material.id }, purchase: null }]),
+    );
+    expect(display[0].imageKey).toBe(newest.images[0].objectKey);
     expect(page.items.find((item) => item.itemId === f.fallback.id)?.objectKey).toBe(
       f.fallback.images[0].objectKey,
     );
@@ -274,7 +291,7 @@ describe.skipIf(!enabled)('attachment candidates and saves', () => {
     const candidates = (await getAttachmentCandidates({ type: 'distributor', id: f.a.id }, queries))
       .items;
     const attachments = candidates.map(asAttachment);
-    const cover = attachments[1].objectKey;
+    const cover = f.fallback.images[0].objectKey;
     const distributor = await updateDistributor(f.a.id, {
       ...distributorHeader(f.a.name),
       attachments,
@@ -284,9 +301,13 @@ describe.skipIf(!enabled)('attachment candidates and saves', () => {
     expect(distributor.attachments.map((item) => item.objectKey)).toEqual(
       attachments.map((item) => item.objectKey),
     );
-    const currentBatch = await updateBatch(f.batches[1].id, {
+    const batchId = f.batches[1].id;
+    const batchAttachments = (
+      await getAttachmentCandidates({ type: 'batch', id: batchId }, queries)
+    ).items.map(asAttachment);
+    const currentBatch = await updateBatch(batchId, {
       ...batchHeader(f.batches[1].name),
-      attachments,
+      attachments: batchAttachments,
       coverObjectKey: cover,
     });
     expect(currentBatch.coverObjectKey).toBe(cover);
@@ -314,8 +335,12 @@ describe.skipIf(!enabled)('attachment candidates and saves', () => {
       distributor.attachments.map((item) => item.url),
     );
     expect(
-      (await updateBatch(f.batches[1].id, { ...batchHeader(f.batches[1].name), attachments }))
-        .coverObjectKey,
+      (
+        await updateBatch(batchId, {
+          ...batchHeader(f.batches[1].name),
+          attachments: batchAttachments,
+        })
+      ).coverObjectKey,
     ).toBe(cover);
     await updateBatch(f.batches[0].id, { ...batchHeader(f.batches[0].name), attachments: [] });
     expect(
@@ -334,9 +359,12 @@ describe.skipIf(!enabled)('attachment candidates and saves', () => {
 
   it('falls back to another purchase image of an owned material and validates it on save', async () => {
     const f = await fixture();
-    await db.materialImage.deleteMany({ where: { materialId: f.material.id } });
     await db.materialBatchImage.deleteMany({
       where: { entry: { materialId: f.material.id, distributorId: f.a.id } },
+    });
+    await db.materialBatch.update({
+      where: { id: f.batches[1].id },
+      data: { receivedAt: new Date('2026-11-04T00:00:00Z') },
     });
     const otherPurchase = f.material.batchEntries.find(
       (entry) => entry.batchId === f.batches[2].id,
@@ -378,10 +406,85 @@ describe.skipIf(!enabled)('attachment candidates and saves', () => {
     ).rejects.toThrow('INVALID_IMAGE');
   });
 
+  it('saves a material cover and uses it for the material while retaining batch photos', async () => {
+    const f = await fixture();
+    const uploadedImage = await uploaded();
+    const batchImage = f.material.batchEntries.find((entry) => entry.batchId === f.batches[1].id)!
+      .images[0];
+    const otherBatch = f.material.batchEntries.find((entry) => entry.batchId === f.batches[2].id)!;
+    const otherBatchImage = otherBatch.images[1];
+    const info = {
+      name: f.material.name,
+      notes: '',
+      unit: f.material.unit,
+      categoryId: materialCategoryId,
+    };
+    const save = (imageKeys?: string[]) =>
+      updateMaterialMaster(f.material.id, materialMasterSchema.parse({ ...info, imageKeys }));
+    const saved = await updateMaterialMaster(
+      f.material.id,
+      materialMasterSchema.parse({
+        ...info,
+        imageKeys: [uploadedImage.objectKey, otherBatchImage.objectKey],
+        imageFramings: { [uploadedImage.objectKey]: { mode: 'contain' } },
+      }),
+    );
+    expect(saved.images.map((image) => image.objectKey)).toEqual([
+      uploadedImage.objectKey,
+      otherBatchImage.objectKey,
+    ]);
+    expect(await save()).toMatchObject({ images: saved.images });
+    expect(
+      await db.uploadGrant.findUniqueOrThrow({ where: { objectKey: uploadedImage.objectKey } }),
+    ).toMatchObject({ usedAt: expect.any(Date) });
+
+    const distributor = { type: 'distributor' as const, id: f.a.id };
+    const batch = { type: 'batch' as const, id: f.batches[1].id };
+    const search = { ...queries, q: f.material.name };
+    const summary = await getDistributorPurchaseSummary(f.a.id, search);
+    expect(summary.items[0].image).toMatchObject({
+      objectKey: uploadedImage.objectKey,
+      framing: { mode: 'contain' },
+    });
+    const result = await getAttachmentCandidates(distributor, search);
+    expect(result.items[0]).toMatchObject({
+      objectKey: uploadedImage.objectKey,
+      source: { kind: 'MATERIAL_IMAGE', id: saved.images[0].id },
+    });
+    expect(await getAttachmentCandidates(batch, search)).toMatchObject({
+      items: [{ objectKey: batchImage.objectKey }],
+    });
+    await updateDistributor(f.a.id, {
+      ...distributorHeader(f.a.name),
+      attachments: [asAttachment(result.items[0])],
+    });
+    const item = { type: 'MATERIAL' as const, id: f.material.id };
+    const display = await db.$transaction((tx) =>
+      readAssistantDisplay(tx, [
+        { item, purchase: null },
+        { item, purchase: { type: 'MATERIAL_PURCHASE', id: batchImage.entryId } },
+      ]),
+    );
+    expect(display.map((row) => row.imageKey)).toEqual([
+      uploadedImage.objectKey,
+      batchImage.objectKey,
+    ]);
+
+    await expect(save([f.product.images[0].objectKey])).rejects.toThrow('INVALID_IMAGE');
+    expect(
+      (await save([otherBatchImage.objectKey, uploadedImage.objectKey])).images[0].objectKey,
+    ).toBe(otherBatchImage.objectKey);
+    expect((await save([])).images).toEqual([]);
+    expect(await getAttachmentCandidates(distributor, search)).toMatchObject({
+      items: [{ objectKey: otherBatch.images[0].objectKey }],
+    });
+  });
+
   it('rejects foreign, changed, second-image and duplicate selections atomically', async () => {
     const f = await fixture();
-    const candidates = (await getAttachmentCandidates({ type: 'distributor', id: f.a.id }, queries))
-      .items;
+    const candidates = (
+      await getAttachmentCandidates({ type: 'batch', id: f.batches[1].id }, queries)
+    ).items;
     const valid = asAttachment(candidates.find((item) => item.itemId === f.material.id)!);
     const batchHeaderValues = batchHeader(f.batches[1].name);
     const saved = await updateBatch(f.batches[1].id, {

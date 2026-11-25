@@ -40,6 +40,7 @@ import { MaterialBasicFields } from './materialBasicFields';
 import { MaterialUnitCorrection } from './materialUnitCorrection';
 import { MaterialDetailFields } from './materialDetailFields';
 import { MaterialLossRateField } from './materialLossRateField';
+import { MaterialMasterImages } from './materialMasterImages';
 import {
   calculatePurchase,
   emptyPurchase,
@@ -485,6 +486,8 @@ export function MaterialEditor({
             unit: values.unit,
             notes: values.notes,
             lossRate: values.lossRate,
+            imageKeys: values.imageKeys,
+            imageFramings: values.imageFramings,
           }),
         });
       } else if (isNew) {
@@ -684,11 +687,11 @@ export function MaterialEditor({
                 )
               }
               options={[
+                { value: 'basics', label: t('basics') },
                 ...linkedEntries.map((entry) => ({
                   value: entry.id,
                   label: `${entry.batch.name} · ${entry.distributor.name}`,
                 })),
-                { value: 'basics', label: t('basics') },
               ]}
             />
           </Form.Item>
@@ -767,13 +770,22 @@ export function MaterialEditor({
             </section>
           )}
           {isMasterEdit && (
-            <section className="editor-block">
-              <MaterialLossRateField
-                value={draft.lossRate ?? null}
-                onChange={(value) => change('lossRate', value)}
-                isDefault
+            <>
+              <section className="editor-block">
+                <MaterialLossRateField
+                  value={draft.lossRate ?? null}
+                  onChange={(value) => change('lossRate', value)}
+                  isDefault
+                />
+              </section>
+              <MaterialMasterImages
+                images={images}
+                entries={linkedEntries}
+                disabled={saving || uploadingImages}
+                onChange={setImages}
+                onUploadingChange={setUploadingImages}
               />
-            </section>
+            </>
           )}
           <MaterialDetailFields
             values={draft}

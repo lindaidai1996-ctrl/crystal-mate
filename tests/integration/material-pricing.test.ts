@@ -120,12 +120,9 @@ describe.skipIf(!enabled)('unified pricing database integration', () => {
       expect(audit).toHaveLength(1);
       expect(audit[0].rootId).toBe(group.id);
       expect(audit[0].actorId).toBe('pricing-test');
-      expect((await listPricingOptions()).items.some((item) => item.id === group.id)).toBe(false);
+      expect((await listPricingOptions()).items.some((item) => item.id === group.id)).toBe(true);
       const published = await getPricingPreview(group.id);
-      await savePricingGroup(
-        { ...config, enabled: true, version: published.group.version },
-        group.id,
-      );
+      expect(published.group.enabled).toBe(true);
       const option = (await listPricingOptions()).items.find((item) => item.id === group.id)!;
       expect(option).toMatchObject({
         unitCost: '15.00',
@@ -245,6 +242,14 @@ describe.skipIf(!enabled)('unified pricing database integration', () => {
         { ...config, lossRate: '50', enabled: false, version: latest.group.version },
         group.id,
       );
+      const disabled = await getPricingPreview(group.id);
+      await publishPricingGroup(group.id, {
+        version: disabled.group.version,
+        fingerprint: disabled.preview.fingerprint,
+        saleGramPrice: '30',
+      });
+      expect((await getPricingPreview(group.id)).group.enabled).toBe(false);
+      expect((await listPricingOptions()).items.some((item) => item.id === group.id)).toBe(false);
       const edited = serializeProductSources(
         await updateProductSource(product.id, run.id, {
           ...source,
@@ -298,7 +303,9 @@ describe.skipIf(!enabled)('unified pricing database integration', () => {
       );
 
       const history = await listPricingHistory(group.id);
-      expect(history.items[0]).toMatchObject({
+      expect(history.total).toBe(2);
+      expect(history.items[0].saleGramPrice).toBe('30.00');
+      expect(history.items[1]).toMatchObject({
         saleGramPrice: '25.00',
         costBasis: { lossRate: '20.00' },
       });
@@ -382,6 +389,7 @@ describe.skipIf(!enabled)('unified pricing database integration', () => {
       ]);
       expect(results.filter((row) => row.status === 'fulfilled')).toHaveLength(1);
       expect((await listPricingHistory(group.id)).total).toBe(1);
+      expect((await getPricingPreview(group.id)).group.enabled).toBe(true);
     } finally {
       await db.material.update({ where: { id: material.id }, data: { pricingGroupId: null } });
       await db.materialPricingPublication.deleteMany({ where: { groupId: group.id } });

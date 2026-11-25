@@ -238,7 +238,10 @@ export async function publishPricingGroup(id: string, value: unknown) {
     if (current.fingerprint !== data.fingerprint) throw new ApiError(409, 'PRICING_CHANGED');
     const changed = await tx.materialPricingGroup.updateMany({
       where: { id, version: data.version },
-      data: { version: { increment: 1 } },
+      data: {
+        version: { increment: 1 },
+        ...(!current.group.publication ? { enabled: true } : {}),
+      },
     });
     if (changed.count !== 1) throw new ApiError(409, 'PRICING_CHANGED');
     // Keep full derivation, but avoid copying an unbounded purchase ledger into every publication.
