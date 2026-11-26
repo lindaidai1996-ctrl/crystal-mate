@@ -1,3 +1,4 @@
+import { syncSchemePrices } from '@/lib/price-schemes/store';
 import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
@@ -39,11 +40,18 @@ async function handlePATCH(request: NextRequest, { params }: Context) {
     const id = (await params).id;
 
     if (input.field === 'price') {
-      const product = await db.product.update({
-        where: { id },
-        data: { priceCents: input.priceCents, saleManual: true },
-        select: { priceCents: true, updatedAt: true },
-      });
+      const product = await db.$transaction(
+        async (tx) => {
+          const updated = await tx.product.update({
+            where: { id },
+            data: { priceCents: input.priceCents, saleManual: true },
+            select: { priceCents: true, updatedAt: true },
+          });
+          await syncSchemePrices(tx, id);
+          return updated;
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+      );
       return NextResponse.json(product);
     }
 

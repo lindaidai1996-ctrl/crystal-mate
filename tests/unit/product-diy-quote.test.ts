@@ -123,9 +123,16 @@ describe('DIY customer quotes', () => {
       perUnitCost: '1',
       quantity: 1,
       totalQuote: '50',
+      perUnitQuote: '50',
     };
-    const newer = { ...old, id: 'new', createdAt: '2026-10-15', totalQuote: null };
-    expect(productDiyQuote(input)).toBe('320.00');
+    const newer = {
+      ...old,
+      id: 'new',
+      createdAt: '2026-10-15',
+      totalQuote: null,
+      perUnitQuote: null,
+    };
+    expect(productDiyQuote(input)).toBe('160.00');
     expect(
       productDiyQuote({ origin: 'DIY', purchaseEntries: [], diyRuns: [old, newer] }),
     ).toBeNull();
@@ -210,7 +217,7 @@ describe('DIY customer quotes', () => {
       craftDesignFee: '100.00',
       materials: [{ name: '原物料名', unitPrice: '5' }],
       cabochons: [{ name: '原蛋面名', unitPrice: '60' }],
-      extraFees: [{ name: '配件', amountPerItem: '0' }],
+      extraFees: [{ name: '配件', quantityPerItem: 1, unitPrice: '0', amountPerItem: '0.00' }],
     });
     const serialized = JSON.stringify(details);
     for (const internal of [

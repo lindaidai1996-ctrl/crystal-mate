@@ -1,5 +1,5 @@
 import type { ProductDiyRun, MaterialBatchEntry, MaterialUnit } from './client-types';
-import { craftDesignFeeTotal } from './product-diy-cost';
+import { craftDesignFeeTotal, extraFeeLineTotal } from './product-diy-cost';
 import { silverCostTotals } from './silver-cost';
 
 export function suggestedMaterialQuote(
@@ -22,7 +22,7 @@ export function customerDiyDetails(run: ProductDiyRun) {
     [...run.materialLines, ...run.cabochonLines].some(
       (line) => !line.quoteSnapshot || line.quoteUnitPrice === null || line.quoteLineTotal === null,
     ) ||
-    run.extraCosts.some((line) => line.quoteAmount == null)
+    run.extraCosts.some((line) => extraFeeLineTotal(line.quantity, line.quoteAmount) === null)
   )
     return null;
   return {
@@ -62,7 +62,12 @@ export function customerDiyDetails(run: ProductDiyRun) {
           subtotalPerItem: silverCostTotals(run.silverCost)?.quote ?? null,
         }
       : null,
-    extraFees: run.extraCosts.map((line) => ({ name: line.name, amountPerItem: line.quoteAmount })),
+    extraFees: run.extraCosts.map((line) => ({
+      name: line.name,
+      quantityPerItem: line.quantity ?? 1,
+      unitPrice: line.quoteAmount,
+      amountPerItem: extraFeeLineTotal(line.quantity, line.quoteAmount),
+    })),
     craftDesignFee: craftDesignFeeTotal(run.craftDesignFee, run.quantity),
   };
 }

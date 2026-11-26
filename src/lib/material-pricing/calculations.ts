@@ -124,12 +124,8 @@ export function computePricing(
     }
   }
   const adjusted = replacement?.div(yieldRatio) ?? null;
-  const basis =
-    historical === null
-      ? null
-      : adjusted !== null && adjusted.gt(historical)
-        ? adjusted
-        : historical;
+  // Selling prices use all valid historical purchases; replacement estimates are advisory only.
+  const basis = historical;
   let suggestion: Prisma.Decimal | null = null;
   if (basis !== null && input.pricingValue !== null) {
     const value = new D(input.pricingValue);

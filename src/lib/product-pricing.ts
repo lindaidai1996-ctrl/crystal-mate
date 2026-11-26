@@ -116,6 +116,7 @@ type SavedSources = {
       perUnitCost: string;
       quantity: number;
       totalCost?: string | null;
+      perUnitQuote?: string | null;
       totalQuote?: string | null;
     }
   >;
@@ -133,8 +134,8 @@ export function productDiyQuote(
 ): string | null | undefined {
   if (source.origin !== 'DIY') return undefined;
   return 'purchaseEntries' in source
-    ? (latest(source.diyRuns)?.totalQuote ?? null)
-    : (calculateDiyQuote(source)?.totalQuote ?? null);
+    ? (latest(source.diyRuns)?.perUnitQuote ?? null)
+    : (calculateDiyQuote(source)?.perUnitQuote ?? null);
 }
 
 export function productPricingCost(
@@ -165,9 +166,7 @@ export function productPricingCost(
       const record = latest(source.diyRuns);
       const cents = record ? amountToCents(record.perUnitCost) : null;
       return {
-        amount:
-          record?.totalCost ??
-          (record && cents !== null ? centsToAmount(cents * BigInt(record.quantity)) : null),
+        amount: cents === null ? null : centsToAmount(cents),
         kind: 'diy',
         record: recordSummary(record),
       };
@@ -179,7 +178,7 @@ export function productPricingCost(
     return { amount: cents === null ? null : centsToAmount(cents), kind: 'purchase' };
   }
   return {
-    amount: calculateDiyCost(source)?.totalCost ?? null,
+    amount: calculateDiyCost(source)?.perUnitCost ?? null,
     kind: 'diy',
   };
 }

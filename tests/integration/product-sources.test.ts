@@ -95,7 +95,7 @@ describe.skipIf(!enabled)('product source transactions', () => {
         ],
         craftDesignFee: source.craftDesignFee,
       });
-      expect(product.priceCents).toBe(6000);
+      expect(product.priceCents).toBe(2000);
       await db.product.update({
         where: { id: egg.id },
         data: { name: '新蛋面名', priceCents: 99999 },
@@ -131,7 +131,7 @@ describe.skipIf(!enabled)('product source transactions', () => {
         { ...base, name: product.name, code: product.code },
         product.id,
       );
-      expect(repriced.priceCents).toBe(8000);
+      expect(repriced.priceCents).toBe(2000);
 
       const automatic = await updateProductSource(product.id, product.diyRuns[0].id, {
         ...edit,
@@ -145,8 +145,8 @@ describe.skipIf(!enabled)('product source transactions', () => {
         craftDesignFee: { ...edit.craftDesignFee, totalAmount: null },
       });
       expect(automatic.stock).toBe(4);
-      expect(automatic.priceCents).toBe(8000);
-      const adopted = diyQuotePricing('80.00', '160.00');
+      expect(automatic.priceCents).toBe(2000);
+      const adopted = diyQuotePricing('20.00', '40.00');
       const accepted = await saveProduct(
         {
           ...base,
@@ -159,10 +159,10 @@ describe.skipIf(!enabled)('product source transactions', () => {
         },
         product.id,
       );
-      expect(accepted.priceCents).toBe(16000);
+      expect(accepted.priceCents).toBe(4000);
       expect(accepted).toMatchObject({
         saleRule: 'FIXED_AMOUNT',
-        saleRuleValue: '80.00',
+        saleRuleValue: '20.00',
         saleManual: false,
       });
       const incomplete = await updateProductSource(product.id, product.diyRuns[0].id, {
@@ -173,8 +173,8 @@ describe.skipIf(!enabled)('product source transactions', () => {
         totalQuote: null,
         perUnitCost: '20.00',
       });
-      expect(incomplete.priceCents).toBe(16000);
-      const discounted = diyQuotePricing('60.00', '50.00');
+      expect(incomplete.priceCents).toBe(4000);
+      const discounted = diyQuotePricing('20.00', '10.00');
       const savedDiscount = await saveProduct(
         {
           ...base,
@@ -183,12 +183,12 @@ describe.skipIf(!enabled)('product source transactions', () => {
           saleRule: discounted.saleRule,
           saleRuleValue: discounted.saleRuleValue,
           saleManual: discounted.saleManual,
-          priceCents: 5000,
+          priceCents: 1000,
         },
         product.id,
       );
       expect(savedDiscount).toMatchObject({
-        priceCents: 5000,
+        priceCents: 1000,
         saleRule: 'FIXED_AMOUNT',
         saleRuleValue: '-10.00',
         saleManual: false,
@@ -214,7 +214,7 @@ describe.skipIf(!enabled)('product source transactions', () => {
         materialLines: [],
         cabochonLines: [],
       });
-      expect(feesOnly.priceCents).toBe(400);
+      expect(feesOnly.priceCents).toBe(200);
       const editedFeesOnly = await updateProductSource(feesOnly.id, feesOnly.diyRuns[0].id, {
         ...feesOnlySource,
         craftDesignFee: { ...feesOnlySource.craftDesignFee, unitAmount: '120' },
@@ -613,7 +613,7 @@ describe.skipIf(!enabled)('product source transactions', () => {
       });
       productIds.push(diy.id);
       expect(diy.diyRuns[0].perUnitCost).toBe('22.00');
-      expect(diy.priceCents).toBe(9900);
+      expect(diy.priceCents).toBe(3300);
       const fixed = await saveProduct(
         {
           ...base,
@@ -625,7 +625,7 @@ describe.skipIf(!enabled)('product source transactions', () => {
         },
         diy.id,
       );
-      expect(fixed).toMatchObject({ priceCents: 8625, saleRuleValue: '20.25' });
+      expect(fixed).toMatchObject({ priceCents: 4225, saleRuleValue: '20.25' });
       await db.category.update({ where: { id: category.id }, data: { prefix: 'PRICE' } });
       const switchedCode = await reserveProductCode(category.id);
       const switched = await saveProduct(

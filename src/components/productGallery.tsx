@@ -1,5 +1,7 @@
 'use client';
 
+import { SchemePriceList } from './priceSchemes/schemePriceList';
+
 import { formatCurrency } from '@/lib/format-money';
 
 import { Tag } from 'antd';
@@ -106,6 +108,7 @@ export function ProductGallery({
                 </dd>
               </div>
             </dl>
+            <SchemePriceList prices={item.schemePrices} />
             <RecordAuditSummary
               entityType="Product"
               entityId={item.id}

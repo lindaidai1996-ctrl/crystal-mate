@@ -27,7 +27,7 @@ describe('DIY craft and design costs', () => {
     };
     expect(calculateDiyCost(input)).toEqual({ perUnitCost: '2.00', totalCost: '4.00' });
     expect(productDiySchema.safeParse(input).success).toBe(true);
-    expect(productPricingCost(false, null, input).amount).toBe('4.00');
+    expect(productPricingCost(false, null, input).amount).toBe('2.00');
     expect(
       calculateDiyCost({
         ...input,
@@ -71,7 +71,7 @@ describe('DIY craft and design costs', () => {
       craftDesignFee: { unitAmount: '10', accumulateByQuantity: false, totalAmount: '99' },
     };
     expect(calculateDiyCost(input)).toEqual({ perUnitCost: '22.00', totalCost: '66.00' });
-    expect(productPricingCost(false, null, input).amount).toBe('66.00');
+    expect(productPricingCost(false, null, input).amount).toBe('22.00');
   });
 
   it('follows quantity and unit fee until a manual total is entered', () => {
@@ -94,16 +94,16 @@ describe('DIY craft and design costs', () => {
     expect(craftDesignFeeTotal({ ...manual, totalAmount: null }, 4)).toBe('40.00');
   });
 
-  it('prices saved runs from the exact total, with a legacy fallback', () => {
+  it('prices saved runs from the unit cost even when a different total is present', () => {
     const record = { id: 'run', createdAt: '2026-10-15', quantity: 3, perUnitCost: '25.33' };
     const source = { origin: 'DIY' as const, purchaseEntries: [], diyRuns: [record] };
-    expect(productPricingCost(false, null, source).amount).toBe('75.99');
+    expect(productPricingCost(false, null, source).amount).toBe('25.33');
     expect(
       productPricingCost(false, null, {
         ...source,
         diyRuns: [{ ...record, totalCost: '76.00' }],
       }).amount,
-    ).toBe('76.00');
+    ).toBe('25.33');
   });
 
   it('rounds each material line without including the service fee', () => {

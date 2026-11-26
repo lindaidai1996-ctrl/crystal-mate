@@ -77,7 +77,7 @@ describe('unified material pricing', () => {
       computePricing({ ...config, pricingRule: 'PERCENT', pricingValue: '30' }, summary, null, now),
     ).toEqual(preview);
   });
-  it('matches a weekend purchase to the preceding trading day and prices from the higher replacement cost', () => {
+  it('matches weekend purchases to the preceding trading day without raising selling prices with replacement costs', () => {
     const summary = summarizePurchases([purchase()], '20', now); // Sunday, November 15.
     const market = {
       quote: {
@@ -99,12 +99,54 @@ describe('unified material pricing', () => {
     expect(result).toMatchObject({
       replacementCost: '14.00',
       adjustedReplacementCost: '17.50',
-      pricingCost: '17.50',
-      suggestedPrice: '25.00',
+      pricingCost: '15.00',
+      suggestedPrice: '21.43',
       warning: null,
     });
     expect(result.market?.purchaseAverage).toBe('10.00000000');
   });
+  it.each([5, 30])(
+    'uses all history for selling prices independently of silver at %s',
+    (silver) => {
+      const summary = summarizePurchases(
+        [
+          purchase({ id: 'old', receivedAt: '2025-01-01', amount: '8000', weight: '1000' }),
+          purchase(),
+          purchase({ id: 'recent', amount: '400', weight: '20' }),
+          purchase({ id: 'future', receivedAt: '2026-11-21', amount: '90000' }),
+          purchase({ id: 'missing', amount: null }),
+        ],
+        '20',
+        now,
+      );
+      const market = {
+        quote: {
+          price: silver,
+          previousClose: 10,
+          open: null,
+          high: null,
+          low: null,
+          change: silver - 10,
+          changePercent: 0,
+          updatedAt: now.toISOString(),
+        },
+        points: [{ date: '2026-11-13', price: 10 }],
+      };
+      const input = { ...config, pricingRule: 'PERCENT' as const, pricingValue: '50' };
+      const plain = computePricing(input, summary, null, now);
+      const linked = computePricing({ ...input, marketLinked: true }, summary, market, now);
+      expect(summary.totals.rawCost).toBe('8.57');
+      expect(summary.recent.rawCost).toBe('13.33');
+      expect(linked).toMatchObject({
+        pricingCost: '10.71',
+        suggestedPrice: '16.08',
+        warning: null,
+      });
+      expect(linked.suggestedPrice).toBe(plain.suggestedPrice);
+      expect(linked.replacementCost).toBe(silver === 5 ? '8.33' : '33.33');
+      expect(linked.market?.purchaseAverage).toBe('10.00000000');
+    },
+  );
   it('falls back explicitly for unavailable history, no recent samples and invalid replacement estimates', () => {
     const input = { ...config, marketLinked: true };
     const summary = summarizePurchases([purchase()], '20', now);

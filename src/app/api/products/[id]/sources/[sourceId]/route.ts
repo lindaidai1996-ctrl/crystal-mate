@@ -1,7 +1,7 @@
 import { withAuditRoute } from '@/lib/audit-route';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiError, requireAdmin } from '@/lib/api';
-import { productSourceSchema } from '@/lib/validation';
+import { productSourceWriteSchema } from '@/lib/product-source-write';
 import {
   deleteProductSource,
   serializeProductSources,
@@ -14,9 +14,17 @@ async function handlePUT(request: NextRequest, { params }: Context) {
   try {
     await requireAdmin(request);
     const { id, sourceId } = await params;
-    const input = productSourceSchema.parse(await request.json());
-    const product = await updateProductSource(id, sourceId, input);
-    return NextResponse.json({ stock: product.stock, ...serializeProductSources(product) });
+    const { source, pricing } = productSourceWriteSchema.parse(await request.json());
+    const product = await updateProductSource(id, sourceId, source, pricing);
+    return NextResponse.json({
+      stock: product.stock,
+      priceCents: product.priceCents,
+      saleManual: product.saleManual,
+      saleRule: product.saleRule,
+      saleRuleValue: product.saleRuleValue?.toFixed(2) ?? null,
+      updatedAt: product.updatedAt,
+      ...serializeProductSources(product),
+    });
   } catch (error) {
     return apiError(error);
   }

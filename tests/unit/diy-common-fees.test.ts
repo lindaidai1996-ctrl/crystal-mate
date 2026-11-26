@@ -14,6 +14,7 @@ describe('DIY common fees', () => {
     const packaging = DEFAULT_DIY_COMMON_FEES[0];
     const selected = toggleCommonFee([manual], packaging, true);
     expect(selected).toHaveLength(2);
+    expect(selected[1].quantity).toBe(1);
     expect(toggleCommonFee(selected, packaging, true)).toEqual(selected);
     expect(toggleCommonFee(selected, packaging, false)).toEqual([manual]);
   });
@@ -56,6 +57,59 @@ describe('DIY common fees', () => {
       productDiySchema.safeParse({ ...input, extraCosts: [{ name: '旧费用', amount: '2' }] })
         .success,
     ).toBe(true);
+  });
+
+  it('persists usage quantities and multiplies independent unit prices before batch quantity', () => {
+    const input = {
+      origin: 'DIY' as const,
+      quantity: 2,
+      notes: '',
+      materials: [],
+      cabochons: [],
+      extraCosts: [
+        { commonFeeId: 'bead', name: '定位珠', quantity: 3, amount: '2.01', quoteAmount: '4.05' },
+        { name: '旧包装费', amount: '10', quoteAmount: '15' },
+      ],
+    };
+    const saved = productDiySchema.parse(JSON.parse(JSON.stringify(input)));
+    expect(saved.extraCosts).toEqual(input.extraCosts);
+    expect(calculateDiyCost(saved)).toEqual({ perUnitCost: '16.03', totalCost: '32.06' });
+    expect(calculateDiyQuote(saved)).toEqual({ perUnitQuote: '27.15', totalQuote: '54.30' });
+    const free = {
+      ...saved,
+      extraCosts: [{ ...saved.extraCosts[0], amount: '0', quoteAmount: '0' }],
+    };
+    expect(calculateDiyCost(free)?.totalCost).toBe('0.00');
+    expect(calculateDiyQuote(free)?.totalQuote).toBe('0.00');
+    expect(
+      calculateDiyQuote({ ...saved, extraCosts: [{ ...saved.extraCosts[0], quoteAmount: null }] }),
+    ).toBeNull();
+  });
+
+  it('rejects invalid usage quantities and per-item cost overflow', () => {
+    const input = {
+      origin: 'DIY' as const,
+      quantity: 1,
+      notes: '',
+      materials: [],
+      cabochons: [],
+      extraCosts: [],
+    };
+    for (const quantity of [0, -1, 1.5, 2147483648, NaN, Infinity]) {
+      const invalid = {
+        ...input,
+        extraCosts: [{ name: '费用', quantity, amount: '2', quoteAmount: '3' }],
+      };
+      expect(productDiySchema.safeParse(invalid).success).toBe(false);
+      expect(calculateDiyCost(invalid)).toBeNull();
+      expect(calculateDiyQuote(invalid)).toBeNull();
+    }
+    expect(
+      productDiySchema.safeParse({
+        ...input,
+        extraCosts: [{ name: '费用', quantity: 2, amount: '9999999999.99' }],
+      }).success,
+    ).toBe(false);
   });
 
   it('accepts empty configuration and zero amounts but rejects duplicate names and bad amounts', () => {

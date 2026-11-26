@@ -53,6 +53,9 @@ export function ProductDiyEntry({
         ) : (
           <span>{t('diyNotConfigured')}</span>
         )}
+        <span>
+          {t('diySaleSummary', { amount: formatCurrency(product.priceCents / 100, locale) })}
+        </span>
       </span>
       {product.diyRuns.length > 1 && (
         <span className={diyStyles.history}>

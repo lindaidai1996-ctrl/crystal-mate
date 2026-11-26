@@ -13,12 +13,10 @@ import {
   Select,
   Switch,
   Table,
-  Tag,
 } from 'antd';
-import { EditOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import { ResponsiveDrawer } from '@/components/responsive/responsiveDialog';
 import { Sensitive } from '@/components/privacyMode';
-import { usePathname, useRouter } from '@/i18n/navigation';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import { formatAmount } from '@/lib/format-money';
 import {
@@ -31,7 +29,11 @@ import {
 } from '@/lib/material-pricing/contracts';
 import pricingStyles from './materialPricingPage.module.css';
 import { MaterialPricingNavigation, type MaterialPricingView } from './materialPricingNavigation';
+import { useMaterialPricingGroup } from './useMaterialPricingGroup';
+import { MaterialPricingGroupSummary } from './materialPricingGroupSummary';
+import { MaterialPricingGroupSwitcher } from './materialPricingGroupSwitcher';
 import { MaterialPricingSkeleton } from './materialPricingSkeleton';
+import { MaterialPricingMetric, MaterialPricingMetrics } from './materialPricingMetrics';
 
 type GroupList = {
   items: PricingGroup[];
@@ -51,14 +53,14 @@ export function MaterialPricingPage({
   const t = useTranslations('materialPricing');
   const common = useTranslations('common');
   const locale = useLocale();
-  const pathname = usePathname();
-  const router = useRouter();
+  const { groupId, selectGroup: updateGroup } = useMaterialPricingGroup(initialGroupId);
   const { message } = App.useApp();
   const [data, setData] = useState<GroupList>({ items: [], materials: [] });
-  const selected = data.items.find((item) => item.id === initialGroupId)?.id ?? data.items[0]?.id;
+  const selectedGroup = data.items.find((item) => item.id === groupId) ?? data.items[0];
+  const selected = selectedGroup?.id;
   const selectGroup = (id: string) => {
     setHistoryPage(1);
-    router.replace({ pathname, query: { group: id } }, { scroll: false });
+    updateGroup(id);
   };
   const [loadedDetail, setDetail] = useState<{
     group: PricingGroup;
@@ -130,7 +132,7 @@ export function MaterialPricingPage({
       .then((result) => {
         if (!controller.signal.aborted) {
           setDetail({ ...result, revision });
-          setPrice(result.preview.suggestedPrice);
+          setPrice(result.group.publication?.saleGramPrice ?? result.preview.suggestedPrice);
         }
       })
       .catch((error) => {
@@ -249,13 +251,9 @@ export function MaterialPricingPage({
       hour12: false,
     });
   const metric = (label: string, amount: string | null | undefined, sensitive = true) => {
-    const element = (
-      <div className={pricingStyles.metric}>
-        <span>{label}</span>
-        <strong>{money(amount)}</strong>
-      </div>
+    return (
+      <MaterialPricingMetric key={label} label={label} amount={amount} sensitive={sensitive} />
     );
-    return sensitive ? <Sensitive key={label}>{element}</Sensitive> : element;
   };
   const pricingValueLabel = editor ? t(`pricingValue_${editor.draft.pricingRule}`) : '';
   const pricingValueUnit =
@@ -266,15 +264,7 @@ export function MaterialPricingPage({
     <>
       <div className="page-heading">
         <div>
-          <h1>
-            {t(
-              view === 'overview'
-                ? 'title'
-                : view === 'distributors'
-                  ? 'distributorComparison'
-                  : 'history',
-            )}
-          </h1>
+          <h1>{t('title')}</h1>
           <p>
             {t(
               view === 'overview'
@@ -286,7 +276,7 @@ export function MaterialPricingPage({
           </p>
         </div>
         <div className={pricingStyles.actions}>
-          <Button icon={<ReloadOutlined />} loading={loading || detailLoading} onClick={refresh}>
+          <Button icon={<ReloadOutlined />} loading={loading} onClick={refresh}>
             {t('refresh')}
           </Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => openEditor()}>
@@ -294,7 +284,6 @@ export function MaterialPricingPage({
           </Button>
         </div>
       </div>
-      <MaterialPricingNavigation active={view} groupId={selected} />
       {failed && (
         <Alert
           type="error"
@@ -303,30 +292,13 @@ export function MaterialPricingPage({
           action={<Button onClick={refresh}>{t('refresh')}</Button>}
         />
       )}
-      <div className={pricingStyles.groupToolbar}>
-        <label className={pricingStyles.groupPicker}>
-          <span>{t('groupName')}</span>
-          <Select
-            aria-label={t('chooseGroup')}
-            placeholder={t('chooseGroup')}
-            value={selected}
-            loading={loading}
-            options={data.items.map((group) => ({ value: group.id, label: group.name }))}
-            onChange={selectGroup}
-          />
-        </label>
-        {detail && (
-          <>
-            <Tag>{t(detail.group.enabled ? 'enabled' : 'disabled')}</Tag>
-            <span className={pricingStyles.muted}>
-              {t('materialCount', { count: detail.group.materials.length })}
-            </span>
-            <Button icon={<EditOutlined />} onClick={() => openEditor(detail.group)}>
-              {t('configure')}
-            </Button>
-          </>
-        )}
-      </div>
+      <MaterialPricingGroupSwitcher
+        groups={data.items}
+        selected={selected}
+        loading={loading}
+        onChange={selectGroup}
+      />
+      <MaterialPricingNavigation active={view} groupId={selected} />
       {!loading && data.items.length === 0 && (
         <div className={pricingStyles.actions}>
           <span className={pricingStyles.help}>{t('presets')}</span>
@@ -339,6 +311,13 @@ export function MaterialPricingPage({
       )}
       <div className={pricingStyles.layout}>
         <main className={pricingStyles.panel} aria-busy={contentLoading}>
+          {selectedGroup && (
+            <MaterialPricingGroupSummary
+              group={detail?.group ?? selectedGroup}
+              showPrice={view === 'overview'}
+              onConfigure={() => openEditor(detail?.group ?? selectedGroup)}
+            />
+          )}
           {contentLoading ? (
             <MaterialPricingSkeleton view={view} label={common('loading')} />
           ) : !detail ? (
@@ -347,15 +326,6 @@ export function MaterialPricingPage({
             <>
               {view === 'overview' && (
                 <>
-                  <div className={pricingStyles.title}>
-                    <div>
-                      <h2>{detail.group.name}</h2>
-                      <p className={pricingStyles.muted}>
-                        {t('executionPrice')}: {money(detail.group.publication?.saleGramPrice)} /{' '}
-                        {t('gram')}
-                      </p>
-                    </div>
-                  </div>
                   {detail.preview.changed && (
                     <Alert showIcon type="warning" message={t('changed')} />
                   )}
@@ -367,11 +337,7 @@ export function MaterialPricingPage({
                       style={{ marginTop: 12 }}
                     />
                   )}
-                  <div className={pricingStyles.metrics}>
-                    {metric(t('rawCost'), detail.preview.totals.rawCost)}
-                    {metric(t('estimatedCost'), detail.preview.totals.adjustedCost)}
-                    {metric(t('suggestedPrice'), detail.preview.suggestedPrice)}
-                  </div>
+                  <MaterialPricingMetrics preview={detail.preview} />
                   <div className={pricingStyles.publish}>
                     <label>
                       <span>{t('pendingPrice')}</span>
@@ -614,6 +580,7 @@ export function MaterialPricingPage({
                 checked={editor.draft.marketLinked}
                 onChange={(marketLinked) => patch({ marketLinked })}
               />
+              <span className={pricingStyles.help}>{t('marketLinkedHelp')}</span>
             </label>
             <Sensitive>
               <label>

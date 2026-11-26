@@ -105,6 +105,7 @@ model Product {
   description      String                   @default("") @db.Text
   categoryId       String
   category         Category                 @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  schemePrices     ProductSchemePrice[]
   priceCents       Int
   saleRule         ProductSaleRule          @default(PERCENT_50)
   saleRuleValue    Decimal?                 @db.Decimal(12, 2)
@@ -953,4 +954,50 @@ model AttachmentRecognition {
   updatedAt     DateTime         @default(now()) @updatedAt
 
   @@index([assetId, imageVersion, createdAt])
+}
+
+model PriceScheme {
+  id        String                @id @default(cuid())
+  name      String                @unique
+  formula   String                @db.Text
+  rounding  String                @default("CENT")
+  common    Boolean               @default(false)
+  position  Int                   @default(0)
+  version   Int                   @default(1)
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+  revisions PriceSchemeRevision[]
+  prices    ProductSchemePrice[]
+}
+
+model PriceSchemeRevision {
+  id        String      @id @default(cuid())
+  schemeId  String
+  scheme    PriceScheme @relation(fields: [schemeId], references: [id], onDelete: Restrict)
+  version   Int
+  formula   String      @db.Text
+  rounding  String
+  createdAt DateTime    @default(now())
+
+  @@unique([schemeId, version])
+}
+
+model ProductSchemePrice {
+  id                  String      @id @default(cuid())
+  productId           String
+  product             Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  schemeId            String
+  scheme              PriceScheme @relation(fields: [schemeId], references: [id], onDelete: Restrict)
+  mode                String      @default("AUTO")
+  amountCents         Int?
+  previousAmountCents Int?
+  error               String?
+  schemeVersion       Int
+  basis               Json
+  version             Int         @default(1)
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  @@unique([productId, schemeId])
+  @@index([schemeId])
 }

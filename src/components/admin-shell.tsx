@@ -92,34 +92,36 @@ function AdminShellContent({
       setOpen(false);
     });
   }
-  const selected = pathname.startsWith('/admin/assistant')
-    ? 'assistant'
-    : pathname.startsWith('/admin/material-pricing')
-      ? 'materialPricing'
-      : pathname.startsWith('/admin/audit-logs')
-        ? 'auditLogs'
-        : pathname.startsWith('/admin/account')
-          ? 'account'
-          : pathname.startsWith('/admin/setting-styles')
-            ? 'settingStyles'
-            : pathname.startsWith('/admin/categories')
-              ? 'categories'
-              : pathname.startsWith('/admin/distributors')
-                ? 'distributors'
-                : pathname === '/admin/materials/batches' ||
-                    pathname.startsWith('/admin/materials/batches/')
-                  ? 'materialBatches'
-                  : pathname.startsWith('/admin/materials')
-                    ? 'materials'
-                    : pathname.startsWith('/admin/tags')
-                      ? 'tags'
-                      : pathname === catalogPath('cabochons') ||
-                          pathname.startsWith(`${catalogPath('cabochons')}/`)
-                        ? 'cabochons'
-                        : pathname === catalogPath('finished-strands') ||
-                            pathname.startsWith(`${catalogPath('finished-strands')}/`)
-                          ? 'finishedStrands'
-                          : 'products';
+  const selected = pathname.startsWith('/admin/price-schemes')
+    ? 'priceSchemes'
+    : pathname.startsWith('/admin/assistant')
+      ? 'assistant'
+      : pathname.startsWith('/admin/material-pricing')
+        ? 'materialPricing'
+        : pathname.startsWith('/admin/audit-logs')
+          ? 'auditLogs'
+          : pathname.startsWith('/admin/account')
+            ? 'account'
+            : pathname.startsWith('/admin/setting-styles')
+              ? 'settingStyles'
+              : pathname.startsWith('/admin/categories')
+                ? 'categories'
+                : pathname.startsWith('/admin/distributors')
+                  ? 'distributors'
+                  : pathname === '/admin/materials/batches' ||
+                      pathname.startsWith('/admin/materials/batches/')
+                    ? 'materialBatches'
+                    : pathname.startsWith('/admin/materials')
+                      ? 'materials'
+                      : pathname.startsWith('/admin/tags')
+                        ? 'tags'
+                        : pathname === catalogPath('cabochons') ||
+                            pathname.startsWith(`${catalogPath('cabochons')}/`)
+                          ? 'cabochons'
+                          : pathname === catalogPath('finished-strands') ||
+                              pathname.startsWith(`${catalogPath('finished-strands')}/`)
+                            ? 'finishedStrands'
+                            : 'products';
   const menu = (
     <Menu
       theme="light"
@@ -159,6 +161,18 @@ function AdminShellContent({
               label: t('materials'),
               onClick: () => navigateFromMenu('/admin/materials'),
             },
+            {
+              key: 'priceSchemes',
+              icon: <GoldOutlined />,
+              label: t('priceSchemes'),
+              onClick: () => navigateFromMenu('/admin/price-schemes'),
+            },
+            {
+              key: 'materialPricing',
+              icon: <GoldOutlined />,
+              label: t('materialPricing'),
+              onClick: () => navigateFromMenu('/admin/material-pricing'),
+            },
           ],
         },
         {
@@ -176,12 +190,6 @@ function AdminShellContent({
               icon: <TeamOutlined />,
               label: t('distributors'),
               onClick: () => navigateFromMenu('/admin/distributors'),
-            },
-            {
-              key: 'materialPricing',
-              icon: <GoldOutlined />,
-              label: t('materialPricing'),
-              onClick: () => navigateFromMenu('/admin/material-pricing'),
             },
             {
               key: 'materialBatches',

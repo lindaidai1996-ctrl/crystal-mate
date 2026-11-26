@@ -1,5 +1,7 @@
 'use client';
 
+import { SchemePriceList } from './priceSchemes/schemePriceList';
+
 import { formatCurrency } from '@/lib/format-money';
 
 import { SearchFilterRow } from '@/components/responsive/searchFilterRow';
@@ -535,15 +537,18 @@ export function ProductsPage({
       key: 'price',
       sorter: true,
       sortOrder: priceSort,
-      width: isCabochon ? 170 : 130,
+      width: 220,
       render: (value: number, item) => (
-        <ProductInlineEdit
-          product={item}
-          field="price"
-          onSave={(change) => saveQuickEdit(item, change)}
-        >
-          {formatCurrency(value / 100, locale)}
-        </ProductInlineEdit>
+        <div>
+          <ProductInlineEdit
+            product={item}
+            field="price"
+            onSave={(change) => saveQuickEdit(item, change)}
+          >
+            {formatCurrency(value / 100, locale)}
+          </ProductInlineEdit>
+          <SchemePriceList prices={item.schemePrices} />
+        </div>
       ),
     },
     {
@@ -1075,6 +1080,7 @@ export function ProductsPage({
                         >
                           {formatCurrency(item.priceCents / 100, locale)}
                         </ProductInlineEdit>
+                        <SchemePriceList prices={item.schemePrices} />
                       </dd>
                     </div>
                     <div>
@@ -1175,8 +1181,11 @@ export function ProductsPage({
             categories={categories}
             quickEdit
             onEditorClose={() => setDiyProduct(null)}
-            onProductChanged={() => {
-              setLoading(true);
+            onProductChanged={(updated) => {
+              setData((current) => ({
+                ...current,
+                items: current.items.map((item) => (item.id === updated.id ? updated : item)),
+              }));
               setRevision((value) => value + 1);
             }}
           />

@@ -47,14 +47,24 @@ export function calculateDiyCost(input: Extract<ProductSourceInput, { origin: 'D
     perUnit += (quantity * cost + BigInt(50)) / BigInt(100);
   }
   for (const line of input.extraCosts) {
-    const cost = amountToCents(line.amount);
+    const cost = extraFeeLineTotal(line.quantity, line.amount);
     if (cost === null) return null;
-    perUnit += cost;
+    perUnit += runAmountToCents(cost)!;
   }
   return {
     perUnitCost: centsToAmount(perUnit),
     totalCost: centsToAmount(perUnit * BigInt(input.quantity)),
   };
+}
+
+export function extraFeeLineTotal(
+  quantity: number | undefined,
+  unitAmount: string | null | undefined,
+) {
+  const count = quantity === undefined ? 1 : quantity;
+  const amount = unitAmount == null ? null : amountToCents(unitAmount);
+  if (!Number.isInteger(count) || count <= 0 || count > 2147483647 || amount === null) return null;
+  return centsToAmount(BigInt(count) * amount);
 }
 
 export function diyQuoteLineTotal(quantity: string | number, unitPrice: string | null | undefined) {
@@ -80,9 +90,9 @@ export function calculateDiyQuote(input: Extract<ProductSourceInput, { origin: '
     perUnit += runAmountToCents(total)!;
   }
   for (const line of input.extraCosts) {
-    const amount = line.quoteAmount == null ? null : amountToCents(line.quoteAmount);
+    const amount = extraFeeLineTotal(line.quantity, line.quoteAmount);
     if (amount === null) return null;
-    perUnit += amount;
+    perUnit += runAmountToCents(amount)!;
   }
   const fee = craftDesignFeeTotal(input.craftDesignFee ?? emptyCraftDesignFee(), input.quantity);
   if (fee === null) return null;

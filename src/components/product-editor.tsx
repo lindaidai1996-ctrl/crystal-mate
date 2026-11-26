@@ -4,7 +4,6 @@ import { imageFramings } from '@/lib/image-framing';
 
 import { RecordAuditPanel } from '@/components/audit-history';
 
-import { CompactFields } from '@/components/responsive/compactFields';
 import { EditorActions } from '@/components/responsive/editorActions';
 
 import {
@@ -21,7 +20,6 @@ import {
   ConfigProvider,
   Form,
   Input,
-  InputNumber,
   Result,
   Select,
   Skeleton,
@@ -57,6 +55,9 @@ import {
   diyQuotePricing,
   type ProductPricingValues,
 } from '@/lib/product-pricing';
+import { SchemePriceFields, productSchemeDraft } from './priceSchemes/schemePriceFields';
+import { schemePricesWriteSchema, type SchemePricesWrite } from '@/lib/price-schemes/contracts';
+import { priceContext } from '@/lib/price-schemes/variables';
 import { ProductPricingFields } from './product-pricing-fields';
 import { CabochonCostFields } from './cabochonCost/cabochonCostFields';
 import { ImagePicker } from './image-picker';
@@ -68,6 +69,7 @@ import type { ProductSourceInput } from '@/lib/client-types';
 import { productSourceSchema } from '@/lib/validation';
 import { useProductCode } from './productEditor/useProductCode';
 import { StockFields } from './productEditor/stockFields';
+import { CabochonMeasurementFields } from './productEditor/cabochonMeasurementFields';
 import { AliasInput } from './catalog/aliasInput';
 import { useNameTagRecognition } from './productEditor/useNameTagRecognition';
 import { NameTagActions, NameTagFeedback } from './productEditor/nameTagControls';
@@ -85,6 +87,7 @@ type Values = {
   categoryId: string;
   tagIds: string[];
   pricing: ProductPricingValues;
+  schemePrices?: SchemePricesWrite;
   stock: number;
   stockReason?: string;
   published: boolean;
@@ -129,7 +132,6 @@ export function ProductEditor({
   const router = useRouter();
   const { message } = App.useApp();
   const [form] = Form.useForm<Values>();
-  const lengthMm = Form.useWatch(['measurement', 'lengthMm'], form);
   const [tagForm] = Form.useForm<{ name: string }>();
   const [settingStyleForm] = Form.useForm<{ magicBoxStyle: string }>();
   const [categories, setCategories] = useState<Category[]>([]);
@@ -186,9 +188,6 @@ export function ProductEditor({
   const isCabochon = categories.some(
     (item) => item.id === selectedCategoryId && item.name === '蛋面',
   );
-  const isFinishedEditor =
-    scope?.key === 'finished-strands' ||
-    (!scope && !isCabochon && initialReturnTo === catalogPath('finished-strands'));
   const listPath = scope ? catalogPath(scope.key) : '/admin/products';
   const returnBatchId = isNew ? initialBatchId : undefined;
   const returnDistributorId = isNew ? initialDistributorId : undefined;
@@ -266,6 +265,7 @@ export function ProductEditor({
             description: product.description,
             categoryId: product.categoryId,
             tagIds: product.tags.map((tag) => tag.id),
+            schemePrices: productSchemeDraft(product),
             pricing: {
               saleRule: product.saleRule ?? 'PERCENT_50',
               saleRuleValue: product.saleRuleValue ?? null,
@@ -366,6 +366,7 @@ export function ProductEditor({
           saleRule: values.pricing.saleRule,
           saleRuleValue: values.pricing.saleRuleValue,
           saleManual: values.pricing.saleManual,
+          schemePrices: values.schemePrices,
           currency: 'CNY',
           stock: values.stock,
           ...(!isNew && product && values.stock !== product.stock
@@ -680,11 +681,11 @@ export function ProductEditor({
           )}
       </div>
       {!isNew && <RecordAuditPanel entityType="Product" entityId={id} />}
-      <ConfigProvider theme={isFinishedEditor ? underlinedTheme : undefined}>
+      <ConfigProvider theme={underlinedTheme}>
         <Form
           form={form}
           layout="vertical"
-          variant={isFinishedEditor ? 'underlined' : undefined}
+          variant="underlined"
           initialValues={{
             aliases: [],
             description: '',
@@ -713,11 +714,7 @@ export function ProductEditor({
           onFinish={save}
           onFinishFailed={() => message.error(common('checkRequiredFields'))}
         >
-          <div
-            className={
-              isFinishedEditor ? `editor-surface ${editorStyles.editor}` : 'editor-surface'
-            }
-          >
+          <div className={`editor-surface ${editorStyles.editor}`}>
             <section className={`editor-block ${editorStyles.details}`}>
               <h2>{t('details')}</h2>
               <div className="editor-fields">
@@ -810,6 +807,14 @@ export function ProductEditor({
                     }
                   />
                 </Form.Item>
+                {isCabochon && (
+                  <CabochonMeasurementFields
+                    saving={saving}
+                    recognitionInput={recognitionInput}
+                    onRecognitionInputChange={setRecognitionInput}
+                    onRecognize={recognizeMeasurement}
+                  />
+                )}
                 <StockFields
                   isNew={isNew}
                   currentStock={product?.stock}
@@ -900,16 +905,14 @@ export function ProductEditor({
             </section>
             <section className={`editor-block ${editorStyles.images}`}>
               <h2>{t('images')}</h2>
-              {isFinishedEditor && (
-                <div className={editorStyles.leadImage}>
-                  <ImageHoverPreview
-                    images={images}
-                    name={product?.name ?? t('images')}
-                    coverObjectKey={images[0]?.objectKey ?? null}
-                    thumbnailSize="original"
-                  />
-                </div>
-              )}
+              <div className={editorStyles.leadImage}>
+                <ImageHoverPreview
+                  images={images}
+                  name={product?.name ?? t('images')}
+                  coverObjectKey={images[0]?.objectKey ?? null}
+                  thumbnailSize="original"
+                />
+              </div>
               <ImagePicker
                 purpose={isCabochon ? 'cabochon' : 'catalog'}
                 images={images}
@@ -918,64 +921,6 @@ export function ProductEditor({
                 disabled={saving}
               />
             </section>
-            {isCabochon && (
-              <section className="editor-block">
-                <div className="compact-field-heading">
-                  <h2>{t('measurements')}</h2>
-                  <Button
-                    type="link"
-                    size="small"
-                    htmlType="button"
-                    disabled={
-                      saving || lengthMm == null || !Number.isFinite(lengthMm) || lengthMm <= 0
-                    }
-                    onClick={() =>
-                      form.setFieldsValue({
-                        measurement: { widthMm: lengthMm, heightMm: lengthMm },
-                      })
-                    }
-                  >
-                    {common('applyToWidthHeight')}
-                  </Button>
-                </div>
-                <CompactFields className="measurement-fields" columns={3}>
-                  {(['lengthMm', 'widthMm', 'heightMm'] as const).map((field) => (
-                    <Form.Item
-                      key={field}
-                      name={['measurement', field]}
-                      label={t(field)}
-                      rules={[{ type: 'number', min: 0.01, max: 99999999.99 }]}
-                    >
-                      <InputNumber
-                        min={0.01}
-                        max={99999999.99}
-                        precision={2}
-                        step={0.01}
-                        inputMode="decimal"
-                        suffix="mm"
-                        style={{ width: '100%' }}
-                      />
-                    </Form.Item>
-                  ))}
-                </CompactFields>
-                <Form.Item className="editor-recognizer-field" label={t('smartRecognition')}>
-                  <div className="measurement-recognizer">
-                    <Input
-                      value={recognitionInput}
-                      onChange={(event) => setRecognitionInput(event.target.value)}
-                      onPressEnter={(event) => {
-                        event.preventDefault();
-                        recognizeMeasurement();
-                      }}
-                      placeholder={t('recognitionPlaceholder')}
-                    />
-                    <Button icon={<ScanOutlined />} onClick={recognizeMeasurement}>
-                      {t('recognize')}
-                    </Button>
-                  </div>
-                </Form.Item>
-              </section>
-            )}
             {isCabochon && (
               <section
                 className="editor-block"
@@ -1027,6 +972,16 @@ export function ProductEditor({
                 const stock = form.getFieldValue('stock') as number;
                 if (stock === product?.stock) {
                   form.setFieldsValue({ stock: updated.stock });
+                }
+                const schemeDraft = form.getFieldValue('schemePrices') as
+                  | SchemePricesWrite
+                  | undefined;
+                if (
+                  !schemeDraft ||
+                  JSON.stringify(schemeDraft.items) ===
+                    JSON.stringify(productSchemeDraft(product).items)
+                ) {
+                  form.setFieldsValue({ schemePrices: productSchemeDraft(updated) });
                 }
                 setProduct(updated);
                 setStockConflict(false);
@@ -1082,6 +1037,30 @@ export function ProductEditor({
                   quote={isCabochon ? undefined : productDiyQuote(product ?? sourceDraft)}
                 />
               </Form.Item>
+              <Form.Item
+                name="schemePrices"
+                rules={[
+                  {
+                    validator: (_, value) =>
+                      value === undefined || schemePricesWriteSchema.safeParse(value).success
+                        ? Promise.resolve()
+                        : Promise.reject(new Error(t('pricingInvalid'))),
+                  },
+                ]}
+              >
+                <SchemePriceFields
+                  context={priceContext(
+                    isCabochon,
+                    watchedCost === undefined ? initialValues.cost : watchedCost,
+                    product ?? sourceDraft,
+                    salePrice ?? null,
+                  )}
+                  saved={product?.schemePrices}
+                />
+              </Form.Item>
+              {isDiyPricing && (
+                <p className="product-pricing-help">{sourceText('salePricingUnitHelp')}</p>
+              )}
               {!isNew && <p className="product-pricing-help">{t('pricingSaveHelp')}</p>}
               <Sensitive>
                 <p

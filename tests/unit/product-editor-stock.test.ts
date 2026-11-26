@@ -34,11 +34,14 @@ function transaction(images: ProductImage[] = []) {
     marketing: null,
     measurement: null,
     cost: null,
+    category: { name: '手链' },
+    schemePrices: [],
     purchaseEntries: [],
     diyRuns: [],
     stockAdjustments: [] as object[],
   };
   return {
+    priceScheme: { findMany: vi.fn().mockResolvedValue([]) },
     category: {
       findUnique: vi.fn().mockResolvedValue({ id: input.categoryId, name: '手链', prefix: 'A' }),
     },
@@ -78,6 +81,44 @@ beforeEach(() => {
   vi.clearAllMocks();
   tx = transaction();
   mocks.transaction.mockImplementation(async (operation) => operation(tx));
+});
+
+describe('full product editor DIY pricing', () => {
+  it.each([false, true])('uses unit cost while respecting manual=%s', async (manual) => {
+    const run = {
+      id: 'run',
+      quantity: 3,
+      createdAt: new Date(),
+      perUnitCost: new Prisma.Decimal(100),
+      totalCost: new Prisma.Decimal(300),
+      perUnitQuote: new Prisma.Decimal(160),
+      totalQuote: new Prisma.Decimal(480),
+      silverWeightGrams: new Prisma.Decimal(0),
+      silverCostGramPrice: new Prisma.Decimal(20),
+      silverQuoteGramPrice: new Prisma.Decimal(30),
+      materialLines: [],
+      cabochonLines: [],
+      pricingLines: [],
+      extraCosts: [],
+    };
+    tx.product.findUniqueOrThrow.mockImplementation(async () => ({
+      ...(await tx.product.findUnique()),
+      origin: 'DIY',
+      diyRuns: [run],
+    }));
+    const saved = await saveProduct(
+      {
+        ...input,
+        priceCents: 19900,
+        saleRule: 'PERCENT_50',
+        saleRuleValue: null,
+        saleManual: manual,
+      },
+      id,
+    );
+    expect(saved.priceCents).toBe(manual ? 19900 : 15000);
+    expect(saved.diyRuns[0]).toMatchObject({ perUnitCost: '100.00', totalCost: '300.00' });
+  });
 });
 
 describe('inline product stock edits', () => {

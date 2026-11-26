@@ -126,7 +126,9 @@ export function CommonFeeFields({
           size="small"
           icon={<PlusOutlined />}
           disabled={value.length >= 50}
-          onClick={() => onChange([...value, { name: '', amount: '', quoteAmount: null }])}
+          onClick={() =>
+            onChange([...value, { name: '', quantity: 1, amount: '', quoteAmount: null }])
+          }
         >
           {t('addCustomFee')}
         </Button>
@@ -152,10 +154,11 @@ export function CommonFeeFields({
         <div className={`${commonFeeStyles.fees} ${privacyMode ? commonFeeStyles.private : ''}`}>
           <div className={commonFeeStyles.columns} aria-hidden="true">
             <span>{t('costName')}</span>
+            <span>{t('feeQuantity')}</span>
             <Sensitive>
-              <span>{t('costAmount')}</span>
+              <span>{t('feeUnitCost')}</span>
             </Sensitive>
-            <span>{t('extraQuoteAmount')}</span>
+            <span>{t('feeUnitQuote')}</span>
             <span />
           </div>
           {value.map((fee, index) => (
@@ -168,9 +171,19 @@ export function CommonFeeFields({
                   onChange={(event) => changeFee(index, { name: event.target.value })}
                 />
               </label>
+              <label className={`${commonFeeStyles.amount} ${commonFeeStyles.quantity}`}>
+                <span className={commonFeeStyles.mobileLabel}>{t('feeQuantity')}</span>
+                <InputNumber
+                  min={1}
+                  max={2147483647}
+                  precision={0}
+                  value={fee.quantity === 0 ? null : (fee.quantity ?? 1)}
+                  onChange={(quantity) => changeFee(index, { quantity: quantity ?? 0 })}
+                />
+              </label>
               <Sensitive>
-                <label className={commonFeeStyles.amount}>
-                  <span className={commonFeeStyles.mobileLabel}>{t('costAmount')}</span>
+                <label className={`${commonFeeStyles.amount} ${commonFeeStyles.cost}`}>
+                  <span className={commonFeeStyles.mobileLabel}>{t('feeUnitCost')}</span>
                   <InputNumber<string>
                     stringMode
                     min="0"
@@ -181,8 +194,8 @@ export function CommonFeeFields({
                   />
                 </label>
               </Sensitive>
-              <label className={commonFeeStyles.amount}>
-                <span className={commonFeeStyles.mobileLabel}>{t('extraQuoteAmount')}</span>
+              <label className={`${commonFeeStyles.amount} ${commonFeeStyles.quote}`}>
+                <span className={commonFeeStyles.mobileLabel}>{t('feeUnitQuote')}</span>
                 <InputNumber<string>
                   stringMode
                   min="0"
@@ -207,6 +220,7 @@ export function CommonFeeFields({
       ) : (
         <span className={commonFeeStyles.hint}>{t('extraCostsEmpty')}</span>
       )}
+      {value.length > 0 && <p className={commonFeeStyles.hint}>{t('feeQuantityHelp')}</p>}
       <Drawer
         title={t('manageCommonFeesTitle')}
         open={draft !== null}

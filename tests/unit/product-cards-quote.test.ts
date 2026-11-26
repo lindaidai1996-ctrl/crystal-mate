@@ -15,6 +15,23 @@ describe('customer product card quote', () => {
       unitPrice: '12.50',
     });
   });
+  it('exports fee usage, unit price and multiplied subtotal without internal cost', () => {
+    const run = cardFixtureRun();
+    run.extraCosts[0].quantity = 3;
+    run.perUnitQuote = '64.33';
+    run.totalQuote = '193.00';
+    const quote = cardQuote(run)!;
+    expect(quote.total).toBe('64.33');
+    expect(quote.rows[1]).toEqual({
+      name: '包装',
+      specification: '',
+      quantity: '3 项',
+      unitPrice: '2.00',
+      subtotal: '6.00',
+    });
+    run.extraCosts[0].quantity = 0;
+    expect(cardQuote(run)).toBeNull();
+  });
   it('uses half-up cent rounding for a manual aggregate craft fee', () => {
     const run = cardFixtureRun();
     run.quantity = 2;

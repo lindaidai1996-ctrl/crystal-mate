@@ -107,6 +107,7 @@ async function loadState(tx: Tx, id: string, now: Date) {
   const fingerprint = createHash('sha256')
     .update(
       JSON.stringify({
+        calculationVersion: 2,
         name: group.name,
         materialIds: input.materialIds,
         lossRate: group.lossRate,

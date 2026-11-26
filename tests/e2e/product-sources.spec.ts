@@ -176,12 +176,8 @@ test('purchased and DIY products share a batch and keep their costs and stock', 
       .locator('input')
       .fill('2');
     await page.getByRole('button', { name: '添加物料' }).click();
-    const materialLine = diyFields.locator('.product-source-line').first();
-    await materialLine
-      .locator('.source-field')
-      .filter({ hasText: '物料与批次' })
-      .locator('.ant-select')
-      .click();
+    const materialLine = diyFields.locator('.product-material-row-container').first();
+    await materialLine.getByRole('combobox', { name: '物料与批次' }).click();
     await page
       .locator('.ant-select-dropdown:visible')
       .getByText(`${material.name} · ${batch.name}`)

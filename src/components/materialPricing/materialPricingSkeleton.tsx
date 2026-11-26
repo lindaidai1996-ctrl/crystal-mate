@@ -14,14 +14,8 @@ export function MaterialPricingSkeleton({
       <div aria-hidden="true">
         {view === 'overview' ? (
           <>
-            <div className={pricingStyles.title}>
-              <div className={pricingStyles.skeletonPrice}>
-                <Skeleton.Input active block style={{ width: 160, minWidth: 0, height: 24 }} />
-                <Skeleton.Input active block style={{ width: 220, minWidth: 0, height: 16 }} />
-              </div>
-            </div>
-            <div className={pricingStyles.metrics}>
-              {Array.from({ length: 3 }, (_, index) => (
+            <div className={`${pricingStyles.metrics} ${pricingStyles.overviewMetrics}`}>
+              {Array.from({ length: 4 }, (_, index) => (
                 <div key={index} className={pricingStyles.metric}>
                   <Skeleton.Input active block style={{ width: '55%', minWidth: 0, height: 16 }} />
                   <Skeleton.Input active block style={{ width: '75%', minWidth: 0, height: 24 }} />

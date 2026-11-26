@@ -31,7 +31,11 @@ export const DEFAULT_DIY_COMMON_FEES: DiyCommonFee[] = [
   { id: 'shipping', name: '快递费', amount: '10.00', quoteAmount: '10.00' },
 ];
 
+export const diyFeeQuantitySchema = z.number().int().positive().max(2147483647);
+
 export type DiyExtraCost = {
+  // Usage per finished item; legacy records without a quantity count as one.
+  quantity?: number;
   name: string;
   amount: string;
   quoteAmount?: string | null;
@@ -56,6 +60,12 @@ export function toggleCommonFee(costs: DiyExtraCost[], fee: DiyCommonFee, enable
   if (costs.some((cost) => cost.commonFeeId === fee.id)) return costs;
   return [
     ...costs,
-    { commonFeeId: fee.id, name: fee.name, amount: fee.amount, quoteAmount: fee.quoteAmount },
+    {
+      commonFeeId: fee.id,
+      name: fee.name,
+      quantity: 1,
+      amount: fee.amount,
+      quoteAmount: fee.quoteAmount,
+    },
   ];
 }

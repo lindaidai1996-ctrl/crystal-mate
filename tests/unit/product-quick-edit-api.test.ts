@@ -15,6 +15,7 @@ vi.mock('@/lib/db', () => ({
     product: { update: mocks.update },
     $transaction: (callback: (tx: object) => Promise<unknown>) =>
       callback({
+        priceScheme: { findMany: vi.fn(async () => []) },
         product: { findUnique: mocks.findUnique, update: mocks.update },
         cabochonMeasurement: {
           upsert: mocks.measurementUpsert,

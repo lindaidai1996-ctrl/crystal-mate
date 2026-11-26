@@ -2,7 +2,8 @@
 
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
-import { Link } from '@/i18n/navigation';
+import { Segmented } from 'antd';
+import { useRouter } from '@/i18n/navigation';
 import pricingStyles from './materialPricingPage.module.css';
 
 const pages = [
@@ -23,31 +24,41 @@ export function MaterialPricingNavigation({
   groupId?: string;
 }) {
   const t = useTranslations('materialPricing');
+  const router = useRouter();
   const navigation = useRef<HTMLElement>(null);
   useEffect(() => {
     const container = navigation.current;
-    const current = container?.querySelector<HTMLElement>('[aria-current="page"]');
-    if (!container || !current) return;
-    const start = current.offsetLeft;
-    const end = start + current.offsetWidth;
-    if (start < container.scrollLeft) container.scrollLeft = start;
-    else if (end > container.scrollLeft + container.clientWidth)
-      container.scrollLeft = end - container.clientWidth;
+    if (!container) return;
+    const revealCurrent = () => {
+      const current = container.querySelector<HTMLElement>('.ant-segmented-item-selected');
+      if (!current) return;
+      const viewport = container.getBoundingClientRect();
+      const item = current.getBoundingClientRect();
+      if (item.left < viewport.left) container.scrollLeft += item.left - viewport.left - 2;
+      else if (item.right > viewport.right) container.scrollLeft += item.right - viewport.right + 2;
+    };
+    revealCurrent();
+    const observer = new ResizeObserver(revealCurrent);
+    observer.observe(container);
+    return () => observer.disconnect();
   }, [active, t]);
   return (
     <nav ref={navigation} className={pricingStyles.navigation} aria-label={t('title')}>
-      {pages.map((page) => (
-        <Link
-          key={page.key}
-          href={{
-            pathname: `/admin/material-pricing${page.path}`,
-            ...(groupId ? { query: { group: groupId } } : {}),
-          }}
-          aria-current={active === page.key ? 'page' : undefined}
-        >
-          {t(page.label)}
-        </Link>
-      ))}
+      <Segmented
+        size="large"
+        aria-label={t('title')}
+        value={active}
+        disabled={!groupId}
+        options={pages.map((page) => ({ value: page.key, label: t(page.label) }))}
+        onChange={(key) => {
+          const page = pages.find((item) => item.key === key);
+          if (page && groupId)
+            router.push(
+              { pathname: `/admin/material-pricing${page.path}`, query: { group: groupId } },
+              { scroll: false },
+            );
+        }}
+      />
     </nav>
   );
 }

@@ -77,8 +77,8 @@ export function cardQuote(run: ProductDiyRun, currency = 'CNY'): CardQuote | nul
     rows.push({
       name: fee.name,
       specification: '',
-      quantity: '1 项',
-      unitPrice: fee.amountPerItem,
+      quantity: `${fee.quantityPerItem} 项`,
+      unitPrice: fee.unitPrice ?? null,
       subtotal: fee.amountPerItem,
     });
   }

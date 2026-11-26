@@ -1,0 +1,125 @@
+.panel {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--ant-color-primary-bg);
+  color: var(--ant-color-text);
+}
+
+.panel h3 {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px 20px;
+  min-width: 0;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary > div {
+  min-width: 0;
+}
+
+.summary dt {
+  margin-bottom: 4px;
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+}
+
+.summary dd {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.priceChange {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+
+.priceChange strong {
+  color: var(--ant-color-primary);
+}
+
+.previous {
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.controls {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.controls > button {
+  justify-self: start;
+}
+
+.help,
+.error {
+  margin: 8px 0 0;
+  font-size: 12px;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.help {
+  color: var(--ant-color-text-secondary);
+}
+
+.error,
+.summary .loss {
+  color: var(--ant-color-error-text);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-block: 4px;
+}
+
+.footer .summary {
+  flex: 1;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.footer > button {
+  flex-shrink: 0;
+}
+
+@media (max-width: 767px) {
+  .panel {
+    padding: 16px;
+  }
+
+  .summary,
+  .footer .summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 16px;
+  }
+
+  .footer {
+    display: grid;
+    gap: 12px;
+  }
+
+  .controls > button,
+  .footer > button,
+  .controls :global(.ant-input-affix-wrapper) {
+    min-height: 44px;
+  }
+
+  .controls > button {
+    justify-self: stretch;
+  }
+}

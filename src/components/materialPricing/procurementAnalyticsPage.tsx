@@ -8,7 +8,7 @@ import { Decimal } from '@prisma/client/runtime/index-browser.js';
 import { DateRangeFilter } from '@/components/date-range-filter';
 import { BatchTrendChart } from '@/components/batchComparison/batchTrendChart';
 import { Sensitive, usePrivacyMode } from '@/components/privacyMode';
-import { Link, usePathname, useRouter } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
 import type { DateRange } from '@/lib/date-range';
 import { formatAmount } from '@/lib/format-money';
@@ -19,6 +19,8 @@ import {
   type ProcurementGranularity,
 } from '@/lib/material-pricing/analytics';
 import type { ProcurementCatalog } from '@/lib/material-pricing/purchase-service';
+import { useMaterialPricingGroup } from './useMaterialPricingGroup';
+import { MaterialPricingGroupSwitcher } from './materialPricingGroupSwitcher';
 import { MaterialPricingNavigation } from './materialPricingNavigation';
 import { ProcurementPieChart } from './procurementPieChart';
 import analysisStyles from './procurementAnalytics.module.css';
@@ -30,9 +32,9 @@ const money = (value: string | null) => (value === null ? '—' : `¥${formatAmo
 export function ProcurementAnalyticsPage({ initialGroupId }: { initialGroupId?: string }) {
   const t = useTranslations('procurementAnalytics');
   const ledger = useTranslations('silverProcurement');
+  const pricing = useTranslations('materialPricing');
   const common = useTranslations('common');
-  const pathname = usePathname(),
-    router = useRouter();
+  const { groupId, selectGroup: changeGroup } = useMaterialPricingGroup(initialGroupId);
   const privacy = usePrivacyMode();
   const [data, setData] = useState<ProcurementCatalog>();
   const [loading, setLoading] = useState(true),
@@ -44,9 +46,7 @@ export function ProcurementAnalyticsPage({ initialGroupId }: { initialGroupId?: 
   const [metric, setMetric] = useState<TrendMetric>('weight');
   const [shareMetric, setShareMetric] = useState<'weight' | 'amount'>('weight');
   const [priceMetric, setPriceMetric] = useState<PriceMetric>('actualPrice');
-  const group = initialGroupId ?? '';
-  const changeGroup = (id: string) =>
-    router.replace({ pathname, query: id ? { group: id } : {} }, { scroll: false });
+  const group = data?.groups.find((item) => item.id === groupId)?.id ?? data?.groups[0]?.id;
   const refresh = () => {
     setLoading(true);
     setRevision((value) => value + 1);
@@ -116,27 +116,21 @@ export function ProcurementAnalyticsPage({ initialGroupId }: { initialGroupId?: 
     <div className={analysisStyles.page}>
       <div className="page-heading">
         <div>
-          <h1>{t('title')}</h1>
+          <h1>{pricing('title')}</h1>
           <p>{t('subtitle')}</p>
         </div>
         <Button icon={<ReloadOutlined />} loading={loading} onClick={refresh}>
           {ledger('refresh')}
         </Button>
       </div>
-      <MaterialPricingNavigation active="analytics" groupId={group || undefined} />
+      <MaterialPricingGroupSwitcher
+        groups={data?.groups ?? []}
+        selected={group}
+        loading={loading}
+        onChange={changeGroup}
+      />
+      <MaterialPricingNavigation active="analytics" groupId={group} />
       <div className={analysisStyles.filters}>
-        <Select
-          aria-label={ledger('group')}
-          placeholder={loading ? common('loading') : t('allGroups')}
-          loading={loading}
-          disabled={loading && !data?.groups.length}
-          allowClear
-          showSearch
-          optionFilterProp="label"
-          value={data?.groups.find((item) => item.id === group)?.id}
-          options={data?.groups.map((item) => ({ value: item.id, label: item.name })) ?? []}
-          onChange={(value) => changeGroup(value ?? '')}
-        />
         <Select
           aria-label={ledger('supplier')}
           placeholder={t('allSuppliers')}
@@ -156,7 +150,6 @@ export function ProcurementAnalyticsPage({ initialGroupId }: { initialGroupId?: 
         />
         <Button
           onClick={() => {
-            changeGroup('');
             setSupplier('');
             setDates(null);
           }}

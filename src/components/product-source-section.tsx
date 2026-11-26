@@ -1,6 +1,10 @@
 'use client';
 
+import { SchemePriceFields } from './priceSchemes/schemePriceFields';
+import { priceContext } from '@/lib/price-schemes/variables';
 import { PricingGroupFields } from '@/components/productEditor/pricingGroupFields';
+import { DiySalePricing, DiySalePricingFooter } from '@/components/productEditor/diySalePricing';
+import { useDiySalePricing } from '@/components/productEditor/useDiySalePricing';
 
 import { DiyPicker, type PickerPreferences } from '@/components/diyPicker/diyPicker';
 import { applyPickerSelection, preferredMaterialUsageUnit } from '@/lib/diy-picker/draft';
@@ -16,6 +20,7 @@ import {
   App,
   Button,
   Checkbox,
+  ConfigProvider,
   Input,
   InputNumber,
   Popconfirm,
@@ -395,10 +400,22 @@ function SourceFields({
               });
             return (
               <div className="product-material-row-container" key={`material-${index}`}>
+                <div className="product-material-row-heading">
+                  <strong>{t('materialNumber', { number: index + 1 })}</strong>
+                  <Tooltip title={t('removeMaterial')}>
+                    <Button
+                      danger
+                      icon={<DeleteOutlined />}
+                      aria-label={t('removeMaterial')}
+                      onClick={() =>
+                        update({ materials: value.materials.filter((_, at) => at !== index) })
+                      }
+                    />
+                  </Tooltip>
+                </div>
                 <div className="product-material-row">
                   <div className="product-material-inputs">
                     <div className="source-field source-field-wide">
-                      <span>{t('material')}</span>
                       <MaterialSourceSelect
                         options={materialOptions}
                         selected={selected}
@@ -491,16 +508,6 @@ function SourceFields({
                       unitCost={line.unitCost}
                       quoteUnitPrice={line.quoteUnitPrice}
                     />
-                    <Tooltip title={t('removeMaterial')}>
-                      <Button
-                        danger
-                        icon={<DeleteOutlined />}
-                        aria-label={t('removeMaterial')}
-                        onClick={() =>
-                          update({ materials: value.materials.filter((_, at) => at !== index) })
-                        }
-                      />
-                    </Tooltip>
                   </div>
                   {selected && (
                     <MaterialSourceSummary
@@ -897,6 +904,7 @@ export function ProductSourceSection({
           }
         : initialSource(quickEdit ? 'DIY' : 'PURCHASED'),
   );
+  const pricing = useDiySalePricing(draft, product);
   const [saving, setSaving] = useState(false);
   const [adjustOpen, setAdjustOpen] = useState(false);
   const materialRequest = useRef(0);
@@ -1001,7 +1009,9 @@ export function ProductSourceSection({
           notes: purchase.notes,
         });
       } else if (run) {
-        setDraft(diySourceDraft(run));
+        const nextDraft = diySourceDraft(run);
+        setDraft(nextDraft);
+        if (quickEdit) pricing.reset(nextDraft);
         setMaterials((current) => [
           ...diyMaterialOptions(run),
           ...current.filter(
@@ -1031,8 +1041,12 @@ export function ProductSourceSection({
 
   function closeEditor() {
     if (saving) return;
-    setMode(null);
-    onEditorClose?.();
+    const close = () => {
+      setMode(null);
+      onEditorClose?.();
+    };
+    if (quickEdit) pricing.confirmDiscard(close);
+    else close();
   }
 
   async function refreshProduct() {
@@ -1041,6 +1055,11 @@ export function ProductSourceSection({
   }
 
   async function saveSource() {
+    if (saving) return;
+    if (quickEdit && pricing.payload === null) {
+      message.error(t('salePricingInvalid'));
+      return;
+    }
     if (!product || !mode || !productSourceSchema.safeParse(draft).success) {
       message.error(t('invalid'));
       return;
@@ -1053,16 +1072,39 @@ export function ProductSourceSection({
           : sourceId
             ? `/api/products/${product.id}/sources/${sourceId}`
             : `/api/products/${product.id}/sources`;
-      await apiFetch(url, { method: mode === 'add' ? 'POST' : 'PUT', body: JSON.stringify(draft) });
+      const body =
+        quickEdit && pricing.edited
+          ? {
+              source: draft,
+              pricing: pricing.payload,
+            }
+          : draft;
+      const saved = await apiFetch<
+        Pick<
+          Product,
+          | 'stock'
+          | 'priceCents'
+          | 'saleManual'
+          | 'saleRule'
+          | 'saleRuleValue'
+          | 'updatedAt'
+          | 'purchaseEntries'
+          | 'diyRuns'
+          | 'stockAdjustments'
+        >
+      >(url, { method: mode === 'add' ? 'POST' : 'PUT', body: JSON.stringify(body) });
+      if (quickEdit) onProductChanged({ ...product, ...saved });
       await refreshProduct();
       setMode(null);
       onEditorClose?.();
       message.success(common('saved'));
     } catch (error) {
       message.error(
-        error instanceof ClientApiError && error.code === 'PRODUCT_STOCK_OUT_OF_RANGE'
-          ? t('stockError')
-          : t('invalid'),
+        error instanceof ClientApiError && error.code === 'PRODUCT_PRICE_CHANGED'
+          ? t('salePriceChanged')
+          : error instanceof ClientApiError && error.code === 'PRODUCT_STOCK_OUT_OF_RANGE'
+            ? t('stockError')
+            : t('invalid'),
       );
     } finally {
       setSaving(false);
@@ -1136,7 +1178,7 @@ export function ProductSourceSection({
                 <span>{t('currentStock', { count: product.stock })}</span>
                 {records.length > 0 && (
                   <Button icon={<EditOutlined />} onClick={() => open('edit', records[0].id)}>
-                    {product.origin === 'DIY' ? t('diyConfiguration') : t('editRecord')}
+                    {product.origin === 'DIY' ? t('diyMaterialsConfiguration') : t('editRecord')}
                   </Button>
                 )}
                 <Button icon={<PlusOutlined />} onClick={() => open('add')}>
@@ -1231,11 +1273,27 @@ export function ProductSourceSection({
         }
         open={mode !== null}
         onClose={closeEditor}
+        closable={!saving}
+        maskClosable={!saving}
+        keyboard={!saving}
         width="min(1280px, 100vw)"
         extra={
-          <Button type="primary" loading={saving} onClick={() => void saveSource()}>
-            {t('save')}
-          </Button>
+          !quickEdit && (
+            <Button type="primary" loading={saving} onClick={() => void saveSource()}>
+              {t('save')}
+            </Button>
+          )
+        }
+        footer={
+          quickEdit && product ? (
+            <DiySalePricingFooter
+              summary={pricing.summary}
+              currentPrice={product.priceCents}
+              saving={saving}
+              valid={pricing.payload !== null}
+              onSave={() => void saveSource()}
+            />
+          ) : undefined
         }
       >
         {quickEdit && product && product.diyRuns.length > 1 && (
@@ -1244,7 +1302,7 @@ export function ProductSourceSection({
             <Select
               value={sourceId}
               disabled={saving}
-              onChange={(id: string) => open('edit', id)}
+              onChange={(id: string) => pricing.confirmDiscard(() => open('edit', id))}
               options={product.diyRuns.map((run, index) => ({
                 value: run.id,
                 label: t('diyRecordOption', {
@@ -1264,22 +1322,58 @@ export function ProductSourceSection({
             className="product-source-warning"
           />
         )}
-        <SourceFields
-          key={`${mode ?? 'closed'}-${sourceId ?? 'new'}`}
-          value={draft}
-          onChange={setDraft}
-          batches={batches}
-          distributors={distributors}
-          materials={materials}
-          materialOptions={materialOptions}
-          materialPreview={materialPreview}
-          cabochons={cabochons}
-          excludeProductId={product?.id}
-          onPickerOptions={rememberPickerOptions}
-          onMaterialSearch={searchMaterials}
-          onCabochonSearch={searchCabochons}
-          allowOriginChange={mode === 'correct'}
-        />
+        <ConfigProvider componentDisabled={saving}>
+          <SourceFields
+            key={`${mode ?? 'closed'}-${sourceId ?? 'new'}`}
+            value={draft}
+            onChange={setDraft}
+            batches={batches}
+            distributors={distributors}
+            materials={materials}
+            materialOptions={materialOptions}
+            materialPreview={materialPreview}
+            cabochons={cabochons}
+            excludeProductId={product?.id}
+            onPickerOptions={rememberPickerOptions}
+            onMaterialSearch={searchMaterials}
+            onCabochonSearch={searchCabochons}
+            allowOriginChange={mode === 'correct'}
+          />
+        </ConfigProvider>
+        {quickEdit && product && (
+          <>
+            <DiySalePricing
+              key={sourceId ?? 'new'}
+              summary={pricing.summary}
+              currentPrice={product.priceCents}
+              value={pricing.value}
+              onChange={pricing.changePricing}
+              valid={pricing.payload !== null}
+              disabled={saving}
+              multipleRuns={product.diyRuns.length > 1}
+            />
+            <SchemePriceFields
+              value={pricing.schemePrices}
+              onChange={pricing.changeSchemePrices}
+              disabled={saving}
+              saved={product.schemePrices}
+              context={priceContext(
+                false,
+                null,
+                sourceId &&
+                  sourceId !==
+                    [...product.diyRuns].sort(
+                      (a, b) =>
+                        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime() ||
+                        b.id.localeCompare(a.id),
+                    )[0]?.id
+                  ? product
+                  : draft,
+                pricing.value.price,
+              )}
+            />
+          </>
+        )}
       </Drawer>
       {adjustOpen && product && (
         <StockAdjustmentDrawer

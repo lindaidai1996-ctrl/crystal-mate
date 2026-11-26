@@ -74,7 +74,7 @@ describe('product pricing', () => {
     expect(productPricingCost(false, cost, purchase).amount).toBe('100.00');
   });
 
-  it('uses purchase unit cost and DIY run total, rounding each material line first', () => {
+  it('uses per-item cost for purchases and DIY, rounding each material line first', () => {
     expect(productPricingCost(false, null, purchase).amount).toBe('100.00');
     const diy = {
       origin: 'DIY' as const,
@@ -91,10 +91,10 @@ describe('product pricing', () => {
       cabochons: [{ productId: 'egg', quantity: 1, unitCost: '20' }],
       extraCosts: [{ name: 'parts', amount: '2' }],
     };
-    expect(productPricingCost(false, null, diy).amount).toBe('66.03');
+    expect(productPricingCost(false, null, diy).amount).toBe('22.01');
     expect(productPricingCost(false, null, { ...diy, quantity: 0 }).amount).toBeNull();
     expect(productPricingCost(false, null, { ...diy, materials: [], cabochons: [] }).amount).toBe(
-      '6.00',
+      '2.00',
     );
   });
 
@@ -127,7 +127,7 @@ describe('product pricing', () => {
         origin: 'DIY',
         diyRuns: [{ id: 'run', createdAt: old.createdAt, quantity: 3, perUnitCost: '32.00' }],
       }).amount,
-    ).toBe('96.00');
+    ).toBe('32.00');
   });
 
   it('keeps manual prices until a rule, parameter or cleared price restores automation', () => {

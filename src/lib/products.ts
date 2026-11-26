@@ -1,3 +1,10 @@
+import {
+  checkPriceState,
+  syncSchemePrices,
+  schemePriceInclude,
+  serializeSchemePrices,
+  priceStateToken,
+} from './price-schemes/store';
 import { sameOrderedRows } from './unchanged-relations';
 import { readImageFraming, serializeImageFraming } from '@/lib/image-framing';
 import { Prisma } from '@prisma/client';
@@ -23,6 +30,7 @@ import {
 type ProductInput = z.infer<typeof productSchema>;
 
 export const productInclude = {
+  schemePrices: { include: schemePriceInclude },
   category: true,
   images: { orderBy: { position: 'asc' } },
   tags: { include: { tag: true } },
@@ -68,6 +76,8 @@ export function serializeProduct(product: ProductWithRelations) {
         }
       : null,
     ...serializeProductSources(product),
+    schemePrices: serializeSchemePrices(product.schemePrices),
+    schemePricesToken: priceStateToken(product),
   };
 }
 
@@ -101,6 +111,9 @@ export async function saveProduct(input: ProductInput, id?: string, context?: Pr
       ? await tx.product.findUnique({ where: { id }, include: { images: true } })
       : null;
     if (id && !current) throw new ApiError(404, 'NOT_FOUND');
+    if (id && input.schemePrices && !input.schemePrices.expectedToken)
+      throw new ApiError(409, 'SCHEME_PRICE_CHANGED');
+    if (id) await checkPriceState(tx, id, input.schemePrices?.expectedToken);
     if (!id && !input.source && !context?.historicalStock)
       throw new ApiError(400, 'PRODUCT_SOURCE_REQUIRED');
     if (id && input.source) throw new ApiError(400, 'INVALID_INPUT');
@@ -266,7 +279,12 @@ export async function saveProduct(input: ProductInput, id?: string, context?: Pr
       });
       saved.updatedAt = updated.updatedAt;
     }
-    return serializeProduct(saved);
+    await syncSchemePrices(tx, saved.id, input.schemePrices);
+    const priced = await tx.product.findUniqueOrThrow({
+      where: { id: saved.id },
+      include: productInclude,
+    });
+    return serializeProduct(priced);
   };
   return context ? operation(context.tx) : withProductTransaction(operation);
 }

@@ -53,6 +53,21 @@
   grid-column: span 6;
 }
 
+.measurements {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-bottom: 28px;
+}
+
+.measurementHeading {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.measurements :global(.measurement-fields) {
+  margin-bottom: 16px;
+}
+
 .leadImage {
   aspect-ratio: 1;
   margin-bottom: 20px;
@@ -156,6 +171,9 @@
   }
   .editor :global(.editor-field-stock) {
     grid-column: 1 / -1;
+  }
+  .measurements {
+    margin-bottom: 20px;
   }
   .leadImage {
     width: 88px;

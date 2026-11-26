@@ -1,6 +1,6 @@
 'use client';
 
-import { InputNumber, Radio } from 'antd';
+import { Input, InputNumber, Radio } from 'antd';
 import { CompactFields } from '@/components/responsive/compactFields';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
@@ -29,6 +29,7 @@ export function ProductPricingFields({
   const automaticMarkup = useRef<boolean | null>(null);
   useEffect(() => {
     if (!value) return;
+    if (value.saleManual) automaticMarkup.current = false;
     if (quote === undefined) automaticMarkup.current = null;
     else if (automaticMarkup.current === null) {
       const defaultPricing = diyQuotePricing(cost, quote);
@@ -106,19 +107,15 @@ export function ProductPricingFields({
         )}
         <label className="source-field">
           <span>{t('price')}</span>
-          <InputNumber<string>
-            stringMode
-            min="0"
-            max="21474836.47"
-            precision={2}
-            step="0.01"
+          <Input
+            inputMode="decimal"
             style={{ width: '100%' }}
-            value={value.price}
+            value={value.price ?? ''}
             suffix="¥"
             aria-label={t('price')}
-            onChange={(price) => {
+            onChange={(event) => {
               automaticMarkup.current = false;
-              onChange?.(editProductPricing(value, cost, { price }));
+              onChange?.(editProductPricing(value, cost, { price: event.target.value || null }));
             }}
           />
         </label>
@@ -130,9 +127,7 @@ export function ProductPricingFields({
               ? 'customAmountHelp'
               : value.saleManual
                 ? 'manualPriceHelp'
-                : quote !== undefined
-                  ? 'diyAutoPriceHelp'
-                  : 'autoPriceHelp',
+                : 'autoPriceHelp',
           )}
         </p>
       )}

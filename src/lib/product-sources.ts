@@ -1,3 +1,4 @@
+import { syncSchemePrices, checkPriceState } from './price-schemes/store';
 import { resolvePricingLines } from './material-pricing/diy-lines';
 import { recordSavedDiyUsage } from '@/lib/diy-picker/recent';
 import { sameOrderedRows } from './unchanged-relations';
@@ -7,6 +8,8 @@ import { z } from 'zod';
 import { ApiError } from '@/lib/api';
 import { db } from '@/lib/db';
 import { stockTransaction } from '@/lib/stock-transaction';
+import { applySourcePrice } from './product-source-price';
+import type { SourcePriceChange } from './product-source-write';
 import { DEFAULT_SILVER_PRICING } from '@/lib/silver-cost';
 import { productSourceSchema, productStockAdjustmentSchema } from '@/lib/validation';
 import {
@@ -321,10 +324,19 @@ export async function createSource(tx: Tx, productId: string, input: SourceInput
   return entry.id;
 }
 
-export async function addProductSource(productId: string, input: SourceInput) {
+export async function addProductSource(
+  productId: string,
+  input: SourceInput,
+  pricing?: SourcePriceChange,
+) {
   return db.$transaction(
     async (tx) => {
-      await createSource(tx, productId, input);
+      if (pricing?.schemePrices && !pricing.schemePrices.expectedToken)
+        throw new ApiError(409, 'SCHEME_PRICE_CHANGED');
+      await checkPriceState(tx, productId, pricing?.schemePrices?.expectedToken);
+      const sourceId = await createSource(tx, productId, input);
+      await applySourcePrice(tx, productId, input.origin, pricing, sourceId);
+      await syncSchemePrices(tx, productId, pricing?.schemePrices);
       return tx.product.findUniqueOrThrow({
         where: { id: productId },
         include: productSourceInclude,
@@ -334,9 +346,17 @@ export async function addProductSource(productId: string, input: SourceInput) {
   );
 }
 
-export async function updateProductSource(productId: string, sourceId: string, input: SourceInput) {
+export async function updateProductSource(
+  productId: string,
+  sourceId: string,
+  input: SourceInput,
+  pricing?: SourcePriceChange,
+) {
   return db.$transaction(
     async (tx) => {
+      if (pricing?.schemePrices && !pricing.schemePrices.expectedToken)
+        throw new ApiError(409, 'SCHEME_PRICE_CHANGED');
+      await checkPriceState(tx, productId, pricing?.schemePrices?.expectedToken);
       const product = await tx.product.findUnique({
         where: { id: productId },
         select: { origin: true },
@@ -389,6 +409,8 @@ export async function updateProductSource(productId: string, sourceId: string, i
         await changeProductStock(tx, productId, input.quantity - current.quantity);
         await recordSavedDiyUsage(tx, input);
       }
+      await applySourcePrice(tx, productId, input.origin, pricing, sourceId);
+      await syncSchemePrices(tx, productId, pricing?.schemePrices);
       return tx.product.findUniqueOrThrow({
         where: { id: productId },
         include: productSourceInclude,
@@ -408,6 +430,7 @@ export async function deleteProductSource(productId: string, sourceId: string) {
       await changeProductStock(tx, productId, -entry.quantity);
       if (purchase) await tx.productPurchaseEntry.delete({ where: { id: sourceId } });
       else await tx.productDiyRun.delete({ where: { id: sourceId } });
+      await syncSchemePrices(tx, productId);
       return tx.product.findUniqueOrThrow({
         where: { id: productId },
         include: productSourceInclude,
@@ -437,6 +460,7 @@ export async function correctProductOrigin(productId: string, input: SourceInput
       await tx.product.update({ where: { id: productId }, data: { origin: input.origin } });
       if (input.origin === 'PURCHASED') await writePurchase(tx, productId, input);
       else await writeDiy(tx, productId, input);
+      await syncSchemePrices(tx, productId);
       return tx.product.findUniqueOrThrow({
         where: { id: productId },
         include: productSourceInclude,

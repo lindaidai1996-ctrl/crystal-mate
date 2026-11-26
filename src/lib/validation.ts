@@ -1,3 +1,4 @@
+import { schemePricesWriteSchema } from './price-schemes/contracts';
 import { pricingLineSchema } from './material-pricing/contracts';
 import { ownerSchema } from './shared-attachment-contracts';
 import { imageFramingsSchema } from './image-framing';
@@ -11,7 +12,7 @@ import { imageObjectKeyPattern } from './image-storage';
 import { MAX_ATTACHMENTS } from './attachments';
 import { normalizeAliases } from './catalog-aliases';
 import { createdTimeFilterFields, validCreatedTimeRange } from './date-range';
-import { commonFeeIdSchema } from './diy-common-fees';
+import { commonFeeIdSchema, diyFeeQuantitySchema } from './diy-common-fees';
 
 export const catalogAliasesSchema = z
   .array(z.string().trim().max(120))
@@ -428,6 +429,7 @@ export const productDiySchema = z
           amount: costAmount,
           quoteAmount: costAmount.nullable().optional(),
           commonFeeId: commonFeeIdSchema.optional(),
+          quantity: diyFeeQuantitySchema.optional(),
         }),
       )
       .max(50),
@@ -465,57 +467,69 @@ export const productSourceSchema = z.discriminatedUnion('origin', [
   productDiySchema,
 ]);
 
+export function validateProductPricing(
+  input: {
+    saleRule?: (typeof productSaleRules)[number];
+    saleRuleValue?: string | null;
+    saleManual?: boolean;
+  },
+  context: z.RefinementCtx,
+) {
+  const hasPricing =
+    input.saleRule !== undefined ||
+    input.saleRuleValue !== undefined ||
+    input.saleManual !== undefined;
+  if (input.saleRule === 'CUSTOM_AMOUNT') {
+    if (input.saleManual !== true)
+      context.addIssue({
+        code: 'custom',
+        path: ['saleManual'],
+        message: 'Custom amount requires manual pricing',
+      });
+    if (input.saleRuleValue != null)
+      context.addIssue({
+        code: 'custom',
+        path: ['saleRuleValue'],
+        message: 'Custom amount does not use a markup parameter',
+      });
+  }
+  if (input.saleRule !== 'FIXED_AMOUNT' && input.saleRuleValue?.startsWith('-'))
+    context.addIssue({
+      code: 'custom',
+      path: ['saleRuleValue'],
+      message: 'Negative values require fixed amount pricing',
+    });
+  if (
+    hasPricing &&
+    (input.saleRule === undefined ||
+      input.saleRuleValue === undefined ||
+      input.saleManual === undefined)
+  ) {
+    context.addIssue({
+      code: 'custom',
+      path: ['saleRule'],
+      message: 'Complete pricing fields required',
+    });
+  }
+  if (
+    input.saleManual === false &&
+    (input.saleRule === 'FIXED_AMOUNT' || input.saleRule === 'CUSTOM_PERCENT') &&
+    input.saleRuleValue == null
+  ) {
+    context.addIssue({
+      code: 'custom',
+      path: ['saleRuleValue'],
+      message: 'Pricing parameter required',
+    });
+  }
+}
+
 export const productSchema = baseProductSchema
-  .extend({ source: productSourceSchema.optional() })
-  .superRefine((input, context) => {
-    const hasPricing =
-      input.saleRule !== undefined ||
-      input.saleRuleValue !== undefined ||
-      input.saleManual !== undefined;
-    if (input.saleRule === 'CUSTOM_AMOUNT') {
-      if (input.saleManual !== true)
-        context.addIssue({
-          code: 'custom',
-          path: ['saleManual'],
-          message: 'Custom amount requires manual pricing',
-        });
-      if (input.saleRuleValue != null)
-        context.addIssue({
-          code: 'custom',
-          path: ['saleRuleValue'],
-          message: 'Custom amount does not use a markup parameter',
-        });
-    }
-    if (input.saleRule !== 'FIXED_AMOUNT' && input.saleRuleValue?.startsWith('-'))
-      context.addIssue({
-        code: 'custom',
-        path: ['saleRuleValue'],
-        message: 'Negative values require fixed amount pricing',
-      });
-    if (
-      hasPricing &&
-      (input.saleRule === undefined ||
-        input.saleRuleValue === undefined ||
-        input.saleManual === undefined)
-    ) {
-      context.addIssue({
-        code: 'custom',
-        path: ['saleRule'],
-        message: 'Complete pricing fields required',
-      });
-    }
-    if (
-      input.saleManual === false &&
-      (input.saleRule === 'FIXED_AMOUNT' || input.saleRule === 'CUSTOM_PERCENT') &&
-      input.saleRuleValue == null
-    ) {
-      context.addIssue({
-        code: 'custom',
-        path: ['saleRuleValue'],
-        message: 'Pricing parameter required',
-      });
-    }
-  });
+  .extend({
+    source: productSourceSchema.optional(),
+    schemePrices: schemePricesWriteSchema.optional(),
+  })
+  .superRefine(validateProductPricing);
 
 const legacyProductStockAdjustmentSchema = z.strictObject({
   delta: z

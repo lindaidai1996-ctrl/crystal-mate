@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Alert, App, Button, Input, InputNumber, Select, Table, Tag } from 'antd';
 import { PlusOutlined, ReloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { apiFetch, ClientApiError } from '@/lib/client-api';
-import { Link, usePathname, useRouter } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
 import { DateInput } from '@/components/date-input';
 import { DateRangeFilter } from '@/components/date-range-filter';
 import type { DateRange } from '@/lib/date-range';
@@ -13,6 +13,8 @@ import {
   filterProcurementRows,
   procurementSupplierOptions,
 } from '@/lib/material-pricing/analytics';
+import { useMaterialPricingGroup } from './useMaterialPricingGroup';
+import { MaterialPricingGroupSwitcher } from './materialPricingGroupSwitcher';
 import { MaterialPricingNavigation } from './materialPricingNavigation';
 import { ResponsiveDrawer } from '@/components/responsive/responsiveDialog';
 import { Sensitive, usePrivacyMode } from '@/components/privacyMode';
@@ -39,9 +41,9 @@ export function ProcurementLedger({
 }) {
   const t = useTranslations('silverProcurement'),
     common = useTranslations('common');
+  const pricing = useTranslations('materialPricing');
   const { message, modal } = App.useApp();
-  const pathname = usePathname();
-  const router = useRouter();
+  const { groupId, selectGroup } = useMaterialPricingGroup(initialGroupId);
   const privacy = usePrivacyMode();
   const [data, setData] = useState<ProcurementCatalog>({
     items: [],
@@ -54,10 +56,11 @@ export function ProcurementLedger({
     [error, setError] = useState(''),
     [revision, setRevision] = useState(0);
   const [localGroup, setGroup] = useState(initialGroupId ?? '');
-  const group = standalone ? (initialGroupId ?? '') : localGroup;
+  const group = standalone
+    ? (data.groups.find((item) => item.id === groupId)?.id ?? data.groups[0]?.id)
+    : localGroup;
   const changeGroup = (value: string) => {
-    if (standalone)
-      router.replace({ pathname, query: value ? { group: value } : {} }, { scroll: false });
+    if (standalone) selectGroup(value);
     else setGroup(value);
   };
   const [supplier, setSupplier] = useState('');
@@ -119,7 +122,6 @@ export function ProcurementLedger({
     () => filterProcurementRows(scopedRows, { distributorId: activeSupplier }),
     [scopedRows, activeSupplier],
   );
-  const groups = data.groups.map((item) => ({ value: item.id, label: item.name }));
   const materialOptions = data.materials.map((item) => ({
     value: item.id,
     label: `${item.pricingGroup!.name} · ${item.name}`,
@@ -239,12 +241,18 @@ export function ProcurementLedger({
       {standalone && (
         <div className="page-heading">
           <div>
-            <h1>{t('title')}</h1>
+            <h1>{pricing('title')}</h1>
             <p className={ledgerStyles.muted}>{t('subtitle')}</p>
           </div>
         </div>
       )}
-      {standalone && <MaterialPricingNavigation active="purchases" groupId={group || undefined} />}
+      <MaterialPricingGroupSwitcher
+        groups={data.groups}
+        selected={group}
+        loading={loading}
+        onChange={changeGroup}
+      />
+      {standalone && <MaterialPricingNavigation active="purchases" groupId={group} />}
       <div className={ledgerStyles.toolbar}>
         <Button
           type="primary"
@@ -290,16 +298,6 @@ export function ProcurementLedger({
       {privacy && <Alert type="info" message={t('privacyHint')} />}
       <div className={ledgerStyles.toolbar}>
         <Select
-          aria-label={t('group')}
-          placeholder={loading ? common('loading') : t('group')}
-          loading={loading}
-          disabled={loading && !groups.length}
-          allowClear
-          value={groups.find((item) => item.value === group)?.value}
-          options={groups}
-          onChange={(value) => changeGroup(value ?? '')}
-        />
-        <Select
           aria-label={t('supplier')}
           placeholder={t('supplier')}
           allowClear
@@ -327,7 +325,7 @@ export function ProcurementLedger({
         />
         <Button
           onClick={() => {
-            changeGroup('');
+            if (!standalone) changeGroup('');
             setSupplier('');
             setDates(null);
           }}

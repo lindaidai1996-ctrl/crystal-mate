@@ -171,6 +171,8 @@ export type CabochonCost = {
   totalManual: boolean;
 };
 export type Product = {
+  schemePrices?: import('./price-schemes/contracts').SchemePrice[];
+  schemePricesToken?: string;
   id: string;
   code: string;
   name: string;
